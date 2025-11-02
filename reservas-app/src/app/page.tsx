@@ -3,6 +3,13 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/utils/supabaseClient";
 import { BookingFormWrapper } from "@/components/home/BookingFormWrapper";
+import BookingSteps from "@/components/booking/BookingSteps";
+import TrustIndicators from "@/components/home/TrustIndicators";
+import ValueProposition from "@/components/home/ValueProposition";
+import VisualProof from "@/components/home/VisualProof";
+import GoogleReviews from "@/components/home/GoogleReviews";
+import FAQ from "@/components/home/FAQ";
+import FinalCTA from "@/components/home/FinalCTA";
 
 interface Location {
   id: string;
@@ -45,13 +52,14 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen">
+      {/* Navigation */}
       <nav className="absolute top-0 left-0 right-0 z-50 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
             <div className="relative w-40 h-12 md:w-48 md:h-14">
               <Image
                 src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/private-shuttle-logo-white.png"
-                alt="Can't Wait Travel"
+                alt="Can't Wait Travel - Costa Rica Private Shuttle Service"
                 fill
                 className="object-contain"
                 priority
@@ -64,7 +72,7 @@ export default async function Home() {
             <Link href="/transfers" className="text-white hover:text-gray-200 transition font-medium">Transfers</Link>
             <Link href="/about" className="text-white hover:text-gray-200 transition font-medium">About</Link>
             <Link href="/contact" className="text-white hover:text-gray-200 transition font-medium">Contact</Link>
-            <Button size="lg" className="rounded-full px-8">Book</Button>
+            <Button size="lg" className="rounded-full px-8">Book Now</Button>
           </div>
 
           <div className="md:hidden">
@@ -73,11 +81,12 @@ export default async function Home() {
         </div>
       </nav>
 
+      {/* Hero Section */}
       <section className="relative h-screen">
         <div className="absolute inset-0 z-0">
           <Image
             src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/private-shuttle-costa-rica-service.WEBP"
-            alt="Costa Rica"
+            alt="Private Shuttle Costa Rica - Airport Transportation SJO LIR"
             fill
             className="object-cover"
             priority
@@ -95,7 +104,8 @@ export default async function Home() {
               Reliable Airport Shuttles & Door-to-Door Service in Costa Rica
             </p>
             <p className="text-base md:text-lg text-white/95 max-w-2xl mx-auto drop-shadow-md">
-              Safe, comfortable, and professional transportation across Costa Rica
+              Safe, comfortable, and professional transportation from San José (SJO) and Liberia (LIR) airports 
+              to La Fortuna, Manuel Antonio, Tamarindo, Monteverde, and all major destinations
             </p>
           </div>
 
@@ -107,58 +117,90 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* Booking Form */}
       <section className="relative -mt-32 z-20 px-6 pb-20">
         <BookingFormWrapper locations={locations} />
       </section>
 
-      <section className="py-20 px-6 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">Why Choose Us?</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition">
-              <div className="w-16 h-16 mx-auto mb-4 bg-primary rounded-full flex items-center justify-center">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Professional Service</h3>
-              <p className="text-gray-600">Experienced drivers</p>
-            </div>
-            <div className="text-center p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition">
-              <div className="w-16 h-16 mx-auto mb-4 bg-primary rounded-full flex items-center justify-center">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Transparent Pricing</h3>
-              <p className="text-gray-600">No hidden fees</p>
-            </div>
-            <div className="text-center p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition">
-              <div className="w-16 h-16 mx-auto mb-4 bg-primary rounded-full flex items-center justify-center">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">24/7 Availability</h3>
-              <p className="text-gray-600">Always ready</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ✨ NEW SECTIONS - TRUST BUILDING ✨ */}
+      
+      {/* Booking Steps - How to Book */}
+      <BookingSteps />
 
+      {/* Trust Indicators - Licensed, Insured, Professional */}
+      <TrustIndicators />
+
+      {/* Value Proposition - Why Choose Us + Guarantees */}
+      <ValueProposition />
+
+      {/* Visual Proof - Photo Gallery */}
+      <VisualProof />
+
+      {/* Google Reviews - 4 Real Reviews */}
+      <GoogleReviews />
+
+      {/* FAQ - 10 Questions */}
+      <FAQ />
+
+      {/* Final CTA - Contact & Booking */}
+      <FinalCTA />
+
+      {/* Footer - Enhanced */}
       <footer className="bg-gray-900 text-white py-12 px-6">
-        <div className="max-w-7xl mx-auto text-center">
-          <div className="mb-4 flex items-center justify-center">
-            <div className="relative w-40 h-10">
-              <Image
-                src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/private-shuttle-logo-white.png"
-                alt="Can't Wait Travel"
-                fill
-                className="object-contain"
-              />
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            {/* Logo & Description */}
+            <div className="md:col-span-2">
+              <div className="mb-4 flex items-center">
+                <div className="relative w-40 h-10">
+                  <Image
+                    src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/private-shuttle-logo-white.png"
+                    alt="Can't Wait Travel Logo"
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+              </div>
+              <p className="text-gray-400 text-sm mb-4">
+                Professional private shuttle service in Costa Rica. Licensed by ICT, 
+                fully insured, and trusted by travelers worldwide.
+              </p>
+              <p className="text-gray-500 text-xs">
+                Business License: ICT-XXXXX
+              </p>
+            </div>
+
+            {/* Quick Links */}
+            <div>
+              <h3 className="font-bold mb-3">Quick Links</h3>
+              <ul className="space-y-2 text-sm text-gray-400">
+                <li><Link href="/transfers" className="hover:text-white transition">Our Routes</Link></li>
+                <li><Link href="/about" className="hover:text-white transition">About Us</Link></li>
+                <li><Link href="/contact" className="hover:text-white transition">Contact</Link></li>
+                <li><Link href="/faq" className="hover:text-white transition">FAQ</Link></li>
+              </ul>
+            </div>
+
+            {/* Legal */}
+            <div>
+              <h3 className="font-bold mb-3">Legal</h3>
+              <ul className="space-y-2 text-sm text-gray-400">
+                <li><Link href="/terms" className="hover:text-white transition">Terms & Conditions</Link></li>
+                <li><Link href="/privacy" className="hover:text-white transition">Privacy Policy</Link></li>
+                <li><Link href="/cancellation" className="hover:text-white transition">Cancellation Policy</Link></li>
+              </ul>
             </div>
           </div>
-          <p className="text-gray-400 text-sm">© {new Date().getFullYear()} Can't Wait Travel</p>
+
+          <div className="border-t border-gray-800 pt-8 text-center">
+            <p className="text-gray-400 text-sm">
+              © {new Date().getFullYear()} Can't Wait Travel Costa Rica. All rights reserved.
+            </p>
+            <p className="text-gray-500 text-xs mt-2">
+              Costa Rica Private Shuttle Service | San José Airport (SJO) | Liberia Airport (LIR) | 
+              La Fortuna | Manuel Antonio | Tamarindo | Monteverde
+            </p>
+          </div>
         </div>
       </footer>
     </main>
