@@ -1,5 +1,5 @@
 // src/components/booking/TripProgress.tsx
-// English version with Grand Total
+// Progress bar for multi-trip bookings - Shows current trip price only
 
 'use client';
 
@@ -11,7 +11,7 @@ interface TripProgressProps {
   currentTrip: number;
   totalTrips: number;
   completedTrips?: number[];
-  grandTotal?: number;
+  currentTripPrice?: number;
   totalPassengers?: number;
 }
 
@@ -19,7 +19,7 @@ export const TripProgress: React.FC<TripProgressProps> = ({
   currentTrip,
   totalTrips,
   completedTrips = [],
-  grandTotal,
+  currentTripPrice,
   totalPassengers,
 }) => {
   if (totalTrips <= 1) return null;
@@ -36,18 +36,13 @@ export const TripProgress: React.FC<TripProgressProps> = ({
           </span>
         </div>
         
-        {/* Grand Total - Compact */}
-        {grandTotal && (
-          <div className="flex items-center gap-3 bg-gradient-to-r from-blue-50 to-indigo-50 px-4 py-2 rounded-lg border border-blue-200">
+        {/* Current Trip Price Only */}
+        {currentTripPrice && (
+          <div className="flex items-center gap-2 bg-gradient-to-r from-blue-50 to-indigo-50 px-4 py-2 rounded-lg border border-blue-200">
             <div className="text-right">
-              <p className="text-xs text-gray-600 font-medium">Total Booking</p>
-              <p className="text-sm text-gray-500">
-                {totalTrips} transfers • {totalPassengers} pax
-              </p>
-            </div>
-            <div className="text-right border-l border-blue-300 pl-3">
-              <p className="text-2xl font-bold text-blue-600">
-                ${grandTotal.toFixed(2)}
+              <p className="text-xs text-gray-600 font-medium">This Transfer</p>
+              <p className="text-xl font-bold text-blue-600">
+                ${currentTripPrice.toFixed(2)}
               </p>
             </div>
           </div>

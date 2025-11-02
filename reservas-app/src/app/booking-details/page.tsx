@@ -1,5 +1,6 @@
 // src/app/booking-details/page.tsx
 // REDESIGNED VERSION - Modern UI in English with What's Included & Important Info
+// FIXED: $50 night surcharge (not 15%)
 
 'use client';
 
@@ -34,8 +35,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { TripProgress } from '@/components/booking/TripProgress';
+import { TripAddOns, calculateAddOnsPrice } from '@/components/booking/TripAddOns';
 import BookingNavbar from '@/components/booking/BookingNavbar';
-import BookingHero from '@/components/booking/BookingHero';
+import BookingStepper from '@/components/booking/BookingStepper';
 import {
   validateBookingDetails,
   sanitizeInput,
@@ -57,6 +59,7 @@ interface Trip {
   date: string;
   adults: number;
   children: number;
+  children_ages?: number[] | null;
   price: number;
   distance: number | null;
   duration: string | null;
@@ -70,6 +73,8 @@ interface Trip {
   night_surcharge?: number | null;
   fees?: number | null;
   final_price?: number | null;
+  add_ons?: string[] | null;
+  add_ons_price?: number | null;
 }
 
 interface FormData {
@@ -80,19 +85,22 @@ interface FormData {
   airline: string;
   arrival_time: string;
   special_requests: string;
+  add_ons: string[];
+  children_ages: number[];
 }
 
 /**
- * Calculate night surcharge (15% between 9 PM - 4 AM)
+ * Calculate night surcharge ($50 FIXED between 9 PM - 4 AM)
+ * IMPORTANTE: Es un cargo fijo de $50, NO un porcentaje
  */
-function calculateNightSurcharge(pickupTime: string | null | undefined, basePrice: number): number {
-  if (!pickupTime || !basePrice) return 0;
+function calculateNightSurcharge(pickupTime: string | null | undefined): number {
+  if (!pickupTime) return 0;
 
   const [hours] = pickupTime.split(':').map(Number);
   if (isNaN(hours) || hours < 0 || hours > 23) return 0;
 
   const isNightTime = hours >= 21 || hours < 4;
-  return isNightTime ? basePrice * 0.15 : 0;
+  return isNightTime ? 50 : 0;
 }
 
 function isNightTime(pickupTime: string | null | undefined): boolean {
@@ -186,43 +194,42 @@ function PuraVidaPromise() {
     {
       icon: CheckCircle,
       title: 'Instant Confirmation',
-      description: 'Your booking is confirmed the moment you pay. Receive all your details by email instantly, with no waiting or uncertainty.',
-      color: 'cyan',
+      description: 'Booking confirmed instantly upon payment.',
     },
     {
       icon: MessageSquare,
-      title: '24/7 Traveler Support',
-      description: 'Plans change? Have a question? Our dedicated support team is available around the clock via WhatsApp or phone to assist you.',
-      color: 'blue',
+      title: '24/7 Support',
+      description: 'Always available via WhatsApp or phone.',
     },
     {
       icon: Shield,
-      title: 'Worry-Free Travel',
-      description: 'We monitor flights, guarantee punctuality, and handle all the logistics. Your only job is to relax and enjoy the journey ahead.',
-      color: 'indigo',
+      title: 'Worry-Free',
+      description: 'We monitor flights and handle logistics.',
     },
   ];
 
   return (
-    <div className="bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 py-16 px-4 mt-12">
-      <div className="max-w-7xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-4">
-          Our Pura Vida Promise to You
-        </h2>
-        <div className="h-1 w-32 bg-gradient-to-r from-cyan-400 to-blue-500 mx-auto mb-12 rounded-full"></div>
+    <div className="bg-gradient-to-r from-slate-800 to-blue-900 py-8 px-4 mt-8">
+      <div className="max-w-5xl mx-auto">
+        <h3 className="text-xl font-bold text-white text-center mb-1">
+          Our Pura Vida Promise
+        </h3>
+        <div className="h-0.5 w-16 bg-cyan-400 mx-auto mb-6 rounded-full"></div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {promises.map((promise, idx) => (
-            <div key={idx} className="text-center">
-              <div className={`mx-auto mb-4 h-16 w-16 rounded-full bg-gradient-to-br from-${promise.color}-400 to-${promise.color}-600 flex items-center justify-center shadow-lg`}>
-                <promise.icon className="h-8 w-8 text-white" />
+            <div key={idx} className="flex items-start gap-3 bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10">
+              <div className="h-10 w-10 rounded-full bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
+                <promise.icon className="h-5 w-5 text-cyan-400" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-3">
-                {promise.title}
-              </h3>
-              <p className="text-blue-100 text-sm leading-relaxed">
-                {promise.description}
-              </p>
+              <div>
+                <h4 className="text-sm font-bold text-white mb-1">
+                  {promise.title}
+                </h4>
+                <p className="text-xs text-blue-100 leading-relaxed">
+                  {promise.description}
+                </p>
+              </div>
             </div>
           ))}
         </div>
@@ -357,6 +364,8 @@ function BookingDetailsContent() {
     airline: '',
     arrival_time: '',
     special_requests: '',
+    add_ons: [],
+    children_ages: [],
   });
 
   const [errors, setErrors] = useState<ValidationErrors>({});
@@ -364,14 +373,36 @@ function BookingDetailsContent() {
   const bookingId = searchParams.get('booking_id');
   const tripParam = searchParams.get('trip');
   const currentTrip = trips[currentTripIndex];
-  const nightSurcharge = currentTrip ? calculateNightSurcharge(formData.pickup_time, currentTrip.price) : 0;
+  
+  // FIXED: Usar solo pickup_time sin basePrice
+  const nightSurcharge = formData.pickup_time ? calculateNightSurcharge(formData.pickup_time) : 0;
+  const addOnsPrice = calculateAddOnsPrice(formData.add_ons);
   const showNightAlert = isNightTime(formData.pickup_time);
   const showFlightFields = currentTrip && (isAirport(currentTrip.from_location) || isAirport(currentTrip.to_location));
 
-  // Calculate grand total for ALL trips
-  const grandTotal = trips.reduce((total, trip) => {
-    const tripNightSurcharge = trip.pickup_time ? calculateNightSurcharge(trip.pickup_time, trip.price) : 0;
-    const tripTotal = trip.price + tripNightSurcharge + calculateFees(trip.price + tripNightSurcharge);
+  // Calculate grand total for ALL trips - FIXED to include current trip's unsaved changes
+  const grandTotal = trips.reduce((total, trip, index) => {
+    // Si es el trip actual, usar los valores del form (que pueden no estar guardados aún)
+    if (index === currentTripIndex) {
+      const currentTripTotal = currentTrip.price + nightSurcharge + addOnsPrice + 
+        calculateFees(currentTrip.price + nightSurcharge + addOnsPrice);
+      return total + currentTripTotal;
+    }
+    
+    // Para otros trips, usar valores guardados en BD
+    const tripNightSurcharge = trip.night_surcharge !== null && trip.night_surcharge !== undefined
+      ? trip.night_surcharge
+      : (trip.pickup_time ? calculateNightSurcharge(trip.pickup_time) : 0);
+    
+    const tripAddOnsPrice = trip.add_ons_price !== null && trip.add_ons_price !== undefined
+      ? trip.add_ons_price
+      : 0;
+    
+    const tripFees = trip.fees !== null && trip.fees !== undefined
+      ? trip.fees
+      : calculateFees(trip.price + tripNightSurcharge + tripAddOnsPrice);
+    
+    const tripTotal = trip.price + tripNightSurcharge + tripAddOnsPrice + tripFees;
     return total + tripTotal;
   }, 0);
 
@@ -398,6 +429,11 @@ function BookingDetailsContent() {
 
   useEffect(() => {
     if (currentTrip) {
+      // Inicializar children_ages según el número de niños
+      const initialAges = currentTrip.children_ages && currentTrip.children_ages.length > 0
+        ? currentTrip.children_ages
+        : Array(currentTrip.children).fill(0);
+      
       setFormData({
         pickup_address: currentTrip.pickup_address || '',
         dropoff_address: currentTrip.dropoff_address || '',
@@ -406,6 +442,8 @@ function BookingDetailsContent() {
         airline: currentTrip.airline || '',
         arrival_time: currentTrip.arrival_time || '',
         special_requests: currentTrip.special_requests || '',
+        add_ons: currentTrip.add_ons || [],
+        children_ages: initialAges,
       });
     }
   }, [currentTrip]);
@@ -456,7 +494,27 @@ function BookingDetailsContent() {
     });
 
     setErrors(validationErrors);
-    return Object.keys(validationErrors).length === 0;
+    
+    // Si hay errores, hacer scroll al primer campo con error
+    if (Object.keys(validationErrors).length > 0) {
+      const firstErrorField = Object.keys(validationErrors)[0];
+      const errorElement = document.getElementById(firstErrorField);
+      
+      if (errorElement) {
+        errorElement.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        });
+        errorElement.focus();
+      } else {
+        // Si no encuentra el elemento, scroll al top de la página
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      
+      return false;
+    }
+    
+    return true;
   }
 
   async function handleSaveAndContinue() {
@@ -468,8 +526,8 @@ function BookingDetailsContent() {
 
     try {
       const supabase = createClient();
-      const fees = calculateFees(currentTrip.price + nightSurcharge);
-      const finalPrice = calculateFinalPrice(currentTrip.price, nightSurcharge);
+      const fees = calculateFees(currentTrip.price + nightSurcharge + addOnsPrice);
+      const finalPrice = currentTrip.price + nightSurcharge + addOnsPrice + fees;
 
       const updateData = {
         pickup_address: sanitizeInput(formData.pickup_address),
@@ -480,6 +538,9 @@ function BookingDetailsContent() {
         arrival_time: formData.arrival_time || null,
         special_requests: sanitizeInput(formData.special_requests),
         night_surcharge: nightSurcharge,
+        add_ons: formData.add_ons,
+        add_ons_price: addOnsPrice,
+        children_ages: formData.children_ages,
         fees,
         final_price: finalPrice,
         updated_at: new Date().toISOString(),
@@ -505,11 +566,9 @@ function BookingDetailsContent() {
         console.log('➡️ Navigating to next trip');
         router.push(`/booking-details?booking_id=${bookingId}&trip=${nextIndex}`);
       } else {
-        console.log('🎉 All trips completed');
-        setIsConfirmed(true);
-        setTimeout(() => {
-          router.push(`/payment?booking_id=${bookingId}`);
-        }, 3000);
+        console.log('🎉 All trips completed - Going to Summary');
+        // CHANGED: Ir a summary en vez de payment directamente
+        router.push(`/summary?booking_id=${bookingId}`);
       }
     } catch (error) {
       console.error('💥 Error:', error);
@@ -523,6 +582,7 @@ function BookingDetailsContent() {
     return (
       <>
         <BookingNavbar />
+        <BookingStepper currentStep={1} />
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
           <div className="text-center">
             <Loader2 className="h-12 w-12 animate-spin text-blue-500 mx-auto mb-4" />
@@ -537,6 +597,7 @@ function BookingDetailsContent() {
     return (
       <>
         <BookingNavbar />
+        <BookingStepper currentStep={1} />
         <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
           <Card className="max-w-md w-full">
             <CardHeader className="text-center">
@@ -556,7 +617,7 @@ function BookingDetailsContent() {
                 </p>
               </div>
               <p className="text-sm text-center text-gray-600">
-                Redirecting to payment in 3 seconds...
+                Redirecting to summary...
               </p>
             </CardContent>
           </Card>
@@ -569,6 +630,7 @@ function BookingDetailsContent() {
     return (
       <>
         <BookingNavbar />
+        <BookingStepper currentStep={1} />
         <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
           <Card className="max-w-md w-full">
             <CardHeader>
@@ -586,12 +648,12 @@ function BookingDetailsContent() {
     );
   }
 
-  const totalPrice = currentTrip.price + nightSurcharge + calculateFees(currentTrip.price + nightSurcharge);
+  const totalPrice = currentTrip.price + nightSurcharge + addOnsPrice + calculateFees(currentTrip.price + nightSurcharge + addOnsPrice);
 
   return (
     <>
       <BookingNavbar />
-      <BookingHero />
+      <BookingStepper currentStep={1} />
       
       <div className="min-h-screen bg-gray-50 py-8 px-4">
         <div className="max-w-7xl mx-auto">
@@ -607,7 +669,7 @@ function BookingDetailsContent() {
           <TripProgress 
             currentTrip={currentTripIndex} 
             totalTrips={trips.length}
-            grandTotal={trips.length > 1 ? grandTotal : undefined}
+            currentTripPrice={totalPrice}
             totalPassengers={trips.reduce((sum, t) => sum + t.adults + t.children, 0)}
           />
 
@@ -707,15 +769,22 @@ function BookingDetailsContent() {
 
                   {nightSurcharge > 0 && (
                     <div className="flex justify-between text-sm text-amber-600">
-                      <span>Night Surcharge (15%):</span>
+                      <span>Night Surcharge ($50 fixed):</span>
                       <span className="font-semibold">+${nightSurcharge.toFixed(2)}</span>
+                    </div>
+                  )}
+
+                  {addOnsPrice > 0 && (
+                    <div className="flex justify-between text-sm text-blue-600">
+                      <span>Add-ons:</span>
+                      <span className="font-semibold">+${addOnsPrice.toFixed(2)}</span>
                     </div>
                   )}
 
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Fees (13%):</span>
                     <span className="font-semibold">
-                      +${calculateFees(currentTrip.price + nightSurcharge).toFixed(2)}
+                      +${calculateFees(currentTrip.price + nightSurcharge + addOnsPrice).toFixed(2)}
                     </span>
                   </div>
 
@@ -789,10 +858,10 @@ function BookingDetailsContent() {
                         <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
                         <div>
                           <p className="text-sm font-semibold text-amber-900">
-                            Night Surcharge
+                            Night Surcharge Applied
                           </p>
                           <p className="text-xs text-amber-700">
-                            A 15% surcharge applies for pickups between 9 PM and 4 AM
+                            A fixed $50 surcharge applies for pickups between 9 PM and 4 AM
                           </p>
                         </div>
                       </div>
@@ -814,10 +883,67 @@ function BookingDetailsContent() {
                           <ul className="text-xs text-blue-700 mt-2 ml-4 list-disc space-y-1">
                             <li>Transfer duration: {currentTrip.duration || '4-5 hours'}</li>
                             <li>Airport check-in time: <strong>3 hours before flight</strong></li>
+                            {showNightAlert && (
+                              <li className="text-amber-700 font-semibold">
+                                Night surcharge: <strong>+$50</strong> (pickup between 9 PM - 4 AM)
+                              </li>
+                            )}
                           </ul>
                           <p className="text-xs text-blue-700 mt-2">
                             Make sure your pickup time allows enough time for both the transfer and check-in.
                           </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Children Ages - Solo si hay niños */}
+                    {currentTrip && currentTrip.children > 0 && (
+                      <div className="space-y-3">
+                        <Label className="text-base font-semibold">Children Ages *</Label>
+                        <p className="text-sm text-gray-600">
+                          Please provide the age of each child for proper car seat arrangements
+                        </p>
+                        
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                          {Array.from({ length: currentTrip.children }).map((_, idx) => (
+                            <div key={idx}>
+                              <Label htmlFor={`child_age_${idx}`} className="text-sm">
+                                Child {idx + 1}
+                              </Label>
+                              <select
+                                id={`child_age_${idx}`}
+                                value={formData.children_ages[idx] || 0}
+                                onChange={(e) => {
+                                  const newAges = [...formData.children_ages];
+                                  newAges[idx] = parseInt(e.target.value);
+                                  setFormData({ ...formData, children_ages: newAges });
+                                }}
+                                className="w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                aria-label={`Age of child ${idx + 1}`}
+                                required
+                              >
+                                <option value="0">Select age</option>
+                                {Array.from({ length: 13 }, (_, i) => i).map((age) => (
+                                  <option key={age} value={age}>
+                                    {age} {age === 1 ? 'year' : 'years'}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Car Seats Note */}
+                        <div className="flex items-start gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
+                          <Baby className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <p className="text-sm font-semibold text-green-900">
+                              Free Car Seats & Boosters Included
+                            </p>
+                            <p className="text-xs text-green-700">
+                              We provide appropriate car seats, boosters, and safety equipment for all children at no extra charge. Your children's safety is our priority!
+                            </p>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -935,6 +1061,14 @@ function BookingDetailsContent() {
                     </div>
                   </div>
 
+                  {/* Add-ons */}
+                  <div className="space-y-4 pt-6 border-t">
+                    <TripAddOns
+                      selectedAddOns={formData.add_ons}
+                      onAddOnsChange={(addOns) => setFormData({ ...formData, add_ons: addOns })}
+                    />
+                  </div>
+
                   {/* Buttons */}
                   <div className="flex gap-4 pt-6">
                     <Button
@@ -963,7 +1097,7 @@ function BookingDetailsContent() {
                         </>
                       ) : (
                         <>
-                          Continue to Payment
+                          Continue to Summary
                           <CheckCircle className="ml-2 h-4 w-4" />
                         </>
                       )}
@@ -988,6 +1122,7 @@ export default function BookingDetailsPage() {
       fallback={
         <>
           <BookingNavbar />
+          <BookingStepper currentStep={1} />
           <div className="min-h-screen flex items-center justify-center bg-gray-50">
             <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
           </div>
