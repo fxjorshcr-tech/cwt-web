@@ -7,6 +7,8 @@ import BookingSteps from "@/components/booking/BookingSteps";
 import TrustIndicators from "@/components/home/TrustIndicators";
 import ValueProposition from "@/components/home/ValueProposition";
 import VisualProof from "@/components/home/VisualProof";
+import TravelGuide from "@/components/home/TravelGuide";
+import PrivateTours from "@/components/home/PrivateTours";
 import GoogleReviews from "@/components/home/GoogleReviews";
 import FAQ from "@/components/home/FAQ";
 import FinalCTA from "@/components/home/FinalCTA";
@@ -70,6 +72,8 @@ export default async function Home() {
           <div className="hidden md:flex items-center gap-8">
             <Link href="/" className="text-white hover:text-gray-200 transition font-medium">Home</Link>
             <Link href="/transfers" className="text-white hover:text-gray-200 transition font-medium">Transfers</Link>
+            <Link href="/private-tours" className="text-white hover:text-gray-200 transition font-medium">Private Tours</Link>
+            <Link href="/travel-guide" className="text-white hover:text-gray-200 transition font-medium">Travel Guide</Link>
             <Link href="/about" className="text-white hover:text-gray-200 transition font-medium">About</Link>
             <Link href="/contact" className="text-white hover:text-gray-200 transition font-medium">Contact</Link>
             <Button size="lg" className="rounded-full px-8">Book Now</Button>
@@ -117,32 +121,38 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Booking Form */}
+      {/* Booking Form - INTACTO */}
       <section className="relative -mt-32 z-20 px-6 pb-20">
         <BookingFormWrapper locations={locations} />
       </section>
 
-      {/* ✨ NEW SECTIONS - TRUST BUILDING ✨ */}
+      {/* ✨ UPDATED SECTIONS ✨ */}
       
-      {/* Booking Steps - How to Book */}
+      {/* 1. Booking Steps - Enhanced with better SEO */}
       <BookingSteps />
 
-      {/* Trust Indicators - Licensed, Insured, Professional */}
+      {/* 2. Trust Indicators - WITH Driver Carousel */}
       <TrustIndicators />
 
-      {/* Value Proposition - Why Choose Us + Guarantees */}
+      {/* 3. Value Proposition - Reformatted Routes (removed "Why Choose Us" redundancy) */}
       <ValueProposition />
 
-      {/* Visual Proof - Photo Gallery */}
+      {/* 4. Visual Proof - Fleet Carousel with better description */}
       <VisualProof />
 
-      {/* Google Reviews - 4 Real Reviews */}
+      {/* 5. NEW - Travel Guide Section */}
+      <TravelGuide />
+
+      {/* 6. NEW - Private Tours Section */}
+      <PrivateTours />
+
+      {/* 7. Google Reviews - MANTENER */}
       <GoogleReviews />
 
-      {/* FAQ - 10 Questions */}
+      {/* 8. FAQ - MANTENER */}
       <FAQ />
 
-      {/* Final CTA - Contact & Booking */}
+      {/* 9. Final CTA - MANTENER */}
       <FinalCTA />
 
       {/* Footer - Enhanced */}
@@ -175,6 +185,8 @@ export default async function Home() {
               <h3 className="font-bold mb-3">Quick Links</h3>
               <ul className="space-y-2 text-sm text-gray-400">
                 <li><Link href="/transfers" className="hover:text-white transition">Our Routes</Link></li>
+                <li><Link href="/private-tours" className="hover:text-white transition">Private Tours</Link></li>
+                <li><Link href="/travel-guide" className="hover:text-white transition">Travel Guide</Link></li>
                 <li><Link href="/about" className="hover:text-white transition">About Us</Link></li>
                 <li><Link href="/contact" className="hover:text-white transition">Contact</Link></li>
                 <li><Link href="/faq" className="hover:text-white transition">FAQ</Link></li>
