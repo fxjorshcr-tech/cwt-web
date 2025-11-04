@@ -1,10 +1,10 @@
 // src/components/home/BookingForm.tsx
-// MINIMALIST REDESIGN - Professional UI with only Blue & Orange
+// OPTIMIZED: Shows form immediately, loads routes in background
 
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   MapPin,
   Calendar,
@@ -24,12 +24,6 @@ import { ModernDatePicker } from './ModernDatePicker';
 import { PassengerSelector } from './PassengerSelector';
 import { format } from 'date-fns';
 import type { TripInsert, Route as SupabaseRoute } from '@/types/supabase';
-
-/**
- * ==========================================
- * INTERFACES Y TIPOS
- * ==========================================
- */
 
 interface Route {
   id: number;
@@ -60,12 +54,6 @@ interface TripData extends BookingFormData {
   selectedRoute: Route | null;
 }
 
-/**
- * ==========================================
- * FUNCIONES HELPER
- * ==========================================
- */
-
 function isValidRoute(route: SupabaseRoute): route is Route {
   return (
     route.origen !== null &&
@@ -79,18 +67,13 @@ function isValidRoute(route: SupabaseRoute): route is Route {
   );
 }
 
-/**
- * ==========================================
- * COMPONENTE PRINCIPAL: BookingForm
- * ==========================================
- */
-
 export function BookingForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // ========== Estados principales ==========
   const [routes, setRoutes] = useState<Route[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoadingRoutes, setIsLoadingRoutes] = useState(true); // ← NUEVO: Flag específico para rutas
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -116,11 +99,65 @@ export function BookingForm() {
     loadRoutes();
   }, []);
 
+  /**
+   * ==========================================
+   * EFECTO: PRE-CARGAR DESDE URL PARAMETERS
+   * ==========================================
+   */
+  useEffect(() => {
+    if (routes.length > 0) {
+      const origin = searchParams.get('origin');
+      const destination = searchParams.get('destination');
+
+      if (origin || destination) {
+        console.log('🎯 Preloading from URL:', { origin, destination });
+        
+        setTrips((prevTrips) => {
+          const newTrips = [...prevTrips];
+          
+          if (origin) {
+            newTrips[0].from_location = origin;
+          }
+          
+          if (destination) {
+            newTrips[0].to_location = destination;
+          }
+
+          if (newTrips[0].from_location && newTrips[0].to_location) {
+            const route = routes.find(
+              (r) =>
+                r.origen === newTrips[0].from_location && 
+                r.destino === newTrips[0].to_location
+            );
+
+            if (route) {
+              const totalPassengers = newTrips[0].adults + newTrips[0].children;
+              const price = calculatePrice(route, totalPassengers);
+
+              newTrips[0].selectedRoute = route;
+              newTrips[0].calculatedPrice = price;
+              newTrips[0].routeId = route.id;
+              newTrips[0].price = price;
+              newTrips[0].distance = route.kilometros;
+              newTrips[0].duration = route.duracion;
+
+              console.log('✅ Route preloaded successfully');
+            }
+          }
+
+          return newTrips;
+        });
+
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    }
+  }, [routes, searchParams]);
+
   async function loadRoutes() {
     console.log('🔄 Loading routes from Supabase...');
 
     try {
-      setLoading(true);
+      setIsLoadingRoutes(true);
       setError(null);
 
       const supabase = createClient();
@@ -139,7 +176,7 @@ export function BookingForm() {
         throw new Error('No routes available in database');
       }
 
-      const validRoutes = data.filter(isValidRoute);
+      const validRoutes: Route[] = data.filter(isValidRoute);
 
       if (validRoutes.length === 0) {
         throw new Error('No valid routes available');
@@ -161,7 +198,7 @@ export function BookingForm() {
       console.error('💥 Error loading routes:', message);
       setError(message);
     } finally {
-      setLoading(false);
+      setIsLoadingRoutes(false);
     }
   }
 
@@ -383,60 +420,7 @@ export function BookingForm() {
 
   /**
    * ==========================================
-   * RENDER: LOADING STATE
-   * ==========================================
-   */
-  if (loading) {
-    return (
-      <div className="w-full max-w-5xl mx-auto bg-white rounded-xl shadow-lg p-10">
-        <div className="flex flex-col items-center justify-center gap-4">
-          <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
-          <div className="text-center">
-            <p className="text-lg font-medium text-gray-800">
-              Loading Available Routes
-            </p>
-            <p className="text-sm text-gray-500 mt-1">
-              Please wait a moment...
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  /**
-   * ==========================================
-   * RENDER: ERROR STATE
-   * ==========================================
-   */
-  if (error) {
-    return (
-      <div className="w-full max-w-5xl mx-auto bg-white rounded-xl shadow-lg p-10">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-16 w-16 bg-red-50 rounded-full flex items-center justify-center">
-            <AlertCircle className="h-8 w-8 text-red-500" />
-          </div>
-          <div className="text-center">
-            <h3 className="text-xl font-semibold text-gray-900">
-              Unable to Load Routes
-            </h3>
-            <p className="text-gray-600 text-sm mt-1 max-w-md">{error}</p>
-          </div>
-          <button
-            onClick={loadRoutes}
-            className="mt-2 px-5 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-          >
-            <RefreshCw className="h-4 w-4" />
-            Try Again
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  /**
-   * ==========================================
-   * RENDER: MAIN FORM
+   * RENDER: MAIN FORM (ALWAYS VISIBLE)
    * ==========================================
    */
   return (
@@ -456,6 +440,25 @@ export function BookingForm() {
 
           {/* Form Content */}
           <div className="p-6 space-y-4">
+            {/* Error Banner */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm text-red-800 font-medium">Unable to load routes</p>
+                  <p className="text-xs text-red-600 mt-1">{error}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={loadRoutes}
+                  className="text-red-600 hover:text-red-800 text-sm font-medium flex items-center gap-1"
+                >
+                  <RefreshCw className="h-3.5 w-3.5" />
+                  Retry
+                </button>
+              </div>
+            )}
+
             {/* Trips List */}
             {trips.map((trip, index) => (
               <div key={index} className="space-y-3">
@@ -503,16 +506,29 @@ export function BookingForm() {
                         onChange={(e) =>
                           updateTrip(index, 'from_location', e.target.value)
                         }
-                        className="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        disabled={isLoadingRoutes || !!error}
+                        className="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
                         required
                       >
-                        <option value="">Where are you traveling from?</option>
-                        {getOrigins().map((origin) => (
+                        <option value="">
+                          {isLoadingRoutes
+                            ? 'Loading routes...'
+                            : error
+                            ? 'Error loading routes'
+                            : 'Where are you traveling from?'}
+                        </option>
+                        {!isLoadingRoutes && !error && getOrigins().map((origin) => (
                           <option key={origin} value={origin}>
                             {origin}
                           </option>
                         ))}
                       </select>
+                      {isLoadingRoutes && (
+                        <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                          <span>Loading available locations...</span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Destination */}
@@ -526,12 +542,20 @@ export function BookingForm() {
                         onChange={(e) =>
                           updateTrip(index, 'to_location', e.target.value)
                         }
-                        disabled={!trip.from_location}
+                        disabled={!trip.from_location || isLoadingRoutes || !!error}
                         className="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
                         required
                       >
-                        <option value="">Where are you going?</option>
-                        {getDestinations(trip.from_location).map(
+                        <option value="">
+                          {isLoadingRoutes
+                            ? 'Loading routes...'
+                            : error
+                            ? 'Error loading routes'
+                            : !trip.from_location
+                            ? 'Select origin first'
+                            : 'Where are you going?'}
+                        </option>
+                        {!isLoadingRoutes && !error && getDestinations(trip.from_location).map(
                           (destination) => (
                             <option key={destination} value={destination}>
                               {destination}
@@ -612,12 +636,13 @@ export function BookingForm() {
               </div>
             ))}
 
-            {/* Add Another Trip Button - Minimalist */}
+            {/* Add Another Trip Button */}
             <div className="flex justify-center">
               <button
                 type="button"
                 onClick={addTrip}
-                className="py-2 px-4 border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all flex items-center gap-2 text-gray-600 hover:text-blue-600 text-sm font-medium"
+                disabled={isLoadingRoutes}
+                className="py-2 px-4 border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all flex items-center gap-2 text-gray-600 hover:text-blue-600 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Plus className="h-4 w-4" />
                 Add Another Trip
@@ -640,11 +665,14 @@ export function BookingForm() {
                 </div>
               )}
 
-              {/* Submit Button - Minimalist & Compact */}
+              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={
-                  isSubmitting || trips.some((t) => !t.selectedRoute || !t.date)
+                  isSubmitting || 
+                  isLoadingRoutes || 
+                  !!error ||
+                  trips.some((t) => !t.selectedRoute || !t.date)
                 }
                 className="px-5 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all flex items-center gap-2 shadow-sm"
               >

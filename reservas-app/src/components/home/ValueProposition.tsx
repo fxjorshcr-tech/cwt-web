@@ -1,56 +1,198 @@
 // src/components/home/ValueProposition.tsx
-// Reformatted routes section + guarantees (removed "Why Choose Us" redundancy)
-
 'use client';
 
+import { useEffect, useState } from 'react';
 import {
   CheckCircle,
   MapPin,
   ArrowRight
 } from 'lucide-react';
+import { createClient } from '@/utils/supabaseClient';
+
+interface Route {
+  origen: string;
+  destino: string;
+  precio1a6: number;
+  duracion: string;
+}
+
+interface Destination {
+  name: string;
+  time: string;
+  price: string;
+  origen: string;
+  destino: string;
+}
 
 export default function ValueProposition() {
-  // Popular routes organized by region
-  const routes = [
-    {
-      region: 'From San José (SJO) Airport',
-      destinations: [
-        { name: 'La Fortuna / Arenal', time: '3 hours', price: 'from $120' },
-        { name: 'Manuel Antonio', time: '3.5 hours', price: 'from $140' },
-        { name: 'Monteverde', time: '4 hours', price: 'from $150' },
-        { name: 'Puerto Viejo', time: '4 hours', price: 'from $150' },
-        { name: 'Tamarindo', time: '4.5 hours', price: 'from $180' },
-      ],
-      color: 'blue'
-    },
-    {
-      region: 'From Liberia (LIR) Airport',
-      destinations: [
-        { name: 'Tamarindo Beach', time: '1.5 hours', price: 'from $80' },
-        { name: 'Papagayo Peninsula', time: '45 min', price: 'from $60' },
-        { name: 'Playa Flamingo', time: '1.5 hours', price: 'from $85' },
-        { name: 'La Fortuna / Arenal', time: '3 hours', price: 'from $140' },
-        { name: 'Monteverde', time: '3 hours', price: 'from $130' },
-      ],
-      color: 'orange'
-    },
-    {
-      region: 'Popular Inter-City Routes',
-      destinations: [
-        { name: 'La Fortuna → Monteverde', time: '3.5 hours', price: 'from $100' },
-        { name: 'Manuel Antonio → Monteverde', time: '5 hours', price: 'from $180' },
-        { name: 'Tamarindo → La Fortuna', time: '4 hours', price: 'from $160' },
-        { name: 'San José → Jaco Beach', time: '2 hours', price: 'from $90' },
-        { name: 'Any Custom Route', time: 'varies', price: 'contact us' },
-      ],
-      color: 'blue'
+  const [routes, setRoutes] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchRoutes() {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from('routes')
+        .select('origen, destino, precio1a6, duracion');
+
+      if (error) {
+        console.error('Error fetching routes:', error);
+        setLoading(false);
+        return;
+      }
+
+      // Organize routes by region
+      const sjoRoutes = data?.filter((r: Route) => 
+        r.origen === 'SJO - Juan Santamaria Int. Airport'
+      ) || [];
+      
+      const lirRoutes = data?.filter((r: Route) => 
+        r.origen === 'LIR - Liberia International Airport'
+      ) || [];
+
+      // Define the order we want
+      const sjoDestinations = [
+        'La Fortuna, Arenal Volcano & El Castillo',
+        'Manuel Antonio (National Park Area)',
+        'Monteverde (Cloud Forest)',
+        'Tamarindo / Flamingo / Conchal (Guanacaste Beaches)',
+        'Jaco / Playa Hermosa (Central Pacific)'
+      ];
+
+      const lirDestinations = [
+        'Nosara (Playa Guiones Area)',
+        'Tamarindo / Flamingo / Conchal (Guanacaste Beaches)',
+        'Hacienda Pinilla / Avellanas / JW Marriot (Guanacaste)',
+        'Las Catalinas, Guanacaste',
+        'RIU Guanacaste Hotel / RIU Palace Hotel (Guanacaste)'
+      ];
+
+      // Map to destination format
+      const sjoFormatted: Destination[] = sjoDestinations
+        .map(dest => {
+          const route = sjoRoutes.find((r: Route) => r.destino === dest);
+          if (!route) return null;
+          return {
+            name: dest.replace(' (National Park Area)', '').replace(' (Cloud Forest)', '').replace(' (Central Pacific)', ''),
+            time: route.duracion || '3 hours',
+            price: `from $${route.precio1a6}`,
+            origen: route.origen,
+            destino: route.destino
+          };
+        })
+        .filter(Boolean) as Destination[];
+
+      const lirFormatted: Destination[] = lirDestinations
+        .map(dest => {
+          const route = lirRoutes.find((r: Route) => r.destino === dest);
+          if (!route) return null;
+          return {
+            name: dest.replace(' (Playa Guiones Area)', '').replace(' (Guanacaste Beaches)', '').replace(' (Guanacaste)', ''),
+            time: route.duracion || '1.5 hours',
+            price: `from $${route.precio1a6}`,
+            origen: route.origen,
+            destino: route.destino
+          };
+        })
+        .filter(Boolean) as Destination[];
+
+      // Static inter-city routes (you can make these dynamic too later)
+      const interCityRoutes: Destination[] = [
+        { 
+          name: 'La Fortuna → Monteverde', 
+          time: '3.5 hours', 
+          price: 'from $100',
+          origen: 'La Fortuna, Arenal Volcano & El Castillo',
+          destino: 'Monteverde (Cloud Forest)'
+        },
+        { 
+          name: 'Manuel Antonio → Monteverde', 
+          time: '5 hours', 
+          price: 'from $180',
+          origen: 'Manuel Antonio (National Park Area)',
+          destino: 'Monteverde (Cloud Forest)'
+        },
+        { 
+          name: 'Tamarindo → La Fortuna', 
+          time: '4 hours', 
+          price: 'from $160',
+          origen: 'Tamarindo / Flamingo / Conchal (Guanacaste Beaches)',
+          destino: 'La Fortuna, Arenal Volcano & El Castillo'
+        },
+        { 
+          name: 'San José → Jaco Beach', 
+          time: '2 hours', 
+          price: 'from $90',
+          origen: 'SJO - Juan Santamaria Int. Airport',
+          destino: 'Jaco / Playa Hermosa (Central Pacific)'
+        },
+        { 
+          name: 'Any Custom Route', 
+          time: 'varies', 
+          price: 'contact us',
+          origen: '',
+          destino: ''
+        }
+      ];
+
+      setRoutes([
+        {
+          region: 'From SJO Airport',
+          destinations: sjoFormatted,
+          color: 'blue'
+        },
+        {
+          region: 'From LIR Airport',
+          destinations: lirFormatted,
+          color: 'orange'
+        },
+        {
+          region: 'Popular Inter-City Routes',
+          destinations: interCityRoutes,
+          color: 'blue'
+        }
+      ]);
+      setLoading(false);
     }
-  ];
+
+    fetchRoutes();
+  }, []);
+
+  const handleRouteClick = (origen: string, destino: string) => {
+    if (!origen || !destino) return;
+    
+    // Scroll to booking form
+    const bookingForm = document.getElementById('booking-form');
+    if (bookingForm) {
+      bookingForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      
+      // Add URL parameters for BookingForm to read
+      const url = new URL(window.location.href);
+      url.searchParams.set('origin', origen);
+      url.searchParams.set('destination', destino);
+      window.history.pushState({}, '', url);
+      
+      // Trigger a re-render by dispatching a custom event
+      window.dispatchEvent(new Event('popstate'));
+    }
+  };
+
+  if (loading) {
+    return (
+      <section className="py-16 bg-gradient-to-b from-gray-50 to-white">
+        <div className="container mx-auto px-6 max-w-7xl">
+          <div className="text-center">
+            <div className="animate-spin h-12 w-12 border-4 border-blue-600 border-t-transparent rounded-full mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading routes...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-16 bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto px-6 max-w-7xl">
-        {/* Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 mb-3">
             <MapPin className="h-5 w-5 text-blue-600" />
@@ -66,7 +208,6 @@ export default function ValueProposition() {
           </p>
         </div>
 
-        {/* Routes Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
           {routes.map((region, idx) => (
             <div
@@ -75,7 +216,6 @@ export default function ValueProposition() {
                 region.color === 'blue' ? 'border-blue-100' : 'border-orange-100'
               } rounded-xl p-6 hover:shadow-xl transition-all duration-300`}
             >
-              {/* Region Header */}
               <div className="mb-5">
                 <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg mb-3 ${
                   region.color === 'blue' ? 'bg-blue-500' : 'bg-orange-500'
@@ -85,14 +225,14 @@ export default function ValueProposition() {
                 </div>
               </div>
 
-              {/* Destinations */}
               <div className="space-y-3">
-                {region.destinations.map((dest, destIdx) => (
-                  <div
+                {region.destinations.map((dest: Destination, destIdx: number) => (
+                  <button
                     key={destIdx}
-                    className="group flex items-start justify-between gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-200"
+                    onClick={() => handleRouteClick(dest.origen, dest.destino)}
+                    className="w-full group flex items-start justify-between gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-200 cursor-pointer"
                   >
-                    <div className="flex-1">
+                    <div className="flex-1 text-left">
                       <p className="font-semibold text-gray-900 text-sm mb-1 group-hover:text-blue-600 transition-colors">
                         {dest.name}
                       </p>
@@ -108,11 +248,10 @@ export default function ValueProposition() {
                       </p>
                       <ArrowRight className="h-3 w-3 text-gray-400 group-hover:text-blue-600 transition-colors ml-auto mt-1" />
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
 
-              {/* Footer note */}
               <div className="mt-5 pt-5 border-t border-gray-100">
                 <p className="text-xs text-gray-600 italic">
                   All prices are per vehicle (up to 10 passengers). Includes all fees, tolls, and taxes.
@@ -122,7 +261,6 @@ export default function ValueProposition() {
           ))}
         </div>
 
-        {/* Custom Route CTA */}
         <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-8 text-white text-center mb-12">
           <h3 className="text-2xl font-bold mb-3">
             Don't See Your Route?
@@ -140,9 +278,7 @@ export default function ValueProposition() {
           </a>
         </div>
 
-        {/* Guarantees Section */}
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-8 md:p-12 text-white relative overflow-hidden">
-          {/* Decorative circles */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
 

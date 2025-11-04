@@ -12,6 +12,9 @@ import PrivateTours from "@/components/home/PrivateTours";
 import GoogleReviews from "@/components/home/GoogleReviews";
 import FAQ from "@/components/home/FAQ";
 import FinalCTA from "@/components/home/FinalCTA";
+import WhatsAppButton from "@/components/WhatsAppButton";
+import BookNowCTA from "@/components/home/BookNowCTA";
+import BackToFormButton from "@/components/BackToFormButton";
 
 interface Location {
   id: string;
@@ -122,7 +125,7 @@ export default async function Home() {
       </section>
 
       {/* Booking Form - INTACTO */}
-      <section className="relative -mt-32 z-20 px-6 pb-20">
+      <section id="booking-form" className="relative -mt-32 z-20 px-6 pb-20">
         <BookingFormWrapper locations={locations} />
       </section>
 
@@ -146,6 +149,9 @@ export default async function Home() {
       {/* 6. NEW - Private Tours Section */}
       <PrivateTours />
 
+      {/* CTA - Book Now */}
+      <BookNowCTA />
+
       {/* 7. Google Reviews - MANTENER */}
       <GoogleReviews />
 
@@ -154,6 +160,12 @@ export default async function Home() {
 
       {/* 9. Final CTA - MANTENER */}
       <FinalCTA />
+
+      {/* Back to Form Button */}
+      <BackToFormButton />
+
+      {/* WhatsApp Floating Button */}
+      <WhatsAppButton />
 
       {/* Footer - Enhanced */}
       <footer className="bg-gray-900 text-white py-12 px-6">
