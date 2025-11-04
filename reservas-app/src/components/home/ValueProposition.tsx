@@ -158,22 +158,11 @@ export default function ValueProposition() {
     fetchRoutes();
   }, []);
 
-  const handleRouteClick = (origen: string, destino: string) => {
-    if (!origen || !destino) return;
-    
-    // Scroll to booking form
+  const handleRouteClick = () => {
+    // SOLO hace scroll al formulario - NO lo modifica
     const bookingForm = document.getElementById('booking-form');
     if (bookingForm) {
       bookingForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      
-      // Add URL parameters for BookingForm to read
-      const url = new URL(window.location.href);
-      url.searchParams.set('origin', origen);
-      url.searchParams.set('destination', destino);
-      window.history.pushState({}, '', url);
-      
-      // Trigger a re-render by dispatching a custom event
-      window.dispatchEvent(new Event('popstate'));
     }
   };
 
@@ -278,59 +267,61 @@ export default function ValueProposition() {
           </a>
         </div>
 
-        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-8 md:p-12 text-white relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+        {/* Guarantees Section - MINIMALIST */}
+        <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-8 md:p-12 border border-gray-200 relative overflow-hidden">
+          {/* Subtle decorative elements */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full -translate-y-1/2 translate-x-1/2 opacity-50"></div>
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-orange-50 rounded-full translate-y-1/2 -translate-x-1/2 opacity-50"></div>
 
           <div className="relative z-10">
             <div className="text-center mb-8">
-              <h3 className="text-2xl md:text-3xl font-bold mb-3">
+              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
                 Our Commitments to You
               </h3>
-              <p className="text-blue-100 max-w-2xl mx-auto">
+              <p className="text-gray-600 max-w-2xl mx-auto">
                 Every Costa Rica private shuttle booking comes with these guarantees for your peace of mind
               </p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-6 w-6 flex-shrink-0 text-orange-300" />
+              <div className="flex items-start gap-3 bg-white p-5 rounded-lg border border-gray-200">
+                <CheckCircle className="h-6 w-6 flex-shrink-0 text-blue-600" />
                 <div>
-                  <h4 className="font-bold mb-1">On-Time Pickup Guarantee</h4>
-                  <p className="text-sm text-blue-100">
+                  <h4 className="font-bold text-gray-900 mb-1">On-Time Pickup Guarantee</h4>
+                  <p className="text-sm text-gray-600">
                     Your driver will be ready at the scheduled time or you'll receive a discount on your next trip. 
                     We value your time as much as you do.
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-6 w-6 flex-shrink-0 text-orange-300" />
+              <div className="flex items-start gap-3 bg-white p-5 rounded-lg border border-gray-200">
+                <CheckCircle className="h-6 w-6 flex-shrink-0 text-orange-500" />
                 <div>
-                  <h4 className="font-bold mb-1">Clean Vehicle Guarantee</h4>
-                  <p className="text-sm text-blue-100">
+                  <h4 className="font-bold text-gray-900 mb-1">Clean Vehicle Guarantee</h4>
+                  <p className="text-sm text-gray-600">
                     All vehicles thoroughly sanitized before each trip with full A/C, comfortable seating, 
                     and premium amenities for your journey.
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-6 w-6 flex-shrink-0 text-orange-300" />
+              <div className="flex items-start gap-3 bg-white p-5 rounded-lg border border-gray-200">
+                <CheckCircle className="h-6 w-6 flex-shrink-0 text-blue-600" />
                 <div>
-                  <h4 className="font-bold mb-1">English-Speaking Driver</h4>
-                  <p className="text-sm text-blue-100">
+                  <h4 className="font-bold text-gray-900 mb-1">English-Speaking Driver</h4>
+                  <p className="text-sm text-gray-600">
                     All our drivers are bilingual (English/Spanish) with excellent communication skills 
                     and local expertise to enhance your Costa Rica experience.
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-6 w-6 flex-shrink-0 text-orange-300" />
+              <div className="flex items-start gap-3 bg-white p-5 rounded-lg border border-gray-200">
+                <CheckCircle className="h-6 w-6 flex-shrink-0 text-orange-500" />
                 <div>
-                  <h4 className="font-bold mb-1">Satisfaction Promise</h4>
-                  <p className="text-sm text-blue-100">
+                  <h4 className="font-bold text-gray-900 mb-1">Satisfaction Promise</h4>
+                  <p className="text-sm text-gray-600">
                     Not satisfied with your service? Contact us within 24 hours and we'll make it right. 
                     Your satisfaction is our priority.
                   </p>
@@ -339,9 +330,9 @@ export default function ValueProposition() {
             </div>
 
             <div className="mt-8 text-center">
-              <p className="text-sm text-blue-100">
+              <p className="text-sm text-gray-500">
                 * Subject to our{' '}
-                <a href="/terms" className="underline hover:text-white">
+                <a href="/terms" className="underline hover:text-gray-700">
                   Terms & Conditions
                 </a>
               </p>

@@ -6,14 +6,13 @@ import { BookingFormWrapper } from "@/components/home/BookingFormWrapper";
 import BookingSteps from "@/components/booking/BookingSteps";
 import TrustIndicators from "@/components/home/TrustIndicators";
 import ValueProposition from "@/components/home/ValueProposition";
-import VisualProof from "@/components/home/VisualProof";
 import TravelGuide from "@/components/home/TravelGuide";
 import PrivateTours from "@/components/home/PrivateTours";
 import GoogleReviews from "@/components/home/GoogleReviews";
 import FAQ from "@/components/home/FAQ";
 import FinalCTA from "@/components/home/FinalCTA";
 import WhatsAppButton from "@/components/WhatsAppButton";
-import BookNowCTA from "@/components/home/BookNowCTA";
+import ScrollToFormButton from "@/components/ScrollToFormButton";
 import BackToFormButton from "@/components/BackToFormButton";
 
 interface Location {
@@ -88,32 +87,44 @@ export default async function Home() {
         </div>
       </nav>
 
-      {/* Hero Section */}
+      {/* Hero Section - OPTIMIZED BEACH IMAGE */}
       <section className="relative h-screen">
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/private-shuttle-costa-rica-service.WEBP"
-            alt="Private Shuttle Costa Rica - Airport Transportation SJO LIR"
+            src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/costa-rica-beach-travel.webp"
+            alt="Private Shuttle Costa Rica - Beach Transportation Service"
             fill
             className="object-cover"
             priority
-            quality={90}
+            quality={85}
           />
           <div className="absolute inset-0 bg-black/50" />
         </div>
 
         <div className="relative z-10 h-full flex flex-col items-center justify-center px-6">
-          <div className="text-center mb-12 max-w-4xl">
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-4 drop-shadow-2xl">
+          <div className="text-center max-w-4xl">
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 drop-shadow-2xl leading-tight">
               PRIVATE TRANSPORTATION
             </h1>
-            <p className="text-xl md:text-2xl text-white mb-3 drop-shadow-lg font-semibold">
-              Reliable Airport Shuttles & Door-to-Door Service in Costa Rica
+            
+            <p className="text-lg md:text-xl text-white/95 mb-8 drop-shadow-lg max-w-3xl mx-auto">
+              Professional shuttle service from SJO & LIR to all major Costa Rica destinations
             </p>
-            <p className="text-base md:text-lg text-white/95 max-w-2xl mx-auto drop-shadow-md">
-              Safe, comfortable, and professional transportation from San José (SJO) and Liberia (LIR) airports 
-              to La Fortuna, Manuel Antonio, Tamarindo, Monteverde, and all major destinations
-            </p>
+
+            {/* Three Words */}
+            <div className="flex items-center justify-center gap-4 md:gap-8">
+              <span className="text-2xl md:text-4xl font-bold text-white drop-shadow-2xl tracking-wider">
+                TRUSTED
+              </span>
+              <span className="text-white text-3xl">•</span>
+              <span className="text-2xl md:text-4xl font-bold text-white drop-shadow-2xl tracking-wider">
+                FLEXIBLE
+              </span>
+              <span className="text-white text-3xl">•</span>
+              <span className="text-2xl md:text-4xl font-bold text-white drop-shadow-2xl tracking-wider">
+                AUTHENTIC
+              </span>
+            </div>
           </div>
 
           <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
@@ -124,50 +135,45 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Booking Form - INTACTO */}
+      {/* Booking Form */}
       <section id="booking-form" className="relative -mt-32 z-20 px-6 pb-20">
         <BookingFormWrapper locations={locations} />
       </section>
 
-      {/* ✨ UPDATED SECTIONS ✨ */}
-      
-      {/* 1. Booking Steps - Enhanced with better SEO */}
+      {/* Booking Steps */}
       <BookingSteps />
 
-      {/* 2. Trust Indicators - WITH Driver Carousel */}
+      {/* Trust Indicators */}
       <TrustIndicators />
 
-      {/* 3. Value Proposition - Reformatted Routes (removed "Why Choose Us" redundancy) */}
+      {/* Value Proposition (Routes with dynamic pricing) */}
       <ValueProposition />
 
-      {/* 4. Visual Proof - Fleet Carousel with better description */}
-      <VisualProof />
-
-      {/* 5. NEW - Travel Guide Section */}
+      {/* Travel Guide */}
       <TravelGuide />
 
-      {/* 6. NEW - Private Tours Section */}
+      {/* Private Tours - TEXTO ACTUALIZADO */}
       <PrivateTours />
 
-      {/* CTA - Book Now */}
-      <BookNowCTA />
-
-      {/* 7. Google Reviews - MANTENER */}
+      {/* Google Reviews */}
       <GoogleReviews />
 
-      {/* 8. FAQ - MANTENER */}
+      {/* FAQ */}
       <FAQ />
 
-      {/* 9. Final CTA - MANTENER */}
+      {/* Final CTA */}
       <FinalCTA />
 
       {/* Back to Form Button */}
       <BackToFormButton />
 
+      {/* Scroll to Form Button - Aparece después de TrustIndicators */}
+      <ScrollToFormButton />
+
       {/* WhatsApp Floating Button */}
       <WhatsAppButton />
 
-      {/* Footer - Enhanced */}
+      {/* Footer */}
       <footer className="bg-gray-900 text-white py-12 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
