@@ -1,5 +1,5 @@
 // src/components/booking/TripProgress.tsx
-// Progress bar for multi-trip bookings - Shows current trip price only
+// FIXED: Removed currentTripPrice display
 
 'use client';
 
@@ -11,7 +11,6 @@ interface TripProgressProps {
   currentTrip: number;
   totalTrips: number;
   completedTrips?: number[];
-  currentTripPrice?: number;
   totalPassengers?: number;
 }
 
@@ -19,7 +18,6 @@ export const TripProgress: React.FC<TripProgressProps> = ({
   currentTrip,
   totalTrips,
   completedTrips = [],
-  currentTripPrice,
   totalPassengers,
 }) => {
   if (totalTrips <= 1) return null;
@@ -36,17 +34,7 @@ export const TripProgress: React.FC<TripProgressProps> = ({
           </span>
         </div>
         
-        {/* Current Trip Price Only */}
-        {currentTripPrice && (
-          <div className="flex items-center gap-2 bg-gradient-to-r from-blue-50 to-indigo-50 px-4 py-2 rounded-lg border border-blue-200">
-            <div className="text-right">
-              <p className="text-xs text-gray-600 font-medium">This Transfer</p>
-              <p className="text-xl font-bold text-blue-600">
-                ${currentTripPrice.toFixed(2)}
-              </p>
-            </div>
-          </div>
-        )}
+        {/* REMOVED PRICE DISPLAY */}
       </div>
 
       <div className="flex gap-2 mb-3">

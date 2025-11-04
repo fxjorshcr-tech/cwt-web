@@ -1,6 +1,5 @@
 // src/app/booking-details/page.tsx
-// REDESIGNED VERSION - Modern UI in English with What's Included & Important Info
-// FIXED: $50 night surcharge (not 15%)
+// FINAL VERSION: Restructured columns + Price at bottom after add-ons
 
 'use client';
 
@@ -47,10 +46,6 @@ import {
   type ValidationErrors,
 } from '@/utils/bookingValidation';
 
-/**
- * ==================== INTERFACES ====================
- */
-
 interface Trip {
   id: string;
   booking_id: string;
@@ -89,16 +84,10 @@ interface FormData {
   children_ages: number[];
 }
 
-/**
- * Calculate night surcharge ($50 FIXED between 9 PM - 4 AM)
- * IMPORTANTE: Es un cargo fijo de $50, NO un porcentaje
- */
 function calculateNightSurcharge(pickupTime: string | null | undefined): number {
   if (!pickupTime) return 0;
-
   const [hours] = pickupTime.split(':').map(Number);
   if (isNaN(hours) || hours < 0 || hours > 23) return 0;
-
   const isNightTime = hours >= 21 || hours < 4;
   return isNightTime ? 50 : 0;
 }
@@ -109,10 +98,6 @@ function isNightTime(pickupTime: string | null | undefined): boolean {
   if (isNaN(hours)) return false;
   return hours >= 21 || hours < 4;
 }
-
-/**
- * ==================== SERVICE INFO COMPONENTS ====================
- */
 
 function WhatsIncluded() {
   const inclusions = [
@@ -185,12 +170,8 @@ function ImportantInformation() {
   );
 }
 
-/**
- * ==================== PURA VIDA PROMISE COMPONENT ====================
- */
-
-function PuraVidaPromise() {
-  const promises = [
+function WhyBookWithUs() {
+  const reasons = [
     {
       icon: CheckCircle,
       title: 'Instant Confirmation',
@@ -209,30 +190,22 @@ function PuraVidaPromise() {
   ];
 
   return (
-    <div className="bg-gradient-to-r from-slate-800 to-blue-900 py-8 px-4 mt-8">
-      <div className="max-w-5xl mx-auto">
-        <h3 className="text-xl font-bold text-white text-center mb-1">
-          Our Pura Vida Promise
-        </h3>
-        <div className="h-0.5 w-16 bg-cyan-400 mx-auto mb-6 rounded-full"></div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {promises.map((promise, idx) => (
-            <div key={idx} className="flex items-start gap-3 bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10">
-              <div className="h-10 w-10 rounded-full bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
-                <promise.icon className="h-5 w-5 text-cyan-400" />
+    <div className="space-y-4">
+      <h3 className="text-lg font-bold text-gray-900">Why Book With Us?</h3>
+      <div className="grid grid-cols-1 gap-4">
+        {reasons.map((reason, idx) => (
+          <div key={idx} className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+            <div className="flex items-start gap-3">
+              <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                <reason.icon className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-white mb-1">
-                  {promise.title}
-                </h4>
-                <p className="text-xs text-blue-100 leading-relaxed">
-                  {promise.description}
-                </p>
+                <h4 className="font-bold text-gray-900 mb-1">{reason.title}</h4>
+                <p className="text-sm text-gray-600">{reason.description}</p>
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -246,7 +219,6 @@ interface TimePickerProps {
 }
 
 function ModernTimePicker({ value, onChange, label, error }: TimePickerProps) {
-  // Convert 24h format to 12h + AM/PM
   const convert24to12 = (time24: string) => {
     if (!time24) return { hour: '', minute: '', period: 'AM' };
     const [h, m] = time24.split(':').map(Number);
@@ -259,22 +231,18 @@ function ModernTimePicker({ value, onChange, label, error }: TimePickerProps) {
     };
   };
 
-  // Convert 12h + AM/PM to 24h format
   const convert12to24 = (hour12: string, minute: string, period: string) => {
     let h = parseInt(hour12);
     if (isNaN(h)) return '';
-    
     if (period === 'AM') {
       if (h === 12) h = 0;
     } else {
       if (h !== 12) h += 12;
     }
-    
     return `${h.toString().padStart(2, '0')}:${minute}`;
   };
 
   const { hour, minute, period } = convert24to12(value);
-  
   const hours12 = Array.from({ length: 12 }, (_, i) => (i + 1).toString());
   const minutes = ['00', '15', '30', '45'];
 
@@ -289,7 +257,6 @@ function ModernTimePicker({ value, onChange, label, error }: TimePickerProps) {
     <div className="space-y-2">
       <Label>{label} *</Label>
       <div className="grid grid-cols-[2fr_2fr_1.5fr] gap-2">
-        {/* Hour */}
         <select
           value={hour}
           onChange={(e) => handleChange(e.target.value, minute || '00', period)}
@@ -303,7 +270,6 @@ function ModernTimePicker({ value, onChange, label, error }: TimePickerProps) {
           ))}
         </select>
 
-        {/* Minute */}
         <select
           value={minute}
           onChange={(e) => handleChange(hour || '1', e.target.value, period)}
@@ -317,7 +283,6 @@ function ModernTimePicker({ value, onChange, label, error }: TimePickerProps) {
           ))}
         </select>
 
-        {/* AM/PM */}
         <select
           value={period}
           onChange={(e) => handleChange(hour || '1', minute || '00', e.target.value)}
@@ -341,10 +306,6 @@ function ModernTimePicker({ value, onChange, label, error }: TimePickerProps) {
     </div>
   );
 }
-
-/**
- * ==================== MAIN COMPONENT ====================
- */
 
 function BookingDetailsContent() {
   const router = useRouter();
@@ -374,37 +335,10 @@ function BookingDetailsContent() {
   const tripParam = searchParams.get('trip');
   const currentTrip = trips[currentTripIndex];
   
-  // FIXED: Usar solo pickup_time sin basePrice
   const nightSurcharge = formData.pickup_time ? calculateNightSurcharge(formData.pickup_time) : 0;
   const addOnsPrice = calculateAddOnsPrice(formData.add_ons);
   const showNightAlert = isNightTime(formData.pickup_time);
   const showFlightFields = currentTrip && (isAirport(currentTrip.from_location) || isAirport(currentTrip.to_location));
-
-  // Calculate grand total for ALL trips - FIXED to include current trip's unsaved changes
-  const grandTotal = trips.reduce((total, trip, index) => {
-    // Si es el trip actual, usar los valores del form (que pueden no estar guardados aún)
-    if (index === currentTripIndex) {
-      const currentTripTotal = currentTrip.price + nightSurcharge + addOnsPrice + 
-        calculateFees(currentTrip.price + nightSurcharge + addOnsPrice);
-      return total + currentTripTotal;
-    }
-    
-    // Para otros trips, usar valores guardados en BD
-    const tripNightSurcharge = trip.night_surcharge !== null && trip.night_surcharge !== undefined
-      ? trip.night_surcharge
-      : (trip.pickup_time ? calculateNightSurcharge(trip.pickup_time) : 0);
-    
-    const tripAddOnsPrice = trip.add_ons_price !== null && trip.add_ons_price !== undefined
-      ? trip.add_ons_price
-      : 0;
-    
-    const tripFees = trip.fees !== null && trip.fees !== undefined
-      ? trip.fees
-      : calculateFees(trip.price + tripNightSurcharge + tripAddOnsPrice);
-    
-    const tripTotal = trip.price + tripNightSurcharge + tripAddOnsPrice + tripFees;
-    return total + tripTotal;
-  }, 0);
 
   useEffect(() => {
     if (!bookingId) {
@@ -413,8 +347,6 @@ function BookingDetailsContent() {
       return;
     }
     loadTrips();
-    
-    // Scroll to top when page loads
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [bookingId, router]);
 
@@ -429,7 +361,6 @@ function BookingDetailsContent() {
 
   useEffect(() => {
     if (currentTrip) {
-      // Inicializar children_ages según el número de niños
       const initialAges = currentTrip.children_ages && currentTrip.children_ages.length > 0
         ? currentTrip.children_ages
         : Array(currentTrip.children).fill(0);
@@ -453,24 +384,15 @@ function BookingDetailsContent() {
       setLoading(true);
       const supabase = createClient();
 
-      console.log('🔄 Loading trips for booking_id:', bookingId);
-
       const { data, error } = await supabase
         .from('trips')
         .select('*')
         .eq('booking_id', bookingId)
         .order('created_at', { ascending: true });
 
-      if (error) {
-        console.error('❌ Supabase Error:', error);
-        throw new Error(error.message);
-      }
+      if (error) throw new Error(error.message);
+      if (!data || data.length === 0) throw new Error('No trips found for this booking');
 
-      if (!data || data.length === 0) {
-        throw new Error('No trips found for this booking');
-      }
-
-      console.log('✅ Trips loaded:', data);
       setTrips(data);
     } catch (error) {
       console.error('💥 Error loading trips:', error);
@@ -495,25 +417,18 @@ function BookingDetailsContent() {
 
     setErrors(validationErrors);
     
-    // Si hay errores, hacer scroll al primer campo con error
     if (Object.keys(validationErrors).length > 0) {
       const firstErrorField = Object.keys(validationErrors)[0];
       const errorElement = document.getElementById(firstErrorField);
       
       if (errorElement) {
-        errorElement.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'center' 
-        });
+        errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
         errorElement.focus();
       } else {
-        // Si no encuentra el elemento, scroll al top de la página
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
-      
       return false;
     }
-    
     return true;
   }
 
@@ -546,28 +461,18 @@ function BookingDetailsContent() {
         updated_at: new Date().toISOString(),
       };
 
-      console.log('💾 Saving trip:', currentTrip.id, updateData);
-
       const { error } = await supabase
         .from('trips')
         .update(updateData)
         .eq('id', currentTrip.id);
 
-      if (error) {
-        console.error('❌ Error saving:', error);
-        throw new Error(error.message);
-      }
-
-      console.log('✅ Trip saved successfully');
+      if (error) throw new Error(error.message);
 
       const nextIndex = currentTripIndex + 1;
 
       if (nextIndex < trips.length) {
-        console.log('➡️ Navigating to next trip');
         router.push(`/booking-details?booking_id=${bookingId}&trip=${nextIndex}`);
       } else {
-        console.log('🎉 All trips completed - Going to Summary');
-        // CHANGED: Ir a summary en vez de payment directamente
         router.push(`/summary?booking_id=${bookingId}`);
       }
     } catch (error) {
@@ -582,7 +487,6 @@ function BookingDetailsContent() {
     return (
       <>
         <BookingNavbar />
-        <BookingStepper currentStep={1} />
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
           <div className="text-center">
             <Loader2 className="h-12 w-12 animate-spin text-blue-500 mx-auto mb-4" />
@@ -597,7 +501,6 @@ function BookingDetailsContent() {
     return (
       <>
         <BookingNavbar />
-        <BookingStepper currentStep={1} />
         <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
           <Card className="max-w-md w-full">
             <CardHeader className="text-center">
@@ -630,7 +533,6 @@ function BookingDetailsContent() {
     return (
       <>
         <BookingNavbar />
-        <BookingStepper currentStep={1} />
         <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
           <Card className="max-w-md w-full">
             <CardHeader>
@@ -653,6 +555,28 @@ function BookingDetailsContent() {
   return (
     <>
       <BookingNavbar />
+      
+      {/* Hero Section */}
+      <div className="relative h-80 w-full overflow-hidden">
+        <div className="absolute inset-0">
+          <img
+            src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/puerto-viejo-costa-rica-beach.webp"
+            alt="Costa Rica Beach"
+            className="w-full h-full object-cover"
+            style={{ objectPosition: '50% 65%' }}
+          />
+          <div className="absolute inset-0 bg-black/45" />
+        </div>
+        
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center px-4">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl">
+              Trusted Costa Rica Drivers for Your Peace of Mind
+            </h1>
+          </div>
+        </div>
+      </div>
+      
       <BookingStepper currentStep={1} />
       
       <div className="min-h-screen bg-gray-50 py-8 px-4">
@@ -669,7 +593,6 @@ function BookingDetailsContent() {
           <TripProgress 
             currentTrip={currentTripIndex} 
             totalTrips={trips.length}
-            currentTripPrice={totalPrice}
             totalPassengers={trips.reduce((sum, t) => sum + t.adults + t.children, 0)}
           />
 
@@ -683,7 +606,7 @@ function BookingDetailsContent() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-            {/* LEFT COLUMN */}
+            {/* LEFT COLUMN - RESTRUCTURED */}
             <div className="lg:col-span-2 space-y-6">
               {/* Trip Summary */}
               <Card>
@@ -756,54 +679,20 @@ function BookingDetailsContent() {
                 </CardContent>
               </Card>
 
-              {/* Price Breakdown */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Price Breakdown</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Base Price:</span>
-                    <span className="font-semibold">${currentTrip.price.toFixed(2)}</span>
-                  </div>
+              {/* What's Included - Desktop */}
+              <div className="hidden lg:block">
+                <WhatsIncluded />
+              </div>
 
-                  {nightSurcharge > 0 && (
-                    <div className="flex justify-between text-sm text-amber-600">
-                      <span>Night Surcharge ($50 fixed):</span>
-                      <span className="font-semibold">+${nightSurcharge.toFixed(2)}</span>
-                    </div>
-                  )}
+              {/* Important Information - Desktop */}
+              <div className="hidden lg:block">
+                <ImportantInformation />
+              </div>
 
-                  {addOnsPrice > 0 && (
-                    <div className="flex justify-between text-sm text-blue-600">
-                      <span>Add-ons:</span>
-                      <span className="font-semibold">+${addOnsPrice.toFixed(2)}</span>
-                    </div>
-                  )}
-
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Fees (13%):</span>
-                    <span className="font-semibold">
-                      +${calculateFees(currentTrip.price + nightSurcharge + addOnsPrice).toFixed(2)}
-                    </span>
-                  </div>
-
-                  <div className="border-t pt-3">
-                    <div className="flex justify-between items-center bg-blue-50 rounded-lg p-3">
-                      <span className="font-bold text-gray-900">Total:</span>
-                      <span className="text-2xl font-bold text-blue-600">
-                        ${totalPrice.toFixed(2)}
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* What's Included */}
-              <WhatsIncluded />
-
-              {/* Important Information */}
-              <ImportantInformation />
+              {/* Why Book With Us - Desktop */}
+              <div className="hidden lg:block">
+                <WhyBookWithUs />
+              </div>
             </div>
 
             {/* RIGHT COLUMN - FORM */}
@@ -867,7 +756,6 @@ function BookingDetailsContent() {
                       </div>
                     )}
 
-                    {/* Airport Timing Alert */}
                     {currentTrip && isAirport(currentTrip.to_location) && formData.pickup_time && (
                       <div className="flex items-start gap-2 p-3 bg-blue-50 border border-blue-300 rounded-lg">
                         <Plane className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
@@ -876,27 +764,13 @@ function BookingDetailsContent() {
                             Airport Departure Reminder
                           </p>
                           <p className="text-xs text-blue-700">
-                            <strong>Important:</strong> This transfer takes approximately{' '}
-                            <strong>{currentTrip.duration || '4-5 hours'}</strong>.{' '}
-                            Please select your pickup time considering:
-                          </p>
-                          <ul className="text-xs text-blue-700 mt-2 ml-4 list-disc space-y-1">
-                            <li>Transfer duration: {currentTrip.duration || '4-5 hours'}</li>
-                            <li>Airport check-in time: <strong>3 hours before flight</strong></li>
-                            {showNightAlert && (
-                              <li className="text-amber-700 font-semibold">
-                                Night surcharge: <strong>+$50</strong> (pickup between 9 PM - 4 AM)
-                              </li>
-                            )}
-                          </ul>
-                          <p className="text-xs text-blue-700 mt-2">
-                            Make sure your pickup time allows enough time for both the transfer and check-in.
+                            This transfer takes approximately {currentTrip.duration || '4-5 hours'}. 
+                            Allow 3 hours for airport check-in.
                           </p>
                         </div>
                       </div>
                     )}
 
-                    {/* Children Ages - Solo si hay niños */}
                     {currentTrip && currentTrip.children > 0 && (
                       <div className="space-y-3">
                         <Label className="text-base font-semibold">Children Ages *</Label>
@@ -919,7 +793,6 @@ function BookingDetailsContent() {
                                   setFormData({ ...formData, children_ages: newAges });
                                 }}
                                 className="w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                aria-label={`Age of child ${idx + 1}`}
                                 required
                               >
                                 <option value="0">Select age</option>
@@ -933,7 +806,6 @@ function BookingDetailsContent() {
                           ))}
                         </div>
 
-                        {/* Car Seats Note */}
                         <div className="flex items-start gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
                           <Baby className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
                           <div>
@@ -941,7 +813,7 @@ function BookingDetailsContent() {
                               Free Car Seats & Boosters Included
                             </p>
                             <p className="text-xs text-green-700">
-                              We provide appropriate car seats, boosters, and safety equipment for all children at no extra charge. Your children's safety is our priority!
+                              We provide appropriate car seats and safety equipment at no extra charge.
                             </p>
                           </div>
                         </div>
@@ -974,7 +846,6 @@ function BookingDetailsContent() {
                     </div>
                   </div>
 
-                  {/* Flight Information */}
                   {showFlightFields && (
                     <div className="space-y-4 pt-6 border-t">
                       <h3 className="font-semibold text-lg flex items-center gap-2">
@@ -1017,25 +888,9 @@ function BookingDetailsContent() {
                         onChange={(value) => setFormData({ ...formData, arrival_time: value })}
                         label={isAirport(currentTrip.to_location) ? "Flight Departure Time" : "Flight Arrival Time"}
                       />
-
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                        <p className="text-sm text-blue-900">
-                          {isAirport(currentTrip.to_location) ? (
-                            <>
-                              <strong>Don't worry!</strong> We'll get you to the airport on time for your flight. 
-                              Who says Tico Time is late? Not when it's airport time! 😁
-                            </>
-                          ) : (
-                            <>
-                              <strong>Note:</strong> We monitor your flight to automatically adjust pickup in case of delays.
-                            </>
-                          )}
-                        </p>
-                      </div>
                     </div>
                   )}
 
-                  {/* Special Requests */}
                   <div className="space-y-4 pt-6 border-t">
                     <h3 className="font-semibold text-lg flex items-center gap-2">
                       <MessageSquare className="h-5 w-5 text-purple-600" />
@@ -1055,13 +910,9 @@ function BookingDetailsContent() {
                         placeholder="Extra luggage, baby seat, surfboard, etc."
                         rows={4}
                       />
-                      <p className="text-xs text-gray-500 mt-1">
-                        Maximum 1000 characters
-                      </p>
                     </div>
                   </div>
 
-                  {/* Add-ons */}
                   <div className="space-y-4 pt-6 border-t">
                     <TripAddOns
                       selectedAddOns={formData.add_ons}
@@ -1069,7 +920,51 @@ function BookingDetailsContent() {
                     />
                   </div>
 
-                  {/* Buttons */}
+                  {/* PRICE BREAKDOWN - MOVED HERE AFTER ADD-ONS */}
+                  <div className="pt-6 border-t">
+                    <Card className="bg-gradient-to-br from-gray-50 to-gray-100">
+                      <CardHeader>
+                        <CardTitle className="text-lg">Price Breakdown</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Base Price:</span>
+                          <span className="font-semibold">${currentTrip.price.toFixed(2)}</span>
+                        </div>
+
+                        {nightSurcharge > 0 && (
+                          <div className="flex justify-between text-sm text-amber-600">
+                            <span>Night Surcharge ($50 fixed):</span>
+                            <span className="font-semibold">+${nightSurcharge.toFixed(2)}</span>
+                          </div>
+                        )}
+
+                        {addOnsPrice > 0 && (
+                          <div className="flex justify-between text-sm text-blue-600">
+                            <span>Add-ons:</span>
+                            <span className="font-semibold">+${addOnsPrice.toFixed(2)}</span>
+                          </div>
+                        )}
+
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Fees (13%):</span>
+                          <span className="font-semibold">
+                            +${calculateFees(currentTrip.price + nightSurcharge + addOnsPrice).toFixed(2)}
+                          </span>
+                        </div>
+
+                        <div className="border-t pt-3">
+                          <div className="flex justify-between items-center bg-blue-50 rounded-lg p-3">
+                            <span className="font-bold text-gray-900">Total:</span>
+                            <span className="text-2xl font-bold text-blue-600">
+                              ${totalPrice.toFixed(2)}
+                            </span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
                   <div className="flex gap-4 pt-6">
                     <Button
                       type="button"
@@ -1105,13 +1000,17 @@ function BookingDetailsContent() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Mobile - What's Included, Important Info, Why Book */}
+              <div className="lg:hidden space-y-6 mt-6">
+                <WhatsIncluded />
+                <ImportantInformation />
+                <WhyBookWithUs />
+              </div>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Pura Vida Promise Section */}
-      <PuraVidaPromise />
     </>
   );
 }
@@ -1122,7 +1021,6 @@ export default function BookingDetailsPage() {
       fallback={
         <>
           <BookingNavbar />
-          <BookingStepper currentStep={1} />
           <div className="min-h-screen flex items-center justify-center bg-gray-50">
             <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
           </div>

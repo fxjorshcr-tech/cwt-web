@@ -1,5 +1,5 @@
 // src/app/summary/page.tsx
-// Summary page - Shows all trips before payment
+// FIXED: Removed individual trip prices, improved Booking ID readability
 
 'use client';
 
@@ -25,10 +25,6 @@ import BookingNavbar from '@/components/booking/BookingNavbar';
 import BookingStepper from '@/components/booking/BookingStepper';
 import { isAirport, calculateFees } from '@/utils/bookingValidation';
 import { AVAILABLE_ADDONS } from '@/components/booking/TripAddOns';
-
-/**
- * ==================== INTERFACES ====================
- */
 
 interface Trip {
   id: string;
@@ -56,46 +52,31 @@ interface Trip {
   add_ons_price: number | null;
 }
 
-/**
- * Format time from 24h to 12h with AM/PM
- */
 function formatTime(time24: string | null): string {
   if (!time24) return 'N/A';
-  
   const [h, m] = time24.split(':').map(Number);
   if (isNaN(h) || isNaN(m)) return time24;
-  
   const period = h >= 12 ? 'PM' : 'AM';
   const hour12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
-  
   return `${hour12}:${m.toString().padStart(2, '0')} ${period}`;
 }
-
-/**
- * ==================== TRIP CARD COMPONENT ====================
- */
 
 function TripCard({ trip, index }: { trip: Trip; index: number }) {
   const showFlightInfo = isAirport(trip.from_location) || isAirport(trip.to_location);
   
   return (
     <Card className="overflow-hidden">
+      {/* REMOVED PRICE FROM HEADER */}
       <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <div className="h-8 w-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">
-              {index + 1}
-            </div>
-            Trip {index + 1}
-          </CardTitle>
-          <div className="text-lg font-bold text-blue-600">
-            ${(trip.final_price || trip.price).toFixed(2)}
+        <CardTitle className="text-lg flex items-center gap-2">
+          <div className="h-8 w-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">
+            {index + 1}
           </div>
-        </div>
+          Trip {index + 1}
+        </CardTitle>
       </CardHeader>
 
       <CardContent className="p-6 space-y-6">
-        {/* Route Information */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <div className="flex items-start gap-2 mb-3">
@@ -153,7 +134,6 @@ function TripCard({ trip, index }: { trip: Trip; index: number }) {
           </div>
         </div>
 
-        {/* Additional Details Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 pt-4 border-t">
           <div className="text-center p-3 bg-gray-50 rounded-lg">
             <Users className="h-4 w-4 mx-auto text-gray-600 mb-1" />
@@ -186,7 +166,6 @@ function TripCard({ trip, index }: { trip: Trip; index: number }) {
           </div>
         </div>
 
-        {/* Flight Information */}
         {showFlightInfo && (trip.airline || trip.flight_number || trip.arrival_time) && (
           <div className="pt-4 border-t">
             <div className="flex items-center gap-2 mb-3">
@@ -220,7 +199,6 @@ function TripCard({ trip, index }: { trip: Trip; index: number }) {
           </div>
         )}
 
-        {/* Special Requests */}
         {trip.special_requests && (
           <div className="pt-4 border-t">
             <div className="flex items-center gap-2 mb-2">
@@ -233,7 +211,6 @@ function TripCard({ trip, index }: { trip: Trip; index: number }) {
           </div>
         )}
 
-        {/* Add-ons */}
         {trip.add_ons && trip.add_ons.length > 0 && (
           <div className="pt-4 border-t">
             <div className="flex items-center gap-2 mb-3">
@@ -306,10 +283,6 @@ function TripCard({ trip, index }: { trip: Trip; index: number }) {
   );
 }
 
-/**
- * ==================== MAIN COMPONENT ====================
- */
-
 function SummaryContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -321,6 +294,14 @@ function SummaryContent() {
 
   const grandTotal = trips.reduce((sum, trip) => sum + (trip.final_price || trip.price), 0);
   const totalPassengers = trips.reduce((sum, trip) => sum + trip.adults + trip.children, 0);
+
+  // Format booking ID to be readable
+  const formatBookingId = (id: string | null) => {
+    if (!id) return 'N/A';
+    if (id.length <= 12) return id.toUpperCase();
+    // Show first 4 and last 8 characters
+    return `${id.substring(0, 4).toUpperCase()}-...-${id.slice(-8).toUpperCase()}`;
+  };
 
   useEffect(() => {
     if (!bookingId) {
@@ -337,24 +318,15 @@ function SummaryContent() {
       setLoading(true);
       const supabase = createClient();
 
-      console.log('🔄 Loading trips for summary:', bookingId);
-
       const { data, error } = await supabase
         .from('trips')
         .select('*')
         .eq('booking_id', bookingId)
         .order('created_at', { ascending: true });
 
-      if (error) {
-        console.error('❌ Supabase Error:', error);
-        throw new Error(error.message);
-      }
+      if (error) throw new Error(error.message);
+      if (!data || data.length === 0) throw new Error('No trips found for this booking');
 
-      if (!data || data.length === 0) {
-        throw new Error('No trips found for this booking');
-      }
-
-      console.log('✅ Trips loaded for summary:', data);
       setTrips(data);
     } catch (error) {
       console.error('💥 Error loading trips:', error);
@@ -366,7 +338,6 @@ function SummaryContent() {
   }
 
   function handleContinueToPayment() {
-    console.log('🚀 Proceeding to payment...');
     router.push(`/payment?booking_id=${bookingId}`);
   }
 
@@ -401,7 +372,6 @@ function SummaryContent() {
             Back to Details
           </Button>
 
-          {/* Header */}
           <div className="mb-8">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
               Booking Summary
@@ -410,31 +380,31 @@ function SummaryContent() {
               Review your transfer details before proceeding to payment
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
+              {/* IMPROVED BOOKING ID */}
               <div className="px-4 py-2 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-xs text-gray-600">Booking ID</p>
-                <p className="font-mono text-sm font-bold text-gray-900">
-                  ...{bookingId?.slice(-8)}
+                <p className="text-xs text-gray-600 mb-1">Booking ID</p>
+                <p className="font-mono text-sm font-bold text-blue-900">
+                  {formatBookingId(bookingId)}
                 </p>
               </div>
               <div className="px-4 py-2 bg-green-50 rounded-lg border border-green-200">
-                <p className="text-xs text-gray-600">Total Transfers</p>
+                <p className="text-xs text-gray-600 mb-1">Total Transfers</p>
                 <p className="text-sm font-bold text-gray-900">{trips.length}</p>
               </div>
               <div className="px-4 py-2 bg-purple-50 rounded-lg border border-purple-200">
-                <p className="text-xs text-gray-600">Total Passengers</p>
+                <p className="text-xs text-gray-600 mb-1">Total Passengers</p>
                 <p className="text-sm font-bold text-gray-900">{totalPassengers}</p>
               </div>
             </div>
           </div>
 
-          {/* Trips List */}
           <div className="space-y-6 mb-8">
             {trips.map((trip, index) => (
               <TripCard key={trip.id} trip={trip} index={index} />
             ))}
           </div>
 
-          {/* Grand Total Card */}
+          {/* Grand Total Floating Bar */}
           <Card className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 border-2 border-blue-300 sticky bottom-4 shadow-xl">
             <CardContent className="p-5">
               <div className="flex flex-col md:flex-row items-center justify-between gap-4">
@@ -467,7 +437,6 @@ function SummaryContent() {
             </CardContent>
           </Card>
 
-          {/* Important Notes */}
           <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
             <div className="flex items-start gap-3">
               <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
@@ -477,8 +446,7 @@ function SummaryContent() {
                 </p>
                 <p className="text-sm text-blue-800">
                   Your booking details are saved. Click "Continue to Payment" to complete your reservation 
-                  and receive instant confirmation via email. Our team monitors your flights and will 
-                  be ready to welcome you on your travel dates.
+                  and receive instant confirmation via email.
                 </p>
               </div>
             </div>
