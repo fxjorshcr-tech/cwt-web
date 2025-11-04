@@ -1,17 +1,23 @@
 "use client";
 
+import Image from "next/image";
+
 export default function BookingHero() {
   return (
-    <section
-      className="relative h-[280px] md:h-[350px] w-full flex items-center justify-center"
-      style={{
-        backgroundImage:
-          'url(https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/private-transfer-sjo-airport.webp)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-      }}
-    >
+    <section className="relative h-[280px] md:h-[350px] w-full flex items-center justify-center overflow-hidden">
+      {/* Imagen optimizada con next/image */}
+      <Image
+        src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/private-transfer-sjo-airport.webp"
+        alt="Private Transfer SJO Airport Costa Rica"
+        fill
+        sizes="100vw"
+        className="object-cover"
+        priority
+        quality={75}
+        placeholder="blur"
+        blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA="
+      />
+
       {/* Lighter overlay for better visibility */}
       <div className="absolute inset-0 bg-black/30 z-[1]" />
 

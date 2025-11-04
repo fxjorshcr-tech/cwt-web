@@ -54,26 +54,13 @@ interface TripData extends BookingFormData {
   selectedRoute: Route | null;
 }
 
-function isValidRoute(route: SupabaseRoute): route is Route {
-  return (
-    route.origen !== null &&
-    route.destino !== null &&
-    route.precio1a6 !== null &&
-    route.precio7a9 !== null &&
-    route.precio10a12 !== null &&
-    route.precio13a18 !== null &&
-    route.kilometros !== null &&
-    route.duracion !== null
-  );
-}
-
 export function BookingForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   // ========== Estados principales ==========
   const [routes, setRoutes] = useState<Route[]>([]);
-  const [isLoadingRoutes, setIsLoadingRoutes] = useState(true); // ← NUEVO: Flag específico para rutas
+  const [isLoadingRoutes, setIsLoadingRoutes] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -176,7 +163,40 @@ export function BookingForm() {
         throw new Error('No routes available in database');
       }
 
-      const validRoutes: Route[] = data.filter(isValidRoute);
+      // ✅ FIX: Filtrar y mapear correctamente
+      const validRoutes: Route[] = (data as SupabaseRoute[])
+        .filter((route): route is SupabaseRoute & {
+          origen: string;
+          destino: string;
+          precio1a6: number;
+          precio7a9: number;
+          precio10a12: number;
+          precio13a18: number;
+          kilometros: number;
+          duracion: string;
+        } => {
+          return (
+            route.origen !== null &&
+            route.destino !== null &&
+            route.precio1a6 !== null &&
+            route.precio7a9 !== null &&
+            route.precio10a12 !== null &&
+            route.precio13a18 !== null &&
+            route.kilometros !== null &&
+            route.duracion !== null
+          );
+        })
+        .map(route => ({
+          id: route.id,
+          origen: route.origen,
+          destino: route.destino,
+          precio1a6: route.precio1a6,
+          precio7a9: route.precio7a9,
+          precio10a12: route.precio10a12,
+          precio13a18: route.precio13a18,
+          kilometros: route.kilometros,
+          duracion: route.duracion,
+        }));
 
       if (validRoutes.length === 0) {
         throw new Error('No valid routes available');

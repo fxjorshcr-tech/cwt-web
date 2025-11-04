@@ -1,5 +1,5 @@
 // src/app/booking-details/page.tsx
-// FINAL VERSION: Restructured columns + Price at bottom after add-ons
+// FINAL VERSION: Restructured columns + Price at bottom after add-ons + TypeScript fix
 
 'use client';
 
@@ -384,10 +384,15 @@ function BookingDetailsContent() {
       setLoading(true);
       const supabase = createClient();
 
+      // ✅ FIX: Validar bookingId antes de usar
+      if (!bookingId) {
+        throw new Error('Booking ID is required');
+      }
+
       const { data, error } = await supabase
         .from('trips')
         .select('*')
-        .eq('booking_id', bookingId)
+        .eq('booking_id', bookingId) // ✅ Ahora TypeScript sabe que no es null
         .order('created_at', { ascending: true });
 
       if (error) throw new Error(error.message);

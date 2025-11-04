@@ -158,7 +158,8 @@ export default function ValueProposition() {
     fetchRoutes();
   }, []);
 
-  const handleRouteClick = () => {
+  // ✅ FIX: Agregar parámetros origin y destination
+  const handleRouteClick = (origin: string, destination: string) => {
     // SOLO hace scroll al formulario - NO lo modifica
     const bookingForm = document.getElementById('booking-form');
     if (bookingForm) {

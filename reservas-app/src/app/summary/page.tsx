@@ -34,7 +34,7 @@ interface Trip {
   date: string;
   adults: number;
   children: number;
-  children_ages: number[] | null;
+  children_ages?: number[] | null;
   price: number;
   distance: number | null;
   duration: string | null;
@@ -48,8 +48,8 @@ interface Trip {
   night_surcharge: number | null;
   fees: number | null;
   final_price: number | null;
-  add_ons: string[] | null;
-  add_ons_price: number | null;
+  add_ons?: string[] | null;
+  add_ons_price?: number | null;
 }
 
 function formatTime(time24: string | null): string {
@@ -318,10 +318,15 @@ function SummaryContent() {
       setLoading(true);
       const supabase = createClient();
 
+      // ✅ FIX: Validar bookingId antes de usar
+      if (!bookingId) {
+        throw new Error('Booking ID is required');
+      }
+
       const { data, error } = await supabase
         .from('trips')
         .select('*')
-        .eq('booking_id', bookingId)
+        .eq('booking_id', bookingId) // ✅ Ahora TypeScript sabe que no es null
         .order('created_at', { ascending: true });
 
       if (error) throw new Error(error.message);

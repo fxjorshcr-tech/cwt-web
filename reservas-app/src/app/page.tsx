@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -65,6 +66,7 @@ export default async function Home() {
                 src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/private-shuttle-logo-white.png"
                 alt="Can't Wait Travel - Costa Rica Private Shuttle Service"
                 fill
+                sizes="(max-width: 768px) 160px, 192px"
                 className="object-contain"
                 priority
               />
@@ -87,16 +89,19 @@ export default async function Home() {
         </div>
       </nav>
 
-      {/* Hero Section - OPTIMIZED BEACH IMAGE */}
+      {/* Hero Section - OPTIMIZADO PARA MOBILE */}
       <section className="relative h-screen">
         <div className="absolute inset-0 z-0">
           <Image
             src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/costa-rica-beach-travel.webp"
             alt="Private Shuttle Costa Rica - Beach Transportation Service"
             fill
+            sizes="100vw"
             className="object-cover"
             priority
-            quality={85}
+            quality={75}
+            placeholder="blur"
+            blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA="
           />
           <div className="absolute inset-0 bg-black/50" />
         </div>
@@ -135,9 +140,20 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Booking Form */}
+      {/* Booking Form - ✅ WRAPPED IN SUSPENSE */}
       <section id="booking-form" className="relative -mt-32 z-20 px-6 pb-20">
-        <BookingFormWrapper locations={locations} />
+        <Suspense fallback={
+          <div className="w-full max-w-5xl mx-auto">
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-12">
+              <div className="flex flex-col items-center justify-center gap-4">
+                <div className="animate-spin h-12 w-12 border-4 border-blue-600 border-t-transparent rounded-full" />
+                <p className="text-gray-600">Loading booking form...</p>
+              </div>
+            </div>
+          </div>
+        }>
+          <BookingFormWrapper locations={locations} />
+        </Suspense>
       </section>
 
       {/* Booking Steps */}
@@ -152,7 +168,7 @@ export default async function Home() {
       {/* Travel Guide */}
       <TravelGuide />
 
-      {/* Private Tours - TEXTO ACTUALIZADO */}
+      {/* Private Tours */}
       <PrivateTours />
 
       {/* Google Reviews */}
@@ -167,7 +183,7 @@ export default async function Home() {
       {/* Back to Form Button */}
       <BackToFormButton />
 
-      {/* Scroll to Form Button - Aparece después de TrustIndicators */}
+      {/* Scroll to Form Button */}
       <ScrollToFormButton />
 
       {/* WhatsApp Floating Button */}
@@ -185,6 +201,7 @@ export default async function Home() {
                     src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/private-shuttle-logo-white.png"
                     alt="Can't Wait Travel Logo"
                     fill
+                    sizes="160px"
                     className="object-contain"
                   />
                 </div>

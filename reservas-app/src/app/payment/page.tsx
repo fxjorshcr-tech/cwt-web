@@ -29,15 +29,32 @@ interface Trip {
   booking_id: string;
   from_location: string;
   to_location: string;
+  date: string;
   adults: number;
   children: number;
+  children_ages?: number[] | null;
   final_price: number | null;
   price: number;
+  distance: number | null;
+  duration: string | null;
+  pickup_address?: string | null;
+  dropoff_address?: string | null;
+  pickup_time?: string | null;
+  flight_number?: string | null;
+  airline?: string | null;
+  arrival_time?: string | null;
+  special_requests?: string | null;
+  night_surcharge?: number | null;
+  fees?: number | null;
+  add_ons?: string[] | null;
+  add_ons_price?: number | null;
   customer_first_name?: string | null;
   customer_last_name?: string | null;
   customer_email?: string | null;
   customer_phone?: string | null;
   customer_country?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
 }
 
 interface CustomerData {
@@ -117,25 +134,30 @@ function PaymentContent() {
       setLoading(true);
       const supabase = createClient();
 
+      // ✅ FIX: Validar bookingId antes de usar
+      if (!bookingId) {
+        throw new Error('Booking ID is required');
+      }
+
       const { data, error } = await supabase
         .from('trips')
         .select('*')
-        .eq('booking_id', bookingId)
+        .eq('booking_id', bookingId) // ✅ Ahora TypeScript sabe que no es null
         .order('created_at', { ascending: true });
 
       if (error) throw new Error(error.message);
       if (!data || data.length === 0) throw new Error('No trips found for this booking');
 
-      setTrips(data);
+      setTrips(data as Trip[]);
 
       // Pre-fill form if data exists
-      if (data[0].customer_first_name) {
+      if (data[0] && 'customer_first_name' in data[0] && data[0].customer_first_name) {
         setCustomerData({
-          firstName: data[0].customer_first_name || '',
-          lastName: data[0].customer_last_name || '',
-          email: data[0].customer_email || '',
-          phone: data[0].customer_phone || '',
-          country: data[0].customer_country || '',
+          firstName: (data[0] as any).customer_first_name || '',
+          lastName: (data[0] as any).customer_last_name || '',
+          email: (data[0] as any).customer_email || '',
+          phone: (data[0] as any).customer_phone || '',
+          country: (data[0] as any).customer_country || '',
         });
       }
     } catch (error) {

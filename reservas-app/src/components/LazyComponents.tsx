@@ -12,15 +12,17 @@ const LoadingSpinner = () => (
   </div>
 );
 
-// Lazy load TripAddOns (only loads when needed)
+// ✅ FIX: Lazy load TripAddOns con export nombrado
 export const LazyTripAddOns = dynamic(
-  () => import('@/components/booking/TripAddOns'),
+  () => import('@/components/booking/TripAddOns').then((mod) => mod.TripAddOns),
   {
     loading: () => <LoadingSpinner />,
     ssr: false, // No SSR needed for this component
   }
 );
 
+// ⚠️ COMENTADO: Descomenta cuando crees estos componentes
+/*
 // Lazy load Map component (if you have one)
 export const LazyMap = dynamic(
   () => import('@/components/Map'),
@@ -42,6 +44,7 @@ export const LazyRichTextEditor = dynamic(
     ssr: false,
   }
 );
+*/
 
 // Example usage in your page:
 /*
