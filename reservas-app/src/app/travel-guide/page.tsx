@@ -17,7 +17,7 @@ export default function TravelGuidePage() {
       description: 'Costa Rica\'s vibrant capital and main gateway. Where to stay, what to do, and how to navigate the city safely.',
       image: 'https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/sjo-costa-rica-city-sunset.webp',
       highlights: ['Airport transfers', 'City tours', 'Museums & culture'],
-      hasImage: true
+      hasGuide: true
     },
     {
       name: 'La Fortuna / Arenal Volcano',
@@ -25,31 +25,85 @@ export default function TravelGuidePage() {
       description: 'Adventure capital with the iconic Arenal Volcano, hot springs, waterfalls, and endless outdoor activities.',
       image: 'https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/arenal-volcano-tour-visit.webp',
       highlights: ['Volcano tours', 'Hot springs', 'Waterfall hikes'],
-      hasImage: true
+      hasGuide: true
     },
     {
       name: 'Puerto Viejo / Cahuita',
       slug: 'puerto-viejo-cahuita',
       description: 'Caribbean coast paradise with Afro-Caribbean culture, pristine beaches, and incredible snorkeling spots.',
-      image: null,
+      image: 'https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/waterfall-costa-rica-tour.webp',
       highlights: ['Beach vibes', 'Snorkeling', 'Local culture'],
-      hasImage: false
+      hasGuide: true
     },
     {
       name: 'Manuel Antonio',
       slug: 'manuel-antonio',
       description: 'World-famous national park combining stunning beaches with incredible wildlife viewing opportunities.',
-      image: null,
+      image: 'https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/waterfall-costa-rica-tour.webp',
       highlights: ['National park', 'Beach & jungle', 'Wildlife'],
-      hasImage: false
+      hasGuide: true
     },
+    {
+      name: 'Monteverde Cloud Forest',
+      slug: 'monteverde',
+      description: 'Mystical cloud forest with hanging bridges, zip-lining, and unique wildlife in misty mountain settings.',
+      image: 'https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/waterfall-costa-rica-tour.webp',
+      highlights: ['Cloud forest', 'Hanging bridges', 'Zip-lining'],
+      hasGuide: true
+    },
+    // ============================================
+    // 🆕 NUEVOS 5 DESTINOS
+    // ============================================
+    {
+      name: 'Río Celeste / Tenorio',
+      slug: 'rio-celeste',
+      description: 'Hidden gem with surreal turquoise waters - like the sky melted into a river. One of Costa Rica\'s most magical natural wonders.',
+      image: 'https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/waterfall-costa-rica-tour.webp',
+      highlights: ['Blue waterfall', 'Jungle hikes', 'Natural phenomenon'],
+      hasGuide: true
+    },
+    {
+      name: 'Montezuma / Santa Teresa',
+      slug: 'montezuma-santa-teresa',
+      description: 'Remote paradise at the tip of Nicoya Peninsula - yoga, world-class surf, and pure vida vibes in bohemian beach towns.',
+      image: 'https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/waterfall-costa-rica-tour.webp',
+      highlights: ['Surf & yoga', 'Waterfalls', 'Beach paradise'],
+      hasGuide: true
+    },
+    {
+      name: 'Liberia (LIR Airport)',
+      slug: 'liberia-lir',
+      description: 'Your gateway to Guanacaste beaches. Everything you need to know about arriving at Costa Rica\'s second international airport.',
+      image: 'https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/sjo-costa-rica-city-sunset.webp',
+      highlights: ['Airport info', 'Beach transfers', 'Fast immigration'],
+      hasGuide: true
+    },
+    {
+      name: 'Guanacaste Beaches',
+      slug: 'guanacaste-beaches',
+      description: 'Gold coast beaches including Tamarindo, Flamingo, Conchal, and Papagayo - from party towns to luxury resorts.',
+      image: 'https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/waterfall-costa-rica-tour.webp',
+      highlights: ['Beach resorts', 'Surfing', 'Nightlife'],
+      hasGuide: true
+    },
+    {
+      name: 'Puerto Jiménez / Osa',
+      slug: 'puerto-jimenez',
+      description: 'Gateway to Corcovado - the most biologically intense place on Earth. Costa Rica\'s wildest and most remote paradise.',
+      image: 'https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/waterfall-costa-rica-tour.webp',
+      highlights: ['Corcovado Park', 'Wildlife paradise', 'Remote jungle'],
+      hasGuide: true
+    },
+    // ============================================
+    // Destinos pendientes (Coming Soon)
+    // ============================================
     {
       name: 'Quepos',
       slug: 'quepos',
       description: 'Gateway to Manuel Antonio with sport fishing, jungle adventures, and authentic local experiences.',
       image: null,
       highlights: ['Sport fishing', 'Adventure tours', 'Local eats'],
-      hasImage: false
+      hasGuide: false
     },
     {
       name: 'Uvita',
@@ -57,7 +111,7 @@ export default function TravelGuidePage() {
       description: 'Hidden gem of the South Pacific with whale watching, pristine beaches, and the famous Whale\'s Tail.',
       image: null,
       highlights: ['Whale watching', 'Waterfalls', 'Quiet beaches'],
-      hasImage: false
+      hasGuide: false
     },
     {
       name: 'Sámara / Nosara',
@@ -65,23 +119,7 @@ export default function TravelGuidePage() {
       description: 'Laid-back beach towns perfect for surfing, yoga retreats, and experiencing the pure vida lifestyle.',
       image: null,
       highlights: ['Surfing', 'Yoga', 'Beaches'],
-      hasImage: false
-    },
-    {
-      name: 'Guanacaste Beaches',
-      slug: 'guanacaste-beaches',
-      description: 'Gold coast beaches including Tamarindo, Flamingo, Conchal, and Papagayo with luxury resorts and adventures.',
-      image: null,
-      highlights: ['Beach resorts', 'Snorkeling', 'Nightlife'],
-      hasImage: false
-    },
-    {
-      name: 'Monteverde Cloud Forest',
-      slug: 'monteverde',
-      description: 'Mystical cloud forest with hanging bridges, zip-lining, and unique wildlife in misty mountain settings.',
-      image: null,
-      highlights: ['Cloud forest', 'Hanging bridges', 'Zip-lining'],
-      hasImage: false
+      hasGuide: false
     },
     {
       name: 'Rincón de la Vieja',
@@ -89,7 +127,7 @@ export default function TravelGuidePage() {
       description: 'Active volcano area with bubbling mud pots, hot springs, horseback riding, and authentic ranch experiences.',
       image: null,
       highlights: ['Volcano hikes', 'Hot springs', 'Horseback riding'],
-      hasImage: false
+      hasGuide: false
     }
   ];
 
@@ -188,7 +226,7 @@ export default function TravelGuidePage() {
                   <div className={`flex flex-col ${isImageRight ? 'md:flex-row' : 'md:flex-row-reverse'} gap-8 bg-white rounded-2xl overflow-hidden border border-gray-200 hover:shadow-2xl transition-all duration-300`}>
                     {/* Image Side */}
                     <div className="md:w-1/2 relative h-72 md:h-96 bg-gray-200 overflow-hidden">
-                      {destination.hasImage && destination.image ? (
+                      {destination.image ? (
                         <Image
                           src={destination.image}
                           alt={`${destination.name} Travel Guide`}
@@ -204,7 +242,7 @@ export default function TravelGuidePage() {
                       
                       {/* Badge */}
                       <div className="absolute top-6 right-6">
-                        {destination.hasImage ? (
+                        {destination.hasGuide ? (
                           <span className="px-4 py-2 bg-green-500 text-white text-sm font-bold rounded-full shadow-lg">
                             ✓ Complete Guide
                           </span>
