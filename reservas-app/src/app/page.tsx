@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { createClient } from "@/utils/supabaseClient";
 import { BookingFormWrapper } from "@/components/home/BookingFormWrapper";
 import BookingSteps from "@/components/booking/BookingSteps";
+import WhyPrivateShuttle from "@/components/home/WhyPrivateShuttle";
 import TrustIndicators from "@/components/home/TrustIndicators";
 import ValueProposition from "@/components/home/ValueProposition";
 import TravelGuide from "@/components/home/TravelGuide";
@@ -61,12 +62,12 @@ export default async function Home() {
       <nav className="absolute top-0 left-0 right-0 z-50 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
-            <div className="relative w-40 h-12 md:w-48 md:h-14">
+            <div className="relative w-96 h-24 md:w-[28rem] md:h-28">
               <Image
-                src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/private-shuttle-logo-white.png"
+                src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/logo-cant-wait-travel.webp"
                 alt="Can't Wait Travel - Costa Rica Private Shuttle Service"
                 fill
-                sizes="(max-width: 768px) 160px, 192px"
+                sizes="(max-width: 768px) 384px, 448px"
                 className="object-contain"
                 priority
               />
@@ -89,11 +90,11 @@ export default async function Home() {
         </div>
       </nav>
 
-      {/* Hero Section - OPTIMIZADO PARA MOBILE */}
+      {/* Hero Section */}
       <section className="relative h-screen">
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/costa-rica-beach-travel.webp"
+            src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/aerial-view-conchal-beach.webp"
             alt="Private Shuttle Costa Rica - Beach Transportation Service"
             fill
             sizes="100vw"
@@ -108,25 +109,24 @@ export default async function Home() {
 
         <div className="relative z-10 h-full flex flex-col items-center justify-center px-6">
           <div className="text-center max-w-4xl">
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 drop-shadow-2xl leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 drop-shadow-2xl leading-tight">
               PRIVATE TRANSPORTATION
             </h1>
             
-            <p className="text-lg md:text-xl text-white/95 mb-8 drop-shadow-lg max-w-3xl mx-auto">
+            <p className="text-sm sm:text-base md:text-lg text-white/95 mb-6 drop-shadow-lg max-w-3xl mx-auto">
               Professional shuttle service from SJO & LIR to all major Costa Rica destinations
             </p>
 
-            {/* Three Words */}
-            <div className="flex items-center justify-center gap-4 md:gap-8">
-              <span className="text-2xl md:text-4xl font-bold text-white drop-shadow-2xl tracking-wider">
+            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 md:gap-6">
+              <span className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-white drop-shadow-2xl tracking-wider">
                 TRUSTED
               </span>
-              <span className="text-white text-3xl">•</span>
-              <span className="text-2xl md:text-4xl font-bold text-white drop-shadow-2xl tracking-wider">
+              <span className="text-white text-lg sm:text-xl">•</span>
+              <span className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-white drop-shadow-2xl tracking-wider">
                 FLEXIBLE
               </span>
-              <span className="text-white text-3xl">•</span>
-              <span className="text-2xl md:text-4xl font-bold text-white drop-shadow-2xl tracking-wider">
+              <span className="text-white text-lg sm:text-xl">•</span>
+              <span className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-white drop-shadow-2xl tracking-wider">
                 AUTHENTIC
               </span>
             </div>
@@ -140,7 +140,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Booking Form - ✅ WRAPPED IN SUSPENSE */}
+      {/* Booking Form */}
       <section id="booking-form" className="relative -mt-32 z-20 px-6 pb-20">
         <Suspense fallback={
           <div className="w-full max-w-5xl mx-auto">
@@ -156,13 +156,16 @@ export default async function Home() {
         </Suspense>
       </section>
 
-      {/* Booking Steps */}
+      {/* Booking Steps - MOVED HERE - Compact with trust badges */}
       <BookingSteps />
 
-      {/* Trust Indicators */}
+      {/* Why Private Shuttle - NEW SECTION */}
+      <WhyPrivateShuttle />
+
+      {/* Trust Indicators - Service Guarantees & Drivers */}
       <TrustIndicators />
 
-      {/* Value Proposition (Routes with dynamic pricing) */}
+      {/* Value Proposition - Routes with pricing */}
       <ValueProposition />
 
       {/* Travel Guide */}
@@ -193,12 +196,11 @@ export default async function Home() {
       <footer className="bg-gray-900 text-white py-12 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
-            {/* Logo & Description */}
             <div className="md:col-span-2">
               <div className="mb-4 flex items-center">
                 <div className="relative w-40 h-10">
                   <Image
-                    src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/private-shuttle-logo-white.png"
+                    src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/logo-cant-wait-travel.webp"
                     alt="Can't Wait Travel Logo"
                     fill
                     sizes="160px"
@@ -215,7 +217,6 @@ export default async function Home() {
               </p>
             </div>
 
-            {/* Quick Links */}
             <div>
               <h3 className="font-bold mb-3">Quick Links</h3>
               <ul className="space-y-2 text-sm text-gray-400">
@@ -228,7 +229,6 @@ export default async function Home() {
               </ul>
             </div>
 
-            {/* Legal */}
             <div>
               <h3 className="font-bold mb-3">Legal</h3>
               <ul className="space-y-2 text-sm text-gray-400">

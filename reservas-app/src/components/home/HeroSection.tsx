@@ -1,10 +1,11 @@
+// src/components/home/HeroSection.tsx
 'use client';
 
 import { ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const HERO_BACKGROUND_URL =
-  'https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/private-shuttle-costa-rica-service.WEBP';
+  'https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/aerial-view-conchal-beach.webp';
 
 export function HeroSection() {
   const scrollToForm = () => {
@@ -27,20 +28,27 @@ export function HeroSection() {
       {/* Overlay oscuro */}
       <div className="absolute inset-0 bg-black/50 z-[1]" />
 
-      {/* Contenido del Hero */}
-      <div className="relative z-[2] text-center px-6 max-w-5xl mx-auto">
-        <h1 className="font-black uppercase tracking-wider text-4xl sm:text-5xl md:text-7xl mb-4 drop-shadow-[2px_2px_8px_rgba(0,0,0,0.8)]">
+      {/* Contenido del Hero - COMPACTO Y OPTIMIZADO PARA MÓVIL */}
+      <div className="relative z-[2] text-center px-4 max-w-4xl mx-auto">
+        
+        {/* Título Principal - Más pequeño */}
+        <h1 className="font-black uppercase tracking-wide text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-3 drop-shadow-[2px_2px_8px_rgba(0,0,0,0.8)] leading-tight">
           Private Transportation
         </h1>
 
-        <h2 className="font-normal text-lg sm:text-xl md:text-3xl mb-6 drop-shadow-[1px_1px_4px_rgba(0,0,0,0.8)]">
-          Reliable Airport Shuttles & Door-to-Door Service in Costa Rica
+        {/* Subtítulo - Más pequeño */}
+        <h2 className="font-normal text-xs sm:text-sm md:text-base lg:text-lg mb-4 drop-shadow-[1px_1px_4px_rgba(0,0,0,0.8)] opacity-90 max-w-2xl mx-auto">
+          Professional shuttle service from SJO & LIR to all major Costa Rica destinations
         </h2>
 
-        <p className="text-sm md:text-lg max-w-2xl mx-auto opacity-95 drop-shadow-[1px_1px_4px_rgba(0,0,0,0.8)]">
-          Safe, comfortable, and professional transportation across Costa Rica. 
-          From airports to beaches, we've got you covered.
-        </p>
+        {/* TRUSTED • FLEXIBLE • AUTHENTIC - Más pequeño */}
+        <div className="flex flex-wrap justify-center items-center gap-2 sm:gap-3 text-xs sm:text-sm md:text-base font-semibold tracking-wider">
+          <span className="drop-shadow-lg">TRUSTED</span>
+          <span className="text-blue-400">•</span>
+          <span className="drop-shadow-lg">FLEXIBLE</span>
+          <span className="text-blue-400">•</span>
+          <span className="drop-shadow-lg">AUTHENTIC</span>
+        </div>
       </div>
 
       {/* Indicador de scroll (flecha animada) */}
@@ -49,9 +57,9 @@ export function HeroSection() {
           variant="ghost"
           size="icon"
           onClick={scrollToForm}
-          className="rounded-full bg-white/10 hover:bg-white/20 text-white h-14 w-14"
+          className="rounded-full bg-white/10 hover:bg-white/20 text-white h-12 w-12 sm:h-14 sm:w-14"
         >
-          <ChevronDown className="h-10 w-10" />
+          <ChevronDown className="h-8 w-8 sm:h-10 sm:w-10" />
         </Button>
       </div>
     </section>

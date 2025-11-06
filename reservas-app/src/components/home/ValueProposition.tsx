@@ -3,9 +3,13 @@
 
 import { useEffect, useState } from 'react';
 import {
-  CheckCircle,
   MapPin,
-  ArrowRight
+  ArrowRight,
+  CheckCircle,
+  Shield,
+  Clock,
+  Users,
+  Award
 } from 'lucide-react';
 import { createClient } from '@/utils/supabaseClient';
 
@@ -96,7 +100,7 @@ export default function ValueProposition() {
         })
         .filter(Boolean) as Destination[];
 
-      // Static inter-city routes (you can make these dynamic too later)
+      // Static inter-city routes
       const interCityRoutes: Destination[] = [
         { 
           name: 'La Fortuna → Monteverde', 
@@ -125,13 +129,6 @@ export default function ValueProposition() {
           price: 'from $90',
           origen: 'SJO - Juan Santamaria Int. Airport',
           destino: 'Jaco / Playa Hermosa (Central Pacific)'
-        },
-        { 
-          name: 'Any Custom Route', 
-          time: 'varies', 
-          price: 'contact us',
-          origen: '',
-          destino: ''
         }
       ];
 
@@ -158,13 +155,21 @@ export default function ValueProposition() {
     fetchRoutes();
   }, []);
 
-  // ✅ FIX: Agregar parámetros origin y destination
+  // ✅ FIXED: Preload destination in booking form
   const handleRouteClick = (origin: string, destination: string) => {
-    // SOLO hace scroll al formulario - NO lo modifica
-    const bookingForm = document.getElementById('booking-form');
-    if (bookingForm) {
-      bookingForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (!origin || !destination) {
+      const bookingForm = document.getElementById('booking-form');
+      if (bookingForm) {
+        bookingForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
     }
+
+    const url = new URL(window.location.origin);
+    url.searchParams.set('origin', origin);
+    url.searchParams.set('destination', destination);
+    
+    window.location.href = url.toString() + '#booking-form';
   };
 
   if (loading) {
@@ -183,6 +188,7 @@ export default function ValueProposition() {
   return (
     <section className="py-16 bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto px-6 max-w-7xl">
+        {/* Popular Routes Section */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 mb-3">
             <MapPin className="h-5 w-5 text-blue-600" />
@@ -198,7 +204,7 @@ export default function ValueProposition() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-20">
           {routes.map((region, idx) => (
             <div
               key={idx}
@@ -251,93 +257,100 @@ export default function ValueProposition() {
           ))}
         </div>
 
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-8 text-white text-center mb-12">
-          <h3 className="text-2xl font-bold mb-3">
-            Don't See Your Route?
-          </h3>
-          <p className="text-blue-100 mb-6 max-w-2xl mx-auto">
-            We cover all of Costa Rica! Get a custom quote for any destination - from beaches to mountains, 
-            we'll get you there safely and comfortably.
-          </p>
-          <a
-            href="/contact"
-            className="inline-flex items-center gap-2 px-8 py-3 bg-white text-blue-600 font-bold rounded-lg hover:bg-blue-50 transition-colors"
-          >
-            Request Custom Quote
-            <ArrowRight className="h-5 w-5" />
-          </a>
-        </div>
-
-        {/* Guarantees Section - MINIMALIST */}
-        <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-8 md:p-12 border border-gray-200 relative overflow-hidden">
-          {/* Subtle decorative elements */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full -translate-y-1/2 translate-x-1/2 opacity-50"></div>
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-orange-50 rounded-full translate-y-1/2 -translate-x-1/2 opacity-50"></div>
-
-          <div className="relative z-10">
-            <div className="text-center mb-8">
-              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
-                Our Commitments to You
-              </h3>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                Every Costa Rica private shuttle booking comes with these guarantees for your peace of mind
-              </p>
+        {/* SERVICE GUARANTEES - CLEAN DESIGN */}
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 rounded-full mb-4">
+              <Award className="h-4 w-4 text-blue-600" />
+              <span className="text-blue-700 font-semibold text-sm uppercase tracking-wide">
+                Premium Service Standard
+              </span>
             </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+              Why Choose Can't Wait Travel
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Every shuttle booking comes with these guarantees for your complete peace of mind
+            </p>
+          </div>
 
-            <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-              <div className="flex items-start gap-3 bg-white p-5 rounded-lg border border-gray-200">
-                <CheckCircle className="h-6 w-6 flex-shrink-0 text-blue-600" />
-                <div>
-                  <h4 className="font-bold text-gray-900 mb-1">On-Time Pickup Guarantee</h4>
-                  <p className="text-sm text-gray-600">
-                    Your driver will be ready at the scheduled time or you'll receive a discount on your next trip. 
-                    We value your time as much as you do.
-                  </p>
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Card 1 */}
+            <div className="bg-white rounded-xl border-2 border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300">
+              <div className="h-1 bg-blue-500"></div>
+              <div className="p-6">
+                <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
+                  <CheckCircle className="h-7 w-7 text-blue-600" />
                 </div>
-              </div>
-
-              <div className="flex items-start gap-3 bg-white p-5 rounded-lg border border-gray-200">
-                <CheckCircle className="h-6 w-6 flex-shrink-0 text-orange-500" />
-                <div>
-                  <h4 className="font-bold text-gray-900 mb-1">Clean Vehicle Guarantee</h4>
-                  <p className="text-sm text-gray-600">
-                    All vehicles thoroughly sanitized before each trip with full A/C, comfortable seating, 
-                    and premium amenities for your journey.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3 bg-white p-5 rounded-lg border border-gray-200">
-                <CheckCircle className="h-6 w-6 flex-shrink-0 text-blue-600" />
-                <div>
-                  <h4 className="font-bold text-gray-900 mb-1">English-Speaking Driver</h4>
-                  <p className="text-sm text-gray-600">
-                    All our drivers are bilingual (English/Spanish) with excellent communication skills 
-                    and local expertise to enhance your Costa Rica experience.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3 bg-white p-5 rounded-lg border border-gray-200">
-                <CheckCircle className="h-6 w-6 flex-shrink-0 text-orange-500" />
-                <div>
-                  <h4 className="font-bold text-gray-900 mb-1">Satisfaction Promise</h4>
-                  <p className="text-sm text-gray-600">
-                    Not satisfied with your service? Contact us within 24 hours and we'll make it right. 
-                    Your satisfaction is our priority.
-                  </p>
-                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                  On-Time Pickup Guarantee
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Your driver will be ready at the scheduled time or you'll receive a discount on your next trip. 
+                  We value your time as much as you do.
+                </p>
               </div>
             </div>
 
-            <div className="mt-8 text-center">
-              <p className="text-sm text-gray-500">
-                * Subject to our{' '}
-                <a href="/terms" className="underline hover:text-gray-700">
-                  Terms & Conditions
-                </a>
-              </p>
+            {/* Card 2 */}
+            <div className="bg-white rounded-xl border-2 border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300">
+              <div className="h-1 bg-orange-500"></div>
+              <div className="p-6">
+                <div className="w-14 h-14 bg-orange-100 rounded-xl flex items-center justify-center mb-4">
+                  <Shield className="h-7 w-7 text-orange-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                  Clean Vehicle Guarantee
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  All vehicles thoroughly sanitized before each trip with full A/C, comfortable seating, 
+                  and premium amenities for your journey.
+                </p>
+              </div>
             </div>
+
+            {/* Card 3 */}
+            <div className="bg-white rounded-xl border-2 border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300">
+              <div className="h-1 bg-green-500"></div>
+              <div className="p-6">
+                <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mb-4">
+                  <Users className="h-7 w-7 text-green-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                  English-Speaking Driver
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  All our drivers are bilingual (English/Spanish) with excellent communication skills 
+                  and local expertise to enhance your Costa Rica experience.
+                </p>
+              </div>
+            </div>
+
+            {/* Card 4 */}
+            <div className="bg-white rounded-xl border-2 border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300">
+              <div className="h-1 bg-purple-500"></div>
+              <div className="p-6">
+                <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center mb-4">
+                  <Award className="h-7 w-7 text-purple-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                  Satisfaction Promise
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Not satisfied with your service? Contact us within 24 hours and we'll make it right. 
+                  Your satisfaction is our priority.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8 text-center">
+            <p className="text-sm text-gray-500">
+              * Subject to our{' '}
+              <a href="/terms" className="underline hover:text-gray-700 font-semibold transition-colors">
+                Terms & Conditions
+              </a>
+            </p>
           </div>
         </div>
       </div>

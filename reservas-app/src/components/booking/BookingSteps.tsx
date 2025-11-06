@@ -1,5 +1,5 @@
 // src/components/booking/BookingSteps.tsx
-// Enhanced with SEO-rich content for AI search and better user guidance
+// BEAUTIFUL VERSION - Colorful steps with descriptive text, no trust badges
 
 'use client';
 
@@ -8,172 +8,118 @@ import {
   FileText,
   Eye,
   Lock,
-  Shield,
-  CheckCircle,
-  Sparkles
+  ArrowRight
 } from 'lucide-react';
 
 export default function BookingSteps() {
   const steps = [
     { 
       icon: Search, 
-      title: 'Select', 
-      subtitle: 'Your Route',
-      color: 'blue' 
+      number: 1,
+      title: 'Select Your Route', 
+      description: 'Choose from 1,000+ destinations across Costa Rica',
+      gradient: 'from-blue-500 to-blue-600',
+      bgLight: 'bg-blue-50',
+      borderColor: 'border-blue-200',
+      hoverBorder: 'hover:border-blue-400'
     },
     { 
       icon: FileText, 
-      title: 'Fill', 
-      subtitle: 'Details',
-      color: 'blue' 
+      number: 2,
+      title: 'Fill Details', 
+      description: 'Add pickup time, location & passenger info',
+      gradient: 'from-indigo-500 to-indigo-600',
+      bgLight: 'bg-indigo-50',
+      borderColor: 'border-indigo-200',
+      hoverBorder: 'hover:border-indigo-400'
     },
     { 
       icon: Eye, 
-      title: 'Review', 
-      subtitle: 'Booking',
-      color: 'orange' 
+      number: 3,
+      title: 'Review Booking', 
+      description: 'Confirm your trip details and pricing',
+      gradient: 'from-orange-500 to-orange-600',
+      bgLight: 'bg-orange-50',
+      borderColor: 'border-orange-200',
+      hoverBorder: 'hover:border-orange-400'
     },
     { 
       icon: Lock, 
-      title: 'Pay', 
-      subtitle: 'Securely',
-      color: 'orange' 
+      number: 4,
+      title: 'Pay Securely', 
+      description: 'Safe payment with bank-level encryption',
+      gradient: 'from-green-500 to-green-600',
+      bgLight: 'bg-green-50',
+      borderColor: 'border-green-200',
+      hoverBorder: 'hover:border-green-400'
     },
   ];
 
   return (
-    <section className="py-16 bg-white relative overflow-hidden">
-      {/* Subtle Background Accent */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-blue-50 rounded-full blur-3xl opacity-30 -z-10"></div>
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-orange-50 rounded-full blur-3xl opacity-30 -z-10"></div>
-
-      <div className="container mx-auto px-6 max-w-6xl relative">
+    <section className="py-16 bg-gradient-to-b from-gray-50 to-white">
+      <div className="container mx-auto px-6 max-w-6xl">
         
-        {/* Header with accent */}
+        {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 mb-3">
-            <div className="h-1 w-8 bg-blue-500 rounded-full"></div>
-            <Sparkles className="h-4 w-4 text-orange-500" />
-            <div className="h-1 w-8 bg-orange-500 rounded-full"></div>
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 rounded-full mb-4">
+            <span className="text-blue-700 font-bold text-sm uppercase tracking-wide">
+              Simple Process
+            </span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-            Book in 4 Simple Steps
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+            Book in 4 Easy Steps
           </h2>
-          <p className="text-base text-gray-600">
-            Fast and secure - under 5 minutes
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Fast, secure, and hassle-free booking in under 5 minutes
           </p>
         </div>
 
-        {/* Steps Timeline */}
-        <div className="relative mb-12">
-          {/* Connection Line - Desktop */}
-          <div className="hidden md:block absolute top-8 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-200 via-orange-200 to-orange-300 mx-24"></div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 relative">
-            {steps.map((step, idx) => (
-              <div key={idx} className="relative group">
-                {/* Card */}
-                <div className="bg-white border-2 border-gray-100 rounded-xl p-6 hover:border-blue-200 hover:shadow-lg transition-all duration-300 relative h-full">
-                  {/* Step Number Badge */}
-                  <div className="absolute -top-3 -right-3 h-8 w-8 bg-gray-900 text-white rounded-full flex items-center justify-center font-bold text-sm shadow-lg z-10">
-                    {idx + 1}
-                  </div>
-
-                  <div className="flex flex-col items-center text-center">
-                    {/* Icon with color accent */}
-                    <div className={`relative mb-4 ${
-                      step.color === 'blue' 
-                        ? 'bg-blue-500 group-hover:bg-blue-600' 
-                        : 'bg-orange-500 group-hover:bg-orange-600'
-                    } h-16 w-16 rounded-xl flex items-center justify-center transition-colors shadow-md`}>
-                      <step.icon className="h-8 w-8 text-white" />
-                      {/* Corner accent */}
-                      <div className={`absolute -bottom-1 -right-1 h-3 w-3 ${
-                        step.color === 'blue' ? 'bg-orange-400' : 'bg-blue-400'
-                      } rounded-sm`}></div>
-                    </div>
-
-                    {/* Text */}
-                    <h3 className="font-bold text-gray-900 text-xl mb-1">{step.title}</h3>
-                    <p className="text-sm text-gray-600">{step.subtitle}</p>
-                  </div>
-                </div>
+        {/* Steps Grid - Beautiful & Descriptive */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {steps.map((step, idx) => (
+            <div
+              key={idx}
+              className={`group relative bg-white rounded-2xl border-2 ${step.borderColor} ${step.hoverBorder} p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1`}
+            >
+              {/* Step Number Badge */}
+              <div className="absolute -top-4 -right-4 h-10 w-10 bg-gray-900 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-lg z-10">
+                {step.number}
               </div>
-            ))}
-          </div>
+
+              {/* Icon with Gradient */}
+              <div className={`relative mb-6`}>
+                <div className={`h-16 w-16 bg-gradient-to-br ${step.gradient} rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}>
+                  <step.icon className="h-8 w-8 text-white" />
+                </div>
+                {/* Decorative corner accent */}
+                <div className={`absolute -bottom-2 -right-2 h-6 w-6 ${step.bgLight} rounded-lg`}></div>
+              </div>
+
+              {/* Text Content */}
+              <div className="space-y-2">
+                <h3 className="font-bold text-gray-900 text-lg leading-tight">
+                  {step.title}
+                </h3>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  {step.description}
+                </p>
+              </div>
+
+              {/* Arrow indicator for next step (except last) */}
+              {idx < steps.length - 1 && (
+                <div className="hidden lg:block absolute -right-8 top-1/2 -translate-y-1/2 z-20">
+                  <ArrowRight className="h-6 w-6 text-gray-300" />
+                </div>
+              )}
+            </div>
+          ))}
         </div>
 
-        {/* Payment Section - Clean & Minimal */}
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-gradient-to-br from-gray-50 to-blue-50/30 border-2 border-gray-200 rounded-2xl p-8 relative overflow-hidden">
-            {/* Decorative corner accents */}
-            <div className="absolute top-0 right-0 h-20 w-20 bg-orange-500/10 rounded-bl-full"></div>
-            <div className="absolute bottom-0 left-0 h-20 w-20 bg-blue-500/10 rounded-tr-full"></div>
-
-            <div className="relative">
-              {/* Header */}
-              <div className="flex items-start gap-4 mb-6">
-                <div className="flex-shrink-0">
-                  <div className="h-12 w-12 bg-blue-500 rounded-xl flex items-center justify-center shadow-md">
-                    <Shield className="h-6 w-6 text-white" />
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">
-                    Secure Payment Platform
-                  </h3>
-                  <p className="text-sm text-gray-700 leading-relaxed">
-                    We use Stripe's payment system - trusted by{' '}
-                    <span className="font-bold text-blue-600">Netflix</span> and{' '}
-                    <span className="font-bold text-orange-600">HBO</span>. 
-                    All payments are encrypted and secure.
-                  </p>
-                </div>
-              </div>
-
-              {/* Payment Methods - Simple List */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-                <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-lg px-4 py-3 text-center hover:border-blue-300 transition-colors">
-                  <p className="font-semibold text-gray-900 text-sm">Credit Card</p>
-                  <p className="text-xs text-gray-600">Visa, Mastercard</p>
-                </div>
-                <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-lg px-4 py-3 text-center hover:border-blue-300 transition-colors">
-                  <p className="font-semibold text-gray-900 text-sm">Bank Transfer</p>
-                  <p className="text-xs text-gray-600">Wire, ACH</p>
-                </div>
-                <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-lg px-4 py-3 text-center hover:border-blue-300 transition-colors">
-                  <p className="font-semibold text-gray-900 text-sm">Direct Debit</p>
-                  <p className="text-xs text-gray-600">SEPA, BACS</p>
-                </div>
-                <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-lg px-4 py-3 text-center hover:border-blue-300 transition-colors">
-                  <p className="font-semibold text-gray-900 text-sm">More Options</p>
-                  <p className="text-xs text-gray-600">iDEAL, PayTo</p>
-                </div>
-              </div>
-
-              {/* Trust Badges - Inline with color accents */}
-              <div className="flex flex-wrap justify-center items-center gap-6 pt-5 border-t border-gray-300">
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <CheckCircle className="h-4 w-4 text-blue-600" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">256-bit SSL Encrypted</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <Shield className="h-4 w-4 text-orange-600" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">PCI-DSS Compliant</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 bg-gray-900 rounded-lg flex items-center justify-center">
-                    <Lock className="h-4 w-4 text-white" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">Powered by Stripe</span>
-                </div>
-              </div>
-            </div>
-          </div>
+        {/* Bottom CTA */}
+        <div className="text-center mt-12">
+          <p className="text-sm text-gray-500">
+            ⚡ Average booking time: <span className="font-bold text-gray-900">3 minutes</span>
+          </p>
         </div>
       </div>
     </section>

@@ -1,5 +1,5 @@
 // src/components/home/PrivateTours.tsx
-// UPDATED: New messaging emphasizing we operate tours directly
+// UPDATED: Fixed image alignment, max 6 people per tour
 
 'use client';
 
@@ -99,15 +99,16 @@ export default function PrivateTours() {
           ))}
         </div>
 
-        {/* Why Choose Our Tours */}
-        <div className="grid md:grid-cols-2 gap-12 mb-16">
-          {/* Image */}
-          <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
+        {/* Why Choose Our Tours - FIXED ALIGNMENT */}
+        <div className="grid md:grid-cols-2 gap-12 mb-16 items-center">
+          {/* Image - FIXED: Added proper aspect ratio and object fit */}
+          <div className="relative h-[500px] md:h-[600px] rounded-2xl overflow-hidden shadow-xl">
             <Image
               src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/private-shuttle-costa-rica-service.WEBP"
-              alt="Private Tours Costa Rica"
+              alt="Private Tours Costa Rica - Expert guides and personalized experiences"
               fill
-              className="object-cover"
+              className="object-cover object-center"
+              sizes="(max-width: 768px) 100vw, 50vw"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
             <div className="absolute bottom-6 left-6 right-6">
@@ -155,7 +156,7 @@ export default function PrivateTours() {
                 <div>
                   <h4 className="font-bold text-gray-900 mb-1">Small Private Groups</h4>
                   <p className="text-sm text-gray-600">
-                    Maximum 8 people per tour for personalized attention and authentic experiences
+                    Maximum 6 people per tour for personalized attention and authentic experiences
                   </p>
                 </div>
               </div>

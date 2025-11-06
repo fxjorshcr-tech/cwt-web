@@ -27,13 +27,13 @@ export default function BookingNavbar() {
       <header className="sticky top-0 z-50 w-full bg-[rgba(26,35,46,0.95)] backdrop-blur-md shadow-lg">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            {/* Logo */}
+            {/* Logo - NUEVO */}
             <Link
               href="/"
               className="relative h-10 w-36 md:h-12 md:w-44 flex-shrink-0"
             >
               <Image
-                src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/private-shuttle-logo-white.png"
+                src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/logo-cant-wait-travel.webp"
                 alt="Can't Wait Travel Logo"
                 fill
                 className="object-contain"

@@ -1,5 +1,5 @@
 // src/components/home/BookingForm.tsx
-// OPTIMIZED: Shows form immediately, loads routes in background
+// VERSION WITHOUT TRUST BADGES - Clean footer
 
 'use client';
 
@@ -58,13 +58,11 @@ export function BookingForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // ========== Estados principales ==========
   const [routes, setRoutes] = useState<Route[]>([]);
   const [isLoadingRoutes, setIsLoadingRoutes] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // ========== Estados del formulario ==========
   const [trips, setTrips] = useState<TripData[]>([
     {
       from_location: '',
@@ -77,20 +75,10 @@ export function BookingForm() {
     },
   ]);
 
-  /**
-   * ==========================================
-   * EFECTO: CARGAR RUTAS AL MONTAR
-   * ==========================================
-   */
   useEffect(() => {
     loadRoutes();
   }, []);
 
-  /**
-   * ==========================================
-   * EFECTO: PRE-CARGAR DESDE URL PARAMETERS
-   * ==========================================
-   */
   useEffect(() => {
     if (routes.length > 0) {
       const origin = searchParams.get('origin');
@@ -163,7 +151,6 @@ export function BookingForm() {
         throw new Error('No routes available in database');
       }
 
-      // ✅ FIX: Filtrar y mapear correctamente
       const validRoutes: Route[] = (data as SupabaseRoute[])
         .filter((route): route is SupabaseRoute & {
           origen: string;
@@ -416,7 +403,9 @@ export function BookingForm() {
 
       console.log('✅ Trips saved successfully:', data);
       console.log('🚀 Navigating to booking-details...');
+      
       router.push(`/booking-details?booking_id=${bookingId}&trip=0`);
+      
     } catch (error) {
       console.error('💥 Complete error:', error);
 
@@ -428,7 +417,7 @@ export function BookingForm() {
       alert(
         `❌ ${errorMessage}\n\nPlease check your data and try again.`
       );
-    } finally {
+      
       setIsSubmitting(false);
     }
   }
@@ -438,29 +427,31 @@ export function BookingForm() {
     0
   );
 
-  /**
-   * ==========================================
-   * RENDER: MAIN FORM (ALWAYS VISIBLE)
-   * ==========================================
-   */
   return (
     <div className="w-full max-w-5xl mx-auto">
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Main Card */}
         <div className="bg-white rounded-xl shadow-lg border border-gray-200">
-          {/* Header */}
-          <div className="bg-gray-50 px-6 py-6 border-b border-gray-200">
-            <h2 className="text-2xl font-bold text-gray-900 text-center">
-              PRIVATE SHUTTLES
-            </h2>
-            <p className="text-gray-600 text-center text-sm mt-1">
-              Powered by Costarican expertise
-            </p>
+          {/* Beautiful Header */}
+          <div className="relative bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 px-6 py-8 border-b border-gray-200">
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute inset-0" style={{
+                backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)',
+                backgroundSize: '32px 32px'
+              }} />
+            </div>
+            
+            <div className="relative text-center">
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight">
+                Book Your Private Shuttle
+              </h2>
+              <p className="text-blue-100 text-base md:text-lg">
+                Professional drivers • Modern vehicles • Door-to-door service
+              </p>
+            </div>
           </div>
 
           {/* Form Content */}
           <div className="p-6 space-y-4">
-            {/* Error Banner */}
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
                 <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
@@ -479,12 +470,9 @@ export function BookingForm() {
               </div>
             )}
 
-            {/* Trips List */}
             {trips.map((trip, index) => (
               <div key={index} className="space-y-3">
-                {/* Trip Card */}
                 <div className="bg-gray-50 rounded-lg p-5 border border-gray-200">
-                  {/* Trip Header */}
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                       <div className="h-7 w-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-semibold">
@@ -513,9 +501,7 @@ export function BookingForm() {
                     )}
                   </div>
 
-                  {/* Location Fields */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-3">
-                    {/* Origin */}
                     <div className="space-y-1.5">
                       <label className="flex items-center gap-1.5 text-xs font-medium text-gray-700">
                         <MapPin className="h-3.5 w-3.5 text-blue-600" />
@@ -551,7 +537,6 @@ export function BookingForm() {
                       )}
                     </div>
 
-                    {/* Destination */}
                     <div className="space-y-1.5">
                       <label className="flex items-center gap-1.5 text-xs font-medium text-gray-700">
                         <MapPin className="h-3.5 w-3.5 text-orange-600" />
@@ -586,7 +571,6 @@ export function BookingForm() {
                     </div>
                   </div>
 
-                  {/* Date and Passengers */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                     <ModernDatePicker
                       value={trip.date ? new Date(trip.date) : null}
@@ -607,11 +591,9 @@ export function BookingForm() {
                     />
                   </div>
 
-                  {/* Route Details */}
                   {trip.selectedRoute && (
                     <div className="mt-3 bg-white rounded-lg p-3 border border-gray-200">
                       <div className="grid grid-cols-3 gap-2">
-                        {/* Price */}
                         <div className="text-center p-2 bg-blue-50 rounded-lg border border-blue-200">
                           <div className="text-xl font-bold text-blue-600">
                             ${trip.calculatedPrice}
@@ -619,7 +601,6 @@ export function BookingForm() {
                           <p className="text-xs text-gray-600 mt-0.5">Price</p>
                         </div>
 
-                        {/* Duration */}
                         <div className="text-center p-2 bg-orange-50 rounded-lg border border-orange-300">
                           <div className="flex items-center justify-center gap-1">
                             <Clock className="h-3.5 w-3.5 text-orange-500" />
@@ -632,7 +613,6 @@ export function BookingForm() {
                           </p>
                         </div>
 
-                        {/* Distance */}
                         <div className="text-center p-2 bg-gray-50 rounded-lg border border-gray-200">
                           <div className="flex items-center justify-center gap-1">
                             <RouteIcon className="h-3.5 w-3.5 text-gray-600" />
@@ -647,7 +627,6 @@ export function BookingForm() {
                   )}
                 </div>
 
-                {/* Separator between trips */}
                 {index < trips.length - 1 && (
                   <div className="flex justify-center py-2">
                     <ChevronDown className="h-5 w-5 text-gray-400" />
@@ -656,7 +635,6 @@ export function BookingForm() {
               </div>
             ))}
 
-            {/* Add Another Trip Button */}
             <div className="flex justify-center">
               <button
                 type="button"
@@ -670,22 +648,8 @@ export function BookingForm() {
             </div>
           </div>
 
-          {/* Footer */}
           <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-              {/* Total */}
-              {totalPrice > 0 && (
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600 font-medium">
-                    Total:
-                  </span>
-                  <span className="text-2xl font-bold text-blue-600">
-                    ${totalPrice}
-                  </span>
-                </div>
-              )}
-
-              {/* Submit Button */}
+            <div className="flex justify-end">
               <button
                 type="submit"
                 disabled={

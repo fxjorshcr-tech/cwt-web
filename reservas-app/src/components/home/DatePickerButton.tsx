@@ -1,4 +1,5 @@
 // src/components/home/DatePickerButton.tsx
+// FIXED: Proper z-index and positioning for mobile & desktop
 
 'use client';
 
@@ -34,7 +35,8 @@ interface DatePickerButtonProps {
  * - Calendario en español
  * - Solo permite fechas futuras (no pasadas)
  * - Integrado con Popover de shadcn/ui
- * - Maneja correctamente el estado y la propagación
+ * - Z-index alto para aparecer sobre todo
+ * - Funciona en mobile y desktop
  * 
  * @param date - Fecha actualmente seleccionada
  * @param onDateChange - Callback cuando cambia la fecha
@@ -72,14 +74,14 @@ export function DatePickerButton({
   today.setHours(0, 0, 0, 0); // Resetear hora para comparación correcta
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 relative">
       {label && (
         <Label htmlFor="date-picker" className="text-sm font-medium">
           {label}
         </Label>
       )}
       
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover open={open} onOpenChange={setOpen} modal={true}>
         <PopoverTrigger asChild>
           <Button
             id="date-picker"
@@ -100,7 +102,16 @@ export function DatePickerButton({
           </Button>
         </PopoverTrigger>
         
-        <PopoverContent className="w-auto p-0" align="start">
+        {/* CRITICAL FIX: High z-index + proper positioning */}
+        <PopoverContent 
+          className="w-auto p-0" 
+          align="start"
+          side="bottom"
+          sideOffset={8}
+          style={{ zIndex: 99999 }}
+          avoidCollisions={true}
+          collisionPadding={20}
+        >
           <Calendar
             mode="single"
             selected={date}
