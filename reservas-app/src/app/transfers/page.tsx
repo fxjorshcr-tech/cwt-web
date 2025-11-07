@@ -1,5 +1,5 @@
 // src/app/transfers/page.tsx
-// ✅ Client Component with metadata via Head
+// ✅ CORRECTED VERSION - Fixed imports
 'use client';
 
 import { Suspense, useState, useEffect } from "react";
@@ -7,8 +7,8 @@ import Image from "next/image";
 import Link from "next/link";
 import Head from "next/head";
 import { Button } from "@/components/ui/button";
-import { createClient } from "@/utils/supabaseClient";
-import { BookingFormWrapper } from "@/components/home/BookingFormWrapper";
+import { createClient } from "@/lib/supabase/client";
+import { BookingForm } from '@/components/home/BookingForm';
 import WhatsAppButton from "@/components/WhatsAppButton";
 import {
   Shield,
@@ -173,7 +173,7 @@ export default function TransfersPage() {
             </div>
           </div>
         ) : (
-          <BookingFormWrapper locations={locations} />
+          <BookingForm />
         )}
       </section>
 

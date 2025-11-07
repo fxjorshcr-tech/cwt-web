@@ -1,26 +1,24 @@
 // src/components/booking/BookingStepper.tsx
-// MINIMALIST TAB-STYLE STEPPER - Professional & Compact
-// 100% Shadcn/ui + Tailwind CSS
+// ✅ MINIMALIST TAB-STYLE STEPPER - Professional & Compact
 
 'use client';
 
 import React from 'react';
 import { Check } from 'lucide-react';
 
-// Shadcn/ui helper para combinar clases
 function cn(...classes: (string | boolean | undefined)[]) {
   return classes.filter(Boolean).join(' ');
 }
 
 interface BookingStepperProps {
-  currentStep: number; // 0: Search, 1: Booking Details, 2: Summary, 3: Payment
+  currentStep: number; // 0: Search, 1: Booking Details, 2: Payment, 3: Summary
 }
 
 const steps = [
   { id: 0, label: 'Search' },
-  { id: 1, label: 'Booking Details' },
-  { id: 2, label: 'Summary' },
-  { id: 3, label: 'Payment' },
+  { id: 1, label: 'Details' },
+  { id: 2, label: 'Payment' },
+  { id: 3, label: 'Summary' },
 ];
 
 export default function BookingStepper({ currentStep }: BookingStepperProps) {

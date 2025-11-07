@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, MapPin, Clock, AlertCircle } from 'lucide-react';
 import { notFound } from 'next/navigation';
-import { getDestinationRoutes, formatDuration, type Route } from '@/lib/getDestinationRoutes';
+import { getDestinationRoutes, formatDuration, type RouteWithDetails } from '@/lib/getDestinationRoutes';
 
 // CONTENIDO COMPLETO REESCRITO - TODOS LOS DESTINOS
 // Tono: Profesional, positivo, útil, celebrando Costa Rica
@@ -1453,7 +1453,7 @@ Nosara has evolved into an upscale wellness destination. World-renowned yoga stu
 // ==============================================
 
 export default function DestinationPage({ params }: { params: { slug: string } }) {
-  const [routes, setRoutes] = useState<Route[]>([]);
+  const [routes, setRoutes] = useState<RouteWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   
   const destination = destinationContent[params.slug];

@@ -1,11 +1,12 @@
 // src/components/home/ModernDatePicker.tsx
+// ✅ WORKING VERSION - Sin template strings anidados
 
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 
 interface ModernDatePickerProps {
   value: Date | null;
@@ -24,17 +25,27 @@ export function ModernDatePicker({
   const [currentMonth, setCurrentMonth] = useState(value || new Date());
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Cerrar al hacer click fuera
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     }
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setIsOpen(false);
+      }
+    }
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+      return () => document.removeEventListener('keydown', handleEscape);
+    }
+  }, [isOpen]);
 
   const daysInMonth = (date: Date) => {
     const year = date.getFullYear();
@@ -51,12 +62,22 @@ export function ModernDatePicker({
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
+  const maxDate = new Date();
+  maxDate.setFullYear(maxDate.getFullYear() + 1);
+  maxDate.setHours(23, 59, 59, 999);
+
   const handlePrevMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
+    const newMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1);
+    if (newMonth >= new Date(today.getFullYear(), today.getMonth(), 1)) {
+      setCurrentMonth(newMonth);
+    }
   };
 
   const handleNextMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
+    const newMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1);
+    if (newMonth <= maxDate) {
+      setCurrentMonth(newMonth);
+    }
   };
 
   const handleDateSelect = (day: number) => {
@@ -65,9 +86,9 @@ export function ModernDatePicker({
       currentMonth.getMonth(),
       day
     );
+    selectedDate.setHours(0, 0, 0, 0);
     
-    // No permitir fechas pasadas
-    if (selectedDate >= today) {
+    if (selectedDate >= today && selectedDate <= maxDate) {
       onChange(selectedDate);
       setIsOpen(false);
     }
@@ -78,37 +99,41 @@ export function ModernDatePicker({
     const totalDays = daysInMonth(currentMonth);
     const firstDay = firstDayOfMonth(currentMonth);
 
-    // Espacios vacíos antes del primer día
     for (let i = 0; i < firstDay; i++) {
       days.push(<div key={`empty-${i}`} className="h-10" />);
     }
 
-    // Días del mes
     for (let day = 1; day <= totalDays; day++) {
       const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+      date.setHours(0, 0, 0, 0);
+      
       const isPast = date < today;
+      const isFuture = date > maxDate;
+      const isDisabled = isPast || isFuture;
+      
       const isSelected = value && 
         date.getDate() === value.getDate() &&
         date.getMonth() === value.getMonth() &&
         date.getFullYear() === value.getFullYear();
+
+      let buttonClass = 'h-10 w-full rounded-lg text-sm font-medium transition-colors ';
+      if (isDisabled) {
+        buttonClass += 'text-gray-300 cursor-not-allowed';
+      } else if (isSelected) {
+        buttonClass += 'bg-blue-500 text-white hover:bg-blue-600';
+      } else {
+        buttonClass += 'hover:bg-blue-50 text-gray-700';
+      }
 
       days.push(
         <button
           key={day}
           type="button"
           onClick={() => handleDateSelect(day)}
-          disabled={isPast}
-          className={`
-            h-10 w-full rounded-lg text-sm font-medium transition-colors
-            ${isPast 
-              ? 'text-gray-300 cursor-not-allowed' 
-              : 'hover:bg-blue-50 text-gray-700'
-            }
-            ${isSelected 
-              ? 'bg-blue-500 text-white hover:bg-blue-600' 
-              : ''
-            }
-          `}
+          disabled={isDisabled}
+          aria-label={`Select ${format(date, 'MMMM d, yyyy', { locale: enUS })}`}
+          aria-pressed={isSelected ? true : undefined}
+          className={buttonClass}
         >
           {day}
         </button>
@@ -118,7 +143,10 @@ export function ModernDatePicker({
     return days;
   };
 
-  const weekDays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  const canGoPrev = currentMonth > new Date(today.getFullYear(), today.getMonth(), 1);
+  const canGoNext = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1) <= maxDate;
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
@@ -128,64 +156,77 @@ export function ModernDatePicker({
         </label>
       )}
 
-      {/* Input Button */}
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
+        aria-label="Select travel date"
+        aria-expanded={isOpen}
+        aria-haspopup="dialog"
         className="w-full px-4 py-3 text-left bg-white border border-gray-300 rounded-lg hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
       >
         <div className="flex items-center gap-2">
-          <CalendarIcon className="h-5 w-5 text-gray-400" />
+          <CalendarIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
           <span className={value ? 'text-gray-900' : 'text-gray-400'}>
             {value 
-              ? format(value, "EEEE, d 'de' MMMM 'de' yyyy", { locale: es })
-              : 'Selecciona una fecha'
+              ? format(value, 'EEEE, MMMM d, yyyy', { locale: enUS })
+              : 'Select a date'
             }
           </span>
         </div>
       </button>
 
-      {/* Calendar Dropdown */}
       {isOpen && (
-        <div className="absolute z-50 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 p-4 w-80">
-          {/* Header */}
+        <div 
+          className="absolute z-50 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 p-4 w-80"
+          role="dialog"
+          aria-label="Date picker"
+        >
           <div className="flex items-center justify-between mb-4">
             <button
               type="button"
               onClick={handlePrevMonth}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              disabled={!canGoPrev}
+              aria-label="Previous month"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white"
             >
               <ChevronLeft className="h-5 w-5 text-gray-600" />
             </button>
             
-            <div className="font-semibold text-gray-900">
-              {format(currentMonth, 'MMMM yyyy', { locale: es })}
+            <div className="font-semibold text-gray-900" aria-live="polite">
+              {format(currentMonth, 'MMMM yyyy', { locale: enUS })}
             </div>
             
             <button
               type="button"
               onClick={handleNextMonth}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              disabled={!canGoNext}
+              aria-label="Next month"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white"
             >
               <ChevronRight className="h-5 w-5 text-gray-600" />
             </button>
           </div>
 
-          {/* Week Days */}
           <div className="grid grid-cols-7 gap-1 mb-2">
             {weekDays.map((day) => (
               <div
                 key={day}
                 className="h-10 flex items-center justify-center text-xs font-medium text-gray-500"
+                aria-label={day}
               >
                 {day}
               </div>
             ))}
           </div>
 
-          {/* Calendar Days */}
-          <div className="grid grid-cols-7 gap-1">
+          <div className="grid grid-cols-7 gap-1" role="grid">
             {renderCalendarDays()}
+          </div>
+
+          <div className="mt-4 pt-4 border-t">
+            <p className="text-xs text-gray-500 text-center">
+              You can book up to one year in advance
+            </p>
           </div>
         </div>
       )}

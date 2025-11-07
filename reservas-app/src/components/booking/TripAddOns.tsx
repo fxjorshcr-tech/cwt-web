@@ -1,27 +1,11 @@
 // src/components/booking/TripAddOns.tsx
-// Add-ons selector for trips - Tico Time Upgrade & Flex Time Protection
+// ✅ PHASE 2 CORRECTED - Removed SimpleCheckbox, improved accessibility
 
 'use client';
 
 import React from 'react';
 import { Clock, Shield, Check } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
-// Simple Checkbox component (si no tienes @/components/ui/checkbox)
-function SimpleCheckbox({ checked, onCheckedChange }: { checked: boolean; onCheckedChange: () => void }) {
-  return (
-    <input
-      type="checkbox"
-      checked={checked}
-      onChange={(e) => {
-        e.stopPropagation(); // Evitar doble trigger
-        onCheckedChange();
-      }}
-      onClick={(e) => e.stopPropagation()} // Evitar que el click se propague al card
-      className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
-    />
-  );
-}
 
 export interface AddOn {
   id: string;
@@ -88,9 +72,20 @@ export function TripAddOns({ selectedAddOns, onAddOnsChange }: TripAddOnsProps) 
           return (
             <div
               key={addon.id}
+              role="button"
+              tabIndex={0}
               onClick={() => handleToggleAddOn(addon.id)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleToggleAddOn(addon.id);
+                }
+              }}
+              aria-pressed={isSelected}
+              aria-label={`${addon.name} - $${addon.price}. ${addon.description}`}
               className={`
                 relative p-4 rounded-lg border-2 transition-all cursor-pointer
+                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
                 ${isSelected 
                   ? 'border-blue-500 bg-white shadow-md' 
                   : 'border-blue-200 bg-white/50 hover:border-blue-300 hover:bg-white'
@@ -106,9 +101,16 @@ export function TripAddOns({ selectedAddOns, onAddOnsChange }: TripAddOnsProps) 
               <div className="flex items-start gap-3">
                 {/* Checkbox */}
                 <div className="mt-1">
-                  <SimpleCheckbox
+                  <input
+                    type="checkbox"
                     checked={isSelected}
-                    onCheckedChange={() => handleToggleAddOn(addon.id)}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      handleToggleAddOn(addon.id);
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                    aria-label={`Select ${addon.name}`}
+                    className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                   />
                 </div>
 
@@ -117,7 +119,7 @@ export function TripAddOns({ selectedAddOns, onAddOnsChange }: TripAddOnsProps) 
                   h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0
                   ${isSelected ? 'bg-blue-100' : 'bg-blue-50'}
                 `}>
-                  <Icon className={`h-5 w-5 ${isSelected ? 'text-blue-600' : 'text-blue-400'}`} />
+                  <Icon className={`h-5 w-5 ${isSelected ? 'text-blue-600' : 'text-blue-400'}`} aria-hidden="true" />
                 </div>
 
                 {/* Content */}
@@ -141,7 +143,7 @@ export function TripAddOns({ selectedAddOns, onAddOnsChange }: TripAddOnsProps) 
                 {/* Selected indicator */}
                 {isSelected && (
                   <div className="absolute top-2 right-2 h-6 w-6 bg-blue-500 rounded-full flex items-center justify-center">
-                    <Check className="h-4 w-4 text-white" strokeWidth={3} />
+                    <Check className="h-4 w-4 text-white" strokeWidth={3} aria-hidden="true" />
                   </div>
                 )}
               </div>

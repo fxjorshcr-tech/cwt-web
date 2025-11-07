@@ -1,13 +1,5 @@
 // src/types/supabase.ts
 
-/**
- * TIPOS DE SUPABASE - ESTRUCTURA REAL DE TU BASE DE DATOS
- * 
- * ⚠️ IMPORTANTE: Este archivo refleja la estructura EXACTA de tu base de datos
- * Regenerar cuando cambies el esquema:
- * npx supabase gen types typescript --project-id mmlbslwljvmscbgsqkkq > src/types/supabase.ts
- */
-
 export type Json =
   | string
   | number
@@ -19,9 +11,6 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
-      // ========================================
-      // TABLA: routes (Rutas/Interconexiones)
-      // ========================================
       routes: {
         Row: {
           id: number
@@ -65,63 +54,9 @@ export interface Database {
         Relationships: []
       }
 
-      // ========================================
-      // TABLA: trips (Viajes/Reservas)
-      // ESTRUCTURA EXACTA según tu base de datos
-      // ========================================
       trips: {
         Row: {
-          // Identificadores
-          id: string                    // uuid - NO es number, es string
-          booking_id: string            // text - ID agrupador de múltiples viajes
-          
-          // Ubicaciones (OBLIGATORIAS)
-          from_location: string         // text - Origen
-          to_location: string           // text - Destino
-          
-          // Fecha (OBLIGATORIA)
-          date: string                  // date - Fecha del viaje
-          
-          // Pasajeros (OBLIGATORIOS)
-          adults: number                // integer - Adultos
-          children: number              // integer - Niños
-          
-          // Precio y distancia (OBLIGATORIOS)
-          price: number                 // numeric - Precio base
-          distance: number | null       // integer - Distancia en km (nullable)
-          duration: string | null       // text - Duración estimada (nullable)
-          
-          // Timestamps
-          created_at: string | null     // timestamptz - Auto-generado
-          updated_at: string | null     // timestamptz - Auto-generado
-          
-          // Direcciones (OPCIONALES)
-          pickup_address: string | null      // text
-          pickup_instructions: string | null // text
-          dropoff_address: string | null     // text
-          dropoff_instructions: string | null // text
-          
-          // Horarios (OPCIONALES)
-          pickup_time: string | null    // time - Hora de recogida
-          arrival_time: string | null   // time - Hora de llegada
-          
-          // Información de vuelo (OPCIONAL)
-          flight_number: string | null  // text
-          airline: string | null        // text
-          
-          // Cargos adicionales (OPCIONALES)
-          night_surcharge: number | null // numeric - Recargo nocturno
-          fees: number | null           // numeric - Fees del 13%
-          final_price: number | null    // numeric - Precio final total
-          
-          // Solicitudes especiales (OPCIONAL)
-          special_requests: string | null // text
-        }
-        Insert: {
-          // ⚠️ IMPORTANTE: uuid se genera automáticamente, NO lo incluyas
-          id?: string
-          
-          // CAMPOS OBLIGATORIOS
+          id: string
           booking_id: string
           from_location: string
           to_location: string
@@ -129,8 +64,40 @@ export interface Database {
           adults: number
           children: number
           price: number
-          
-          // CAMPOS OPCIONALES
+          distance: number | null
+          duration: string | null
+          created_at: string | null
+          updated_at: string | null
+          pickup_address: string | null
+          pickup_instructions: string | null
+          dropoff_address: string | null
+          dropoff_instructions: string | null
+          pickup_time: string | null
+          arrival_time: string | null
+          flight_number: string | null
+          airline: string | null
+          night_surcharge: number | null
+          fees: number | null
+          final_price: number | null
+          special_requests: string | null
+          children_ages: number[] | null
+          add_ons: string[] | null
+          add_ons_price: number | null
+          customer_first_name: string | null
+          customer_last_name: string | null
+          customer_email: string | null
+          customer_phone: string | null
+          customer_country: string | null
+        }
+        Insert: {
+          id?: string
+          booking_id: string
+          from_location: string
+          to_location: string
+          date: string
+          adults: number
+          children: number
+          price: number
           distance?: number | null
           duration?: string | null
           created_at?: string | null
@@ -147,6 +114,14 @@ export interface Database {
           fees?: number | null
           final_price?: number | null
           special_requests?: string | null
+          children_ages?: number[] | null
+          add_ons?: string[] | null
+          add_ons_price?: number | null
+          customer_first_name?: string | null
+          customer_last_name?: string | null
+          customer_email?: string | null
+          customer_phone?: string | null
+          customer_country?: string | null
         }
         Update: {
           id?: string
@@ -173,6 +148,14 @@ export interface Database {
           fees?: number | null
           final_price?: number | null
           special_requests?: string | null
+          children_ages?: number[] | null
+          add_ons?: string[] | null
+          add_ons_price?: number | null
+          customer_first_name?: string | null
+          customer_last_name?: string | null
+          customer_email?: string | null
+          customer_phone?: string | null
+          customer_country?: string | null
         }
         Relationships: []
       }
@@ -192,30 +175,17 @@ export interface Database {
   }
 }
 
-// ========================================
-// TIPOS DE UTILIDAD
-// ========================================
-
 export type Tables<T extends keyof Database['public']['Tables']> = 
   Database['public']['Tables'][T]
 
-// Tipos específicos para Routes
 export type Route = Tables<'routes'>['Row']
 export type RouteInsert = Tables<'routes'>['Insert']
 export type RouteUpdate = Tables<'routes'>['Update']
 
-// Tipos específicos para Trips
 export type Trip = Tables<'trips'>['Row']
 export type TripInsert = Tables<'trips'>['Insert']
 export type TripUpdate = Tables<'trips'>['Update']
 
-// ========================================
-// INTERFACES DE DOMINIO
-// ========================================
-
-/**
- * Interface para crear una nueva reserva
- */
 export interface CreateTripData {
   booking_id: string
   from_location: string
@@ -228,9 +198,6 @@ export interface CreateTripData {
   duration?: string
 }
 
-/**
- * Interface para el formulario de reserva
- */
 export interface BookingFormData {
   from_location: string
   to_location: string

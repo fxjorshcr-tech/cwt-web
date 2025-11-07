@@ -1,10 +1,11 @@
-// src/utils/bookingValidation.ts
-
+// src/utils/bookingValidation.ts - CORREGIDO FASE 2
 /**
  * ==========================================
  * UTILIDADES DE VALIDACIÓN PARA BOOKINGS
  * ==========================================
  */
+
+import { VALIDATION_RULES } from '@/lib/constants';
 
 /**
  * Interface para errores de validación
@@ -33,21 +34,17 @@ export function sanitizeInput(input: string): string {
 }
 
 /**
- * Validar formato de hora (HH:mm)
+ * Sanitizar input para búsquedas (prevenir SQL injection)
  */
-export function isValidTime(time: string): boolean {
-  if (!time) return false;
-  const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
-  return timeRegex.test(time);
-}
-
-/**
- * Validar número de vuelo
- */
-export function isValidFlightNumber(flightNumber: string): boolean {
-  if (!flightNumber) return false;
-  const flightRegex = /^[A-Z]{2,3}\s*\d{1,4}[A-Z]?$/i;
-  return flightRegex.test(flightNumber);
+export function sanitizeSearchInput(input: string): string {
+  if (!input) return '';
+  
+  return input
+    .replace(/[%_]/g, '')
+    .replace(/['"]/g, '')
+    .replace(/[;]/g, '')
+    .trim()
+    .slice(0, 100);
 }
 
 /**
@@ -67,6 +64,43 @@ export function isAirport(location: string): boolean {
 }
 
 /**
+ * Validar formato de hora (HH:mm)
+ */
+export function isValidTime(time: string): boolean {
+  if (!time) return false;
+  const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
+  return timeRegex.test(time);
+}
+
+/**
+ * Validar número de vuelo
+ */
+export function isValidFlightNumber(flightNumber: string): boolean {
+  if (!flightNumber) return false;
+  const flightRegex = /^[A-Z]{2,3}\s*\d{1,4}[A-Z]?$/i;
+  return flightRegex.test(flightNumber);
+}
+
+/**
+ * Validar dirección
+ */
+function validateAddress(address: string, fieldName: string): string | null {
+  if (!address || address.trim().length === 0) {
+    return `${fieldName} is required`;
+  }
+  
+  if (address.length < VALIDATION_RULES.MIN_ADDRESS_LENGTH) {
+    return `${fieldName} must be at least ${VALIDATION_RULES.MIN_ADDRESS_LENGTH} characters`;
+  }
+  
+  if (address.length > VALIDATION_RULES.MAX_ADDRESS_LENGTH) {
+    return `${fieldName} is too long (max ${VALIDATION_RULES.MAX_ADDRESS_LENGTH} characters)`;
+  }
+  
+  return null;
+}
+
+/**
  * Validar campos del formulario de booking details
  */
 export function validateBookingDetails(data: {
@@ -79,30 +113,30 @@ export function validateBookingDetails(data: {
 }): ValidationErrors {
   const errors: ValidationErrors = {};
 
-  if (!data.pickup_address || data.pickup_address.trim().length === 0) {
-    errors.pickup_address = 'La dirección de recogida es requerida';
-  } else if (data.pickup_address.length < 10) {
-    errors.pickup_address = 'Proporciona una dirección más detallada (mínimo 10 caracteres)';
+  // Validar pickup address
+  const pickupError = validateAddress(data.pickup_address, 'Pickup address');
+  if (pickupError) {
+    errors.pickup_address = pickupError;
   }
 
-  if (!data.dropoff_address || data.dropoff_address.trim().length === 0) {
-    errors.dropoff_address = 'La dirección de entrega es requerida';
-  } else if (data.dropoff_address.length < 10) {
-    errors.dropoff_address = 'Proporciona una dirección más detallada (mínimo 10 caracteres)';
+  // Validar dropoff address
+  const dropoffError = validateAddress(data.dropoff_address, 'Drop-off address');
+  if (dropoffError) {
+    errors.dropoff_address = dropoffError;
   }
 
-  if (!data.pickup_time || data.pickup_time.trim().length === 0) {
-    errors.pickup_time = 'La hora de recogida es requerida';
-  } else if (!isValidTime(data.pickup_time)) {
-    errors.pickup_time = 'Formato de hora inválido (HH:mm)';
+  // Validar pickup time
+  if (!data.pickup_time || !isValidTime(data.pickup_time)) {
+    errors.pickup_time = 'Valid pickup time is required (HH:mm format)';
   }
 
+  // Validar flight number si es necesario
   const isAirportPickup = isAirport(data.from_location);
   const isAirportDropoff = isAirport(data.to_location);
 
   if ((isAirportPickup || isAirportDropoff) && data.flight_number && data.flight_number.trim().length > 0) {
     if (!isValidFlightNumber(data.flight_number)) {
-      errors.flight_number = 'Formato de vuelo inválido (ej: AA 1234)';
+      errors.flight_number = 'Invalid flight number format (e.g., AA 1234)';
     }
   }
 

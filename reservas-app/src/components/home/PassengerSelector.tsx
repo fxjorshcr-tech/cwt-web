@@ -1,4 +1,5 @@
 // src/components/home/PassengerSelector.tsx
+// ✅ PHASE 2 CORRECTED - English text, accessibility improvements
 
 'use client';
 
@@ -25,7 +26,7 @@ export function PassengerSelector({
 
   const totalPassengers = adults + children;
 
-  // Cerrar al hacer click fuera
+  // Close on click outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
@@ -36,6 +37,20 @@ export function PassengerSelector({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Close on Escape key
+  useEffect(() => {
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setIsOpen(false);
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+      return () => document.removeEventListener('keydown', handleEscape);
+    }
+  }, [isOpen]);
 
   const handleAdultsChange = (delta: number) => {
     const newAdults = Math.max(1, Math.min(18, adults + delta));
@@ -51,13 +66,14 @@ export function PassengerSelector({
     }
   };
 
+  // ✅ English text
   const getPassengerText = () => {
     const parts = [];
     if (adults > 0) {
-      parts.push(`${adults} ${adults === 1 ? 'Adulto' : 'Adultos'}`);
+      parts.push(`${adults} ${adults === 1 ? 'Adult' : 'Adults'}`);
     }
     if (children > 0) {
-      parts.push(`${children} ${children === 1 ? 'Niño' : 'Niños'}`);
+      parts.push(`${children} ${children === 1 ? 'Child' : 'Children'}`);
     }
     return parts.join(', ');
   };
@@ -70,15 +86,18 @@ export function PassengerSelector({
         </label>
       )}
 
-      {/* Botón Principal */}
+      {/* Main Button */}
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
+        aria-label="Select number of passengers"
+        aria-expanded={isOpen}
+        aria-haspopup="dialog"
         className="w-full px-4 py-3 text-left bg-white border border-gray-300 rounded-lg hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
       >
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-gray-400" />
+            <Users className="h-5 w-5 text-gray-400" aria-hidden="true" />
             <span className="text-gray-900">{getPassengerText()}</span>
           </div>
           <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
@@ -87,15 +106,19 @@ export function PassengerSelector({
         </div>
       </button>
 
-      {/* Dropdown de Pasajeros */}
+      {/* Passenger Dropdown */}
       {isOpen && (
-        <div className="absolute z-50 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 p-4 w-full min-w-[280px]">
+        <div 
+          className="absolute z-50 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 p-4 w-full min-w-[280px]"
+          role="dialog"
+          aria-label="Passenger selector"
+        >
           
-          {/* Adultos */}
+          {/* Adults */}
           <div className="flex items-center justify-between mb-4 pb-4 border-b">
             <div>
-              <p className="font-semibold text-gray-900">Adultos</p>
-              <p className="text-xs text-gray-500">13+ años</p>
+              <p className="font-semibold text-gray-900">Adults</p>
+              <p className="text-xs text-gray-500">Age 13+</p>
             </div>
             
             <div className="flex items-center gap-3">
@@ -103,12 +126,17 @@ export function PassengerSelector({
                 type="button"
                 onClick={() => handleAdultsChange(-1)}
                 disabled={adults <= 1}
+                aria-label="Decrease number of adults"
                 className="h-8 w-8 rounded-full border-2 border-gray-300 flex items-center justify-center hover:border-blue-500 hover:bg-blue-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-gray-300 disabled:hover:bg-white"
               >
-                <Minus className="h-4 w-4 text-gray-600" />
+                <Minus className="h-4 w-4 text-gray-600" aria-hidden="true" />
               </button>
               
-              <span className="w-8 text-center font-semibold text-lg">
+              <span 
+                className="w-8 text-center font-semibold text-lg"
+                aria-label={`${adults} adults`}
+                role="status"
+              >
                 {adults}
               </span>
               
@@ -116,18 +144,19 @@ export function PassengerSelector({
                 type="button"
                 onClick={() => handleAdultsChange(1)}
                 disabled={totalPassengers >= 18}
+                aria-label="Increase number of adults"
                 className="h-8 w-8 rounded-full border-2 border-gray-300 flex items-center justify-center hover:border-blue-500 hover:bg-blue-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-gray-300 disabled:hover:bg-white"
               >
-                <Plus className="h-4 w-4 text-gray-600" />
+                <Plus className="h-4 w-4 text-gray-600" aria-hidden="true" />
               </button>
             </div>
           </div>
 
-          {/* Niños */}
+          {/* Children */}
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-semibold text-gray-900">Niños</p>
-              <p className="text-xs text-gray-500">0-12 años</p>
+              <p className="font-semibold text-gray-900">Children</p>
+              <p className="text-xs text-gray-500">Age 0-12</p>
             </div>
             
             <div className="flex items-center gap-3">
@@ -135,12 +164,17 @@ export function PassengerSelector({
                 type="button"
                 onClick={() => handleChildrenChange(-1)}
                 disabled={children <= 0}
+                aria-label="Decrease number of children"
                 className="h-8 w-8 rounded-full border-2 border-gray-300 flex items-center justify-center hover:border-blue-500 hover:bg-blue-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-gray-300 disabled:hover:bg-white"
               >
-                <Minus className="h-4 w-4 text-gray-600" />
+                <Minus className="h-4 w-4 text-gray-600" aria-hidden="true" />
               </button>
               
-              <span className="w-8 text-center font-semibold text-lg">
+              <span 
+                className="w-8 text-center font-semibold text-lg"
+                aria-label={`${children} children`}
+                role="status"
+              >
                 {children}
               </span>
               
@@ -148,29 +182,30 @@ export function PassengerSelector({
                 type="button"
                 onClick={() => handleChildrenChange(1)}
                 disabled={totalPassengers >= 18}
+                aria-label="Increase number of children"
                 className="h-8 w-8 rounded-full border-2 border-gray-300 flex items-center justify-center hover:border-blue-500 hover:bg-blue-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-gray-300 disabled:hover:bg-white"
               >
-                <Plus className="h-4 w-4 text-gray-600" />
+                <Plus className="h-4 w-4 text-gray-600" aria-hidden="true" />
               </button>
             </div>
           </div>
 
-          {/* Info de Límite */}
+          {/* Limit Info */}
           {totalPassengers >= 18 && (
             <div className="mt-4 pt-4 border-t">
-              <p className="text-xs text-amber-600 text-center">
-                ⚠️ Máximo 18 pasajeros por viaje
+              <p className="text-xs text-amber-600 text-center" role="alert">
+                ⚠️ Maximum 18 passengers per trip
               </p>
             </div>
           )}
 
-          {/* Botón Listo */}
+          {/* Done Button */}
           <button
             type="button"
             onClick={() => setIsOpen(false)}
-            className="w-full mt-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
+            className="w-full mt-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
-            Listo
+            Done
           </button>
         </div>
       )}

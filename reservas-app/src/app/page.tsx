@@ -1,9 +1,9 @@
+// src/app/page.tsx - CORREGIDO
 import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { createClient } from "@/utils/supabaseClient";
-import { BookingFormWrapper } from "@/components/home/BookingFormWrapper";
+import { BookingForm } from "@/components/home/BookingForm";
 import BookingSteps from "@/components/booking/BookingSteps";
 import WhyPrivateShuttle from "@/components/home/WhyPrivateShuttle";
 import TrustIndicators from "@/components/home/TrustIndicators";
@@ -78,70 +78,30 @@ export const metadata: Metadata = {
   },
 };
 
-interface Location {
-  id: string;
-  name: string;
-  display_name: string;
-}
-
-async function getLocations(): Promise<Location[]> {
-  const supabase = createClient();
-  
-  const { data: routes, error } = await supabase
-    .from('routes')
-    .select('origen, destino');
-
-  if (error) {
-    console.error('❌ Error:', error);
-    return [];
-  }
-
-  const locationsSet = new Set<string>();
-  routes?.forEach(route => {
-    if (route.origen) locationsSet.add(route.origen);
-    if (route.destino) locationsSet.add(route.destino);
-  });
-
-  const locations: Location[] = Array.from(locationsSet)
-    .map(loc => ({
-      id: loc,
-      name: loc,
-      display_name: loc.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
-    }))
-    .sort((a, b) => a.display_name.localeCompare(b.display_name));
-
-  console.log('✅ Locations:', locations.length);
-  return locations;
-}
-
 export default async function Home() {
-  const locations = await getLocations();
+  // ✅ REMOVED: getLocations() function - no longer needed
+  // BookingForm loads routes directly from Supabase
 
   return (
     <>
-      {/* Google Analytics 4 - Commented out until you add your real Measurement ID
-          This placeholder is causing the "third-party cookies" warning in Lighthouse.
-          When you're ready to go live:
-          1. Create your GA4 account at https://analytics.google.com
-          2. Get your Measurement ID (G-XXXXXXXXXX)
-          3. Replace both instances of G-XXXXXXXXXX below
-          4. Uncomment this section
-      */}
-      {/* 
-      <Script
-        src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"
-        strategy="afterInteractive"
-        async
-      />
-      <Script id="google-analytics" strategy="afterInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-XXXXXXXXXX');
-        `}
-      </Script>
-      */}
+      {/* Google Analytics - Conditional rendering based on env variable */}
+      {process.env.NEXT_PUBLIC_GA_ID && (
+        <>
+          <Script
+            src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+            strategy="afterInteractive"
+            async
+          />
+          <Script id="google-analytics" strategy="afterInteractive">
+            {`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}');
+            `}
+          </Script>
+        </>
+      )}
 
       <main className="min-h-screen">
         
@@ -154,7 +114,7 @@ export default async function Home() {
             <Link href="/" className="flex items-center gap-3">
               <div className="relative w-96 h-24 md:w-[28rem] md:h-28">
                 <Image
-                  src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/logo-cant-wait-travel.webp?width=448&quality=85"
+                  src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/logo-cant-wait-travel.webp"
                   alt="Can't Wait Travel - Costa Rica Private Shuttle Service"
                   fill
                   sizes="(max-width: 768px) 384px, 448px"
@@ -171,11 +131,19 @@ export default async function Home() {
               <Link href="/travel-guide" className="text-white hover:text-gray-200 transition font-medium">Travel Guide</Link>
               <Link href="/about" className="text-white hover:text-gray-200 transition font-medium">About</Link>
               <Link href="/contact" className="text-white hover:text-gray-200 transition font-medium">Contact</Link>
-              <Button size="lg" className="rounded-full px-8" aria-label="Book shuttle now">Book Now</Button>
+              <Link href="#booking-form">
+                <Button size="lg" className="rounded-full px-8" aria-label="Book shuttle now">
+                  Book Now
+                </Button>
+              </Link>
             </div>
 
             <div className="md:hidden">
-              <Button size="lg" className="rounded-full" aria-label="Book shuttle">Book</Button>
+              <Link href="#booking-form">
+                <Button size="lg" className="rounded-full" aria-label="Book shuttle">
+                  Book
+                </Button>
+              </Link>
             </div>
           </div>
         </nav>
@@ -184,7 +152,7 @@ export default async function Home() {
         <section className="relative h-screen">
           <div className="absolute inset-0 z-0">
             <Image
-              src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/aerial-view-conchal-beach.webp?width=1920&quality=75"
+              src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/aerial-view-conchal-beach.webp"
               alt="Private Shuttle Costa Rica - Beach Transportation Service"
               fill
               sizes="100vw"
@@ -242,7 +210,8 @@ export default async function Home() {
               </div>
             </div>
           }>
-            <BookingFormWrapper locations={locations} />
+            {/* ✅ FIXED: Using BookingForm directly without wrapper */}
+            <BookingForm />
           </Suspense>
         </section>
 
@@ -290,7 +259,7 @@ export default async function Home() {
                 <div className="mb-4 flex items-center">
                   <div className="relative w-40 h-10">
                     <Image
-                      src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/logo-cant-wait-travel.webp?width=160&quality=85"
+                      src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/logo-cant-wait-travel.webp"
                       alt="Can't Wait Travel Logo"
                       fill
                       sizes="160px"
