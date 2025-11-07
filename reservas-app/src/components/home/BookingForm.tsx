@@ -1,5 +1,5 @@
 // src/components/home/BookingForm.tsx
-// VERSION WITHOUT TRUST BADGES - Clean footer
+// ✅ ACCESSIBILITY FIXED - All selects have proper labels
 
 'use client';
 
@@ -463,6 +463,7 @@ export function BookingForm() {
                   type="button"
                   onClick={loadRoutes}
                   className="text-red-600 hover:text-red-800 text-sm font-medium flex items-center gap-1"
+                  aria-label="Retry loading routes"
                 >
                   <RefreshCw className="h-3.5 w-3.5" />
                   Retry
@@ -493,7 +494,7 @@ export function BookingForm() {
                       <button
                         type="button"
                         onClick={() => removeTrip(index)}
-                        className="h-7 w-7 rounded-full bg-white border border-gray-300 text-gray-500 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all flex items-center justify-center"
+                        className="h-9 w-9 rounded-full bg-white border border-gray-300 text-gray-500 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all flex items-center justify-center"
                         aria-label={`Remove trip ${index + 1}`}
                       >
                         <X className="h-4 w-4" />
@@ -502,12 +503,18 @@ export function BookingForm() {
                   </div>
 
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-3">
+                    {/* ✅ FIXED: Pick-up Location with proper label */}
                     <div className="space-y-1.5">
-                      <label className="flex items-center gap-1.5 text-xs font-medium text-gray-700">
+                      <label 
+                        htmlFor={`pickup-location-${index}`}
+                        className="flex items-center gap-1.5 text-xs font-medium text-gray-700"
+                      >
                         <MapPin className="h-3.5 w-3.5 text-blue-600" />
                         Pick-up Location
                       </label>
                       <select
+                        id={`pickup-location-${index}`}
+                        name={`pickup-location-${index}`}
                         value={trip.from_location}
                         onChange={(e) =>
                           updateTrip(index, 'from_location', e.target.value)
@@ -515,6 +522,7 @@ export function BookingForm() {
                         disabled={isLoadingRoutes || !!error}
                         className="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
                         required
+                        aria-label={`Select pickup location for trip ${index + 1}`}
                       >
                         <option value="">
                           {isLoadingRoutes
@@ -537,12 +545,18 @@ export function BookingForm() {
                       )}
                     </div>
 
+                    {/* ✅ FIXED: Drop-off Location with proper label */}
                     <div className="space-y-1.5">
-                      <label className="flex items-center gap-1.5 text-xs font-medium text-gray-700">
+                      <label 
+                        htmlFor={`dropoff-location-${index}`}
+                        className="flex items-center gap-1.5 text-xs font-medium text-gray-700"
+                      >
                         <MapPin className="h-3.5 w-3.5 text-orange-600" />
                         Drop-off Location
                       </label>
                       <select
+                        id={`dropoff-location-${index}`}
+                        name={`dropoff-location-${index}`}
                         value={trip.to_location}
                         onChange={(e) =>
                           updateTrip(index, 'to_location', e.target.value)
@@ -550,6 +564,7 @@ export function BookingForm() {
                         disabled={!trip.from_location || isLoadingRoutes || !!error}
                         className="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
                         required
+                        aria-label={`Select drop-off location for trip ${index + 1}`}
                       >
                         <option value="">
                           {isLoadingRoutes
@@ -629,7 +644,7 @@ export function BookingForm() {
 
                 {index < trips.length - 1 && (
                   <div className="flex justify-center py-2">
-                    <ChevronDown className="h-5 w-5 text-gray-400" />
+                    <ChevronDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
                   </div>
                 )}
               </div>
@@ -640,7 +655,8 @@ export function BookingForm() {
                 type="button"
                 onClick={addTrip}
                 disabled={isLoadingRoutes}
-                className="py-2 px-4 border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all flex items-center gap-2 text-gray-600 hover:text-blue-600 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="py-3 px-6 min-h-[48px] border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all flex items-center gap-2 text-gray-600 hover:text-blue-600 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Add another trip"
               >
                 <Plus className="h-4 w-4" />
                 Add Another Trip
@@ -658,7 +674,8 @@ export function BookingForm() {
                   !!error ||
                   trips.some((t) => !t.selectedRoute || !t.date)
                 }
-                className="px-5 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all flex items-center gap-2 shadow-sm"
+                className="px-6 py-3 min-h-[48px] bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all flex items-center gap-2 shadow-sm"
+                aria-label="Search available transfers"
               >
                 {isSubmitting ? (
                   <>

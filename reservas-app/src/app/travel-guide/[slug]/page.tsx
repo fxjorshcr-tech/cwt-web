@@ -11,7 +11,7 @@ import { getDestinationRoutes, formatDuration, type Route } from '@/lib/getDesti
 // CONTENIDO COMPLETO REESCRITO - TODOS LOS DESTINOS
 // Tono: Profesional, positivo, útil, celebrando Costa Rica
 
-export const destinationContent: Record<string, any> = {
+const destinationContent: Record<string, any> = {
   
   'san-jose-sjo': {
     name: 'San José (SJO)',
@@ -1721,7 +1721,7 @@ export default function DestinationPage({ params }: { params: { slug: string } }
                                 </div>
                               </div>
                               <div className="text-right">
-                                <div className="text-2xl font-bold text-blue-600">${route.preciola6}</div>
+                                <div className="text-2xl font-bold text-blue-600">${route.precio1a6}</div>
                                 <div className="text-xs text-gray-500">1-6 passengers</div>
                               </div>
                             </div>

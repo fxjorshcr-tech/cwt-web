@@ -3,14 +3,15 @@ import { createClient } from '@/lib/supabase/client';
 
 export interface Route {
   id: number;
-  origen: string;
-  destino: string;
-  duracion: string;
-  kilometros: number;
-  preciola6: number;
-  precio7a9: number;
-  precio10a12: number;
-  precio13a18: number;
+  created_at?: string;  // ← Agregado (opcional)
+  origen: string | null;  // ← Agregado | null
+  destino: string | null;  // ← Agregado | null
+  duracion: string | null;  // ← Agregado | null
+  kilometros: number | null;  // ← Agregado | null
+  precio1a6: number | null;  // ← Agregado | null
+  precio7a9: number | null;  // ← Agregado | null
+  precio10a12: number | null;  // ← Agregado | null
+  precio13a18: number | null;  // ← Agregado | null
   alias: string | null;
 }
 
@@ -44,7 +45,9 @@ export async function getDestinationRoutes(destinationName: string): Promise<Rou
 /**
  * Formatea la duración para mostrar (ej: "3:00" → "3 hours")
  */
-export function formatDuration(duration: string): string {
+export function formatDuration(duration: string | null): string {
+  if (!duration) return 'N/A';
+  
   const parts = duration.split(':');
   const hours = parseInt(parts[0], 10);
   const minutes = parseInt(parts[1], 10);
@@ -59,5 +62,5 @@ export function formatDuration(duration: string): string {
  * Obtiene el precio base para mostrar (precio más común: 1-6 personas)
  */
 export function getBasePrice(route: Route): number {
-  return route.preciola6;
+  return route.precio1a6 || 0;  // ← Agregado || 0 por si es null
 }

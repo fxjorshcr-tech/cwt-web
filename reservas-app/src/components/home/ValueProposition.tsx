@@ -1,15 +1,14 @@
 // src/components/home/ValueProposition.tsx
+// ✅ ACCESSIBILITY FIXED - All contrast issues resolved
+
 'use client';
 
 import { useEffect, useState } from 'react';
 import {
+  CheckCircle,
   MapPin,
   ArrowRight,
-  CheckCircle,
-  Shield,
-  Clock,
-  Users,
-  Award
+  Sparkles
 } from 'lucide-react';
 import { createClient } from '@/utils/supabaseClient';
 
@@ -100,7 +99,6 @@ export default function ValueProposition() {
         })
         .filter(Boolean) as Destination[];
 
-      // Static inter-city routes
       const interCityRoutes: Destination[] = [
         { 
           name: 'La Fortuna → Monteverde', 
@@ -129,6 +127,13 @@ export default function ValueProposition() {
           price: 'from $90',
           origen: 'SJO - Juan Santamaria Int. Airport',
           destino: 'Jaco / Playa Hermosa (Central Pacific)'
+        },
+        { 
+          name: 'Monteverde → Manuel Antonio', 
+          time: '5 hours', 
+          price: 'from $180',
+          origen: 'Monteverde (Cloud Forest)',
+          destino: 'Manuel Antonio (National Park Area)'
         }
       ];
 
@@ -155,7 +160,6 @@ export default function ValueProposition() {
     fetchRoutes();
   }, []);
 
-  // ✅ FIXED: Preload destination in booking form
   const handleRouteClick = (origin: string, destination: string) => {
     if (!origin || !destination) {
       const bookingForm = document.getElementById('booking-form');
@@ -165,11 +169,24 @@ export default function ValueProposition() {
       return;
     }
 
-    const url = new URL(window.location.origin);
+    const url = new URL(window.location.href);
     url.searchParams.set('origin', origin);
     url.searchParams.set('destination', destination);
-    
-    window.location.href = url.toString() + '#booking-form';
+    window.history.pushState({}, '', url);
+
+    setTimeout(() => {
+      const bookingForm = document.getElementById('booking-form');
+      if (bookingForm) {
+        bookingForm.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        });
+      }
+    }, 100);
+
+    window.dispatchEvent(new CustomEvent('updateBookingForm', {
+      detail: { origin, destination }
+    }));
   };
 
   if (loading) {
@@ -188,7 +205,6 @@ export default function ValueProposition() {
   return (
     <section className="py-16 bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto px-6 max-w-7xl">
-        {/* Popular Routes Section */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 mb-3">
             <MapPin className="h-5 w-5 text-blue-600" />
@@ -204,7 +220,7 @@ export default function ValueProposition() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-20">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
           {routes.map((region, idx) => (
             <div
               key={idx}
@@ -226,13 +242,14 @@ export default function ValueProposition() {
                   <button
                     key={destIdx}
                     onClick={() => handleRouteClick(dest.origen, dest.destino)}
-                    className="w-full group flex items-start justify-between gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-200 cursor-pointer"
+                    className="w-full group flex items-start justify-between gap-3 p-4 min-h-[48px] rounded-lg hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-200 cursor-pointer"
+                    aria-label={`Book shuttle from ${dest.origen} to ${dest.destino}`}
                   >
                     <div className="flex-1 text-left">
                       <p className="font-semibold text-gray-900 text-sm mb-1 group-hover:text-blue-600 transition-colors">
                         {dest.name}
                       </p>
-                      <p className="text-xs text-gray-600">
+                      <p className="text-xs text-gray-700">
                         ⏱️ {dest.time}
                       </p>
                     </div>
@@ -242,14 +259,14 @@ export default function ValueProposition() {
                       }`}>
                         {dest.price}
                       </p>
-                      <ArrowRight className="h-3 w-3 text-gray-400 group-hover:text-blue-600 transition-colors ml-auto mt-1" />
+                      <ArrowRight className="h-3 w-3 text-gray-500 group-hover:text-blue-600 transition-colors ml-auto mt-1" />
                     </div>
                   </button>
                 ))}
               </div>
 
               <div className="mt-5 pt-5 border-t border-gray-100">
-                <p className="text-xs text-gray-600 italic">
+                <p className="text-xs text-gray-700 italic">
                   All prices are per vehicle (up to 10 passengers). Includes all fees, tolls, and taxes.
                 </p>
               </div>
@@ -257,97 +274,73 @@ export default function ValueProposition() {
           ))}
         </div>
 
-        {/* SERVICE GUARANTEES - CLEAN DESIGN */}
-        <div className="max-w-6xl mx-auto">
+        {/* WHY CHOOSE CAN'T WAIT TRAVEL */}
+        <div className="mt-16 max-w-5xl mx-auto">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 rounded-full mb-4">
-              <Award className="h-4 w-4 text-blue-600" />
-              <span className="text-blue-700 font-semibold text-sm uppercase tracking-wide">
+            <div className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full mb-5 border border-blue-200">
+              <Sparkles className="h-5 w-5 text-blue-600" />
+              <span className="text-blue-700 font-bold text-sm uppercase tracking-wide">
                 Premium Service Standard
               </span>
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+            <h3 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
               Why Choose Can't Wait Travel
-            </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+            </h3>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Every shuttle booking comes with these guarantees for your complete peace of mind
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Card 1 */}
-            <div className="bg-white rounded-xl border-2 border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300">
-              <div className="h-1 bg-blue-500"></div>
-              <div className="p-6">
-                <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
-                  <CheckCircle className="h-7 w-7 text-blue-600" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  On-Time Pickup Guarantee
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  Your driver will be ready at the scheduled time or you'll receive a discount on your next trip. 
-                  We value your time as much as you do.
-                </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div className="group bg-white rounded-2xl p-8 border-2 border-blue-100 hover:border-blue-300 hover:shadow-xl transition-all duration-300 text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-2xl mb-5 group-hover:scale-110 transition-transform">
+                <CheckCircle className="h-8 w-8 text-blue-600" />
               </div>
+              <h4 className="font-bold text-gray-900 mb-3 text-xl">On-Time Pickup Guarantee</h4>
+              <p className="text-gray-700 leading-relaxed">
+                Your driver will be ready at the scheduled time or you'll receive a discount on your next trip.
+              </p>
             </div>
 
-            {/* Card 2 */}
-            <div className="bg-white rounded-xl border-2 border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300">
-              <div className="h-1 bg-orange-500"></div>
-              <div className="p-6">
-                <div className="w-14 h-14 bg-orange-100 rounded-xl flex items-center justify-center mb-4">
-                  <Shield className="h-7 w-7 text-orange-600" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  Clean Vehicle Guarantee
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  All vehicles thoroughly sanitized before each trip with full A/C, comfortable seating, 
-                  and premium amenities for your journey.
-                </p>
+            <div className="group bg-white rounded-2xl p-8 border-2 border-orange-100 hover:border-orange-300 hover:shadow-xl transition-all duration-300 text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-100 rounded-2xl mb-5 group-hover:scale-110 transition-transform">
+                <CheckCircle className="h-8 w-8 text-orange-600" />
               </div>
+              <h4 className="font-bold text-gray-900 mb-3 text-xl">Clean Vehicle Guarantee</h4>
+              <p className="text-gray-700 leading-relaxed">
+                All vehicles thoroughly sanitized with full A/C, comfortable seating, and premium amenities.
+              </p>
             </div>
 
-            {/* Card 3 */}
-            <div className="bg-white rounded-xl border-2 border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300">
-              <div className="h-1 bg-green-500"></div>
-              <div className="p-6">
-                <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mb-4">
-                  <Users className="h-7 w-7 text-green-600" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  English-Speaking Driver
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  All our drivers are bilingual (English/Spanish) with excellent communication skills 
-                  and local expertise to enhance your Costa Rica experience.
-                </p>
+            <div className="group bg-white rounded-2xl p-8 border-2 border-green-100 hover:border-green-300 hover:shadow-xl transition-all duration-300 text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-2xl mb-5 group-hover:scale-110 transition-transform">
+                <CheckCircle className="h-8 w-8 text-green-600" />
               </div>
+              <h4 className="font-bold text-gray-900 mb-3 text-xl">English-Speaking Driver</h4>
+              <p className="text-gray-700 leading-relaxed">
+                All drivers are bilingual (English/Spanish) with excellent local expertise.
+              </p>
             </div>
 
-            {/* Card 4 */}
-            <div className="bg-white rounded-xl border-2 border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300">
-              <div className="h-1 bg-purple-500"></div>
-              <div className="p-6">
-                <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center mb-4">
-                  <Award className="h-7 w-7 text-purple-600" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  Satisfaction Promise
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  Not satisfied with your service? Contact us within 24 hours and we'll make it right. 
-                  Your satisfaction is our priority.
-                </p>
+            <div className="group bg-white rounded-2xl p-8 border-2 border-purple-100 hover:border-purple-300 hover:shadow-xl transition-all duration-300 text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-100 rounded-2xl mb-5 group-hover:scale-110 transition-transform">
+                <CheckCircle className="h-8 w-8 text-purple-600" />
               </div>
+              <h4 className="font-bold text-gray-900 mb-3 text-xl">Satisfaction Promise</h4>
+              <p className="text-gray-700 leading-relaxed">
+                Not satisfied? Contact us within 24 hours and we'll make it right.
+              </p>
             </div>
           </div>
 
-          <div className="mt-8 text-center">
-            <p className="text-sm text-gray-500">
+          <div className="text-center">
+            <p className="text-sm text-gray-600">
               * Subject to our{' '}
-              <a href="/terms" className="underline hover:text-gray-700 font-semibold transition-colors">
+              <a 
+                href="/terms" 
+                className="text-blue-600 hover:text-blue-700 font-semibold underline transition-colors"
+                aria-label="Read our terms and conditions"
+              >
                 Terms & Conditions
               </a>
             </p>
