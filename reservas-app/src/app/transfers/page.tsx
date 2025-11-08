@@ -1,5 +1,5 @@
 // src/app/transfers/page.tsx
-// ✅ OPTIMIZED VERSION - Sin doble carga de datos, mejor UX
+// ✅ FINAL FIX - Con Suspense para BookingForm
 'use client';
 
 import { Suspense, useState, useEffect } from "react";
@@ -28,7 +28,6 @@ export default function TransfersPage() {
   const [isPageReady, setIsPageReady] = useState(false);
 
   useEffect(() => {
-    // ✅ Small delay para smooth page transition
     const timer = setTimeout(() => {
       setIsPageReady(true);
     }, 150);
@@ -49,7 +48,6 @@ export default function TransfersPage() {
         <link rel="canonical" href="https://cantwaittravelcr.com/transfers" />
       </Head>
       
-      {/* Modern Navbar */}
       <BookingNavbar />
       
       <main className="min-h-screen bg-white">
@@ -99,14 +97,25 @@ export default function TransfersPage() {
         </div>
       </section>
 
-      {/* Booking Form - con transición suave */}
+      {/* ✅ Booking Form - ENVUELTO EN SUSPENSE */}
       <section id="booking-form" className="relative -mt-20 z-20 px-6 pb-20">
         <div 
           className={`transition-opacity duration-500 ${
             isPageReady ? 'opacity-100' : 'opacity-0'
           }`}
         >
-          <BookingForm />
+          <Suspense fallback={
+            <div className="w-full max-w-5xl mx-auto">
+              <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-12">
+                <div className="flex flex-col items-center justify-center gap-4">
+                  <div className="animate-spin h-12 w-12 border-4 border-blue-600 border-t-transparent rounded-full" />
+                  <p className="text-gray-600">Loading booking form...</p>
+                </div>
+              </div>
+            </div>
+          }>
+            <BookingForm />
+          </Suspense>
         </div>
       </section>
 
@@ -114,7 +123,6 @@ export default function TransfersPage() {
       <section className="py-20 bg-gradient-to-b from-white via-blue-50 to-white">
         <div className="container mx-auto px-6 max-w-7xl">
           
-          {/* Header */}
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-5 py-2 bg-blue-100 rounded-full mb-6 border border-blue-200">
               <MapPin className="h-5 w-5 text-blue-600" />
@@ -132,10 +140,8 @@ export default function TransfersPage() {
             </p>
           </div>
 
-          {/* Benefits Grid with Elegant Art */}
           <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
             
-            {/* Benefits List */}
             <div className="space-y-6">
               <div className="flex items-start gap-4 group">
                 <div className="flex-shrink-0 w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -216,9 +222,7 @@ export default function TransfersPage() {
               </div>
             </div>
 
-            {/* Elegant Stats Cards */}
             <div className="space-y-6">
-              {/* Main Card */}
               <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl p-8 shadow-2xl">
                 <div className="flex items-center gap-4 mb-6">
                   <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border-2 border-white/30">
@@ -234,7 +238,6 @@ export default function TransfersPage() {
                   to your final destination.
                 </p>
                 
-                {/* Mini Stats */}
                 <div className="grid grid-cols-3 gap-3">
                   <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20 text-center">
                     <p className="text-2xl font-bold text-white">500+</p>
@@ -251,7 +254,6 @@ export default function TransfersPage() {
                 </div>
               </div>
 
-              {/* Quality Commitment Card */}
               <div className="bg-white rounded-2xl p-8 shadow-xl border-2 border-orange-200">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
@@ -265,7 +267,6 @@ export default function TransfersPage() {
                 </p>
               </div>
 
-              {/* Trust Badge */}
               <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border-2 border-green-200">
                 <div className="flex items-center gap-3">
                   <Heart className="h-8 w-8 text-green-600" />
@@ -347,7 +348,6 @@ export default function TransfersPage() {
           </div>
         </div>
         
-        {/* CTA Button - Now at the bottom */}
         <div className="text-center mt-12">
           <button
             onClick={() => {
@@ -369,7 +369,6 @@ export default function TransfersPage() {
         </div>
       </section>
 
-      {/* WhatsApp Floating Button */}
       <WhatsAppButton />
     </main>
     </>
