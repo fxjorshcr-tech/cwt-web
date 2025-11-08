@@ -1,5 +1,5 @@
 // src/app/booking-details/page.tsx
-// ✅ FULLY UPDATED - BookingStepper + TimePicker + Phase 2
+// ✅ FINAL VERSION - Stepper after Hero + No duplicate surcharge + All fixes
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
@@ -137,7 +137,7 @@ function BookingDetailsContent() {
               <p className="text-sm text-gray-600 mb-4">
                 Please return to the home page and start a new booking.
               </p>
-              <Button onClick={() => router.push('/')} className="w-full">
+              <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
                 Return Home
               </Button>
             </CardContent>
@@ -360,7 +360,7 @@ function BookingDetailsContent() {
               <CardDescription>Unable to load trip details</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button onClick={() => router.push('/')} className="w-full">
+              <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
                 Return Home
               </Button>
             </CardContent>
@@ -379,7 +379,6 @@ function BookingDetailsContent() {
   return (
     <>
       <BookingNavbar />
-      <BookingStepper currentStep={1} />
       
       {/* Hero Section */}
       <section className="relative h-64 md:h-80 w-full overflow-hidden">
@@ -391,10 +390,12 @@ function BookingDetailsContent() {
           style={{ objectPosition: '50% 65%' }}
           priority
           sizes="100vw"
+          placeholder="blur"
+          blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA="
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center text-white px-4">
+          <div className="text-center text-white px-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <h1 className="text-3xl md:text-5xl font-bold mb-2 drop-shadow-lg">
               Complete Your Booking
             </h1>
@@ -405,17 +406,28 @@ function BookingDetailsContent() {
         </div>
       </section>
 
+      {/* ✅ STEPPER DESPUÉS DEL HERO - STICKY */}
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <BookingStepper currentStep={1} />
+        </div>
+      </div>
+
       {/* Progress Indicator */}
       {trips.length > 1 && (
-        <TripProgress currentTrip={currentTripIndex} totalTrips={trips.length} />
+        <div className="bg-gray-50 py-4">
+          <div className="max-w-7xl mx-auto px-4">
+            <TripProgress currentTrip={currentTripIndex} totalTrips={trips.length} />
+          </div>
+        </div>
       )}
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className="max-w-7xl mx-auto px-4 py-12 bg-gray-50">
         <div className="grid lg:grid-cols-3 gap-8">
           
           {/* LEFT COLUMN - Form */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-6 animate-in fade-in slide-in-from-left duration-700">
             
             {/* Trip Summary Card */}
             <Card>
@@ -467,10 +479,11 @@ function BookingDetailsContent() {
                     placeholder="Enter full pickup address (hotel, house, etc.)"
                     value={formData.pickup_address}
                     onChange={(e) => setFormData({ ...formData, pickup_address: e.target.value })}
-                    className={errors.pickup_address ? 'border-red-500' : ''}
+                    className={`min-h-[48px] ${errors.pickup_address ? 'border-red-500' : ''}`}
+                    aria-invalid={!!errors.pickup_address}
                   />
                   {errors.pickup_address && (
-                    <p className="text-sm text-red-600 mt-1">{errors.pickup_address}</p>
+                    <p className="text-sm text-red-600 mt-1" role="alert">{errors.pickup_address}</p>
                   )}
                 </div>
 
@@ -483,11 +496,12 @@ function BookingDetailsContent() {
                     onChange={(time) => setFormData({ ...formData, pickup_time: time })}
                   />
                   {errors.pickup_time && (
-                    <p className="text-sm text-red-600 mt-1">{errors.pickup_time}</p>
+                    <p className="text-sm text-red-600 mt-1" role="alert">{errors.pickup_time}</p>
                   )}
                   
+                  {/* ✅ NIGHT SURCHARGE - SOLO UNA VEZ */}
                   {nightSurcharge > 0 && (
-                    <div className="flex items-start gap-2 mt-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                    <div className="flex items-start gap-2 mt-2 p-3 bg-amber-50 border border-amber-200 rounded-lg animate-in fade-in duration-300">
                       <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
                       <div className="text-sm">
                         <p className="font-semibold text-amber-900">Night Surcharge Applied</p>
@@ -519,6 +533,7 @@ function BookingDetailsContent() {
                       placeholder="e.g., United Airlines, American Airlines"
                       value={formData.airline}
                       onChange={(e) => setFormData({ ...formData, airline: e.target.value })}
+                      className="min-h-[48px]"
                     />
                   </div>
                   <div>
@@ -528,10 +543,10 @@ function BookingDetailsContent() {
                       placeholder="e.g., UA 1234"
                       value={formData.flight_number}
                       onChange={(e) => setFormData({ ...formData, flight_number: e.target.value })}
-                      className={errors.flight_number ? 'border-red-500' : ''}
+                      className={`min-h-[48px] ${errors.flight_number ? 'border-red-500' : ''}`}
                     />
                     {errors.flight_number && (
-                      <p className="text-sm text-red-600 mt-1">{errors.flight_number}</p>
+                      <p className="text-sm text-red-600 mt-1" role="alert">{errors.flight_number}</p>
                     )}
                   </div>
                 </CardContent>
@@ -554,10 +569,10 @@ function BookingDetailsContent() {
                     placeholder="Enter full drop-off address"
                     value={formData.dropoff_address}
                     onChange={(e) => setFormData({ ...formData, dropoff_address: e.target.value })}
-                    className={errors.dropoff_address ? 'border-red-500' : ''}
+                    className={`min-h-[48px] ${errors.dropoff_address ? 'border-red-500' : ''}`}
                   />
                   {errors.dropoff_address && (
-                    <p className="text-sm text-red-600 mt-1">{errors.dropoff_address}</p>
+                    <p className="text-sm text-red-600 mt-1" role="alert">{errors.dropoff_address}</p>
                   )}
                 </div>
               </CardContent>
@@ -583,7 +598,7 @@ function BookingDetailsContent() {
                             newAges[idx] = e.target.value ? parseInt(e.target.value) : null;
                             setFormData({ ...formData, children_ages: newAges });
                           }}
-                          className="w-full h-9 px-3 rounded-md border border-input bg-transparent text-sm"
+                          className="w-full h-10 px-3 rounded-md border border-input bg-transparent text-sm"
                         >
                           <option value="">Select age</option>
                           {Array.from({ length: 13 }, (_, i) => i).map((age) => (
@@ -625,7 +640,7 @@ function BookingDetailsContent() {
 
           {/* RIGHT COLUMN - Price Summary */}
           <div className="lg:col-span-1">
-            <div className="sticky top-4">
+            <div className="sticky top-[140px] animate-in fade-in slide-in-from-right duration-700 delay-300">
               <Card>
                 <CardHeader>
                   <CardTitle>Price Summary</CardTitle>
@@ -680,7 +695,7 @@ function BookingDetailsContent() {
                     <Button
                       onClick={handleNext}
                       disabled={saving}
-                      className="w-full"
+                      className="w-full min-h-[48px]"
                     >
                       {saving ? (
                         <>
@@ -697,7 +712,7 @@ function BookingDetailsContent() {
                     <Button
                       onClick={handleBack}
                       variant="outline"
-                      className="w-full"
+                      className="w-full min-h-[48px]"
                       disabled={saving}
                     >
                       <ArrowLeft className="h-4 w-4 mr-2" />

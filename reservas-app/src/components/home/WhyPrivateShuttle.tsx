@@ -1,4 +1,5 @@
 // src/components/home/WhyPrivateShuttle.tsx
+// ✅ OPTIMIZED: Lazy loading added to images
 'use client';
 
 import Image from 'next/image';
@@ -101,7 +102,7 @@ export default function WhyPrivateShuttle() {
                 <p className="text-gray-700 leading-relaxed font-medium italic">
                   "For us, every trip is a chance to share the Costa Rica we love."
                 </p>
-                {/* Black Logo - 2x Bigger, Right Aligned */}
+                {/* ✅ OPTIMIZED: Black Logo with lazy loading */}
                 <div className="flex justify-end">
                   <div className="relative w-80 h-20">
                     <Image
@@ -110,6 +111,8 @@ export default function WhyPrivateShuttle() {
                       fill
                       className="object-contain object-right"
                       sizes="320px"
+                      loading="lazy"
+                      quality={85}
                     />
                   </div>
                 </div>
@@ -138,13 +141,15 @@ export default function WhyPrivateShuttle() {
                 </div>
               </div>
               
-              {/* When adding real photo, use this structure:
+              {/* ✅ When adding real photo, use this structure with lazy loading:
               <Image
                 src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/team-photo.webp"
                 alt="Can't Wait Travel Team - Professional Costa Rica Drivers"
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 50vw"
+                loading="lazy"
+                quality={85}
               />
               */}
             </div>

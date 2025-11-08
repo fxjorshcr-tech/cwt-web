@@ -1,5 +1,5 @@
 // src/app/transfers/page.tsx
-// ✅ CORRECTED VERSION - Fixed imports
+// ✅ OPTIMIZED VERSION - Sin doble carga de datos, mejor UX
 'use client';
 
 import { Suspense, useState, useEffect } from "react";
@@ -7,8 +7,8 @@ import Image from "next/image";
 import Link from "next/link";
 import Head from "next/head";
 import { Button } from "@/components/ui/button";
-import { createClient } from "@/lib/supabase/client";
 import { BookingForm } from '@/components/home/BookingForm';
+import BookingNavbar from '@/components/booking/BookingNavbar';
 import WhatsAppButton from "@/components/WhatsAppButton";
 import {
   Shield,
@@ -24,49 +24,16 @@ import {
   Heart
 } from 'lucide-react';
 
-interface Location {
-  id: string;
-  name: string;
-  display_name: string;
-}
-
 export default function TransfersPage() {
-  const [locations, setLocations] = useState<Location[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isPageReady, setIsPageReady] = useState(false);
 
   useEffect(() => {
-    async function fetchLocations() {
-      const supabase = createClient();
-      
-      const { data: routes, error } = await supabase
-        .from('routes')
-        .select('origen, destino');
+    // ✅ Small delay para smooth page transition
+    const timer = setTimeout(() => {
+      setIsPageReady(true);
+    }, 150);
 
-      if (error) {
-        console.error('❌ Error:', error);
-        setIsLoading(false);
-        return;
-      }
-
-      const locationsSet = new Set<string>();
-      routes?.forEach(route => {
-        if (route.origen) locationsSet.add(route.origen);
-        if (route.destino) locationsSet.add(route.destino);
-      });
-
-      const locs: Location[] = Array.from(locationsSet)
-        .map(loc => ({
-          id: loc,
-          name: loc,
-          display_name: loc.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
-        }))
-        .sort((a, b) => a.display_name.localeCompare(b.display_name));
-
-      setLocations(locs);
-      setIsLoading(false);
-    }
-
-    fetchLocations();
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -82,39 +49,10 @@ export default function TransfersPage() {
         <link rel="canonical" href="https://cantwaittravelcr.com/transfers" />
       </Head>
       
-      <main className="min-h-screen bg-white">
+      {/* Modern Navbar */}
+      <BookingNavbar />
       
-      {/* Navigation */}
-      <nav className="absolute top-0 left-0 right-0 z-50 px-6 py-4 bg-gradient-to-b from-black/30 to-transparent">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="relative w-96 h-24 md:w-[28rem] md:h-28">
-              <Image
-                src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/logo-cant-wait-travel.webp?width=450&quality=80"
-                alt="Can't Wait Travel - Costa Rica Private Shuttle Service"
-                fill
-                sizes="(max-width: 768px) 384px, 448px"
-                className="object-contain"
-                priority
-              />
-            </div>
-          </Link>
-
-          <div className="hidden md:flex items-center gap-8">
-            <Link href="/" className="text-white hover:text-gray-200 transition font-medium">Home</Link>
-            <Link href="/transfers" className="text-white hover:text-gray-200 transition font-medium border-b-2 border-white">Transfers</Link>
-            <Link href="/private-tours" className="text-white hover:text-gray-200 transition font-medium">Private Tours</Link>
-            <Link href="/travel-guide" className="text-white hover:text-gray-200 transition font-medium">Travel Guide</Link>
-            <Link href="/about" className="text-white hover:text-gray-200 transition font-medium">About</Link>
-            <Link href="/contact" className="text-white hover:text-gray-200 transition font-medium">Contact</Link>
-            <Button size="lg" className="rounded-full px-8" aria-label="Book shuttle now">Book Now</Button>
-          </div>
-
-          <div className="md:hidden">
-            <Button size="lg" className="rounded-full" aria-label="Book shuttle">Book</Button>
-          </div>
-        </div>
-      </nav>
+      <main className="min-h-screen bg-white">
 
       {/* Compact Hero Section */}
       <section className="relative h-[50vh] min-h-[400px]">
@@ -161,20 +99,15 @@ export default function TransfersPage() {
         </div>
       </section>
 
-      {/* Booking Form */}
+      {/* Booking Form - con transición suave */}
       <section id="booking-form" className="relative -mt-20 z-20 px-6 pb-20">
-        {isLoading ? (
-          <div className="w-full max-w-5xl mx-auto">
-            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-12">
-              <div className="flex flex-col items-center justify-center gap-4">
-                <div className="animate-spin h-12 w-12 border-4 border-blue-600 border-t-transparent rounded-full" />
-                <p className="text-gray-600">Loading booking form...</p>
-              </div>
-            </div>
-          </div>
-        ) : (
+        <div 
+          className={`transition-opacity duration-500 ${
+            isPageReady ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
           <BookingForm />
-        )}
+        </div>
       </section>
 
       {/* Why Choose Can't Wait Travel Section */}
@@ -438,69 +371,6 @@ export default function TransfersPage() {
 
       {/* WhatsApp Floating Button */}
       <WhatsAppButton />
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div className="md:col-span-2">
-              <div className="mb-4 flex items-center">
-                <div className="relative w-40 h-10">
-                  <Image
-                    src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/logo-cant-wait-travel.webp?width=160&quality=75"
-                    alt="Can't Wait Travel Logo"
-                    fill
-                    sizes="160px"
-                    className="object-contain"
-                    loading="lazy"
-                  />
-                </div>
-              </div>
-              <p className="text-gray-300 text-sm mb-4">
-                Professional private shuttle service in Costa Rica. Licensed by ICT, 
-                fully insured, and trusted by travelers worldwide.
-              </p>
-              <p className="text-gray-400 text-xs mb-2">
-                ICT License: 4121-2025
-              </p>
-              <p className="text-gray-400 text-xs">
-                WhatsApp: +506-8596-2438
-              </p>
-            </div>
-
-            <div>
-              <h3 className="font-bold mb-3">Quick Links</h3>
-              <ul className="space-y-2 text-sm text-gray-300">
-                <li><Link href="/transfers" className="hover:text-white transition">Our Routes</Link></li>
-                <li><Link href="/private-tours" className="hover:text-white transition">Private Tours</Link></li>
-                <li><Link href="/travel-guide" className="hover:text-white transition">Travel Guide</Link></li>
-                <li><Link href="/about" className="hover:text-white transition">About Us</Link></li>
-                <li><Link href="/contact" className="hover:text-white transition">Contact</Link></li>
-                <li><Link href="/faq" className="hover:text-white transition">FAQ</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="font-bold mb-3">Legal</h3>
-              <ul className="space-y-2 text-sm text-gray-300">
-                <li><Link href="/terms" className="hover:text-white transition">Terms & Conditions</Link></li>
-                <li><Link href="/privacy" className="hover:text-white transition">Privacy Policy</Link></li>
-                <li><Link href="/cancellation" className="hover:text-white transition">Cancellation Policy</Link></li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-800 pt-8 text-center">
-            <p className="text-gray-300 text-sm">
-              © {new Date().getFullYear()} Can't Wait Travel Costa Rica. All rights reserved.
-            </p>
-            <p className="text-gray-400 text-xs mt-2">
-              Costa Rica Private Shuttle Service | San José Airport (SJO) | Liberia Airport (LIR) | 
-              La Fortuna | Manuel Antonio | Tamarindo | Monteverde
-            </p>
-          </div>
-        </div>
-      </footer>
     </main>
     </>
   );

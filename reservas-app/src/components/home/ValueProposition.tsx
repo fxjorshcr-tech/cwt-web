@@ -1,23 +1,9 @@
 // src/components/home/ValueProposition.tsx
-// ✅ ACCESSIBILITY FIXED - All contrast issues resolved
+// ✅ OPTIMIZED - SEO natural sin keyword stuffing
 
 'use client';
 
-import { useEffect, useState } from 'react';
-import {
-  CheckCircle,
-  MapPin,
-  ArrowRight,
-  Sparkles
-} from 'lucide-react';
-import { createClient } from '@/utils/supabaseClient';
-
-interface Route {
-  origen: string;
-  destino: string;
-  precio1a6: number;
-  duracion: string;
-}
+import { MapPin, ArrowRight } from 'lucide-react';
 
 interface Destination {
   name: string;
@@ -27,139 +13,134 @@ interface Destination {
   destino: string;
 }
 
-export default function ValueProposition() {
-  const [routes, setRoutes] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchRoutes() {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from('routes')
-        .select('origen, destino, precio1a6, duracion');
-
-      if (error) {
-        console.error('Error fetching routes:', error);
-        setLoading(false);
-        return;
+// ✅ Static data - no database calls needed
+const ROUTES = [
+  {
+    region: 'From SJO Airport',
+    destinations: [
+      {
+        name: 'La Fortuna, Arenal Volcano',
+        time: '3 hours',
+        price: 'from $140',
+        origen: 'SJO - Juan Santamaria Int. Airport',
+        destino: 'La Fortuna, Arenal Volcano & El Castillo'
+      },
+      {
+        name: 'Manuel Antonio',
+        time: '3.5 hours',
+        price: 'from $160',
+        origen: 'SJO - Juan Santamaria Int. Airport',
+        destino: 'Manuel Antonio (National Park Area)'
+      },
+      {
+        name: 'Monteverde',
+        time: '3 hours',
+        price: 'from $150',
+        origen: 'SJO - Juan Santamaria Int. Airport',
+        destino: 'Monteverde (Cloud Forest)'
+      },
+      {
+        name: 'Tamarindo / Flamingo / Conchal',
+        time: '5 hours',
+        price: 'from $240',
+        origen: 'SJO - Juan Santamaria Int. Airport',
+        destino: 'Tamarindo / Flamingo / Conchal (Guanacaste Beaches)'
+      },
+      {
+        name: 'Jaco / Playa Hermosa',
+        time: '2 hours',
+        price: 'from $90',
+        origen: 'SJO - Juan Santamaria Int. Airport',
+        destino: 'Jaco / Playa Hermosa (Central Pacific)'
       }
+    ],
+    color: 'blue'
+  },
+  {
+    region: 'From LIR Airport',
+    destinations: [
+      {
+        name: 'Nosara',
+        time: '2.5 hours',
+        price: 'from $150',
+        origen: 'LIR - Liberia International Airport',
+        destino: 'Nosara (Playa Guiones Area)'
+      },
+      {
+        name: 'Tamarindo / Flamingo / Conchal',
+        time: '1.5 hours',
+        price: 'from $100',
+        origen: 'LIR - Liberia International Airport',
+        destino: 'Tamarindo / Flamingo / Conchal (Guanacaste Beaches)'
+      },
+      {
+        name: 'Hacienda Pinilla / Avellanas',
+        time: '1.5 hours',
+        price: 'from $95',
+        origen: 'LIR - Liberia International Airport',
+        destino: 'Hacienda Pinilla / Avellanas / JW Marriot (Guanacaste)'
+      },
+      {
+        name: 'Las Catalinas',
+        time: '1 hour',
+        price: 'from $85',
+        origen: 'LIR - Liberia International Airport',
+        destino: 'Las Catalinas, Guanacaste'
+      },
+      {
+        name: 'RIU Guanacaste Hotel',
+        time: '45 min',
+        price: 'from $75',
+        origen: 'LIR - Liberia International Airport',
+        destino: 'RIU Guanacaste Hotel / RIU Palace Hotel (Guanacaste)'
+      }
+    ],
+    color: 'orange'
+  },
+  {
+    region: 'Popular Inter-City Routes',
+    destinations: [
+      {
+        name: 'La Fortuna → Monteverde',
+        time: '3.5 hours',
+        price: 'from $100',
+        origen: 'La Fortuna, Arenal Volcano & El Castillo',
+        destino: 'Monteverde (Cloud Forest)'
+      },
+      {
+        name: 'Manuel Antonio → Monteverde',
+        time: '5 hours',
+        price: 'from $180',
+        origen: 'Manuel Antonio (National Park Area)',
+        destino: 'Monteverde (Cloud Forest)'
+      },
+      {
+        name: 'Tamarindo → La Fortuna',
+        time: '4 hours',
+        price: 'from $160',
+        origen: 'Tamarindo / Flamingo / Conchal (Guanacaste Beaches)',
+        destino: 'La Fortuna, Arenal Volcano & El Castillo'
+      },
+      {
+        name: 'San José → Jaco Beach',
+        time: '2 hours',
+        price: 'from $90',
+        origen: 'SJO - Juan Santamaria Int. Airport',
+        destino: 'Jaco / Playa Hermosa (Central Pacific)'
+      },
+      {
+        name: 'Monteverde → Manuel Antonio',
+        time: '5 hours',
+        price: 'from $180',
+        origen: 'Monteverde (Cloud Forest)',
+        destino: 'Manuel Antonio (National Park Area)'
+      }
+    ],
+    color: 'blue'
+  }
+];
 
-      // Organize routes by region
-      const sjoRoutes = data?.filter((r: Route) => 
-        r.origen === 'SJO - Juan Santamaria Int. Airport'
-      ) || [];
-      
-      const lirRoutes = data?.filter((r: Route) => 
-        r.origen === 'LIR - Liberia International Airport'
-      ) || [];
-
-      // Define the order we want
-      const sjoDestinations = [
-        'La Fortuna, Arenal Volcano & El Castillo',
-        'Manuel Antonio (National Park Area)',
-        'Monteverde (Cloud Forest)',
-        'Tamarindo / Flamingo / Conchal (Guanacaste Beaches)',
-        'Jaco / Playa Hermosa (Central Pacific)'
-      ];
-
-      const lirDestinations = [
-        'Nosara (Playa Guiones Area)',
-        'Tamarindo / Flamingo / Conchal (Guanacaste Beaches)',
-        'Hacienda Pinilla / Avellanas / JW Marriot (Guanacaste)',
-        'Las Catalinas, Guanacaste',
-        'RIU Guanacaste Hotel / RIU Palace Hotel (Guanacaste)'
-      ];
-
-      // Map to destination format
-      const sjoFormatted: Destination[] = sjoDestinations
-        .map(dest => {
-          const route = sjoRoutes.find((r: Route) => r.destino === dest);
-          if (!route) return null;
-          return {
-            name: dest.replace(' (National Park Area)', '').replace(' (Cloud Forest)', '').replace(' (Central Pacific)', ''),
-            time: route.duracion || '3 hours',
-            price: `from $${route.precio1a6}`,
-            origen: route.origen,
-            destino: route.destino
-          };
-        })
-        .filter(Boolean) as Destination[];
-
-      const lirFormatted: Destination[] = lirDestinations
-        .map(dest => {
-          const route = lirRoutes.find((r: Route) => r.destino === dest);
-          if (!route) return null;
-          return {
-            name: dest.replace(' (Playa Guiones Area)', '').replace(' (Guanacaste Beaches)', '').replace(' (Guanacaste)', ''),
-            time: route.duracion || '1.5 hours',
-            price: `from $${route.precio1a6}`,
-            origen: route.origen,
-            destino: route.destino
-          };
-        })
-        .filter(Boolean) as Destination[];
-
-      const interCityRoutes: Destination[] = [
-        { 
-          name: 'La Fortuna → Monteverde', 
-          time: '3.5 hours', 
-          price: 'from $100',
-          origen: 'La Fortuna, Arenal Volcano & El Castillo',
-          destino: 'Monteverde (Cloud Forest)'
-        },
-        { 
-          name: 'Manuel Antonio → Monteverde', 
-          time: '5 hours', 
-          price: 'from $180',
-          origen: 'Manuel Antonio (National Park Area)',
-          destino: 'Monteverde (Cloud Forest)'
-        },
-        { 
-          name: 'Tamarindo → La Fortuna', 
-          time: '4 hours', 
-          price: 'from $160',
-          origen: 'Tamarindo / Flamingo / Conchal (Guanacaste Beaches)',
-          destino: 'La Fortuna, Arenal Volcano & El Castillo'
-        },
-        { 
-          name: 'San José → Jaco Beach', 
-          time: '2 hours', 
-          price: 'from $90',
-          origen: 'SJO - Juan Santamaria Int. Airport',
-          destino: 'Jaco / Playa Hermosa (Central Pacific)'
-        },
-        { 
-          name: 'Monteverde → Manuel Antonio', 
-          time: '5 hours', 
-          price: 'from $180',
-          origen: 'Monteverde (Cloud Forest)',
-          destino: 'Manuel Antonio (National Park Area)'
-        }
-      ];
-
-      setRoutes([
-        {
-          region: 'From SJO Airport',
-          destinations: sjoFormatted,
-          color: 'blue'
-        },
-        {
-          region: 'From LIR Airport',
-          destinations: lirFormatted,
-          color: 'orange'
-        },
-        {
-          region: 'Popular Inter-City Routes',
-          destinations: interCityRoutes,
-          color: 'blue'
-        }
-      ]);
-      setLoading(false);
-    }
-
-    fetchRoutes();
-  }, []);
-
+export default function ValueProposition() {
   const handleRouteClick = (origin: string, destination: string) => {
     if (!origin || !destination) {
       const bookingForm = document.getElementById('booking-form');
@@ -189,19 +170,6 @@ export default function ValueProposition() {
     }));
   };
 
-  if (loading) {
-    return (
-      <section className="py-16 bg-gradient-to-b from-gray-50 to-white">
-        <div className="container mx-auto px-6 max-w-7xl">
-          <div className="text-center">
-            <div className="animate-spin h-12 w-12 border-4 border-blue-600 border-t-transparent rounded-full mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading routes...</p>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
   return (
     <section className="py-16 bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto px-6 max-w-7xl">
@@ -215,13 +183,15 @@ export default function ValueProposition() {
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             Most Popular Destinations
           </h2>
-          <p className="text-base text-gray-600 max-w-2xl mx-auto">
-            Transparent pricing for all major destinations - no hidden fees
+          <p className="text-base text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Choose your destination and see transparent pricing with no hidden fees. 
+            All transfers include bilingual drivers, modern vehicles (up to 12 passengers), 
+            and door-to-door service with flexible schedules.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
-          {routes.map((region, idx) => (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {ROUTES.map((region, idx) => (
             <div
               key={idx}
               className={`bg-white border-2 ${
@@ -267,84 +237,11 @@ export default function ValueProposition() {
 
               <div className="mt-5 pt-5 border-t border-gray-100">
                 <p className="text-xs text-gray-700 italic">
-                  All prices are per vehicle (up to 10 passengers). Includes all fees, tolls, and taxes.
+                  Per vehicle (up to 12 passengers). Includes fees, tolls, and taxes.
                 </p>
               </div>
             </div>
           ))}
-        </div>
-
-        {/* WHY CHOOSE CAN'T WAIT TRAVEL */}
-        <div className="mt-16 max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full mb-5 border border-blue-200">
-              <Sparkles className="h-5 w-5 text-blue-600" />
-              <span className="text-blue-700 font-bold text-sm uppercase tracking-wide">
-                Premium Service Standard
-              </span>
-            </div>
-            <h3 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Why Choose Can't Wait Travel
-            </h3>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Every shuttle booking comes with these guarantees for your complete peace of mind
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div className="group bg-white rounded-2xl p-8 border-2 border-blue-100 hover:border-blue-300 hover:shadow-xl transition-all duration-300 text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-2xl mb-5 group-hover:scale-110 transition-transform">
-                <CheckCircle className="h-8 w-8 text-blue-600" />
-              </div>
-              <h4 className="font-bold text-gray-900 mb-3 text-xl">On-Time Pickup Guarantee</h4>
-              <p className="text-gray-700 leading-relaxed">
-                Your driver will be ready at the scheduled time or you'll receive a discount on your next trip.
-              </p>
-            </div>
-
-            <div className="group bg-white rounded-2xl p-8 border-2 border-orange-100 hover:border-orange-300 hover:shadow-xl transition-all duration-300 text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-100 rounded-2xl mb-5 group-hover:scale-110 transition-transform">
-                <CheckCircle className="h-8 w-8 text-orange-600" />
-              </div>
-              <h4 className="font-bold text-gray-900 mb-3 text-xl">Clean Vehicle Guarantee</h4>
-              <p className="text-gray-700 leading-relaxed">
-                All vehicles thoroughly sanitized with full A/C, comfortable seating, and premium amenities.
-              </p>
-            </div>
-
-            <div className="group bg-white rounded-2xl p-8 border-2 border-green-100 hover:border-green-300 hover:shadow-xl transition-all duration-300 text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-2xl mb-5 group-hover:scale-110 transition-transform">
-                <CheckCircle className="h-8 w-8 text-green-600" />
-              </div>
-              <h4 className="font-bold text-gray-900 mb-3 text-xl">English-Speaking Driver</h4>
-              <p className="text-gray-700 leading-relaxed">
-                All drivers are bilingual (English/Spanish) with excellent local expertise.
-              </p>
-            </div>
-
-            <div className="group bg-white rounded-2xl p-8 border-2 border-purple-100 hover:border-purple-300 hover:shadow-xl transition-all duration-300 text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-100 rounded-2xl mb-5 group-hover:scale-110 transition-transform">
-                <CheckCircle className="h-8 w-8 text-purple-600" />
-              </div>
-              <h4 className="font-bold text-gray-900 mb-3 text-xl">Satisfaction Promise</h4>
-              <p className="text-gray-700 leading-relaxed">
-                Not satisfied? Contact us within 24 hours and we'll make it right.
-              </p>
-            </div>
-          </div>
-
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              * Subject to our{' '}
-              <a 
-                href="/terms" 
-                className="text-blue-600 hover:text-blue-700 font-semibold underline transition-colors"
-                aria-label="Read our terms and conditions"
-              >
-                Terms & Conditions
-              </a>
-            </p>
-          </div>
         </div>
       </div>
     </section>

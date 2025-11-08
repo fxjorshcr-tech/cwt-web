@@ -1,10 +1,10 @@
 // src/components/home/TimePicker.tsx
-// ✅ COMPLETE 24-HOUR TIME PICKER with Night Surcharge Notification
+// ✅ COMPLETE 24-HOUR TIME PICKER - NO duplicate warning
 
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Clock, AlertCircle } from 'lucide-react';
+import { Clock } from 'lucide-react';
 
 interface TimePickerProps {
   value: string;
@@ -140,18 +140,7 @@ export function TimePicker({
         </div>
       </button>
 
-      {/* Night Surcharge Warning */}
-      {showNightSurchargeWarning && isNightTime && value && (
-        <div className="flex items-start gap-2 mt-2 p-3 bg-amber-50 border border-amber-200 rounded-lg animate-in fade-in slide-in-from-top-2 duration-300">
-          <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
-          <div className="text-sm">
-            <p className="font-semibold text-amber-900">Night Surcharge Applied</p>
-            <p className="text-amber-700">
-              Pickups between <strong>9:00 PM - 3:59 AM</strong> include a <strong>$50</strong> surcharge
-            </p>
-          </div>
-        </div>
-      )}
+      {/* ✅ REMOVIDO: Night Surcharge Warning - Ya se muestra en la página principal */}
 
       {/* Dropdown */}
       {isOpen && (

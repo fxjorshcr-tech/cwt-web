@@ -1,18 +1,19 @@
 // src/app/payment/page.tsx
-// ✅ CORRECTED VERSION - Phase 1 fixes applied
+// ✅ FINAL VERSION - Stepper in proper position + All fixes
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, Loader2, CreditCard, User, Mail, Phone, MapPin, CheckCircle } from 'lucide-react';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import BookingNavbar from '@/components/booking/BookingNavbar';
+import BookingStepper from '@/components/booking/BookingStepper';
 
-// ✅ IMPORTS CORREGIDOS - Validaciones robustas centralizadas
 import { validateEmail, validatePhone, validateName } from '@/lib/validators';
 import { sanitizeInput } from '@/utils/bookingValidation';
 import { formatDate, formatTime, formatCurrency } from '@/lib/formatters';
@@ -64,7 +65,6 @@ function PaymentPageContent() {
   const searchParams = useSearchParams();
   const supabase = createClient();
 
-  // ✅ FIX CRÍTICO: Validar bookingId ANTES del render
   const bookingId = searchParams.get('booking_id');
 
   // ============================================
@@ -100,7 +100,7 @@ function PaymentPageContent() {
               <p className="text-sm text-gray-600 mb-4">
                 Please return to the home page and start a new booking.
               </p>
-              <Button onClick={() => router.push('/')} className="w-full">
+              <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
                 Return Home
               </Button>
             </CardContent>
@@ -138,7 +138,6 @@ function PaymentPageContent() {
 
         setTrips(data as Trip[]);
 
-        // ✅ Pre-fill form de forma segura
         const firstTrip = data[0] as Trip;
         if (firstTrip.customer_first_name) {
           setCustomerData({
@@ -162,28 +161,24 @@ function PaymentPageContent() {
   }, [bookingId, supabase, router]);
 
   // ============================================
-  // VALIDATION - Usando funciones centralizadas
+  // VALIDATION
   // ============================================
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
-    // ✅ Validar nombre con función robusta
     const firstNameError = validateName(customerData.firstName, 'First name');
     if (firstNameError) newErrors.firstName = firstNameError;
 
     const lastNameError = validateName(customerData.lastName, 'Last name');
     if (lastNameError) newErrors.lastName = lastNameError;
 
-    // ✅ Validar email con función robusta
     const emailError = validateEmail(customerData.email);
     if (emailError) newErrors.email = emailError;
 
-    // ✅ Validar teléfono con función robusta
     const phoneError = validatePhone(customerData.phone);
     if (phoneError) newErrors.phone = phoneError;
 
-    // Validar país
     if (!customerData.country || customerData.country.trim().length === 0) {
       newErrors.country = 'Country is required';
     } else if (customerData.country.trim().length < 2) {
@@ -206,14 +201,13 @@ function PaymentPageContent() {
     try {
       setSaving(true);
 
-      // ✅ FIX: Sanitizar TODOS los inputs antes de guardar
       const updatePromises = trips.map(trip =>
         supabase
           .from('trips')
           .update({
             customer_first_name: sanitizeInput(customerData.firstName.trim()),
             customer_last_name: sanitizeInput(customerData.lastName.trim()),
-            customer_email: customerData.email.trim().toLowerCase(), // Email no necesita sanitize
+            customer_email: customerData.email.trim().toLowerCase(),
             customer_phone: sanitizeInput(customerData.phone.trim()),
             customer_country: sanitizeInput(customerData.country.trim()),
             updated_at: new Date().toISOString(),
@@ -223,16 +217,13 @@ function PaymentPageContent() {
 
       const results = await Promise.all(updatePromises);
 
-      // Verificar errores
       const hasError = results.some(result => result.error);
       if (hasError) {
         throw new Error('Failed to update customer information');
       }
 
-      // ✅ Mostrar éxito con UI profesional
       setShowSuccess(true);
       
-      // Redirigir después de 2 segundos
       setTimeout(() => {
         router.push(`/summary?booking_id=${bookingId}`);
       }, 2000);
@@ -283,10 +274,10 @@ function PaymentPageContent() {
     return (
       <>
         <BookingNavbar />
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Card className="max-w-md mx-4 animate-in fade-in zoom-in duration-300">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-in fade-in duration-300">
+          <Card className="max-w-md mx-4 animate-in zoom-in duration-300">
             <CardHeader className="text-center">
-              <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
+              <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4 animate-in zoom-in duration-500" />
               <CardTitle className="text-2xl">Success!</CardTitle>
               <CardDescription>
                 Your information has been saved
@@ -312,18 +303,43 @@ function PaymentPageContent() {
     <>
       <BookingNavbar />
 
+      {/* Hero Section */}
+      <section className="relative h-64 md:h-80 w-full overflow-hidden">
+        <Image
+          src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/puerto-viejo-costa-rica-beach.webp"
+          alt="Costa Rica Beach"
+          fill
+          className="object-cover"
+          style={{ objectPosition: '50% 65%' }}
+          priority
+          sizes="100vw"
+          placeholder="blur"
+          blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA="
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center text-white px-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <h1 className="text-3xl md:text-5xl font-bold mb-2 drop-shadow-lg">
+              Customer Information
+            </h1>
+            <p className="text-lg md:text-xl drop-shadow-md">
+              Just a few details to complete your booking
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ✅ STEPPER DESPUÉS DEL HERO - STICKY */}
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          <BookingStepper currentStep={2} />
+        </div>
+      </div>
+
       <div className="min-h-screen bg-gray-50 py-12">
         <div className="max-w-4xl mx-auto px-4">
           
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-              Customer Information
-            </h1>
-            <p className="text-gray-600">
-              Please provide your contact details to complete the booking
-            </p>
-          </div>
+          {/* Header - Removido porque ya está en el hero */}
 
           <div className="grid lg:grid-cols-3 gap-8">
             
@@ -350,10 +366,14 @@ function PaymentPageContent() {
                         placeholder="John"
                         value={customerData.firstName}
                         onChange={(e) => setCustomerData({ ...customerData, firstName: e.target.value })}
-                        className={errors.firstName ? 'border-red-500' : ''}
+                        className={`min-h-[48px] ${errors.firstName ? 'border-red-500' : ''}`}
+                        aria-invalid={!!errors.firstName}
+                        aria-describedby={errors.firstName ? "firstName-error" : undefined}
                       />
                       {errors.firstName && (
-                        <p className="text-sm text-red-600 mt-1">{errors.firstName}</p>
+                        <p id="firstName-error" className="text-sm text-red-600 mt-1" role="alert">
+                          {errors.firstName}
+                        </p>
                       )}
                     </div>
 
@@ -366,10 +386,14 @@ function PaymentPageContent() {
                         placeholder="Doe"
                         value={customerData.lastName}
                         onChange={(e) => setCustomerData({ ...customerData, lastName: e.target.value })}
-                        className={errors.lastName ? 'border-red-500' : ''}
+                        className={`min-h-[48px] ${errors.lastName ? 'border-red-500' : ''}`}
+                        aria-invalid={!!errors.lastName}
+                        aria-describedby={errors.lastName ? "lastName-error" : undefined}
                       />
                       {errors.lastName && (
-                        <p className="text-sm text-red-600 mt-1">{errors.lastName}</p>
+                        <p id="lastName-error" className="text-sm text-red-600 mt-1" role="alert">
+                          {errors.lastName}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -396,10 +420,14 @@ function PaymentPageContent() {
                       placeholder="john.doe@example.com"
                       value={customerData.email}
                       onChange={(e) => setCustomerData({ ...customerData, email: e.target.value })}
-                      className={errors.email ? 'border-red-500' : ''}
+                      className={`min-h-[48px] ${errors.email ? 'border-red-500' : ''}`}
+                      aria-invalid={!!errors.email}
+                      aria-describedby={errors.email ? "email-error" : undefined}
                     />
                     {errors.email && (
-                      <p className="text-sm text-red-600 mt-1">{errors.email}</p>
+                      <p id="email-error" className="text-sm text-red-600 mt-1" role="alert">
+                        {errors.email}
+                      </p>
                     )}
                   </div>
 
@@ -415,11 +443,15 @@ function PaymentPageContent() {
                         placeholder="+1 (555) 123-4567"
                         value={customerData.phone}
                         onChange={(e) => setCustomerData({ ...customerData, phone: e.target.value })}
-                        className={`pl-10 ${errors.phone ? 'border-red-500' : ''}`}
+                        className={`pl-10 min-h-[48px] ${errors.phone ? 'border-red-500' : ''}`}
+                        aria-invalid={!!errors.phone}
+                        aria-describedby={errors.phone ? "phone-error" : undefined}
                       />
                     </div>
                     {errors.phone && (
-                      <p className="text-sm text-red-600 mt-1">{errors.phone}</p>
+                      <p id="phone-error" className="text-sm text-red-600 mt-1" role="alert">
+                        {errors.phone}
+                      </p>
                     )}
                     <p className="text-xs text-gray-500 mt-1">
                       Include country code (e.g., +1 for USA, +506 for Costa Rica)
@@ -437,11 +469,15 @@ function PaymentPageContent() {
                         placeholder="United States"
                         value={customerData.country}
                         onChange={(e) => setCustomerData({ ...customerData, country: e.target.value })}
-                        className={`pl-10 ${errors.country ? 'border-red-500' : ''}`}
+                        className={`pl-10 min-h-[48px] ${errors.country ? 'border-red-500' : ''}`}
+                        aria-invalid={!!errors.country}
+                        aria-describedby={errors.country ? "country-error" : undefined}
                       />
                     </div>
                     {errors.country && (
-                      <p className="text-sm text-red-600 mt-1">{errors.country}</p>
+                      <p id="country-error" className="text-sm text-red-600 mt-1" role="alert">
+                        {errors.country}
+                      </p>
                     )}
                   </div>
                 </CardContent>
@@ -467,7 +503,7 @@ function PaymentPageContent() {
 
             {/* RIGHT - Summary */}
             <div className="lg:col-span-1">
-              <div className="sticky top-4">
+              <div className="sticky top-[140px]">
                 <Card>
                   <CardHeader>
                     <CardTitle>Booking Summary</CardTitle>
@@ -512,7 +548,7 @@ function PaymentPageContent() {
                       <Button
                         onClick={handleSubmit}
                         disabled={saving}
-                        className="w-full"
+                        className="w-full min-h-[48px]"
                         size="lg"
                       >
                         {saving ? (
@@ -528,7 +564,7 @@ function PaymentPageContent() {
                       <Button
                         onClick={handleBack}
                         variant="outline"
-                        className="w-full"
+                        className="w-full min-h-[48px]"
                         disabled={saving}
                       >
                         <ArrowLeft className="h-4 w-4 mr-2" />

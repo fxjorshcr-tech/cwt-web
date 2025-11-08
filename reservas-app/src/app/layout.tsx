@@ -1,7 +1,8 @@
-// src/app/layout.tsx - CORREGIDO
+// src/app/layout.tsx - CON FOOTER
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import Footer from "@/components/home/Footer";
 
 // ✅ Optimizar fuente con swap para mejor FCP
 const inter = Inter({
@@ -35,7 +36,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    // ✅ FIXED: Changed to English (site is in English)
     <html lang="en">
       <head>
         {/* Preconnect para cargar recursos externos más rápido */}
@@ -48,7 +48,10 @@ export default function RootLayout({
           href="https://mmlbslwljvmscbgsqkkq.supabase.co"
         />
       </head>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        {children}
+        <Footer />
+      </body>
     </html>
   );
 }

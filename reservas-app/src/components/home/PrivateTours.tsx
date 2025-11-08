@@ -1,6 +1,5 @@
 // src/components/home/PrivateTours.tsx
-// UPDATED: Fixed image alignment, max 6 people per tour
-
+// ✅ OPTIMIZED: Lazy loading added to image
 'use client';
 
 import { Mountain, Binoculars, Waves, Trees, ArrowRight } from 'lucide-react';
@@ -99,9 +98,9 @@ export default function PrivateTours() {
           ))}
         </div>
 
-        {/* Why Choose Our Tours - FIXED ALIGNMENT */}
+        {/* Why Choose Our Tours */}
         <div className="grid md:grid-cols-2 gap-12 mb-16 items-center">
-          {/* Image - FIXED: Added proper aspect ratio and object fit */}
+          {/* ✅ OPTIMIZED: Image with lazy loading */}
           <div className="relative h-[500px] md:h-[600px] rounded-2xl overflow-hidden shadow-xl">
             <Image
               src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/private-shuttle-costa-rica-service.WEBP"
@@ -109,6 +108,8 @@ export default function PrivateTours() {
               fill
               className="object-cover object-center"
               sizes="(max-width: 768px) 100vw, 50vw"
+              loading="lazy"
+              quality={80}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
             <div className="absolute bottom-6 left-6 right-6">
