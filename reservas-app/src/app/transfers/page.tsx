@@ -1,13 +1,12 @@
 // src/app/transfers/page.tsx
-// ✅ FINAL FIX - Con Suspense para BookingForm
+// ✅ FIXED - Usando BookingFormWrapper para resolver error de useSearchParams
 'use client';
 
 import { Suspense, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import Head from "next/head";
 import { Button } from "@/components/ui/button";
-import { BookingForm } from '@/components/home/BookingForm';
+import { BookingFormWrapper } from '@/components/home/BookingFormWrapper';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import WhatsAppButton from "@/components/WhatsAppButton";
 import {
@@ -37,17 +36,6 @@ export default function TransfersPage() {
 
   return (
     <>
-      <Head>
-        <title>Costa Rica Private Shuttle Transfers | Airport & Inter-Destination | Can't Wait Travel</title>
-        <meta name="description" content="Book reliable private shuttle transfers in Costa Rica. Professional drivers, modern vehicles, door-to-door service from SJO & LIR airports. ICT licensed, 24/7 support." />
-        <meta name="keywords" content="costa rica transfers, private shuttle service, airport transfer costa rica, SJO to La Fortuna, transportation costa rica, private transfer service" />
-        <meta property="og:title" content="Private Shuttle Transfers Costa Rica | Can't Wait Travel" />
-        <meta property="og:description" content="Professional private shuttle service across Costa Rica. Book your transfer now." />
-        <meta property="og:url" content="https://cantwaittravelcr.com/transfers" />
-        <meta property="og:image" content="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/aerial-view-conchal-beach.webp" />
-        <link rel="canonical" href="https://cantwaittravelcr.com/transfers" />
-      </Head>
-      
       <BookingNavbar />
       
       <main className="min-h-screen bg-white">
@@ -97,25 +85,14 @@ export default function TransfersPage() {
         </div>
       </section>
 
-      {/* ✅ Booking Form - ENVUELTO EN SUSPENSE */}
+      {/* ✅ Booking Form - USANDO WRAPPER CON SUSPENSE */}
       <section id="booking-form" className="relative -mt-20 z-20 px-6 pb-20">
         <div 
           className={`transition-opacity duration-500 ${
             isPageReady ? 'opacity-100' : 'opacity-0'
           }`}
         >
-          <Suspense fallback={
-            <div className="w-full max-w-5xl mx-auto">
-              <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-12">
-                <div className="flex flex-col items-center justify-center gap-4">
-                  <div className="animate-spin h-12 w-12 border-4 border-blue-600 border-t-transparent rounded-full" />
-                  <p className="text-gray-600">Loading booking form...</p>
-                </div>
-              </div>
-            </div>
-          }>
-            <BookingForm />
-          </Suspense>
+          <BookingFormWrapper />
         </div>
       </section>
 
