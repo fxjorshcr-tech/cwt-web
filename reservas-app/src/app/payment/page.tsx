@@ -1,10 +1,10 @@
 // src/app/payment/page.tsx
-// ✅ FINAL VERSION - Stepper in proper position + All fixes
+// ✅ PAYMENT PAGE - Customer info + Stripe (Step 3)
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ArrowLeft, Loader2, CreditCard, User, Mail, Phone, MapPin, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Loader2, CreditCard, User, Mail, Phone, MapPin, CheckCircle, Lock } from 'lucide-react';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,21 +16,13 @@ import BookingStepper from '@/components/booking/BookingStepper';
 
 import { validateEmail, validatePhone, validateName } from '@/lib/validators';
 import { sanitizeInput } from '@/utils/bookingValidation';
-import { formatDate, formatTime, formatCurrency } from '@/lib/formatters';
-
-// ============================================
-// TYPES
-// ============================================
+import { formatCurrency } from '@/lib/formatters';
 
 interface Trip {
   id: string;
   booking_id: string;
   from_location: string;
   to_location: string;
-  date: string;
-  pickup_time: string;
-  adults: number;
-  children: number;
   price: number;
   final_price: number | null;
   customer_first_name: string | null;
@@ -56,10 +48,6 @@ interface FormErrors {
   country?: string;
 }
 
-// ============================================
-// MAIN COMPONENT
-// ============================================
-
 function PaymentPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -67,14 +55,9 @@ function PaymentPageContent() {
 
   const bookingId = searchParams.get('booking_id');
 
-  // ============================================
-  // STATE
-  // ============================================
-
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
 
   const [customerData, setCustomerData] = useState<CustomerData>({
@@ -85,7 +68,6 @@ function PaymentPageContent() {
     country: '',
   });
 
-  // ✅ VALIDACIÓN TEMPRANA
   if (!bookingId) {
     return (
       <>
@@ -97,9 +79,6 @@ function PaymentPageContent() {
               <CardDescription>No booking ID provided</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-600 mb-4">
-                Please return to the home page and start a new booking.
-              </p>
               <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
                 Return Home
               </Button>
@@ -109,10 +88,6 @@ function PaymentPageContent() {
       </>
     );
   }
-
-  // ============================================
-  // LOAD TRIPS
-  // ============================================
 
   useEffect(() => {
     async function loadTrips() {
@@ -131,10 +106,7 @@ function PaymentPageContent() {
           .order('created_at', { ascending: true });
 
         if (error) throw error;
-
-        if (!data || data.length === 0) {
-          throw new Error('No trips found for this booking');
-        }
+        if (!data || data.length === 0) throw new Error('No trips found');
 
         setTrips(data as Trip[]);
 
@@ -152,17 +124,13 @@ function PaymentPageContent() {
         setLoading(false);
       } catch (error) {
         console.error('Error loading trips:', error);
-        alert('Failed to load booking details. Please try again.');
+        alert('Failed to load booking details');
         router.push('/');
       }
     }
 
     loadTrips();
   }, [bookingId, supabase, router]);
-
-  // ============================================
-  // VALIDATION
-  // ============================================
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -181,22 +149,14 @@ function PaymentPageContent() {
 
     if (!customerData.country || customerData.country.trim().length === 0) {
       newErrors.country = 'Country is required';
-    } else if (customerData.country.trim().length < 2) {
-      newErrors.country = 'Please enter a valid country';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // ============================================
-  // HANDLERS
-  // ============================================
-
   const handleSubmit = async () => {
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     try {
       setSaving(true);
@@ -216,94 +176,38 @@ function PaymentPageContent() {
       );
 
       const results = await Promise.all(updatePromises);
-
       const hasError = results.some(result => result.error);
-      if (hasError) {
-        throw new Error('Failed to update customer information');
-      }
+      if (hasError) throw new Error('Failed to update customer information');
 
-      setShowSuccess(true);
+      // TODO: Aquí iría la integración con Stripe
+      // Por ahora solo redirigimos a confirmation
       
-      setTimeout(() => {
-        router.push(`/summary?booking_id=${bookingId}`);
-      }, 2000);
+      router.push(`/confirmation?booking_id=${bookingId}`);
 
-      setSaving(false);
     } catch (error) {
-      console.error('Error saving customer data:', error);
-      alert('Failed to save your information. Please try again.');
+      console.error('Error:', error);
+      alert('Failed to process payment');
       setSaving(false);
     }
   };
 
-  const handleBack = () => {
-    router.push(`/booking-details?booking_id=${bookingId}`);
-  };
-
-  // ============================================
-  // CALCULATE TOTAL
-  // ============================================
-
-  const grandTotal = trips.reduce((sum, trip) => {
-    return sum + (trip.final_price || trip.price);
-  }, 0);
-
-  // ============================================
-  // LOADING STATE
-  // ============================================
+  const grandTotal = trips.reduce((sum, trip) => sum + (trip.final_price || trip.price), 0);
 
   if (loading) {
     return (
       <>
         <BookingNavbar />
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="text-center">
-            <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
-            <p className="text-gray-600">Loading payment details...</p>
-          </div>
+          <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
         </div>
       </>
     );
   }
-
-  // ============================================
-  // SUCCESS MODAL
-  // ============================================
-
-  if (showSuccess) {
-    return (
-      <>
-        <BookingNavbar />
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-in fade-in duration-300">
-          <Card className="max-w-md mx-4 animate-in zoom-in duration-300">
-            <CardHeader className="text-center">
-              <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4 animate-in zoom-in duration-500" />
-              <CardTitle className="text-2xl">Success!</CardTitle>
-              <CardDescription>
-                Your information has been saved
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-center">
-              <p className="text-gray-600 mb-4">
-                Redirecting to booking summary...
-              </p>
-              <Loader2 className="h-6 w-6 animate-spin text-blue-600 mx-auto" />
-            </CardContent>
-          </Card>
-        </div>
-      </>
-    );
-  }
-
-  // ============================================
-  // RENDER
-  // ============================================
 
   return (
     <>
       <BookingNavbar />
 
-      {/* Hero Section */}
       <section className="relative h-64 md:h-80 w-full overflow-hidden">
         <Image
           src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/puerto-viejo-costa-rica-beach.webp"
@@ -313,34 +217,30 @@ function PaymentPageContent() {
           style={{ objectPosition: '50% 65%' }}
           priority
           sizes="100vw"
-          placeholder="blur"
-          blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA="
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center text-white px-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <div className="text-center text-white px-4">
             <h1 className="text-3xl md:text-5xl font-bold mb-2 drop-shadow-lg">
-              Customer Information
+              Payment Information
             </h1>
             <p className="text-lg md:text-xl drop-shadow-md">
-              Just a few details to complete your booking
+              Secure payment for your Costa Rica adventure
             </p>
           </div>
         </div>
       </section>
 
-      {/* ✅ STEPPER DESPUÉS DEL HERO - STICKY */}
+      {/* Stepper - Step 3: Payment */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-8">
-          <BookingStepper currentStep={2} />
+          <BookingStepper currentStep={3} />
         </div>
       </div>
 
       <div className="min-h-screen bg-gray-50 py-12">
         <div className="max-w-4xl mx-auto px-4">
           
-          {/* Header - Removido porque ya está en el hero */}
-
           <div className="grid lg:grid-cols-3 gap-8">
             
             {/* LEFT - Form */}
@@ -367,13 +267,9 @@ function PaymentPageContent() {
                         value={customerData.firstName}
                         onChange={(e) => setCustomerData({ ...customerData, firstName: e.target.value })}
                         className={`min-h-[48px] ${errors.firstName ? 'border-red-500' : ''}`}
-                        aria-invalid={!!errors.firstName}
-                        aria-describedby={errors.firstName ? "firstName-error" : undefined}
                       />
                       {errors.firstName && (
-                        <p id="firstName-error" className="text-sm text-red-600 mt-1" role="alert">
-                          {errors.firstName}
-                        </p>
+                        <p className="text-sm text-red-600 mt-1">{errors.firstName}</p>
                       )}
                     </div>
 
@@ -387,13 +283,9 @@ function PaymentPageContent() {
                         value={customerData.lastName}
                         onChange={(e) => setCustomerData({ ...customerData, lastName: e.target.value })}
                         className={`min-h-[48px] ${errors.lastName ? 'border-red-500' : ''}`}
-                        aria-invalid={!!errors.lastName}
-                        aria-describedby={errors.lastName ? "lastName-error" : undefined}
                       />
                       {errors.lastName && (
-                        <p id="lastName-error" className="text-sm text-red-600 mt-1" role="alert">
-                          {errors.lastName}
-                        </p>
+                        <p className="text-sm text-red-600 mt-1">{errors.lastName}</p>
                       )}
                     </div>
                   </div>
@@ -421,13 +313,9 @@ function PaymentPageContent() {
                       value={customerData.email}
                       onChange={(e) => setCustomerData({ ...customerData, email: e.target.value })}
                       className={`min-h-[48px] ${errors.email ? 'border-red-500' : ''}`}
-                      aria-invalid={!!errors.email}
-                      aria-describedby={errors.email ? "email-error" : undefined}
                     />
                     {errors.email && (
-                      <p id="email-error" className="text-sm text-red-600 mt-1" role="alert">
-                        {errors.email}
-                      </p>
+                      <p className="text-sm text-red-600 mt-1">{errors.email}</p>
                     )}
                   </div>
 
@@ -444,14 +332,10 @@ function PaymentPageContent() {
                         value={customerData.phone}
                         onChange={(e) => setCustomerData({ ...customerData, phone: e.target.value })}
                         className={`pl-10 min-h-[48px] ${errors.phone ? 'border-red-500' : ''}`}
-                        aria-invalid={!!errors.phone}
-                        aria-describedby={errors.phone ? "phone-error" : undefined}
                       />
                     </div>
                     {errors.phone && (
-                      <p id="phone-error" className="text-sm text-red-600 mt-1" role="alert">
-                        {errors.phone}
-                      </p>
+                      <p className="text-sm text-red-600 mt-1">{errors.phone}</p>
                     )}
                     <p className="text-xs text-gray-500 mt-1">
                       Include country code (e.g., +1 for USA, +506 for Costa Rica)
@@ -470,80 +354,76 @@ function PaymentPageContent() {
                         value={customerData.country}
                         onChange={(e) => setCustomerData({ ...customerData, country: e.target.value })}
                         className={`pl-10 min-h-[48px] ${errors.country ? 'border-red-500' : ''}`}
-                        aria-invalid={!!errors.country}
-                        aria-describedby={errors.country ? "country-error" : undefined}
                       />
                     </div>
                     {errors.country && (
-                      <p id="country-error" className="text-sm text-red-600 mt-1" role="alert">
-                        {errors.country}
-                      </p>
+                      <p className="text-sm text-red-600 mt-1">{errors.country}</p>
                     )}
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Payment Notice */}
+              {/* Payment Method - Stripe Placeholder */}
               <Card className="border-blue-200 bg-blue-50">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-blue-900">
                     <CreditCard className="h-5 w-5" />
-                    Payment Information
+                    Payment Method
                   </CardTitle>
+                  <CardDescription className="text-blue-700">
+                    Secure payment powered by Stripe
+                  </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-blue-800 leading-relaxed">
-                    After submitting your information, you'll receive a payment link via email 
-                    or WhatsApp to complete your booking. We accept all major credit cards.
-                  </p>
+                <CardContent className="space-y-4">
+                  
+                  {/* TODO: Aquí va el componente de Stripe */}
+                  <div className="bg-white rounded-lg p-6 border-2 border-dashed border-blue-300">
+                    <div className="text-center">
+                      <Lock className="h-12 w-12 text-blue-600 mx-auto mb-3" />
+                      <p className="font-semibold text-gray-900 mb-2">
+                        Stripe Payment Integration
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        Credit card form will be integrated here
+                      </p>
+                      <p className="text-xs text-gray-500 mt-2">
+                        All payments are processed securely through Stripe
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-center gap-4 pt-4">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" alt="Stripe" className="h-6" />
+                    <div className="flex gap-2">
+                      <CreditCard className="h-6 w-6 text-gray-400" />
+                      <Lock className="h-6 w-6 text-green-600" />
+                    </div>
+                  </div>
+
                 </CardContent>
               </Card>
 
             </div>
 
-            {/* RIGHT - Summary */}
+            {/* RIGHT - Summary (STICKY) */}
             <div className="lg:col-span-1">
               <div className="sticky top-[140px]">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Booking Summary</CardTitle>
+                    <CardTitle>Order Total</CardTitle>
                     <CardDescription>{trips.length} trip{trips.length !== 1 ? 's' : ''}</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    
-                    {/* Trip List */}
-                    <div className="space-y-3">
-                      {trips.map((trip, index) => (
-                        <div key={trip.id} className="pb-3 border-b last:border-0">
-                          <p className="text-sm font-semibold text-gray-900">
-                            Trip {index + 1}
-                          </p>
-                          <p className="text-xs text-gray-600 mt-1">
-                            {trip.from_location} → {trip.to_location}
-                          </p>
-                          <div className="flex justify-between items-center mt-2">
-                            <span className="text-xs text-gray-500">
-                              {formatDate(trip.date)} at {formatTime(trip.pickup_time)}
-                            </span>
-                            <span className="text-sm font-semibold text-gray-900">
-                              {formatCurrency(trip.final_price || trip.price)}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
 
-                    {/* Total */}
                     <div className="pt-4 border-t">
-                      <div className="flex justify-between items-center">
+                      <div className="flex justify-between items-center mb-4">
                         <span className="text-lg font-bold text-gray-900">Total</span>
-                        <span className="text-2xl font-bold text-blue-600">
+                        <span className="text-3xl font-bold text-blue-600">
                           {formatCurrency(grandTotal)}
                         </span>
                       </div>
                     </div>
 
-                    {/* Actions */}
                     <div className="space-y-2 pt-4">
                       <Button
                         onClick={handleSubmit}
@@ -554,22 +434,32 @@ function PaymentPageContent() {
                         {saving ? (
                           <>
                             <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                            Saving...
+                            Processing...
                           </>
                         ) : (
-                          'Continue to Summary'
+                          <>
+                            <Lock className="h-4 w-4 mr-2" />
+                            Pay Now
+                          </>
                         )}
                       </Button>
 
                       <Button
-                        onClick={handleBack}
+                        onClick={() => router.push(`/summary?booking_id=${bookingId}`)}
                         variant="outline"
                         className="w-full min-h-[48px]"
                         disabled={saving}
                       >
                         <ArrowLeft className="h-4 w-4 mr-2" />
-                        Back to Details
+                        Back to Summary
                       </Button>
+                    </div>
+
+                    <div className="pt-4 border-t">
+                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <Lock className="h-4 w-4 text-green-600" />
+                        <span>Secure 256-bit SSL encryption</span>
+                      </div>
                     </div>
 
                   </CardContent>
@@ -584,20 +474,13 @@ function PaymentPageContent() {
   );
 }
 
-// ============================================
-// SUSPENSE WRAPPER
-// ============================================
-
 export default function PaymentPage() {
   return (
     <Suspense fallback={
       <>
         <BookingNavbar />
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="text-center">
-            <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
-            <p className="text-gray-600">Loading...</p>
-          </div>
+          <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
         </div>
       </>
     }>

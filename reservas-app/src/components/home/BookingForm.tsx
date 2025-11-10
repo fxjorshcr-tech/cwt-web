@@ -1,5 +1,5 @@
 // src/components/home/BookingForm.tsx
-// ✅ CLEAN VERSION - Sin botón flotante, solo el formulario
+// ✅ VERSIÓN COMPLETA CORREGIDA - Mensaje de 13+ abajo, mejor manejo de errores
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -373,11 +373,14 @@ export function BookingForm() {
 
     const validationError = validate();
     if (validationError) {
-      alert(validationError);
+      setError(validationError);
+      // Scroll to top to show error
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
     setIsSubmitting(true);
+    setError(null);
 
     try {
       const supabase = createClient();
@@ -429,8 +432,8 @@ export function BookingForm() {
           ? error.message
           : 'Unknown error processing booking';
 
-      alert(`❌ ${errorMessage}\n\nPlease check your data and try again.`);
-      
+      setError(errorMessage);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       setIsSubmitting(false);
     }
   }
@@ -452,40 +455,16 @@ export function BookingForm() {
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
                 <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
-                  <p className="text-sm text-red-800 font-medium">Unable to load routes</p>
+                  <p className="text-sm text-red-800 font-medium">Unable to process booking</p>
                   <p className="text-xs text-red-600 mt-1">{error}</p>
                 </div>
                 <button
                   type="button"
-                  onClick={loadRoutes}
-                  className="text-red-600 hover:text-red-800 text-sm font-medium flex items-center gap-1"
+                  onClick={() => setError(null)}
+                  className="text-red-600 hover:text-red-800 text-sm font-medium"
                 >
-                  <RefreshCw className="h-3.5 w-3.5" />
-                  Retry
+                  <X className="h-4 w-4" />
                 </button>
-              </div>
-            )}
-
-            {/* ✅ Mensaje para grupos grandes (13+) */}
-            {hasLargeGroup && (
-              <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-5 flex items-start gap-4 animate-in fade-in duration-300">
-                <MessageSquare className="h-6 w-6 text-blue-600 flex-shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <p className="text-sm font-bold text-blue-900 mb-2">
-                    Large Group? We'd Love to Help!
-                  </p>
-                  <p className="text-sm text-gray-700 leading-relaxed mb-3">
-                    For groups of <strong>13 or more passengers</strong>, we need to provide you with a custom quote 
-                    to ensure the best service and pricing for your group.
-                  </p>
-                  <a
-                    href="/contact"
-                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-all shadow-md hover:shadow-lg"
-                  >
-                    <MessageSquare className="h-4 w-4" />
-                    Request Custom Quote
-                  </a>
-                </div>
               </div>
             )}
 
@@ -704,7 +683,34 @@ export function BookingForm() {
             </div>
           </div>
 
+          {/* ✅ BOTTOM CTA CON MENSAJE DE GRUPOS GRANDES ABAJO */}
           <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
+            
+            {/* ✅ MENSAJE PARA GRUPOS GRANDES - AHORA ABAJO Y MÁS VISIBLE EN MOBILE */}
+            {hasLargeGroup && (
+              <div className="mb-4 bg-gradient-to-r from-blue-50 to-blue-100 border-2 border-blue-400 rounded-xl p-5 shadow-lg animate-in fade-in duration-300">
+                <div className="flex items-start gap-4">
+                  <MessageSquare className="h-7 w-7 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-base font-bold text-blue-900 mb-2">
+                      🎉 Large Group? We'd Love to Help!
+                    </p>
+                    <p className="text-sm text-gray-700 leading-relaxed mb-3">
+                      For groups of <strong>13 or more passengers</strong>, please contact us for a custom quote 
+                      to ensure the best service and pricing.
+                    </p>
+                    <a
+                      href="/contact"
+                      className="inline-flex items-center gap-2 px-5 py-3 bg-blue-600 text-white text-sm font-bold rounded-lg hover:bg-blue-700 transition-all shadow-md hover:shadow-xl"
+                    >
+                      <MessageSquare className="h-4 w-4" />
+                      Request Custom Quote
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="flex justify-end">
               <button
                 type="submit"

@@ -1,4 +1,5 @@
 // src/lib/constants.ts
+// ✅ CORREGIDO: MIN_ADDRESS_LENGTH reducido de 10 a 3
 /**
  * ==========================================
  * CONSTANTES GLOBALES DE LA APLICACIÓN
@@ -12,7 +13,7 @@
 
 export const VALIDATION_RULES = {
   // Direcciones
-  MIN_ADDRESS_LENGTH: 10,
+  MIN_ADDRESS_LENGTH: 3, // ✅ Cambiado de 10 a 3
   MAX_ADDRESS_LENGTH: 200,
   
   // Instrucciones

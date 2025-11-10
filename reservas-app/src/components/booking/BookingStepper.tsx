@@ -1,5 +1,5 @@
 // src/components/booking/BookingStepper.tsx
-// ✅ MINIMALIST TAB-STYLE STEPPER - Professional & Compact
+// ✅ CORRECTED - 5 steps in proper order
 
 'use client';
 
@@ -11,14 +11,15 @@ function cn(...classes: (string | boolean | undefined)[]) {
 }
 
 interface BookingStepperProps {
-  currentStep: number; // 0: Search, 1: Booking Details, 2: Payment, 3: Summary
+  currentStep: number; // 0: Search, 1: Details, 2: Summary, 3: Payment, 4: Confirmation
 }
 
 const steps = [
   { id: 0, label: 'Search' },
   { id: 1, label: 'Details' },
-  { id: 2, label: 'Payment' },
-  { id: 3, label: 'Summary' },
+  { id: 2, label: 'Summary' },
+  { id: 3, label: 'Payment' },
+  { id: 4, label: 'Confirmation' },
 ];
 
 export default function BookingStepper({ currentStep }: BookingStepperProps) {

@@ -276,7 +276,6 @@ export default async function Home() {
                   <li><Link href="/transfers" className="hover:text-white transition">Private Shuttles</Link></li>
                   <li><Link href="/private-tours" className="hover:text-white transition">Tailored Tours</Link></li>
                   <li><Link href="/travel-guide" className="hover:text-white transition">Travel Guide</Link></li>
-                  <li><Link href="/blog" className="hover:text-white transition">Blog</Link></li>
                   <li><Link href="/about" className="hover:text-white transition">About Us</Link></li>
                   <li><Link href="/contact" className="hover:text-white transition">Contact</Link></li>
                   <li><Link href="/faq" className="hover:text-white transition">FAQ</Link></li>

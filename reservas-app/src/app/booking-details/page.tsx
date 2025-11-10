@@ -1,10 +1,10 @@
 // src/app/booking-details/page.tsx
-// ✅ FINAL VERSION - Stepper after Hero + No duplicate surcharge + All fixes
+// ✅ VERSIÓN COMPLETA CORREGIDA - Todos los fixes aplicados
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ArrowLeft, Calendar, Users, MapPin, Loader2, AlertCircle, Plane } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Calendar, Users, MapPin, Loader2, AlertCircle, Plane } from 'lucide-react';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -275,6 +275,37 @@ function BookingDetailsContent() {
   };
 
   // ============================================
+  // AUTO-SAVE FUNCTION
+  // ============================================
+
+  const autoSaveTrip = async () => {
+    if (!currentTrip) return;
+    
+    try {
+      const updateData = {
+        pickup_address: formData.pickup_address,
+        dropoff_address: formData.dropoff_address,
+        pickup_time: formData.pickup_time,
+        flight_number: formData.flight_number || null,
+        airline: formData.airline || null,
+        special_requests: formData.special_requests || null,
+        children_ages: formData.children_ages.filter((age): age is number => age !== null),
+        add_ons: selectedAddOns.length > 0 ? selectedAddOns : null,
+        night_surcharge: nightSurcharge,
+        final_price: finalPrice,
+        updated_at: new Date().toISOString(),
+      };
+
+      await supabase
+        .from('trips')
+        .update(updateData)
+        .eq('id', currentTrip.id);
+    } catch (error) {
+      console.error('Auto-save error:', error);
+    }
+  };
+
+  // ============================================
   // HANDLERS
   // ============================================
 
@@ -311,7 +342,7 @@ function BookingDetailsContent() {
         setCurrentTripIndex(currentTripIndex + 1);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
-        router.push(`/payment?booking_id=${bookingId}`);
+        router.push(`/summary?booking_id=${bookingId}`);
       }
 
       setSaving(false);
@@ -322,7 +353,10 @@ function BookingDetailsContent() {
     }
   };
 
-  const handleBack = () => {
+  const handleBack = async () => {
+    // ✅ Auto-guardar antes de ir atrás
+    await autoSaveTrip();
+    
     if (currentTripIndex > 0) {
       setCurrentTripIndex(currentTripIndex - 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -423,11 +457,12 @@ function BookingDetailsContent() {
       )}
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-12 bg-gray-50">
-        <div className="grid lg:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-4 py-12 pb-32 bg-gray-50">
+        {/* SINGLE COLUMN - Form only */}
+        <div className="max-w-4xl mx-auto">
           
-          {/* LEFT COLUMN - Form */}
-          <div className="lg:col-span-2 space-y-6 animate-in fade-in slide-in-from-left duration-700">
+          {/* Form Content */}
+          <div className="space-y-6 animate-in fade-in slide-in-from-left duration-700">
             
             {/* Trip Summary Card */}
             <Card>
@@ -638,89 +673,75 @@ function BookingDetailsContent() {
             </Card>
           </div>
 
-          {/* RIGHT COLUMN - Price Summary */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-[140px] animate-in fade-in slide-in-from-right duration-700 delay-300">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Price Summary</CardTitle>
-                  <CardDescription>Trip {currentTripIndex + 1}</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Base Price</span>
+          {/* ✅ FIXED BOTTOM BAR - Compacto y visible */}
+          <div className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-r from-blue-600 to-blue-700 border-t-4 border-blue-800 shadow-2xl">
+            <div className="max-w-7xl mx-auto px-4 py-4">
+              <div className="flex items-center justify-between gap-4">
+                
+                {/* Left - Price Info */}
+                <div className="flex items-center gap-6">
+                  <div className="text-white">
+                    <p className="text-xs opacity-90 mb-1">Trip {currentTripIndex + 1} of {trips.length}</p>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl font-bold">${finalPrice.toFixed(2)}</span>
+                      {addOnsPrice > 0 && (
+                        <span className="text-sm opacity-75">(+${addOnsPrice} add-ons)</span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Breakdown - Desktop only */}
+                  <div className="hidden lg:flex items-center gap-4 text-sm text-blue-100 border-l border-blue-500 pl-6">
+                    <div>
+                      <span className="opacity-75">Base: </span>
                       <span className="font-semibold">${basePrice.toFixed(2)}</span>
                     </div>
-                    
                     {nightSurcharge > 0 && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Night Surcharge (9PM-4AM)</span>
-                        <span className="font-semibold text-amber-600">
-                          +${nightSurcharge.toFixed(2)}
-                        </span>
+                      <div>
+                        <span className="opacity-75">Night: </span>
+                        <span className="font-semibold text-amber-300">+${nightSurcharge.toFixed(2)}</span>
                       </div>
                     )}
-                    
                     {addOnsPrice > 0 && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Add-ons</span>
-                        <span className="font-semibold text-blue-600">
-                          +${addOnsPrice.toFixed(2)}
-                        </span>
+                      <div>
+                        <span className="opacity-75">Add-ons: </span>
+                        <span className="font-semibold text-green-300">+${addOnsPrice.toFixed(2)}</span>
                       </div>
                     )}
-                    
-                    <div className="flex justify-between text-sm pt-2 border-t">
-                      <span className="text-gray-600">Subtotal</span>
-                      <span className="font-semibold">${subtotal.toFixed(2)}</span>
-                    </div>
-                    
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Service Fee ({(PRICING_CONFIG.FEES_PERCENTAGE * 100).toFixed(0)}%)</span>
-                      <span className="font-semibold">${fees.toFixed(2)}</span>
-                    </div>
                   </div>
+                </div>
 
-                  <div className="pt-4 border-t">
-                    <div className="flex justify-between items-center">
-                      <span className="text-lg font-bold">Total</span>
-                      <span className="text-2xl font-bold text-blue-600">
-                        ${finalPrice.toFixed(2)}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2 pt-4">
-                    <Button
-                      onClick={handleNext}
-                      disabled={saving}
-                      className="w-full min-h-[48px]"
-                    >
-                      {saving ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                          Saving...
-                        </>
-                      ) : (
-                        <>
-                          {currentTripIndex < trips.length - 1 ? 'Save & Next Trip' : 'Continue to Payment'}
-                        </>
-                      )}
-                    </Button>
-
-                    <Button
-                      onClick={handleBack}
-                      variant="outline"
-                      className="w-full min-h-[48px]"
-                      disabled={saving}
-                    >
-                      <ArrowLeft className="h-4 w-4 mr-2" />
-                      Back
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                {/* Right - Buttons */}
+                <div className="flex items-center gap-3">
+                  <Button
+                    onClick={handleBack}
+                    variant="outline"
+                    className="min-h-[50px] px-6 bg-white hover:bg-gray-100 text-gray-900 border-2"
+                    disabled={saving}
+                  >
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    <span className="hidden sm:inline">Back</span>
+                  </Button>
+                  
+                  <Button
+                    onClick={handleNext}
+                    disabled={saving}
+                    className="min-h-[50px] px-8 bg-white hover:bg-gray-100 text-blue-700 font-bold shadow-lg hover:shadow-xl transition-all"
+                  >
+                    {saving ? (
+                      <>
+                        <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        {currentTripIndex < trips.length - 1 ? 'Save & Next Trip' : 'Continue to Summary'}
+                        <ArrowRight className="h-4 w-4 ml-2" />
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
 

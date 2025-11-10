@@ -1,5 +1,4 @@
 // src/components/booking/BookingNavbar.tsx
-// ✅ NAVBAR LIMPIO - Redes sociales movidas al footer
 "use client";
 
 import { useState } from "react";
@@ -13,7 +12,6 @@ const navLinks = [
   { label: "Private Shuttles", href: "/transfers" },
   { label: "Tailored Tours", href: "/private-tours" },
   { label: "Travel Guide", href: "/travel-guide" },
-  { label: "Blog", href: "/blog" },
   { label: "Contact", href: "/contact" },
   { label: "About", href: "/about" },
 ];
@@ -27,12 +25,12 @@ export default function BookingNavbar() {
 
   return (
     <>
-      {/* ✅ NAVBAR LIMPIO - Sin redes sociales, con carrito */}
+      {/* NAVBAR LIMPIO - Sin Blog */}
       <header className="absolute top-0 left-0 right-0 z-50 w-full">
         <div className="container mx-auto px-4 sm:px-6 py-4 max-w-full">
           <div className="flex items-center justify-between gap-2">
             
-            {/* ✅ LOGO - Responsive sizes */}
+            {/* LOGO - Responsive sizes */}
             <Link
               href="/"
               className="flex items-center gap-3"
@@ -50,7 +48,7 @@ export default function BookingNavbar() {
               </div>
             </Link>
 
-            {/* ✅ DESKTOP NAVIGATION */}
+            {/* DESKTOP NAVIGATION */}
             <nav className="hidden lg:flex items-center gap-6" aria-label="Main navigation">
               {navLinks.map((link) => (
                 <Link
@@ -62,7 +60,7 @@ export default function BookingNavbar() {
                 </Link>
               ))}
 
-              {/* ✅ CART ICON */}
+              {/* CART ICON */}
               <Link
                 href="/cart"
                 className="text-white hover:text-gray-200 transition-colors p-2 rounded-full hover:bg-white/10 relative ml-2"
@@ -72,7 +70,7 @@ export default function BookingNavbar() {
               </Link>
             </nav>
 
-            {/* ✅ MOBILE MENU BUTTON */}
+            {/* MOBILE MENU BUTTON */}
             <button
               onClick={handleDrawerToggle}
               className="lg:hidden text-white p-3 hover:bg-white/10 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
@@ -90,7 +88,7 @@ export default function BookingNavbar() {
         </div>
       </header>
 
-      {/* ✅ MOBILE DRAWER OVERLAY */}
+      {/* MOBILE DRAWER OVERLAY */}
       {mobileOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden animate-in fade-in duration-200"
@@ -99,7 +97,7 @@ export default function BookingNavbar() {
         />
       )}
 
-      {/* ✅ MOBILE DRAWER */}
+      {/* MOBILE DRAWER */}
       <aside
         id="mobile-menu"
         className={cn(

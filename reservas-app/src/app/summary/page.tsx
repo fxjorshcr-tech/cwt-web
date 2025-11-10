@@ -1,17 +1,17 @@
 // src/app/summary/page.tsx
-// ✅ FINAL VERSION - Stepper in proper position + All fixes
+// ✅ SUMMARY PAGE - Review before payment (Step 2)
 'use client';
 
 import { useEffect, useState, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ArrowLeft, Calendar, Users, MapPin, Clock, Loader2, CheckCircle, Mail, Phone, User } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Calendar, Users, MapPin, Clock, Loader2, Mail, Phone, User, ShoppingCart } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import BookingStepper from '@/components/booking/BookingStepper';
 
-import { formatDate, formatTime, formatCurrency, formatBookingId } from '@/lib/formatters';
+import { formatDate, formatTime, formatCurrency } from '@/lib/formatters';
 import { PRICING_CONFIG } from '@/lib/pricing-config';
 
 // ============================================
@@ -36,17 +36,8 @@ interface Trip {
   flight_number: string | null;
   airline: string | null;
   special_requests: string | null;
-  customer_first_name: string | null;
-  customer_last_name: string | null;
-  customer_email: string | null;
-  customer_phone: string | null;
-  customer_country: string | null;
   children_ages: number[] | null;
 }
-
-// ============================================
-// ADD-ONS CONFIGURATION
-// ============================================
 
 const ADD_ON_NAMES: Record<string, string> = {
   tico_time: 'Tico Time Upgrade',
@@ -64,14 +55,9 @@ function SummaryPageContent() {
 
   const bookingId = searchParams.get('booking_id');
 
-  // ============================================
-  // STATE
-  // ============================================
-
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ VALIDACIÓN TEMPRANA
   if (!bookingId) {
     return (
       <>
@@ -83,9 +69,6 @@ function SummaryPageContent() {
               <CardDescription>No booking ID provided</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-600 mb-4">
-                Please return to the home page and start a new booking.
-              </p>
               <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
                 Return Home
               </Button>
@@ -95,10 +78,6 @@ function SummaryPageContent() {
       </>
     );
   }
-
-  // ============================================
-  // LOAD TRIPS
-  // ============================================
 
   useEffect(() => {
     async function loadTrips() {
@@ -112,26 +91,19 @@ function SummaryPageContent() {
           .order('created_at', { ascending: true });
 
         if (error) throw error;
-
-        if (!data || data.length === 0) {
-          throw new Error('No trips found for this booking');
-        }
+        if (!data || data.length === 0) throw new Error('No trips found');
 
         setTrips(data as Trip[]);
         setLoading(false);
       } catch (error) {
         console.error('Error loading trips:', error);
-        alert('Failed to load booking summary. Please try again.');
+        alert('Failed to load booking summary');
         router.push('/');
       }
     }
 
     loadTrips();
   }, [bookingId, supabase, router]);
-
-  // ============================================
-  // MEMOIZED CALCULATIONS
-  // ============================================
 
   const grandTotal = useMemo(
     () => trips.reduce((sum, trip) => sum + (trip.final_price || trip.price), 0),
@@ -143,31 +115,12 @@ function SummaryPageContent() {
     [trips]
   );
 
-  const customerInfo = useMemo(() => {
-    const firstTrip = trips[0];
-    if (!firstTrip) return null;
-
-    return {
-      name: [firstTrip.customer_first_name, firstTrip.customer_last_name].filter(Boolean).join(' ') || 'N/A',
-      email: firstTrip.customer_email || 'N/A',
-      phone: firstTrip.customer_phone || 'N/A',
-      country: firstTrip.customer_country || 'N/A',
-    };
-  }, [trips]);
-
-  // ============================================
-  // LOADING STATE
-  // ============================================
-
   if (loading) {
     return (
       <>
         <BookingNavbar />
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="text-center">
-            <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
-            <p className="text-gray-600">Loading your booking summary...</p>
-          </div>
+          <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
         </div>
       </>
     );
@@ -181,7 +134,6 @@ function SummaryPageContent() {
           <Card className="max-w-md mx-4">
             <CardHeader>
               <CardTitle className="text-red-600">No Trips Found</CardTitle>
-              <CardDescription>Unable to load your booking</CardDescription>
             </CardHeader>
             <CardContent>
               <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
@@ -194,108 +146,39 @@ function SummaryPageContent() {
     );
   }
 
-  // ============================================
-  // RENDER
-  // ============================================
-
   return (
     <>
       <BookingNavbar />
 
-      <main id="main-content" className="min-h-screen bg-gray-50">
-        {/* ✅ STEPPER AL INICIO DEL MAIN - STICKY */}
+      <main className="min-h-screen bg-gray-50">
+        {/* Stepper - Step 2: Summary */}
         <div className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
           <div className="max-w-5xl mx-auto px-4 py-8">
-            <BookingStepper currentStep={3} />
+            <BookingStepper currentStep={2} />
           </div>
         </div>
 
-        {/* Success Header */}
         <div className="py-12">
           <div className="max-w-5xl mx-auto px-4">
-            <div className="text-center mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4 animate-in zoom-in duration-500 delay-150">
-                <CheckCircle className="h-10 w-10 text-green-600" />
-              </div>
+            
+            {/* Header */}
+            <div className="text-center mb-8">
               <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-2">
-                Booking Confirmed!
+                Review Your Booking
               </h1>
               <p className="text-gray-600 text-lg">
-                Your reservation has been successfully created
+                Please review all details before proceeding to payment
               </p>
             </div>
-
-            {/* Booking ID */}
-            <Card className="mb-8 bg-blue-50 border-blue-200 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
-              <CardContent className="py-6">
-                <div className="text-center">
-                  <p className="text-sm text-blue-800 mb-2">Your Booking ID</p>
-                  <p className="text-2xl md:text-3xl font-mono font-bold text-blue-900">
-                    {formatBookingId(bookingId)}
-                  </p>
-                  <p className="text-xs text-blue-700 mt-2">
-                    Save this ID for your records
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
 
             <div className="grid lg:grid-cols-3 gap-8">
               
               {/* LEFT - Trip Details */}
               <div className="lg:col-span-2 space-y-6">
                 
-                {/* Customer Information */}
-                {customerInfo && (
-                  <Card className="animate-in fade-in slide-in-from-left duration-700 delay-500">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <User className="h-5 w-5 text-blue-600" />
-                        Customer Information
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <div className="flex items-center gap-3">
-                          <User className="h-5 w-5 text-gray-400" />
-                          <div>
-                            <p className="text-sm text-gray-500">Name</p>
-                            <p className="font-semibold">{customerInfo.name}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <Mail className="h-5 w-5 text-gray-400" />
-                          <div>
-                            <p className="text-sm text-gray-500">Email</p>
-                            <p className="font-semibold break-all">{customerInfo.email}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <Phone className="h-5 w-5 text-gray-400" />
-                          <div>
-                            <p className="text-sm text-gray-500">Phone</p>
-                            <p className="font-semibold">{customerInfo.phone}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <MapPin className="h-5 w-5 text-gray-400" />
-                          <div>
-                            <p className="text-sm text-gray-500">Country</p>
-                            <p className="font-semibold">{customerInfo.country}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
                 {/* Trips */}
                 {trips.map((trip, index) => (
-                  <Card 
-                    key={trip.id} 
-                    className="animate-in fade-in slide-in-from-left duration-700"
-                    style={{ animationDelay: `${600 + (index * 100)}ms` }}
-                  >
+                  <Card key={trip.id}>
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <MapPin className="h-5 w-5 text-blue-600" />
@@ -307,7 +190,6 @@ function SummaryPageContent() {
                     </CardHeader>
                     <CardContent className="space-y-4">
                       
-                      {/* Date & Time */}
                       <div className="grid md:grid-cols-2 gap-4">
                         <div className="flex items-center gap-3">
                           <Calendar className="h-5 w-5 text-gray-400" />
@@ -325,7 +207,6 @@ function SummaryPageContent() {
                         </div>
                       </div>
 
-                      {/* Passengers */}
                       <div className="flex items-center gap-3">
                         <Users className="h-5 w-5 text-gray-400" />
                         <div>
@@ -337,7 +218,6 @@ function SummaryPageContent() {
                         </div>
                       </div>
 
-                      {/* Addresses */}
                       <div className="space-y-2 pt-4 border-t">
                         <div>
                           <p className="text-sm text-gray-500 mb-1">Pickup Address</p>
@@ -349,7 +229,6 @@ function SummaryPageContent() {
                         </div>
                       </div>
 
-                      {/* Flight Info */}
                       {(trip.airline || trip.flight_number) && (
                         <div className="space-y-2 pt-4 border-t">
                           <p className="text-sm font-semibold text-gray-700">Flight Information</p>
@@ -370,14 +249,13 @@ function SummaryPageContent() {
                         </div>
                       )}
 
-                      {/* Add-ons */}
                       {trip.add_ons && trip.add_ons.length > 0 && (
                         <div className="space-y-2 pt-4 border-t">
                           <p className="text-sm font-semibold text-gray-700">Add-ons</p>
                           <ul className="space-y-1">
                             {trip.add_ons.map((addonId) => (
                               <li key={addonId} className="flex items-center gap-2 text-sm">
-                                <CheckCircle className="h-4 w-4 text-green-600" />
+                                <ShoppingCart className="h-4 w-4 text-blue-600" />
                                 <span>{ADD_ON_NAMES[addonId] || addonId}</span>
                               </li>
                             ))}
@@ -385,7 +263,6 @@ function SummaryPageContent() {
                         </div>
                       )}
 
-                      {/* Special Requests */}
                       {trip.special_requests && (
                         <div className="space-y-2 pt-4 border-t">
                           <p className="text-sm font-semibold text-gray-700">Special Requests</p>
@@ -393,25 +270,32 @@ function SummaryPageContent() {
                         </div>
                       )}
 
+                      <div className="pt-4 border-t">
+                        <div className="flex justify-between items-center">
+                          <span className="font-semibold text-gray-700">Trip Price:</span>
+                          <span className="text-xl font-bold text-blue-600">
+                            {formatCurrency(trip.final_price || trip.price)}
+                          </span>
+                        </div>
+                      </div>
+
                     </CardContent>
                   </Card>
                 ))}
 
               </div>
 
-              {/* RIGHT - Price Summary */}
+              {/* RIGHT - Price Summary (STICKY) */}
               <div className="lg:col-span-1">
                 <div className="sticky top-[140px] space-y-6">
                   
-                  {/* Total Summary */}
-                  <Card className="animate-in fade-in slide-in-from-right duration-700 delay-500">
+                  <Card>
                     <CardHeader>
-                      <CardTitle>Booking Summary</CardTitle>
+                      <CardTitle>Order Summary</CardTitle>
                       <CardDescription>{trips.length} trip{trips.length !== 1 ? 's' : ''}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       
-                      {/* Stats */}
                       <div className="space-y-3">
                         <div className="flex justify-between text-sm">
                           <span className="text-gray-600">Total Passengers</span>
@@ -423,70 +307,40 @@ function SummaryPageContent() {
                         </div>
                       </div>
 
-                      {/* Total Price */}
                       <div className="pt-4 border-t">
-                        <div className="flex justify-between items-center">
+                        <div className="flex justify-between items-center mb-2">
                           <span className="text-lg font-bold text-gray-900">Total Amount</span>
-                          <span className="text-2xl font-bold text-blue-600">
+                          <span className="text-3xl font-bold text-blue-600">
                             {formatCurrency(grandTotal)}
                           </span>
                         </div>
-                      </div>
-
-                      <div className="pt-4 border-t">
                         <p className="text-xs text-gray-500">
-                          * Service fee ({(PRICING_CONFIG.FEES_PERCENTAGE * 100).toFixed(0)}%) included
+                          * Includes {(PRICING_CONFIG.FEES_PERCENTAGE * 100).toFixed(0)}% service fee
                         </p>
                       </div>
 
+                      <div className="pt-4 space-y-2">
+                        <Button
+                          onClick={() => router.push(`/payment?booking_id=${bookingId}`)}
+                          className="w-full min-h-[48px]"
+                          size="lg"
+                        >
+                          Proceed to Payment
+                          <ArrowRight className="h-4 w-4 ml-2" />
+                        </Button>
+
+                        <Button
+                          onClick={() => router.push(`/booking-details?booking_id=${bookingId}&trip=0`)}
+                          variant="outline"
+                          className="w-full min-h-[48px]"
+                        >
+                          <ArrowLeft className="h-4 w-4 mr-2" />
+                          Back to Details
+                        </Button>
+                      </div>
+
                     </CardContent>
                   </Card>
-
-                  {/* Next Steps */}
-                  <Card className="bg-green-50 border-green-200 animate-in fade-in slide-in-from-right duration-700 delay-700">
-                    <CardHeader>
-                      <CardTitle className="text-green-900">What's Next?</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div className="flex gap-3">
-                        <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                        <div>
-                          <p className="text-sm font-semibold text-green-900">Check Your Email</p>
-                          <p className="text-xs text-green-700">
-                            Confirmation sent to your email
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex gap-3">
-                        <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                        <div>
-                          <p className="text-sm font-semibold text-green-900">Payment Link</p>
-                          <p className="text-xs text-green-700">
-                            You'll receive a payment link via email or WhatsApp
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex gap-3">
-                        <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                        <div>
-                          <p className="text-sm font-semibold text-green-900">Save Your Booking ID</p>
-                          <p className="text-xs text-green-700">
-                            Keep your booking ID for reference
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Actions */}
-                  <Button
-                    onClick={() => router.push('/')}
-                    variant="outline"
-                    className="w-full min-h-[48px]"
-                  >
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    Return to Home
-                  </Button>
 
                 </div>
               </div>
@@ -499,20 +353,13 @@ function SummaryPageContent() {
   );
 }
 
-// ============================================
-// SUSPENSE WRAPPER
-// ============================================
-
 export default function SummaryPage() {
   return (
     <Suspense fallback={
       <>
         <BookingNavbar />
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="text-center">
-            <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
-            <p className="text-gray-600">Loading...</p>
-          </div>
+          <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
         </div>
       </>
     }>

@@ -1,5 +1,5 @@
 // src/components/booking/TripAddOns.tsx
-// ✅ PHASE 2 CORRECTED - Removed SimpleCheckbox, improved accessibility
+// ✅ CORREGIDO - IDs con guión bajo para coincidir con page.tsx
 
 'use client';
 
@@ -18,7 +18,7 @@ export interface AddOn {
 
 export const AVAILABLE_ADDONS: AddOn[] = [
   {
-    id: 'tico-time',
+    id: 'tico_time', // ✅ Cambiado de 'tico-time' a 'tico_time'
     name: 'Tico Time Upgrade',
     description: 'Add 3 extra hours to explore Costa Rica! Stop at scenic viewpoints, enjoy a traditional casado lunch, visit local attractions, or capture stunning photos at hidden gems along the way.',
     price: 160,
@@ -26,7 +26,7 @@ export const AVAILABLE_ADDONS: AddOn[] = [
     popular: true,
   },
   {
-    id: 'flex-time',
+    id: 'flex_time', // ✅ Cambiado de 'flex-time' a 'flex_time'
     name: 'Flex Time Protection',
     description: 'Life happens! Get up to 2 hours of flexibility if your plans change. Perfect for late checkouts, unexpected delays, or simply wanting to enjoy that last swim.',
     price: 45,

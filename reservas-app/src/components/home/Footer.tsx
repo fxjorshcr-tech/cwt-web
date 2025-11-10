@@ -71,30 +71,23 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Quick Links - ✅ ARREGLADO */}
+          {/* Quick Links */}
           <div>
             <h3 className="font-bold mb-4">Quick Links</h3>
             <ul className="space-y-2 text-sm text-gray-300">
               <li><Link href="/transfers" className="hover:text-white transition">Private Shuttles</Link></li>
-              {/* Comentados temporalmente hasta crear las páginas */}
-              {/* <li><Link href="/private-tours" className="hover:text-white transition">Tailored Tours</Link></li> */}
-              {/* <li><Link href="/travel-guide" className="hover:text-white transition">Travel Guide</Link></li> */}
-              {/* <li><Link href="/blog" className="hover:text-white transition">Blog</Link></li> */}
               <li><Link href="/about" className="hover:text-white transition">About Us</Link></li>
               <li><Link href="/contact" className="hover:text-white transition">Contact</Link></li>
-              {/* <li><Link href="/faq" className="hover:text-white transition">FAQ</Link></li> */}
             </ul>
           </div>
 
-          {/* Legal - ✅ ARREGLADO */}
+          {/* Legal */}
           <div>
             <h3 className="font-bold mb-4">Legal</h3>
             <ul className="space-y-2 text-sm text-gray-300">
-              {/* Comentados temporalmente hasta crear las páginas */}
-              {/* <li><Link href="/terms" className="hover:text-white transition">Terms & Conditions</Link></li> */}
-              {/* <li><Link href="/privacy" className="hover:text-white transition">Privacy Policy</Link></li> */}
-              {/* <li><Link href="/cancellation" className="hover:text-white transition">Cancellation Policy</Link></li> */}
-              <li className="text-gray-400 text-xs italic">Coming soon</li>
+              <li className="text-gray-400 text-xs italic">Terms & Conditions - Coming soon</li>
+              <li className="text-gray-400 text-xs italic">Privacy Policy - Coming soon</li>
+              <li className="text-gray-400 text-xs italic">Cancellation Policy - Coming soon</li>
             </ul>
           </div>
 
