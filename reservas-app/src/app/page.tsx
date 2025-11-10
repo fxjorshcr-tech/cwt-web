@@ -1,4 +1,4 @@
-// src/app/page.tsx - ✅ UPDATED VERSION
+// src/app/page.tsx - ✅ FULLY UPDATED VERSION
 import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -8,12 +8,13 @@ import BookingSteps from "@/components/booking/BookingSteps";
 import BookingNavbar from "@/components/booking/BookingNavbar";
 import WhyPrivateShuttle from "@/components/home/WhyPrivateShuttle";
 import ValueProposition from "@/components/home/ValueProposition";
+import PaymentMethods from "@/components/home/PaymentMethods"; // ✅ NUEVO
 import TravelGuide from "@/components/home/TravelGuide";
 import PrivateTours from "@/components/home/PrivateTours";
 import GoogleReviews from "@/components/home/GoogleReviews";
 import FinalCTA from "@/components/home/FinalCTA";
 import WhatsAppButton from "@/components/WhatsAppButton";
-import ScrollToBookingButton from "@/components/ScrollToBookingButton"; // ✅ NUEVO
+import ScrollToBookingButton from "@/components/ScrollToBookingButton";
 import StructuredData from "@/components/SEO/StructuredData";
 import type { Metadata } from 'next';
 import Script from 'next/script';
@@ -75,10 +76,10 @@ export const metadata: Metadata = {
 export default async function Home() {
   return (
     <>
-      {/* ✅ SKIP TO CONTENT LINK - Accessibility */}
+      {/* ✅ SKIP TO CONTENT LINK - Fixed: solo visible en keyboard focus */}
       <a 
         href="#main-content" 
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-lg focus:shadow-lg"
+        className="absolute -top-96 left-4 z-[9999] px-4 py-2 bg-blue-600 text-white rounded-lg shadow-lg focus:top-4 transition-all"
       >
         Skip to main content
       </a>
@@ -179,13 +180,16 @@ export default async function Home() {
         {/* Booking Steps */}
         <BookingSteps />
 
+        {/* ✅ NUEVA SECCIÓN - Payment Methods con Stripe */}
+        <PaymentMethods />
+
         {/* Why Private Shuttle */}
         <WhyPrivateShuttle />
 
         {/* Value Proposition */}
         <ValueProposition />
 
-        {/* Travel Guide */}
+        {/* Travel Guide - Simplificado */}
         <TravelGuide />
 
         {/* Private Tours */}
