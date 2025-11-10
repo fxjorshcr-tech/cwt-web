@@ -1,4 +1,4 @@
-// src/app/layout.tsx - CON FOOTER Y SIN OVERFLOW
+// src/app/layout.tsx - CON FOOTER Y SIN OVERFLOW - ✅ CORREGIDO
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
