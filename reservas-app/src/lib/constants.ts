@@ -1,5 +1,5 @@
 // src/lib/constants.ts
-// ✅ CORREGIDO: MIN_ADDRESS_LENGTH reducido de 10 a 3
+// ✅ CORREGIDO: Solo límites de pasajeros a 12 (líneas 23-28)
 /**
  * ==========================================
  * CONSTANTES GLOBALES DE LA APLICACIÓN
@@ -13,7 +13,7 @@
 
 export const VALIDATION_RULES = {
   // Direcciones
-  MIN_ADDRESS_LENGTH: 3, // ✅ Cambiado de 10 a 3
+  MIN_ADDRESS_LENGTH: 3,
   MAX_ADDRESS_LENGTH: 200,
   
   // Instrucciones
@@ -22,12 +22,12 @@ export const VALIDATION_RULES = {
   // Solicitudes especiales
   MAX_SPECIAL_REQUESTS_LENGTH: 1000,
   
-  // Pasajeros
+  // Pasajeros - ✅ CORREGIDO: Máximo 12
   MIN_ADULTS: 1,
-  MAX_ADULTS: 18,
+  MAX_ADULTS: 12,              // ✅ Cambiado de 18 a 12
   MIN_CHILDREN: 0,
-  MAX_CHILDREN: 18,
-  MAX_TOTAL_PASSENGERS: 18,
+  MAX_CHILDREN: 12,            // ✅ Cambiado de 18 a 12
+  MAX_TOTAL_PASSENGERS: 12,    // ✅ Cambiado de 18 a 12
   
   // Fechas
   MAX_BOOKING_ADVANCE_DAYS: 365, // 1 año
@@ -276,9 +276,10 @@ export const BOOKING_STEPS = [
 // ADD-ONS IDS
 // ========================================
 
+// ✅ CORREGIDO: Usar underscore para consistencia con la base de datos
 export const ADD_ON_IDS = {
-  TICO_TIME: 'tico-time',
-  FLEX_TIME: 'flex-time',
+  TICO_TIME: 'tico_time',  // ✅ Con underscore
+  FLEX_TIME: 'flex_time',  // ✅ Con underscore
 } as const;
 
 // ========================================

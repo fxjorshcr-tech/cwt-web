@@ -3,7 +3,8 @@
  * ==========================================
  * CONFIGURACIÓN Y CÁLCULOS DE PRECIOS
  * ==========================================
- * Toda la lógica de pricing centralizada en un solo lugar
+ * ✅ CORREGIDO: Solo límites de pasajeros a 12 (líneas 29-35)
+ * ✅ precio13a18 permanece intacto para compatibilidad con Supabase
  */
 
 import type { Route } from '@/types/supabase';
@@ -19,10 +20,10 @@ import type { Route } from '@/types/supabase';
 export const PRICING_CONFIG = {
   // Recargo nocturno
   NIGHT_SURCHARGE: {
-    TYPE: 'FIXED' as 'FIXED' | 'PERCENTAGE', // Tipo de recargo
-    AMOUNT: 50,                                // $50 fijo o 0.15 para 15%
-    START_HOUR: 21,                            // 9:00 PM
-    END_HOUR: 4,                               // 4:00 AM
+    TYPE: 'FIXED' as 'FIXED' | 'PERCENTAGE',
+    AMOUNT: 50,                                
+    START_HOUR: 21,                            
+    END_HOUR: 4,                               
   },
   
   // Fees (13% service fee)
@@ -30,20 +31,27 @@ export const PRICING_CONFIG = {
   
   // Add-ons precios
   ADD_ONS: {
-    TICO_TIME: 160,           // Tico Time Upgrade (3 extra hours)
-    FLEX_TIME: 45,            // Flex Time Protection (2 hours flexibility)
+    TICO_TIME: 160,           
+    FLEX_TIME: 45,            
   },
   
-  // Límites de pasajeros
+  // ✅ IDs OFICIALES de add-ons (consistentes en toda la app)
+  ADD_ON_IDS: {
+    TICO_TIME: 'tico_time',
+    FLEX_TIME: 'flex_time',
+  } as const,
+  
+  // Límites de pasajeros - ✅ CORREGIDO: Máximo 12
   PASSENGERS: {
     MIN_ADULTS: 1,
-    MAX_ADULTS: 18,
+    MAX_ADULTS: 12,        // ✅ Cambiado de 18 a 12
     MIN_CHILDREN: 0,
-    MAX_CHILDREN: 18,
-    MAX_TOTAL: 18,
+    MAX_CHILDREN: 12,      // ✅ Cambiado de 18 a 12
+    MAX_TOTAL: 12,         // ✅ Cambiado de 18 a 12
   },
   
   // Rangos de precios por número de pasajeros
+  // ✅ precio13a18 se mantiene para compatibilidad con Supabase
   PRICE_RANGES: [
     { min: 1, max: 6, priceKey: 'precio1a6' as const },
     { min: 7, max: 9, priceKey: 'precio7a9' as const },
@@ -63,27 +71,21 @@ export const PRICING_CONFIG = {
  * @returns Precio base
  */
 export function calculateBasePrice(route: Route, totalPassengers: number): number {
-  // Validar entrada
   if (!route || totalPassengers < 1) {
     return 0;
   }
   
-  // Encontrar el rango de precio apropiado
   const priceRange = PRICING_CONFIG.PRICE_RANGES.find(
     range => totalPassengers >= range.min && totalPassengers <= range.max
   );
   
   if (!priceRange) {
-    // Si está fuera de rango, usar el precio más alto
     return route.precio13a18 || 0;
   }
   
-  // Obtener el precio correspondiente
   const price = route[priceRange.priceKey];
   
-  // Si el precio no existe, intentar con el siguiente rango disponible
   if (!price || price === 0) {
-    // Buscar el primer precio disponible en orden descendente
     for (let i = PRICING_CONFIG.PRICE_RANGES.length - 1; i >= 0; i--) {
       const fallbackPrice = route[PRICING_CONFIG.PRICE_RANGES[i].priceKey];
       if (fallbackPrice && fallbackPrice > 0) {
@@ -107,25 +109,21 @@ export function calculateNightSurcharge(
 ): number {
   if (!pickupTime) return 0;
   
-  // Parsear la hora
   const [hoursStr] = pickupTime.split(':');
   const hours = parseInt(hoursStr, 10);
   
-  // Validar que sea una hora válida
   if (isNaN(hours) || hours < 0 || hours > 23) {
     return 0;
   }
   
   const { START_HOUR, END_HOUR, TYPE, AMOUNT } = PRICING_CONFIG.NIGHT_SURCHARGE;
   
-  // Verificar si está en horario nocturno
   const isNightTime = hours >= START_HOUR || hours < END_HOUR;
   
   if (!isNightTime) {
     return 0;
   }
   
-  // Calcular según el tipo
   if (TYPE === 'FIXED') {
     return AMOUNT;
   } else if (TYPE === 'PERCENTAGE' && basePrice) {
@@ -165,13 +163,11 @@ export function calculateFees(subtotal: number): number {
   }
   
   const fees = subtotal * PRICING_CONFIG.FEES_PERCENTAGE;
-  
-  // Redondear a 2 decimales
   return Math.round(fees * 100) / 100;
 }
 
 /**
- * Calcular precio de add-ons
+ * ✅ CORREGIDO - Calcular precio de add-ons con IDs consistentes
  * @param addOnIds - Array de IDs de add-ons seleccionados
  * @returns Total de add-ons
  */
@@ -184,10 +180,10 @@ export function calculateAddOnsPrice(addOnIds: string[]): number {
   
   addOnIds.forEach(id => {
     switch (id) {
-      case 'tico-time':
+      case PRICING_CONFIG.ADD_ON_IDS.TICO_TIME:  // ✅ 'tico_time'
         total += PRICING_CONFIG.ADD_ONS.TICO_TIME;
         break;
-      case 'flex-time':
+      case PRICING_CONFIG.ADD_ON_IDS.FLEX_TIME:  // ✅ 'flex_time'
         total += PRICING_CONFIG.ADD_ONS.FLEX_TIME;
         break;
       default:
@@ -210,16 +206,10 @@ export function calculateFinalPrice(params: {
 }): number {
   const { basePrice, nightSurcharge = 0, addOnsPrice = 0 } = params;
   
-  // Calcular subtotal
   const subtotal = basePrice + nightSurcharge + addOnsPrice;
-  
-  // Calcular fees
   const fees = calculateFees(subtotal);
-  
-  // Total final
   const total = subtotal + fees;
   
-  // Redondear a 2 decimales
   return Math.round(total * 100) / 100;
 }
 
@@ -236,7 +226,6 @@ export function calculatePriceBreakdown(params: {
 }) {
   const { route, totalPassengers, pickupTime, addOnIds = [] } = params;
   
-  // Calcular cada componente
   const basePrice = calculateBasePrice(route, totalPassengers);
   const nightSurcharge = pickupTime ? calculateNightSurcharge(pickupTime, basePrice) : 0;
   const addOnsPrice = calculateAddOnsPrice(addOnIds);
@@ -256,13 +245,9 @@ export function calculatePriceBreakdown(params: {
 }
 
 // ========================================
-// CLASE PRINCIPAL (OPCIONAL - Para uso avanzado)
+// CLASE PRINCIPAL
 // ========================================
 
-/**
- * Clase para manejar cálculos de pricing de forma orientada a objetos
- * Útil para casos complejos donde necesitas mantener estado
- */
 export class PricingCalculator {
   private route: Route;
   private totalPassengers: number;
@@ -302,11 +287,6 @@ export class PricingCalculator {
 // HELPERS
 // ========================================
 
-/**
- * Verificar si una ruta tiene precios válidos
- * @param route - Ruta a verificar
- * @returns true si tiene al menos un precio válido
- */
 export function hasValidPrices(route: Route): boolean {
   return !!(
     route.precio1a6 ||
@@ -316,11 +296,6 @@ export function hasValidPrices(route: Route): boolean {
   );
 }
 
-/**
- * Obtener el precio más bajo disponible de una ruta
- * @param route - Ruta
- * @returns Precio más bajo o 0
- */
 export function getLowestPrice(route: Route): number {
   const prices = [
     route.precio1a6,

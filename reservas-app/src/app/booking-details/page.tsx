@@ -1,10 +1,10 @@
 // src/app/booking-details/page.tsx
-// ✅ VERSIÓN RENOVADA - Mobile optimizado, progress arreglado, bottom bar mejorado
+// ✅ VERSIÓN OPTIMIZADA - useMemo, timeHelpers, validación mejorada
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ArrowLeft, ArrowRight, Calendar, Users, MapPin, Loader2, AlertCircle, Plane, DollarSign, Clock as ClockIcon } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Calendar, Users, MapPin, Loader2, AlertCircle, Plane } from 'lucide-react';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,8 +23,9 @@ import {
   isAirport,
   ValidationErrors
 } from '@/utils/bookingValidation';
+import { normalizeTime } from '@/utils/timeHelpers';  // ✅ NUEVO
 import { formatDate } from '@/lib/formatters';
-import { calculateNightSurcharge, PRICING_CONFIG } from '@/lib/pricing-config';
+import { calculateNightSurcharge, calculateAddOnsPrice, PRICING_CONFIG } from '@/lib/pricing-config';
 
 // ============================================
 // TYPES
@@ -84,6 +85,7 @@ function BookingDetailsContent() {
   const [completedTrips, setCompletedTrips] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);  // ✅ NUEVO - Prevenir saves paralelos
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
   
@@ -122,6 +124,39 @@ function BookingDetailsContent() {
   const currentTrip = trips[currentTripIndex];
 
   // ============================================
+  // ✅ OPTIMIZACIÓN - Cálculos con useMemo
+  // ============================================
+  
+  const priceCalculation = useMemo(() => {
+    if (!currentTrip) {
+      return {
+        basePrice: 0,
+        nightSurcharge: 0,
+        addOnsPrice: 0,
+        subtotal: 0,
+        fees: 0,
+        finalPrice: 0,
+      };
+    }
+
+    const basePrice = currentTrip.price || 0;
+    const nightSurcharge = calculateNightSurcharge(formData.pickup_time, basePrice);
+    const addOnsPrice = calculateAddOnsPrice(selectedAddOns);  // ✅ Usar función centralizada
+    const subtotal = basePrice + nightSurcharge + addOnsPrice;
+    const fees = subtotal * PRICING_CONFIG.FEES_PERCENTAGE;
+    const finalPrice = subtotal + fees;
+
+    return {
+      basePrice,
+      nightSurcharge,
+      addOnsPrice,
+      subtotal,
+      fees,
+      finalPrice,
+    };
+  }, [currentTrip?.price, formData.pickup_time, selectedAddOns]);
+
+  // ============================================
   // LOAD TRIPS
   // ============================================
 
@@ -149,7 +184,7 @@ function BookingDetailsContent() {
 
         setTrips(data as any);
 
-        // ✅ Cargar trips completados desde DB
+        // Cargar trips completados desde DB
         const completed = data
           .map((trip, idx) => trip.pickup_time && trip.pickup_address && trip.dropoff_address ? idx : null)
           .filter((idx): idx is number => idx !== null);
@@ -166,7 +201,7 @@ function BookingDetailsContent() {
           setFormData({
             pickup_address: trip.pickup_address || '',
             dropoff_address: trip.dropoff_address || '',
-            pickup_time: trip.pickup_time || '',
+            pickup_time: normalizeTime(trip.pickup_time),  // ✅ NORMALIZAR
             flight_number: trip.flight_number || '',
             airline: trip.airline || '',
             special_requests: trip.special_requests || '',
@@ -199,20 +234,10 @@ function BookingDetailsContent() {
         ? currentTrip.children_ages
         : Array(currentTrip.children).fill(null);
 
-      // ✅ FIX: Convertir pickup_time de "HH:mm:ss" a "HH:mm" si es necesario
-      let pickupTime = currentTrip.pickup_time || '';
-      if (pickupTime && pickupTime.includes(':')) {
-        const parts = pickupTime.split(':');
-        if (parts.length === 3) {
-          // Si tiene formato HH:mm:ss, convertir a HH:mm
-          pickupTime = `${parts[0]}:${parts[1]}`;
-        }
-      }
-
       setFormData({
         pickup_address: currentTrip.pickup_address || '',
         dropoff_address: currentTrip.dropoff_address || '',
-        pickup_time: pickupTime,
+        pickup_time: normalizeTime(currentTrip.pickup_time),  // ✅ NORMALIZAR
         flight_number: currentTrip.flight_number || '',
         airline: currentTrip.airline || '',
         special_requests: currentTrip.special_requests || '',
@@ -232,28 +257,8 @@ function BookingDetailsContent() {
   // ============================================
 
   useEffect(() => {
-    // Limpiar errores cuando el usuario cambia los inputs
     setErrors({});
   }, [formData.pickup_address, formData.dropoff_address, formData.pickup_time, formData.flight_number]);
-
-  // ============================================
-  // CALCULATE PRICES
-  // ============================================
-
-  const basePrice = currentTrip?.price || 0;
-  const nightSurcharge = calculateNightSurcharge(formData.pickup_time, basePrice);
-  
-  const addOnsPrice = selectedAddOns.reduce((total, addonId) => {
-    const prices: Record<string, number> = {
-      tico_time: PRICING_CONFIG.ADD_ONS.TICO_TIME,
-      flex_time: PRICING_CONFIG.ADD_ONS.FLEX_TIME,
-    };
-    return total + (prices[addonId] || 0);
-  }, 0);
-
-  const subtotal = basePrice + nightSurcharge + addOnsPrice;
-  const fees = subtotal * PRICING_CONFIG.FEES_PERCENTAGE;
-  const finalPrice = subtotal + fees;
 
   // ============================================
   // VALIDATION
@@ -269,6 +274,8 @@ function BookingDetailsContent() {
       flight_number: formData.flight_number,
       from_location: currentTrip.from_location,
       to_location: currentTrip.to_location,
+      children: currentTrip.children,  // ✅ NUEVO
+      children_ages: formData.children_ages,  // ✅ NUEVO
     });
 
     setErrors(validationErrors);
@@ -279,11 +286,13 @@ function BookingDetailsContent() {
   // HANDLERS
   // ============================================
 
-  // ✅ AUTO-SAVE FUNCTION (sin validación estricta para Back button)
+  // ✅ AUTO-SAVE FUNCTION (con prevención de saves paralelos)
   const saveTripSilently = async (): Promise<boolean> => {
-    if (!currentTrip) return false;
+    if (!currentTrip || isSaving) return false;  // ✅ Prevenir saves paralelos
 
     try {
+      setIsSaving(true);
+
       const updateData = {
         pickup_address: formData.pickup_address ? sanitizeInput(formData.pickup_address) : null,
         dropoff_address: formData.dropoff_address ? sanitizeInput(formData.dropoff_address) : null,
@@ -293,8 +302,8 @@ function BookingDetailsContent() {
         special_requests: formData.special_requests ? sanitizeInput(formData.special_requests) : null,
         children_ages: formData.children_ages.filter((age): age is number => age !== null),
         add_ons: selectedAddOns.length > 0 ? selectedAddOns : null,
-        night_surcharge: nightSurcharge,
-        final_price: finalPrice,
+        night_surcharge: priceCalculation.nightSurcharge,
+        final_price: priceCalculation.finalPrice,
         updated_at: new Date().toISOString(),
       };
 
@@ -312,6 +321,8 @@ function BookingDetailsContent() {
     } catch (error) {
       console.error('Error in saveTripSilently:', error);
       return false;
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -333,8 +344,8 @@ function BookingDetailsContent() {
         special_requests: formData.special_requests ? sanitizeInput(formData.special_requests) : null,
         children_ages: formData.children_ages.filter((age): age is number => age !== null),
         add_ons: selectedAddOns.length > 0 ? selectedAddOns : null,
-        night_surcharge: nightSurcharge,
-        final_price: finalPrice,
+        night_surcharge: priceCalculation.nightSurcharge,
+        final_price: priceCalculation.finalPrice,
         updated_at: new Date().toISOString(),
       };
 
@@ -345,7 +356,7 @@ function BookingDetailsContent() {
 
       if (error) throw error;
 
-      // ✅ Marcar trip como completado
+      // Marcar trip como completado
       if (!completedTrips.includes(currentTripIndex)) {
         setCompletedTrips([...completedTrips, currentTripIndex]);
       }
@@ -365,24 +376,24 @@ function BookingDetailsContent() {
     }
   };
 
+  // ✅ MEJORADO - handleBack con mejor error handling
   const handleBack = async () => {
-    // ✅ Auto-guardar antes de cambiar de trip o volver
-    await saveTripSilently();
+    try {
+      await saveTripSilently();
+    } catch (error) {
+      console.error('Auto-save failed on back:', error);
+    }
     
     if (currentTripIndex > 0) {
-      // Si hay trips anteriores, ir al trip anterior
       setCurrentTripIndex(currentTripIndex - 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
-      // Si estamos en el primer trip, verificar si venimos de summary
       const params = new URLSearchParams(window.location.search);
       const fromSummary = params.get('from') === 'summary';
       
       if (fromSummary) {
-        // Volver a summary si venimos de ahí
         router.push(`/summary?booking_id=${bookingId}`);
       } else {
-        // Ir al home si es la primera vez
         router.push('/');
       }
     }
@@ -468,7 +479,7 @@ function BookingDetailsContent() {
         </div>
       </div>
 
-      {/* ✅ Progress Indicator - CON COMPLETED TRIPS */}
+      {/* Progress Indicator */}
       {trips.length > 1 && (
         <div className="bg-gray-50 py-4">
           <div className="max-w-7xl mx-auto px-4">
@@ -565,13 +576,13 @@ function BookingDetailsContent() {
                     <p className="text-xs text-red-600 mt-1">{errors.pickup_time}</p>
                   )}
                   
-                  {nightSurcharge > 0 && (
+                  {priceCalculation.nightSurcharge > 0 && (
                     <div className="flex items-start gap-2 mt-2 p-2 md:p-3 bg-amber-50 border border-amber-200 rounded-lg">
                       <AlertCircle className="h-4 w-4 md:h-5 md:w-5 text-amber-600 flex-shrink-0 mt-0.5" />
                       <div className="text-xs md:text-sm">
                         <p className="font-semibold text-amber-900">Night Surcharge Applied</p>
                         <p className="text-amber-700">
-                          Pickups 9 PM - 4 AM: +${nightSurcharge.toFixed(2)}
+                          Pickups 9 PM - 4 AM: +${priceCalculation.nightSurcharge.toFixed(2)}
                         </p>
                       </div>
                     </div>
@@ -657,7 +668,9 @@ function BookingDetailsContent() {
               <Card>
                 <CardHeader className="pb-4">
                   <CardTitle className="text-base md:text-lg">Children's Ages</CardTitle>
-                  <CardDescription className="text-xs md:text-sm">Age of each child (0-12 years)</CardDescription>
+                  <CardDescription className="text-xs md:text-sm">
+                    Age of each child (0-12 years) <span className="text-red-500">*</span>
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -682,6 +695,10 @@ function BookingDetailsContent() {
                       </div>
                     ))}
                   </div>
+                  {/* ✅ NUEVO - Error para children_ages */}
+                  {errors.children_ages && (
+                    <p className="text-xs text-red-600 mt-2">{errors.children_ages}</p>
+                  )}
                 </CardContent>
               </Card>
             )}
@@ -712,7 +729,7 @@ function BookingDetailsContent() {
 
         </div>
         
-        {/* ✅ FIXED BOTTOM BAR - Siempre visible abajo */}
+        {/* FIXED BOTTOM BAR */}
         <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t-2 border-blue-200 shadow-2xl">
           <div className="max-w-7xl mx-auto px-3 md:px-4 py-3 md:py-4">
               
@@ -722,23 +739,23 @@ function BookingDetailsContent() {
                 <div className="bg-gray-50 rounded-lg p-3 space-y-1.5">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-gray-600">Trip {currentTripIndex + 1}/{trips.length}</span>
-                    <span className="font-semibold text-gray-900">Base: ${basePrice}</span>
+                    <span className="font-semibold text-gray-900">Base: ${priceCalculation.basePrice}</span>
                   </div>
-                  {nightSurcharge > 0 && (
+                  {priceCalculation.nightSurcharge > 0 && (
                     <div className="flex justify-between text-xs">
                       <span className="text-amber-700">Night Surcharge</span>
-                      <span className="text-amber-700 font-semibold">+${nightSurcharge}</span>
+                      <span className="text-amber-700 font-semibold">+${priceCalculation.nightSurcharge}</span>
                     </div>
                   )}
-                  {addOnsPrice > 0 && (
+                  {priceCalculation.addOnsPrice > 0 && (
                     <div className="flex justify-between text-xs">
                       <span className="text-green-700">Add-ons</span>
-                      <span className="text-green-700 font-semibold">+${addOnsPrice}</span>
+                      <span className="text-green-700 font-semibold">+${priceCalculation.addOnsPrice}</span>
                     </div>
                   )}
                   <div className="pt-1.5 border-t border-gray-200 flex justify-between items-center">
                     <span className="text-sm font-bold text-gray-900">Total</span>
-                    <span className="text-2xl font-bold text-blue-600">${finalPrice.toFixed(2)}</span>
+                    <span className="text-2xl font-bold text-blue-600">${priceCalculation.finalPrice.toFixed(2)}</span>
                   </div>
                 </div>
 
@@ -781,7 +798,7 @@ function BookingDetailsContent() {
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Trip {currentTripIndex + 1} of {trips.length}</p>
                     <div className="flex items-baseline gap-2">
-                      <span className="text-3xl font-bold text-gray-900">${finalPrice.toFixed(2)}</span>
+                      <span className="text-3xl font-bold text-gray-900">${priceCalculation.finalPrice.toFixed(2)}</span>
                     </div>
                   </div>
                   
@@ -789,18 +806,18 @@ function BookingDetailsContent() {
                   <div className="flex items-center gap-4 text-sm text-gray-600 border-l border-gray-300 pl-6">
                     <div>
                       <span className="text-gray-500">Base: </span>
-                      <span className="font-semibold">${basePrice}</span>
+                      <span className="font-semibold">${priceCalculation.basePrice}</span>
                     </div>
-                    {nightSurcharge > 0 && (
+                    {priceCalculation.nightSurcharge > 0 && (
                       <div>
                         <span className="text-amber-600">Night: </span>
-                        <span className="font-semibold text-amber-600">+${nightSurcharge}</span>
+                        <span className="font-semibold text-amber-600">+${priceCalculation.nightSurcharge}</span>
                       </div>
                     )}
-                    {addOnsPrice > 0 && (
+                    {priceCalculation.addOnsPrice > 0 && (
                       <div>
                         <span className="text-green-600">Add-ons: </span>
-                        <span className="font-semibold text-green-600">+${addOnsPrice}</span>
+                        <span className="font-semibold text-green-600">+${priceCalculation.addOnsPrice}</span>
                       </div>
                     )}
                   </div>

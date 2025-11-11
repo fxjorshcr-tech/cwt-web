@@ -1,8 +1,9 @@
-// src/utils/bookingValidation.ts - CORREGIDO FASE 2
+// src/utils/bookingValidation.ts
 /**
  * ==========================================
  * UTILIDADES DE VALIDACIÓN PARA BOOKINGS
  * ==========================================
+ * ✅ CORREGIDO - Validación de children_ages agregada
  */
 
 import { VALIDATION_RULES } from '@/lib/constants';
@@ -15,13 +16,15 @@ export interface ValidationErrors {
   dropoff_address?: string;
   pickup_time?: string;
   flight_number?: string;
+  children_ages?: string;  // ✅ NUEVO
   [key: string]: string | undefined;
 }
 
 /**
- * Sanitizar input para prevenir XSS
+ * ✅ CORREGIDO - Sanitizar input para prevenir XSS
+ * Acepta null/undefined
  */
-export function sanitizeInput(input: string): string {
+export function sanitizeInput(input: string | null | undefined): string {
   if (!input) return '';
   
   return input
@@ -101,7 +104,8 @@ function validateAddress(address: string, fieldName: string): string | null {
 }
 
 /**
- * Validar campos del formulario de booking details
+ * ✅ CORREGIDO - Validar campos del formulario de booking details
+ * Ahora incluye validación de children_ages
  */
 export function validateBookingDetails(data: {
   pickup_address: string;
@@ -110,6 +114,8 @@ export function validateBookingDetails(data: {
   flight_number?: string;
   from_location: string;
   to_location: string;
+  children?: number;  // ✅ NUEVO
+  children_ages?: (number | null)[];  // ✅ NUEVO
 }): ValidationErrors {
   const errors: ValidationErrors = {};
 
@@ -140,6 +146,21 @@ export function validateBookingDetails(data: {
     }
   }
 
+  // ✅ NUEVO - Validar edades de niños
+  if (data.children && data.children > 0) {
+    const childrenAges = data.children_ages || [];
+    
+    // Filtrar solo las edades válidas
+    const validAges = childrenAges.filter(
+      age => age !== null && age !== undefined && age >= 0 && age <= 12
+    );
+    
+    // Verificar que todas las edades estén completas
+    if (validAges.length !== data.children) {
+      errors.children_ages = `Please select age for all ${data.children} ${data.children === 1 ? 'child' : 'children'}`;
+    }
+  }
+
   return errors;
 }
 
@@ -159,4 +180,28 @@ export function calculateFinalPrice(basePrice: number, nightSurcharge: number): 
   const subtotal = basePrice + (nightSurcharge || 0);
   const fees = calculateFees(subtotal);
   return Math.round((subtotal + fees) * 100) / 100;
+}
+
+/**
+ * ✅ NUEVO - Validar que todas las edades de niños estén completas
+ */
+export function validateChildrenAges(
+  children: number,
+  childrenAges: (number | null)[]
+): string | null {
+  if (children === 0) return null;
+  
+  if (!childrenAges || childrenAges.length === 0) {
+    return `Please select age for all ${children} ${children === 1 ? 'child' : 'children'}`;
+  }
+  
+  const validAges = childrenAges.filter(
+    age => age !== null && age !== undefined && age >= 0 && age <= 12
+  );
+  
+  if (validAges.length !== children) {
+    return `Please select age for all ${children} ${children === 1 ? 'child' : 'children'}`;
+  }
+  
+  return null;
 }

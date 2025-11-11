@@ -1,5 +1,5 @@
 // src/components/home/PassengerSelector.tsx
-// ✅ PHASE 2 CORRECTED - English text, accessibility improvements
+// ✅ CORREGIDO - Límite cambiado de 18 a 12 pasajeros
 
 'use client';
 
@@ -52,21 +52,22 @@ export function PassengerSelector({
     }
   }, [isOpen]);
 
+  // ✅ CORREGIDO: Cambio de 18 a 12
   const handleAdultsChange = (delta: number) => {
-    const newAdults = Math.max(1, Math.min(18, adults + delta));
-    if (newAdults + children <= 18) {
+    const newAdults = Math.max(1, Math.min(12, adults + delta));
+    if (newAdults + children <= 12) {
       onPassengersChange(newAdults, children);
     }
   };
 
+  // ✅ CORREGIDO: Cambio de 18 a 12
   const handleChildrenChange = (delta: number) => {
-    const newChildren = Math.max(0, Math.min(18, children + delta));
-    if (adults + newChildren <= 18) {
+    const newChildren = Math.max(0, Math.min(12, children + delta));
+    if (adults + newChildren <= 12) {
       onPassengersChange(adults, newChildren);
     }
   };
 
-  // ✅ English text
   const getPassengerText = () => {
     const parts = [];
     if (adults > 0) {
@@ -143,7 +144,7 @@ export function PassengerSelector({
               <button
                 type="button"
                 onClick={() => handleAdultsChange(1)}
-                disabled={totalPassengers >= 18}
+                disabled={totalPassengers >= 12}
                 aria-label="Increase number of adults"
                 className="h-8 w-8 rounded-full border-2 border-gray-300 flex items-center justify-center hover:border-blue-500 hover:bg-blue-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-gray-300 disabled:hover:bg-white"
               >
@@ -181,7 +182,7 @@ export function PassengerSelector({
               <button
                 type="button"
                 onClick={() => handleChildrenChange(1)}
-                disabled={totalPassengers >= 18}
+                disabled={totalPassengers >= 12}
                 aria-label="Increase number of children"
                 className="h-8 w-8 rounded-full border-2 border-gray-300 flex items-center justify-center hover:border-blue-500 hover:bg-blue-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-gray-300 disabled:hover:bg-white"
               >
@@ -190,11 +191,11 @@ export function PassengerSelector({
             </div>
           </div>
 
-          {/* Limit Info */}
-          {totalPassengers >= 18 && (
+          {/* Limit Info - ✅ CORREGIDO: Texto cambiado a 12 */}
+          {totalPassengers >= 12 && (
             <div className="mt-4 pt-4 border-t">
               <p className="text-xs text-amber-600 text-center" role="alert">
-                ⚠️ Maximum 18 passengers per trip
+                ⚠️ Maximum 12 passengers per trip
               </p>
             </div>
           )}
