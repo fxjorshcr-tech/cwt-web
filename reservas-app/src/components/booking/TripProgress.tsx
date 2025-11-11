@@ -1,5 +1,5 @@
 // src/components/booking/TripProgress.tsx
-// FIXED: Removed currentTripPrice display
+// ✅ UPDATED: Shows incomplete trips as empty/white
 
 'use client';
 
@@ -33,15 +33,13 @@ export const TripProgress: React.FC<TripProgressProps> = ({
             {completedTrips.length}/{totalTrips} completed
           </span>
         </div>
-        
-        {/* REMOVED PRICE DISPLAY */}
       </div>
 
       <div className="flex gap-2 mb-3">
         {Array.from({ length: totalTrips }).map((_, idx) => {
           const isCompleted = completedTrips.includes(idx);
           const isCurrent = idx === currentTrip;
-          const isPending = idx > currentTrip;
+          const isPending = idx > currentTrip && !isCompleted;
 
           return (
             <div
@@ -50,7 +48,7 @@ export const TripProgress: React.FC<TripProgressProps> = ({
                 'flex-1 h-2 rounded-full relative transition-all duration-300',
                 isCompleted && 'bg-green-500',
                 isCurrent && 'bg-blue-500',
-                isPending && 'bg-gray-200'
+                isPending && 'bg-white border-2 border-gray-300' // ✅ Blanco si no está completado
               )}
             >
               {isCompleted && (
@@ -68,7 +66,7 @@ export const TripProgress: React.FC<TripProgressProps> = ({
         {Array.from({ length: totalTrips }).map((_, idx) => {
           const isCompleted = completedTrips.includes(idx);
           const isCurrent = idx === currentTrip;
-          const isPending = idx > currentTrip;
+          const isPending = idx > currentTrip && !isCompleted;
 
           return (
             <div key={idx} className="flex-1 text-center">

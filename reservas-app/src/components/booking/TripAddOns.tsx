@@ -1,10 +1,10 @@
 // src/components/booking/TripAddOns.tsx
-// ✅ CORREGIDO - IDs con guión bajo para coincidir con page.tsx
+// ✅ MOBILE-OPTIMIZED - Checkbox arreglado, diseño compacto
 
 'use client';
 
 import React from 'react';
-import { Clock, Shield, Check } from 'lucide-react';
+import { Clock, Shield } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export interface AddOn {
@@ -18,7 +18,7 @@ export interface AddOn {
 
 export const AVAILABLE_ADDONS: AddOn[] = [
   {
-    id: 'tico_time', // ✅ Cambiado de 'tico-time' a 'tico_time'
+    id: 'tico_time',
     name: 'Tico Time Upgrade',
     description: 'Add 3 extra hours to explore Costa Rica! Stop at scenic viewpoints, enjoy a traditional casado lunch, visit local attractions, or capture stunning photos at hidden gems along the way.',
     price: 160,
@@ -26,7 +26,7 @@ export const AVAILABLE_ADDONS: AddOn[] = [
     popular: true,
   },
   {
-    id: 'flex_time', // ✅ Cambiado de 'flex-time' a 'flex_time'
+    id: 'flex_time',
     name: 'Flex Time Protection',
     description: 'Life happens! Get up to 2 hours of flexibility if your plans change. Perfect for late checkouts, unexpected delays, or simply wanting to enjoy that last swim.',
     price: 45,
@@ -54,17 +54,17 @@ export function TripAddOns({ selectedAddOns, onAddOnsChange }: TripAddOnsProps) 
 
   return (
     <Card className="bg-gradient-to-br from-cyan-50 to-blue-50 border-blue-200">
-      <CardHeader>
-        <CardTitle className="text-lg flex items-center gap-2 text-blue-900">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base md:text-lg flex items-center gap-2 text-blue-900">
           <Clock className="h-5 w-5" />
           Enhance Your Experience
         </CardTitle>
-        <p className="text-sm text-blue-700">
+        <p className="text-xs md:text-sm text-blue-700">
           Make the most of your journey with our exclusive add-ons
         </p>
       </CardHeader>
       
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-3 pt-0">
         {AVAILABLE_ADDONS.map((addon) => {
           const isSelected = selectedAddOns.includes(addon.id);
           const Icon = addon.icon;
@@ -72,35 +72,25 @@ export function TripAddOns({ selectedAddOns, onAddOnsChange }: TripAddOnsProps) 
           return (
             <div
               key={addon.id}
-              role="button"
-              tabIndex={0}
               onClick={() => handleToggleAddOn(addon.id)}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  handleToggleAddOn(addon.id);
-                }
-              }}
-              aria-pressed={isSelected}
-              aria-label={`${addon.name} - $${addon.price}. ${addon.description}`}
               className={`
-                relative p-4 rounded-lg border-2 transition-all cursor-pointer
-                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                relative p-3 md:p-4 rounded-lg border-2 transition-all cursor-pointer
                 ${isSelected 
                   ? 'border-blue-500 bg-white shadow-md' 
                   : 'border-blue-200 bg-white/50 hover:border-blue-300 hover:bg-white'
                 }
               `}
             >
+              {/* Badge POPULAR */}
               {addon.popular && (
-                <div className="absolute -top-2 -right-2 bg-gradient-to-r from-orange-500 to-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                <div className="absolute -top-2 right-2 bg-gradient-to-r from-orange-500 to-pink-500 text-white text-[10px] md:text-xs font-bold px-2 md:px-3 py-0.5 md:py-1 rounded-full shadow-lg z-10">
                   POPULAR
                 </div>
               )}
 
-              <div className="flex items-start gap-3">
-                {/* Checkbox */}
-                <div className="mt-1">
+              <div className="flex items-start gap-2 md:gap-3">
+                {/* ✅ CHECKBOX - IZQUIERDA, BIEN POSICIONADO */}
+                <div className="flex-shrink-0 mt-0.5">
                   <input
                     type="checkbox"
                     checked={isSelected}
@@ -109,43 +99,39 @@ export function TripAddOns({ selectedAddOns, onAddOnsChange }: TripAddOnsProps) 
                       handleToggleAddOn(addon.id);
                     }}
                     onClick={(e) => e.stopPropagation()}
-                    aria-label={`Select ${addon.name}`}
                     className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                   />
                 </div>
 
                 {/* Icon */}
                 <div className={`
-                  h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0
+                  h-9 w-9 md:h-10 md:w-10 rounded-full flex items-center justify-center flex-shrink-0
                   ${isSelected ? 'bg-blue-100' : 'bg-blue-50'}
                 `}>
-                  <Icon className={`h-5 w-5 ${isSelected ? 'text-blue-600' : 'text-blue-400'}`} aria-hidden="true" />
+                  <Icon className={`h-4 w-4 md:h-5 md:w-5 ${isSelected ? 'text-blue-600' : 'text-blue-400'}`} />
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-2 mb-1">
-                    <h4 className={`font-semibold ${isSelected ? 'text-blue-900' : 'text-gray-900'}`}>
+                <div className="flex-1 min-w-0 pr-2">
+                  {/* Title y Precio en la misma línea */}
+                  <div className="flex items-start justify-between gap-2 mb-1">
+                    <h4 className={`font-semibold text-sm md:text-base ${isSelected ? 'text-blue-900' : 'text-gray-900'}`}>
                       {addon.name}
                     </h4>
+                    {/* ✅ PRECIO - DERECHA, SIN OVERLAP */}
                     <div className={`
-                      text-lg font-bold whitespace-nowrap
+                      text-base md:text-lg font-bold whitespace-nowrap flex-shrink-0
                       ${isSelected ? 'text-blue-600' : 'text-gray-600'}
                     `}>
                       +${addon.price}
                     </div>
                   </div>
-                  <p className="text-sm text-gray-600">
+                  
+                  {/* Description */}
+                  <p className="text-xs md:text-sm text-gray-600 leading-relaxed">
                     {addon.description}
                   </p>
                 </div>
-
-                {/* Selected indicator */}
-                {isSelected && (
-                  <div className="absolute top-2 right-2 h-6 w-6 bg-blue-500 rounded-full flex items-center justify-center">
-                    <Check className="h-4 w-4 text-white" strokeWidth={3} aria-hidden="true" />
-                  </div>
-                )}
               </div>
             </div>
           );
@@ -153,12 +139,12 @@ export function TripAddOns({ selectedAddOns, onAddOnsChange }: TripAddOnsProps) 
 
         {/* Total add-ons */}
         {totalAddOnsPrice > 0 && (
-          <div className="pt-3 border-t border-blue-200">
+          <div className="pt-2">
             <div className="flex justify-between items-center bg-blue-100 rounded-lg p-3">
-              <span className="font-semibold text-blue-900">
+              <span className="font-semibold text-sm md:text-base text-blue-900">
                 Add-ons Total:
               </span>
-              <span className="text-xl font-bold text-blue-600">
+              <span className="text-lg md:text-xl font-bold text-blue-600">
                 +${totalAddOnsPrice}
               </span>
             </div>

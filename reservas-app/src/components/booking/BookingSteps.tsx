@@ -1,125 +1,132 @@
 // src/components/booking/BookingSteps.tsx
-// BEAUTIFUL VERSION - Colorful steps with descriptive text, no trust badges
+// PROFESSIONAL VERSION - Modern, clean, and visually stunning
 
 'use client';
 
 import { 
   Search,
-  FileText,
-  Eye,
-  Lock,
-  ArrowRight
+  ClipboardList,
+  CheckSquare,
+  CreditCard,
+  Sparkles
 } from 'lucide-react';
 
 export default function BookingSteps() {
   const steps = [
     { 
       icon: Search, 
-      number: 1,
-      title: 'Select Your Route', 
-      description: 'Choose from 1,000+ destinations across Costa Rica',
-      gradient: 'from-blue-500 to-blue-600',
-      bgLight: 'bg-blue-50',
-      borderColor: 'border-blue-200',
-      hoverBorder: 'hover:border-blue-400'
+      number: '01',
+      title: 'Search', 
+      description: 'Pick your origin & destination',
+      gradient: 'from-blue-500 via-blue-600 to-indigo-600',
+      glow: 'group-hover:shadow-blue-500/50'
     },
     { 
-      icon: FileText, 
-      number: 2,
-      title: 'Fill Details', 
-      description: 'Add pickup time, location & passenger info',
-      gradient: 'from-indigo-500 to-indigo-600',
-      bgLight: 'bg-indigo-50',
-      borderColor: 'border-indigo-200',
-      hoverBorder: 'hover:border-indigo-400'
+      icon: ClipboardList, 
+      number: '02',
+      title: 'Details', 
+      description: 'Pickup time & passenger info',
+      gradient: 'from-purple-500 via-purple-600 to-pink-600',
+      glow: 'group-hover:shadow-purple-500/50'
     },
     { 
-      icon: Eye, 
-      number: 3,
-      title: 'Review Booking', 
-      description: 'Confirm your trip details and pricing',
-      gradient: 'from-orange-500 to-orange-600',
-      bgLight: 'bg-orange-50',
-      borderColor: 'border-orange-200',
-      hoverBorder: 'hover:border-orange-400'
+      icon: CheckSquare, 
+      number: '03',
+      title: 'Review', 
+      description: 'Confirm trip & pricing',
+      gradient: 'from-orange-500 via-orange-600 to-red-600',
+      glow: 'group-hover:shadow-orange-500/50'
     },
     { 
-      icon: Lock, 
-      number: 4,
-      title: 'Pay Securely', 
-      description: 'Safe payment with bank-level encryption',
-      gradient: 'from-green-500 to-green-600',
-      bgLight: 'bg-green-50',
-      borderColor: 'border-green-200',
-      hoverBorder: 'hover:border-green-400'
+      icon: CreditCard, 
+      number: '04',
+      title: 'Payment', 
+      description: 'Secure checkout via Stripe',
+      gradient: 'from-green-500 via-green-600 to-emerald-600',
+      glow: 'group-hover:shadow-green-500/50'
     },
   ];
 
   return (
-    <section className="py-16 bg-gradient-to-b from-gray-50 to-white">
-      <div className="container mx-auto px-6 max-w-6xl">
+    <section className="relative py-20 overflow-hidden">
+      {/* Background with subtle gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-gray-50 via-white to-gray-50" />
+      
+      {/* Decorative elements */}
+      <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200/30 rounded-full blur-3xl" />
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-200/30 rounded-full blur-3xl" />
+
+      <div className="container relative mx-auto px-6 max-w-7xl">
         
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 rounded-full mb-4">
-            <span className="text-blue-700 font-bold text-sm uppercase tracking-wide">
-              Simple Process
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full mb-6 shadow-lg shadow-blue-500/30">
+            <Sparkles className="h-4 w-4" />
+            <span className="font-bold text-sm uppercase tracking-wider">
+              Quick & Easy
             </span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-            Book in 4 Easy Steps
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">
+            Your Journey in <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">4 Simple Steps</span>
           </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Fast, secure, and hassle-free booking in under 5 minutes
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            From search to confirmation in under 3 minutes
           </p>
         </div>
 
-        {/* Steps Grid - Beautiful & Descriptive */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Steps Grid */}
+        <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
           {steps.map((step, idx) => (
-            <div
-              key={idx}
-              className={`group relative bg-white rounded-2xl border-2 ${step.borderColor} ${step.hoverBorder} p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1`}
-            >
-              {/* Step Number Badge */}
-              <div className="absolute -top-4 -right-4 h-10 w-10 bg-gray-900 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-lg z-10">
-                {step.number}
-              </div>
-
-              {/* Icon with Gradient */}
-              <div className={`relative mb-6`}>
-                <div className={`h-16 w-16 bg-gradient-to-br ${step.gradient} rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}>
-                  <step.icon className="h-8 w-8 text-white" />
-                </div>
-                {/* Decorative corner accent */}
-                <div className={`absolute -bottom-2 -right-2 h-6 w-6 ${step.bgLight} rounded-lg`}></div>
-              </div>
-
-              {/* Text Content */}
-              <div className="space-y-2">
-                <h3 className="font-bold text-gray-900 text-lg leading-tight">
-                  {step.title}
-                </h3>
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  {step.description}
-                </p>
-              </div>
-
-              {/* Arrow indicator for next step (except last) */}
+            <div key={idx} className="relative">
+              {/* Connecting line between steps (desktop only) */}
               {idx < steps.length - 1 && (
-                <div className="hidden lg:block absolute -right-8 top-1/2 -translate-y-1/2 z-20">
-                  <ArrowRight className="h-6 w-6 text-gray-300" />
-                </div>
+                <div className="hidden lg:block absolute top-20 -right-3 w-6 h-0.5 bg-gradient-to-r from-gray-300 to-gray-200 z-0" />
               )}
+
+              {/* Step Card */}
+              <div className={`group relative bg-white rounded-3xl p-8 border border-gray-200 transition-all duration-500 hover:border-transparent hover:-translate-y-2 hover:shadow-2xl ${step.glow}`}>
+                
+                {/* Step Number - Top Right Corner */}
+                <div className="absolute -top-3 -right-3 w-14 h-14 bg-gray-900 text-white rounded-2xl flex items-center justify-center font-bold text-lg shadow-xl rotate-12 group-hover:rotate-0 transition-transform duration-500">
+                  {step.number}
+                </div>
+
+                {/* Icon Container with Gradient */}
+                <div className="relative mb-6">
+                  <div className={`relative h-20 w-20 bg-gradient-to-br ${step.gradient} rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
+                    <step.icon className="h-10 w-10 text-white" strokeWidth={2.5} />
+                    
+                    {/* Glow effect */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${step.gradient} rounded-2xl opacity-0 group-hover:opacity-50 blur-xl transition-opacity duration-500`} />
+                  </div>
+                </div>
+
+                {/* Text Content */}
+                <div className="space-y-2">
+                  <h3 className="font-bold text-gray-900 text-xl">
+                    {step.title}
+                  </h3>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    {step.description}
+                  </p>
+                </div>
+
+                {/* Bottom accent line */}
+                <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${step.gradient} rounded-b-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+              </div>
             </div>
           ))}
         </div>
 
-        {/* Bottom CTA */}
-        <div className="text-center mt-12">
-          <p className="text-sm text-gray-500">
-            ⚡ Average booking time: <span className="font-bold text-gray-900">3 minutes</span>
-          </p>
+        {/* Bottom Info */}
+        <div className="mt-16 text-center">
+          <div className="inline-flex items-center gap-3 px-6 py-3 bg-gray-50 border border-gray-200 rounded-2xl">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              <span className="text-sm font-semibold text-gray-900">Average booking time:</span>
+            </div>
+            <span className="text-sm font-bold text-blue-600">3 minutes</span>
+          </div>
         </div>
       </div>
     </section>

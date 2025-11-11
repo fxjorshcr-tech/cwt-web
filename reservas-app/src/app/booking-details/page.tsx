@@ -1,10 +1,10 @@
 // src/app/booking-details/page.tsx
-// ✅ VERSIÓN COMPLETA CORREGIDA - Todos los fixes aplicados
+// ✅ VERSIÓN RENOVADA - Mobile optimizado, progress arreglado, bottom bar mejorado
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ArrowLeft, ArrowRight, Calendar, Users, MapPin, Loader2, AlertCircle, Plane } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Calendar, Users, MapPin, Loader2, AlertCircle, Plane, DollarSign, Clock as ClockIcon } from 'lucide-react';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -64,32 +64,6 @@ interface FormData {
   children_ages: (number | null)[];
 }
 
-interface AddOn {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-}
-
-// ============================================
-// ADD-ONS CONFIGURATION
-// ============================================
-
-const AVAILABLE_ADD_ONS: AddOn[] = [
-  {
-    id: 'tico_time',
-    name: 'Tico Time Upgrade',
-    description: 'Flexible pickup time window',
-    price: PRICING_CONFIG.ADD_ONS.TICO_TIME,
-  },
-  {
-    id: 'flex_time',
-    name: 'Flex Time Protection',
-    description: 'Protection for schedule changes',
-    price: PRICING_CONFIG.ADD_ONS.FLEX_TIME,
-  },
-];
-
 // ============================================
 // MAIN COMPONENT
 // ============================================
@@ -107,6 +81,7 @@ function BookingDetailsContent() {
 
   const [trips, setTrips] = useState<Trip[]>([]);
   const [currentTripIndex, setCurrentTripIndex] = useState(0);
+  const [completedTrips, setCompletedTrips] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<ValidationErrors>({});
@@ -134,9 +109,6 @@ function BookingDetailsContent() {
               <CardDescription>No booking ID provided</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-600 mb-4">
-                Please return to the home page and start a new booking.
-              </p>
               <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
                 Return Home
               </Button>
@@ -177,6 +149,13 @@ function BookingDetailsContent() {
 
         setTrips(data as any);
 
+        // ✅ Cargar trips completados desde DB
+        const completed = data
+          .map((trip, idx) => trip.pickup_time && trip.pickup_address && trip.dropoff_address ? idx : null)
+          .filter((idx): idx is number => idx !== null);
+        setCompletedTrips(completed);
+
+        // Cargar el primer trip
         if (data[0]) {
           const trip = data[0];
           
@@ -220,10 +199,20 @@ function BookingDetailsContent() {
         ? currentTrip.children_ages
         : Array(currentTrip.children).fill(null);
 
+      // ✅ FIX: Convertir pickup_time de "HH:mm:ss" a "HH:mm" si es necesario
+      let pickupTime = currentTrip.pickup_time || '';
+      if (pickupTime && pickupTime.includes(':')) {
+        const parts = pickupTime.split(':');
+        if (parts.length === 3) {
+          // Si tiene formato HH:mm:ss, convertir a HH:mm
+          pickupTime = `${parts[0]}:${parts[1]}`;
+        }
+      }
+
       setFormData({
         pickup_address: currentTrip.pickup_address || '',
         dropoff_address: currentTrip.dropoff_address || '',
-        pickup_time: currentTrip.pickup_time || '',
+        pickup_time: pickupTime,
         flight_number: currentTrip.flight_number || '',
         airline: currentTrip.airline || '',
         special_requests: currentTrip.special_requests || '',
@@ -246,8 +235,11 @@ function BookingDetailsContent() {
   const nightSurcharge = calculateNightSurcharge(formData.pickup_time, basePrice);
   
   const addOnsPrice = selectedAddOns.reduce((total, addonId) => {
-    const addon = AVAILABLE_ADD_ONS.find(a => a.id === addonId);
-    return total + (addon?.price || 0);
+    const prices: Record<string, number> = {
+      tico_time: PRICING_CONFIG.ADD_ONS.TICO_TIME,
+      flex_time: PRICING_CONFIG.ADD_ONS.FLEX_TIME,
+    };
+    return total + (prices[addonId] || 0);
   }, 0);
 
   const subtotal = basePrice + nightSurcharge + addOnsPrice;
@@ -275,42 +267,12 @@ function BookingDetailsContent() {
   };
 
   // ============================================
-  // AUTO-SAVE FUNCTION
-  // ============================================
-
-  const autoSaveTrip = async () => {
-    if (!currentTrip) return;
-    
-    try {
-      const updateData = {
-        pickup_address: formData.pickup_address,
-        dropoff_address: formData.dropoff_address,
-        pickup_time: formData.pickup_time,
-        flight_number: formData.flight_number || null,
-        airline: formData.airline || null,
-        special_requests: formData.special_requests || null,
-        children_ages: formData.children_ages.filter((age): age is number => age !== null),
-        add_ons: selectedAddOns.length > 0 ? selectedAddOns : null,
-        night_surcharge: nightSurcharge,
-        final_price: finalPrice,
-        updated_at: new Date().toISOString(),
-      };
-
-      await supabase
-        .from('trips')
-        .update(updateData)
-        .eq('id', currentTrip.id);
-    } catch (error) {
-      console.error('Auto-save error:', error);
-    }
-  };
-
-  // ============================================
   // HANDLERS
   // ============================================
 
   const handleNext = async () => {
     if (!validateForm()) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
@@ -338,6 +300,11 @@ function BookingDetailsContent() {
 
       if (error) throw error;
 
+      // ✅ Marcar trip como completado
+      if (!completedTrips.includes(currentTripIndex)) {
+        setCompletedTrips([...completedTrips, currentTripIndex]);
+      }
+
       if (currentTripIndex < trips.length - 1) {
         setCurrentTripIndex(currentTripIndex + 1);
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -353,10 +320,7 @@ function BookingDetailsContent() {
     }
   };
 
-  const handleBack = async () => {
-    // ✅ Auto-guardar antes de ir atrás
-    await autoSaveTrip();
-    
+  const handleBack = () => {
     if (currentTripIndex > 0) {
       setCurrentTripIndex(currentTripIndex - 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -415,7 +379,7 @@ function BookingDetailsContent() {
       <BookingNavbar />
       
       {/* Hero Section */}
-      <section className="relative h-64 md:h-80 w-full overflow-hidden">
+      <section className="relative h-48 md:h-64 w-full overflow-hidden">
         <Image
           src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/puerto-viejo-costa-rica-beach.webp"
           alt="Costa Rica Beach"
@@ -424,71 +388,71 @@ function BookingDetailsContent() {
           style={{ objectPosition: '50% 65%' }}
           priority
           sizes="100vw"
-          placeholder="blur"
-          blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA="
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center text-white px-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <h1 className="text-3xl md:text-5xl font-bold mb-2 drop-shadow-lg">
+          <div className="text-center text-white px-4">
+            <h1 className="text-2xl md:text-4xl font-bold mb-1 md:mb-2 drop-shadow-lg">
               Complete Your Booking
             </h1>
-            <p className="text-lg md:text-xl drop-shadow-md">
+            <p className="text-sm md:text-lg drop-shadow-md">
               Just a few more details for your trip
             </p>
           </div>
         </div>
       </section>
 
-      {/* ✅ STEPPER DESPUÉS DEL HERO - STICKY */}
+      {/* Stepper */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="max-w-7xl mx-auto px-4 py-6 md:py-8">
           <BookingStepper currentStep={1} />
         </div>
       </div>
 
-      {/* Progress Indicator */}
+      {/* ✅ Progress Indicator - CON COMPLETED TRIPS */}
       {trips.length > 1 && (
         <div className="bg-gray-50 py-4">
           <div className="max-w-7xl mx-auto px-4">
-            <TripProgress currentTrip={currentTripIndex} totalTrips={trips.length} />
+            <TripProgress 
+              currentTrip={currentTripIndex} 
+              totalTrips={trips.length}
+              completedTrips={completedTrips}
+            />
           </div>
         </div>
       )}
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-12 pb-32 bg-gray-50">
-        {/* SINGLE COLUMN - Form only */}
+      <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 pb-32 md:pb-28 bg-gray-50">
         <div className="max-w-4xl mx-auto">
           
-          {/* Form Content */}
-          <div className="space-y-6 animate-in fade-in slide-in-from-left duration-700">
+          <div className="space-y-4 md:space-y-6">
             
             {/* Trip Summary Card */}
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-base md:text-lg">
                   <MapPin className="h-5 w-5 text-blue-600" />
                   Trip {currentTripIndex + 1} of {trips.length}
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-sm">
                   {currentTrip.from_location} → {currentTrip.to_location}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="flex items-center gap-3">
-                    <Calendar className="h-5 w-5 text-gray-400" />
+              <CardContent className="space-y-3 md:space-y-4">
+                <div className="grid grid-cols-2 gap-3 md:gap-4">
+                  <div className="flex items-center gap-2 md:gap-3">
+                    <Calendar className="h-4 w-4 md:h-5 md:w-5 text-gray-400" />
                     <div>
-                      <p className="text-sm text-gray-500">Date</p>
-                      <p className="font-semibold">{formatDate(currentTrip.date)}</p>
+                      <p className="text-xs text-gray-500">Date</p>
+                      <p className="font-semibold text-sm md:text-base">{formatDate(currentTrip.date)}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Users className="h-5 w-5 text-gray-400" />
+                  <div className="flex items-center gap-2 md:gap-3">
+                    <Users className="h-4 w-4 md:h-5 md:w-5 text-gray-400" />
                     <div>
-                      <p className="text-sm text-gray-500">Passengers</p>
-                      <p className="font-semibold">
+                      <p className="text-xs text-gray-500">Passengers</p>
+                      <p className="font-semibold text-sm md:text-base">
                         {currentTrip.adults} Adult{currentTrip.adults !== 1 ? 's' : ''}
                         {currentTrip.children > 0 && `, ${currentTrip.children} Child${currentTrip.children !== 1 ? 'ren' : ''}`}
                       </p>
@@ -500,30 +464,29 @@ function BookingDetailsContent() {
 
             {/* Pickup Details */}
             <Card>
-              <CardHeader>
-                <CardTitle>Pickup Details</CardTitle>
-                <CardDescription>Where and when should we pick you up?</CardDescription>
+              <CardHeader className="pb-4">
+                <CardTitle className="text-base md:text-lg">Pickup Details</CardTitle>
+                <CardDescription className="text-xs md:text-sm">Where and when should we pick you up?</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3 md:space-y-4">
                 <div>
-                  <Label htmlFor="pickup_address">
+                  <Label htmlFor="pickup_address" className="text-sm">
                     Pickup Address <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id="pickup_address"
-                    placeholder="Enter full pickup address (hotel, house, etc.)"
+                    placeholder="Enter full pickup address"
                     value={formData.pickup_address}
                     onChange={(e) => setFormData({ ...formData, pickup_address: e.target.value })}
-                    className={`min-h-[48px] ${errors.pickup_address ? 'border-red-500' : ''}`}
-                    aria-invalid={!!errors.pickup_address}
+                    className={`min-h-[44px] md:min-h-[48px] ${errors.pickup_address ? 'border-red-500' : ''}`}
                   />
                   {errors.pickup_address && (
-                    <p className="text-sm text-red-600 mt-1" role="alert">{errors.pickup_address}</p>
+                    <p className="text-xs text-red-600 mt-1">{errors.pickup_address}</p>
                   )}
                 </div>
 
                 <div>
-                  <Label htmlFor="pickup_time">
+                  <Label htmlFor="pickup_time" className="text-sm">
                     Pickup Time <span className="text-red-500">*</span>
                   </Label>
                   <TimePicker
@@ -531,17 +494,16 @@ function BookingDetailsContent() {
                     onChange={(time) => setFormData({ ...formData, pickup_time: time })}
                   />
                   {errors.pickup_time && (
-                    <p className="text-sm text-red-600 mt-1" role="alert">{errors.pickup_time}</p>
+                    <p className="text-xs text-red-600 mt-1">{errors.pickup_time}</p>
                   )}
                   
-                  {/* ✅ NIGHT SURCHARGE - SOLO UNA VEZ */}
                   {nightSurcharge > 0 && (
-                    <div className="flex items-start gap-2 mt-2 p-3 bg-amber-50 border border-amber-200 rounded-lg animate-in fade-in duration-300">
-                      <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                      <div className="text-sm">
+                    <div className="flex items-start gap-2 mt-2 p-2 md:p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                      <AlertCircle className="h-4 w-4 md:h-5 md:w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                      <div className="text-xs md:text-sm">
                         <p className="font-semibold text-amber-900">Night Surcharge Applied</p>
                         <p className="text-amber-700">
-                          Pickups between 9 PM - 4 AM include a ${nightSurcharge.toFixed(2)} surcharge
+                          Pickups 9 PM - 4 AM: +${nightSurcharge.toFixed(2)}
                         </p>
                       </div>
                     </div>
@@ -553,35 +515,35 @@ function BookingDetailsContent() {
             {/* Flight Information */}
             {showFlightFields && (
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-2 text-base md:text-lg">
                     <Plane className="h-5 w-5 text-blue-600" />
                     Flight Information
                   </CardTitle>
-                  <CardDescription>Optional but helps us track your arrival</CardDescription>
+                  <CardDescription className="text-xs md:text-sm">Optional but helps us track your arrival</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3 md:space-y-4">
                   <div>
-                    <Label htmlFor="airline">Airline</Label>
+                    <Label htmlFor="airline" className="text-sm">Airline</Label>
                     <Input
                       id="airline"
-                      placeholder="e.g., United Airlines, American Airlines"
+                      placeholder="e.g., United Airlines"
                       value={formData.airline}
                       onChange={(e) => setFormData({ ...formData, airline: e.target.value })}
-                      className="min-h-[48px]"
+                      className="min-h-[44px] md:min-h-[48px]"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="flight_number">Flight Number</Label>
+                    <Label htmlFor="flight_number" className="text-sm">Flight Number</Label>
                     <Input
                       id="flight_number"
                       placeholder="e.g., UA 1234"
                       value={formData.flight_number}
                       onChange={(e) => setFormData({ ...formData, flight_number: e.target.value })}
-                      className={`min-h-[48px] ${errors.flight_number ? 'border-red-500' : ''}`}
+                      className={`min-h-[44px] md:min-h-[48px] ${errors.flight_number ? 'border-red-500' : ''}`}
                     />
                     {errors.flight_number && (
-                      <p className="text-sm text-red-600 mt-1" role="alert">{errors.flight_number}</p>
+                      <p className="text-xs text-red-600 mt-1">{errors.flight_number}</p>
                     )}
                   </div>
                 </CardContent>
@@ -590,13 +552,13 @@ function BookingDetailsContent() {
 
             {/* Drop-off Details */}
             <Card>
-              <CardHeader>
-                <CardTitle>Drop-off Details</CardTitle>
-                <CardDescription>Where should we drop you off?</CardDescription>
+              <CardHeader className="pb-4">
+                <CardTitle className="text-base md:text-lg">Drop-off Details</CardTitle>
+                <CardDescription className="text-xs md:text-sm">Where should we drop you off?</CardDescription>
               </CardHeader>
               <CardContent>
                 <div>
-                  <Label htmlFor="dropoff_address">
+                  <Label htmlFor="dropoff_address" className="text-sm">
                     Drop-off Address <span className="text-red-500">*</span>
                   </Label>
                   <Input
@@ -604,10 +566,10 @@ function BookingDetailsContent() {
                     placeholder="Enter full drop-off address"
                     value={formData.dropoff_address}
                     onChange={(e) => setFormData({ ...formData, dropoff_address: e.target.value })}
-                    className={`min-h-[48px] ${errors.dropoff_address ? 'border-red-500' : ''}`}
+                    className={`min-h-[44px] md:min-h-[48px] ${errors.dropoff_address ? 'border-red-500' : ''}`}
                   />
                   {errors.dropoff_address && (
-                    <p className="text-sm text-red-600 mt-1" role="alert">{errors.dropoff_address}</p>
+                    <p className="text-xs text-red-600 mt-1">{errors.dropoff_address}</p>
                   )}
                 </div>
               </CardContent>
@@ -616,15 +578,15 @@ function BookingDetailsContent() {
             {/* Children Ages */}
             {currentTrip.children > 0 && (
               <Card>
-                <CardHeader>
-                  <CardTitle>Children's Ages</CardTitle>
-                  <CardDescription>Please provide the age of each child (0-12 years)</CardDescription>
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-base md:text-lg">Children's Ages</CardTitle>
+                  <CardDescription className="text-xs md:text-sm">Age of each child (0-12 years)</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {Array.from({ length: currentTrip.children }, (_, idx) => (
                       <div key={idx}>
-                        <Label htmlFor={`child_age_${idx}`}>Child {idx + 1} Age</Label>
+                        <Label htmlFor={`child_age_${idx}`} className="text-sm">Child {idx + 1}</Label>
                         <select
                           id={`child_age_${idx}`}
                           value={formData.children_ages[idx] ?? ''}
@@ -635,11 +597,9 @@ function BookingDetailsContent() {
                           }}
                           className="w-full h-10 px-3 rounded-md border border-input bg-transparent text-sm"
                         >
-                          <option value="">Select age</option>
+                          <option value="">Select</option>
                           {Array.from({ length: 13 }, (_, i) => i).map((age) => (
-                            <option key={age} value={age}>
-                              {age} {age === 1 ? 'year' : 'years'}
-                            </option>
+                            <option key={age} value={age}>{age} yr{age !== 1 ? 's' : ''}</option>
                           ))}
                         </select>
                       </div>
@@ -657,55 +617,113 @@ function BookingDetailsContent() {
 
             {/* Special Requests */}
             <Card>
-              <CardHeader>
-                <CardTitle>Special Requests</CardTitle>
-                <CardDescription>Any special needs or requests? (Optional)</CardDescription>
+              <CardHeader className="pb-4">
+                <CardTitle className="text-base md:text-lg">Special Requests</CardTitle>
+                <CardDescription className="text-xs md:text-sm">Any special needs? (Optional)</CardDescription>
               </CardHeader>
               <CardContent>
                 <textarea
-                  placeholder="e.g., Need child car seat, extra luggage space, etc."
+                  placeholder="e.g., Need child car seat, extra luggage..."
                   value={formData.special_requests}
                   onChange={(e) => setFormData({ ...formData, special_requests: e.target.value })}
-                  rows={4}
+                  rows={3}
                   className="w-full px-3 py-2 rounded-md border border-input bg-transparent text-sm resize-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 />
               </CardContent>
             </Card>
           </div>
 
-          {/* ✅ FIXED BOTTOM BAR - Compacto y visible */}
-          <div className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-r from-blue-600 to-blue-700 border-t-4 border-blue-800 shadow-2xl">
-            <div className="max-w-7xl mx-auto px-4 py-4">
-              <div className="flex items-center justify-between gap-4">
-                
+        </div>
+        
+        {/* ✅ FIXED BOTTOM BAR - Siempre visible abajo */}
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t-2 border-blue-200 shadow-2xl">
+          <div className="max-w-7xl mx-auto px-3 md:px-4 py-3 md:py-4">
+              
+              {/* Mobile: Vertical layout */}
+              <div className="block md:hidden space-y-3">
+                {/* Price breakdown */}
+                <div className="bg-gray-50 rounded-lg p-3 space-y-1.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-gray-600">Trip {currentTripIndex + 1}/{trips.length}</span>
+                    <span className="font-semibold text-gray-900">Base: ${basePrice}</span>
+                  </div>
+                  {nightSurcharge > 0 && (
+                    <div className="flex justify-between text-xs">
+                      <span className="text-amber-700">Night Surcharge</span>
+                      <span className="text-amber-700 font-semibold">+${nightSurcharge}</span>
+                    </div>
+                  )}
+                  {addOnsPrice > 0 && (
+                    <div className="flex justify-between text-xs">
+                      <span className="text-green-700">Add-ons</span>
+                      <span className="text-green-700 font-semibold">+${addOnsPrice}</span>
+                    </div>
+                  )}
+                  <div className="pt-1.5 border-t border-gray-200 flex justify-between items-center">
+                    <span className="text-sm font-bold text-gray-900">Total</span>
+                    <span className="text-2xl font-bold text-blue-600">${finalPrice.toFixed(2)}</span>
+                  </div>
+                </div>
+
+                {/* Buttons */}
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleBack}
+                    variant="outline"
+                    className="flex-1 min-h-[48px] text-sm"
+                    disabled={saving}
+                  >
+                    <ArrowLeft className="h-4 w-4 mr-1" />
+                    Back
+                  </Button>
+                  
+                  <Button
+                    onClick={handleNext}
+                    disabled={saving}
+                    className="flex-[2] min-h-[48px] bg-blue-600 hover:bg-blue-700 text-sm font-bold"
+                  >
+                    {saving ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        {currentTripIndex < trips.length - 1 ? 'Next Trip' : 'Summary'}
+                        <ArrowRight className="h-4 w-4 ml-1" />
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Desktop: Horizontal layout */}
+              <div className="hidden md:flex items-center justify-between gap-6">
                 {/* Left - Price Info */}
                 <div className="flex items-center gap-6">
-                  <div className="text-white">
-                    <p className="text-xs opacity-90 mb-1">Trip {currentTripIndex + 1} of {trips.length}</p>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Trip {currentTripIndex + 1} of {trips.length}</p>
                     <div className="flex items-baseline gap-2">
-                      <span className="text-3xl font-bold">${finalPrice.toFixed(2)}</span>
-                      {addOnsPrice > 0 && (
-                        <span className="text-sm opacity-75">(+${addOnsPrice} add-ons)</span>
-                      )}
+                      <span className="text-3xl font-bold text-gray-900">${finalPrice.toFixed(2)}</span>
                     </div>
                   </div>
                   
-                  {/* Breakdown - Desktop only */}
-                  <div className="hidden lg:flex items-center gap-4 text-sm text-blue-100 border-l border-blue-500 pl-6">
+                  {/* Breakdown */}
+                  <div className="flex items-center gap-4 text-sm text-gray-600 border-l border-gray-300 pl-6">
                     <div>
-                      <span className="opacity-75">Base: </span>
-                      <span className="font-semibold">${basePrice.toFixed(2)}</span>
+                      <span className="text-gray-500">Base: </span>
+                      <span className="font-semibold">${basePrice}</span>
                     </div>
                     {nightSurcharge > 0 && (
                       <div>
-                        <span className="opacity-75">Night: </span>
-                        <span className="font-semibold text-amber-300">+${nightSurcharge.toFixed(2)}</span>
+                        <span className="text-amber-600">Night: </span>
+                        <span className="font-semibold text-amber-600">+${nightSurcharge}</span>
                       </div>
                     )}
                     {addOnsPrice > 0 && (
                       <div>
-                        <span className="opacity-75">Add-ons: </span>
-                        <span className="font-semibold text-green-300">+${addOnsPrice.toFixed(2)}</span>
+                        <span className="text-green-600">Add-ons: </span>
+                        <span className="font-semibold text-green-600">+${addOnsPrice}</span>
                       </div>
                     )}
                   </div>
@@ -716,17 +734,17 @@ function BookingDetailsContent() {
                   <Button
                     onClick={handleBack}
                     variant="outline"
-                    className="min-h-[50px] px-6 bg-white hover:bg-gray-100 text-gray-900 border-2"
+                    className="min-h-[50px] px-6"
                     disabled={saving}
                   >
                     <ArrowLeft className="h-4 w-4 mr-2" />
-                    <span className="hidden sm:inline">Back</span>
+                    Back
                   </Button>
                   
                   <Button
                     onClick={handleNext}
                     disabled={saving}
-                    className="min-h-[50px] px-8 bg-white hover:bg-gray-100 text-blue-700 font-bold shadow-lg hover:shadow-xl transition-all"
+                    className="min-h-[50px] px-8 bg-blue-600 hover:bg-blue-700 font-bold"
                   >
                     {saving ? (
                       <>
@@ -745,7 +763,6 @@ function BookingDetailsContent() {
             </div>
           </div>
 
-        </div>
       </div>
     </>
   );

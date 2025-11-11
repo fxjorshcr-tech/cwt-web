@@ -1,8 +1,8 @@
-// src/app/layout.tsx - CON FOOTER Y SIN OVERFLOW
+// src/app/layout.tsx - CON FOOTER CONDICIONAL
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Footer from "@/components/home/Footer";
+import ConditionalFooter from "@/components/layout/ConditionalFooter";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -50,7 +50,7 @@ export default function RootLayout({
           <main className="flex-1 w-full overflow-x-hidden">
             {children}
           </main>
-          <Footer />
+          <ConditionalFooter />
         </div>
       </body>
     </html>

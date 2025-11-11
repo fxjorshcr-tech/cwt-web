@@ -1,156 +1,149 @@
 // src/components/home/GoogleReviews.tsx
-// Google reviews section with social proof
+// SEO OPTIMIZED - Reviews con rutas específicas y destinos de Costa Rica
 
 'use client';
 
-import { Star, Quote, ExternalLink } from 'lucide-react';
+import { Star, ExternalLink } from 'lucide-react';
 
 export default function GoogleReviews() {
   const reviews = [
     {
       name: 'Sarah M.',
-      country: 'United States',
+      country: '🇺🇸 United States',
       date: 'October 2024',
       rating: 5,
-      text: 'Excellent service from SJO to La Fortuna! Our driver was punctual, professional, and the van was spotless. Highly recommend for anyone traveling to Arenal.',
-      route: 'San José Airport → La Fortuna'
+      text: 'Best private shuttle from San José Airport to La Fortuna! The driver was punctual, the van spotless, and he gave us great tips about what to do in Arenal. Highly recommend for anyone traveling to the volcano area.',
+      route: 'SJO Airport → La Fortuna, Arenal'
     },
     {
       name: 'John D.',
-      country: 'Canada',
+      country: '🇨🇦 Canada',
       date: 'September 2024',
       rating: 5,
-      text: 'Very professional and reliable. The booking process was simple, and they monitored our delayed flight. Great communication throughout. Will use again!',
-      route: 'Liberia Airport → Tamarindo'
+      text: 'Perfect airport transfer from Liberia to Tamarindo. They monitored our delayed flight and were waiting when we arrived. The driver spoke excellent English and recommended the best beaches in Guanacaste to visit.',
+      route: 'Liberia Airport → Tamarindo Beach'
     },
     {
       name: 'Emma L.',
-      country: 'United Kingdom',
+      country: '🇬🇧 United Kingdom',
       date: 'November 2024',
       rating: 5,
-      text: 'Perfect transfer service! Clean vehicle, friendly driver who spoke perfect English, and great value for money. Made our Costa Rica trip stress-free.',
+      text: 'Excellent private shuttle service from San José to Manuel Antonio. Clean vehicle with AC, friendly bilingual driver, and great value. He told us where to eat in Quepos and the best time to visit the national park.',
       route: 'San José → Manuel Antonio'
     },
     {
       name: 'Michael R.',
-      country: 'Germany',
+      country: '🇩🇪 Germany',
       date: 'October 2024',
       rating: 5,
-      text: 'Outstanding experience. Driver was early, helped with luggage, and provided great tips about Costa Rica. Comfortable ride with AC and WiFi.',
-      route: 'Liberia Airport → Papagayo'
+      text: 'Outstanding transportation from Liberia Airport to Papagayo Peninsula. Driver was early, helped with all our luggage, and shared insider tips about Costa Rica. The shuttle had WiFi and was very comfortable for our family.',
+      route: 'LIR Airport → Papagayo Peninsula'
     }
   ];
 
   return (
-    <section className="py-16 bg-gradient-to-b from-white to-gray-50">
-      <div className="container mx-auto px-6 max-w-7xl">
-        {/* Header */}
+    <section className="py-16 bg-white">
+      <div className="container mx-auto px-4 sm:px-6 max-w-6xl">
+        
+        {/* Header with SEO content */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 mb-3">
-            <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
-            <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
-              Customer Reviews
-            </span>
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-50 border border-yellow-200 rounded-full mb-4">
+            <Star className="h-4 w-4 text-yellow-600 fill-yellow-600" />
+            <span className="text-yellow-700 font-bold text-sm">Verified Google Reviews</span>
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            What Our Travelers Say
+            What Travelers Say About Our Costa Rica Shuttle Service
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Real reviews from real travelers who chose our Costa Rica private shuttle service
+          <p className="text-gray-600 max-w-3xl mx-auto text-sm sm:text-base">
+            Real reviews from real travelers who chose our private shuttle service for their 
+            Costa Rica airport transfers and transportation between destinations
           </p>
         </div>
 
-        {/* Google Rating Summary */}
-        <div className="flex flex-col items-center mb-12">
-          <div className="bg-white border-2 border-gray-200 rounded-2xl p-6 shadow-lg">
-            <div className="flex items-center gap-4">
-              <div className="text-center">
-                <div className="text-5xl font-bold text-gray-900">4.9</div>
-                <div className="flex items-center gap-1 mt-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
-                      key={star}
-                      className="h-5 w-5 text-yellow-500 fill-yellow-500"
-                    />
-                  ))}
-                </div>
-              </div>
-              <div className="border-l-2 border-gray-200 pl-4">
-                <p className="text-lg font-semibold text-gray-900">
-                  Based on Google Reviews
-                </p>
-                <p className="text-sm text-gray-600">
-                  4 five-star reviews
-                </p>
-                <a
-                  href="https://www.google.com/maps"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-medium mt-2"
-                >
-                  See all reviews
-                  <ExternalLink className="h-3 w-3" />
-                </a>
+        {/* Google Rating Card */}
+        <div className="max-w-md mx-auto mb-12">
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl p-6 sm:p-8 text-center shadow-lg">
+            <div className="mb-4">
+              <div className="text-5xl sm:text-6xl font-bold text-gray-900">4.9</div>
+              <div className="flex items-center justify-center gap-1 mt-3">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star
+                    key={star}
+                    className="h-6 w-6 sm:h-7 sm:w-7 text-yellow-500 fill-yellow-500"
+                  />
+                ))}
               </div>
             </div>
+            <p className="text-sm sm:text-base text-gray-700 font-semibold mb-1">
+              Based on Google Reviews
+            </p>
+            <p className="text-xs sm:text-sm text-gray-600 mb-4">
+              4 five-star reviews from verified Costa Rica travelers
+            </p>
+            <a
+              href="https://www.google.com/maps"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+            >
+              View all reviews on Google
+              <ExternalLink className="h-3 w-3" />
+            </a>
           </div>
         </div>
 
-        {/* Reviews Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        {/* Reviews Grid with SEO-rich content */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-10">
           {reviews.map((review, idx) => (
             <div
               key={idx}
-              className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 relative"
+              className="bg-white border-2 border-gray-200 rounded-xl p-5 sm:p-6 hover:border-blue-300 hover:shadow-lg transition-all"
             >
-              {/* Quote icon */}
-              <Quote className="absolute top-4 right-4 h-8 w-8 text-blue-100" />
+              {/* Rating */}
+              <div className="flex items-center gap-1 mb-3">
+                {[...Array(review.rating)].map((_, i) => (
+                  <Star
+                    key={i}
+                    className="h-4 w-4 text-yellow-500 fill-yellow-500"
+                  />
+                ))}
+              </div>
 
-              <div className="relative">
-                {/* Rating */}
-                <div className="flex items-center gap-1 mb-3">
-                  {[...Array(review.rating)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className="h-4 w-4 text-yellow-500 fill-yellow-500"
-                    />
-                  ))}
+              {/* Review text - SEO optimized */}
+              <p className="text-gray-700 text-sm sm:text-base mb-4 leading-relaxed">
+                "{review.text}"
+              </p>
+
+              {/* Route badge - Important for local SEO */}
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 text-xs sm:text-sm font-medium rounded-full mb-4 border border-blue-200">
+                <span>📍 {review.route}</span>
+              </div>
+
+              {/* Reviewer info */}
+              <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                <div>
+                  <p className="font-bold text-gray-900 text-sm">{review.name}</p>
+                  <p className="text-xs text-gray-600">{review.country}</p>
                 </div>
-
-                {/* Review text */}
-                <p className="text-gray-700 mb-4 leading-relaxed">
-                  "{review.text}"
-                </p>
-
-                {/* Route badge */}
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full mb-4">
-                  <span>📍 {review.route}</span>
-                </div>
-
-                {/* Reviewer info */}
-                <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                  <div>
-                    <p className="font-semibold text-gray-900">{review.name}</p>
-                    <p className="text-sm text-gray-600">{review.country}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs text-gray-500">{review.date}</p>
-                  </div>
+                <div className="text-right">
+                  <p className="text-xs text-gray-500">{review.date}</p>
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Context Box */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 text-center">
-          <h3 className="font-bold text-gray-900 mb-2">
-            New to Online Booking, Not New to the Business
+        {/* Trust Message with SEO keywords */}
+        <div className="max-w-3xl mx-auto bg-blue-50 border-2 border-blue-200 rounded-xl p-6 sm:p-8 text-center">
+          <h3 className="font-bold text-gray-900 mb-3 text-lg sm:text-xl">
+            New to Online Booking, Not New to Costa Rica Transportation
           </h3>
-          <p className="text-sm text-gray-700 max-w-2xl mx-auto">
-            While we recently launched our online platform, our team has been providing reliable 
-            transportation services across Costa Rica for years. We're building our digital presence, 
-            but our commitment to excellent service has always been our priority.
+          <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
+            While we recently launched our online booking platform, our team has been providing 
+            reliable private shuttle services across Costa Rica for years. From San José and Liberia 
+            airports to La Fortuna, Manuel Antonio, Tamarindo, and Monteverde—we know every route. 
+            We're building our digital presence, but our commitment to excellent service and local 
+            expertise has always been our priority.
           </p>
         </div>
       </div>

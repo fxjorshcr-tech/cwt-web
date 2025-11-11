@@ -1,10 +1,11 @@
 // src/app/summary/page.tsx
-// ✅ SUMMARY PAGE - Review before payment (Step 2)
+// ✅ SUMMARY PAGE - Con Navbar y Hero agregados
 'use client';
 
 import { useEffect, useState, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ArrowLeft, ArrowRight, Calendar, Users, MapPin, Clock, Loader2, Mail, Phone, User, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Calendar, Users, MapPin, Clock, Loader2, ShoppingCart } from 'lucide-react';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -148,10 +149,35 @@ function SummaryPageContent() {
 
   return (
     <>
+      {/* ✅ NAVBAR */}
       <BookingNavbar />
 
+      {/* ✅ HERO SECTION */}
+      <section className="relative h-64 md:h-80 w-full overflow-hidden">
+        <Image
+          src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/puerto-viejo-costa-rica-beach.webp"
+          alt="Costa Rica Beach"
+          fill
+          className="object-cover"
+          style={{ objectPosition: '50% 65%' }}
+          priority
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center text-white px-4">
+            <h1 className="text-3xl md:text-5xl font-bold mb-2 drop-shadow-lg">
+              Review Your Booking
+            </h1>
+            <p className="text-lg md:text-xl drop-shadow-md">
+              Please review all details before proceeding to payment
+            </p>
+          </div>
+        </div>
+      </section>
+
       <main className="min-h-screen bg-gray-50">
-        {/* Stepper - Step 2: Summary */}
+        {/* Stepper - Step 3: Summary */}
         <div className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
           <div className="max-w-5xl mx-auto px-4 py-8">
             <BookingStepper currentStep={2} />
@@ -160,16 +186,6 @@ function SummaryPageContent() {
 
         <div className="py-12">
           <div className="max-w-5xl mx-auto px-4">
-            
-            {/* Header */}
-            <div className="text-center mb-8">
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-2">
-                Review Your Booking
-              </h1>
-              <p className="text-gray-600 text-lg">
-                Please review all details before proceeding to payment
-              </p>
-            </div>
 
             <div className="grid lg:grid-cols-3 gap-8">
               
@@ -307,6 +323,55 @@ function SummaryPageContent() {
                         </div>
                       </div>
 
+                      {/* ✅ PRICE BREAKDOWN */}
+                      <div className="pt-4 border-t space-y-2">
+                        {trips.map((trip, index) => {
+                          const basePrice = trip.price;
+                          const nightSurcharge = trip.night_surcharge || 0;
+                          const addOnsTotal = trip.add_ons && trip.add_ons.length > 0
+                            ? trip.add_ons.reduce((sum, addonId) => {
+                                const prices: Record<string, number> = {
+                                  tico_time: 160,
+                                  flex_time: 45,
+                                };
+                                return sum + (prices[addonId] || 0);
+                              }, 0)
+                            : 0;
+
+                          return (
+                            <div key={trip.id} className="space-y-1.5">
+                              {trips.length > 1 && (
+                                <p className="text-xs font-semibold text-gray-700 mb-1">
+                                  Trip {index + 1}
+                                </p>
+                              )}
+                              <div className="flex justify-between text-sm">
+                                <span className="text-gray-600">Base Price</span>
+                                <span className="font-semibold">{formatCurrency(basePrice)}</span>
+                              </div>
+                              {nightSurcharge > 0 && (
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-amber-600">Night Surcharge</span>
+                                  <span className="font-semibold text-amber-600">+{formatCurrency(nightSurcharge)}</span>
+                                </div>
+                              )}
+                              {addOnsTotal > 0 && (
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-green-600">Add-ons</span>
+                                  <span className="font-semibold text-green-600">+{formatCurrency(addOnsTotal)}</span>
+                                </div>
+                              )}
+                              {trips.length > 1 && (
+                                <div className="flex justify-between text-sm pt-1 border-t border-gray-100">
+                                  <span className="text-gray-700 font-medium">Trip Subtotal</span>
+                                  <span className="font-semibold">{formatCurrency(trip.final_price || trip.price)}</span>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+
                       <div className="pt-4 border-t">
                         <div className="flex justify-between items-center mb-2">
                           <span className="text-lg font-bold text-gray-900">Total Amount</span>
@@ -339,6 +404,64 @@ function SummaryPageContent() {
                         </Button>
                       </div>
 
+                    </CardContent>
+                  </Card>
+
+                  {/* What's Included */}
+                  <Card className="bg-gradient-to-br from-cyan-50 to-blue-50 border-blue-200">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base text-cyan-900">What's Included?</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      <div className="flex items-start gap-2 text-sm">
+                        <span className="text-cyan-600 mt-0.5">🚐</span>
+                        <span className="text-gray-700">Spacious Van with Full A/C</span>
+                      </div>
+                      <div className="flex items-start gap-2 text-sm">
+                        <span className="text-cyan-600 mt-0.5">👥</span>
+                        <span className="text-gray-700">Personalized Meet & Greet at airport</span>
+                      </div>
+                      <div className="flex items-start gap-2 text-sm">
+                        <span className="text-cyan-600 mt-0.5">🚪</span>
+                        <span className="text-gray-700">Door-to-Door Private Service</span>
+                      </div>
+                      <div className="flex items-start gap-2 text-sm">
+                        <span className="text-cyan-600 mt-0.5">📶</span>
+                        <span className="text-gray-700">Free Onboard Wi-Fi & Bottled Water</span>
+                      </div>
+                      <div className="flex items-start gap-2 text-sm">
+                        <span className="text-cyan-600 mt-0.5">👨‍✈️</span>
+                        <span className="text-gray-700">Professional, Bilingual Driver</span>
+                      </div>
+                      <div className="flex items-start gap-2 text-sm">
+                        <span className="text-cyan-600 mt-0.5">💎</span>
+                        <span className="text-gray-700">All-Inclusive Rates, No Hidden Fees</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Important Information */}
+                  <Card className="bg-gradient-to-br from-slate-50 to-gray-50 border-gray-300">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base text-gray-900">Important Information</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      <div className="flex items-start gap-2 text-sm">
+                        <span className="text-blue-600 mt-0.5">🧳</span>
+                        <span className="text-gray-700">1 large bag + 1 carry-on per person.</span>
+                      </div>
+                      <div className="flex items-start gap-2 text-sm">
+                        <span className="text-orange-600 mt-0.5">⏱️</span>
+                        <span className="text-gray-700">One complimentary 1-hour stop included.</span>
+                      </div>
+                      <div className="flex items-start gap-2 text-sm">
+                        <span className="text-green-600 mt-0.5">👶</span>
+                        <span className="text-gray-700">Baby car seats & boosters included free of charge.</span>
+                      </div>
+                      <div className="flex items-start gap-2 text-sm">
+                        <span className="text-red-600 mt-0.5">🚫</span>
+                        <span className="text-gray-700">No refund for cancellations within 48 hours of pickup.</span>
+                      </div>
                     </CardContent>
                   </Card>
 

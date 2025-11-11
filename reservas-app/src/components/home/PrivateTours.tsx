@@ -1,243 +1,188 @@
 // src/components/home/PrivateTours.tsx
-// ✅ OPTIMIZED: Lazy loading added to image
+// FINAL - Cards con imágenes, sin sección "Why Book", solo botón
+
 'use client';
 
-import { Mountain, Binoculars, Waves, Trees, ArrowRight } from 'lucide-react';
+import { Mountain, Flame, Droplets, Trees, ArrowRight, CheckCircle, Clock } from 'lucide-react';
 import Image from 'next/image';
 
 export default function PrivateTours() {
-  const tourCategories = [
+  const laFortunaTours = [
     {
       icon: Mountain,
-      title: 'Adventure Tours',
-      description: 'Zip-lining, Rafting, ATV',
-      color: 'blue'
+      title: 'Arenal Volcano Hiking Tour',
+      description: 'Hike the ancient lava trails of Arenal Volcano with expert naturalist guides. Learn about the 1968 eruption, spot wildlife, and enjoy breathtaking views.',
+      price: 'From $95',
+      duration: 'Half day (4-5 hours)',
+      image: 'https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/aerial-view-conchal-beach.webp',
+      highlights: ['Expert local guide', 'Wildlife spotting', 'Volcano history']
     },
     {
-      icon: Binoculars,
-      title: 'Wildlife Watching',
-      description: 'Sloths, Monkeys, Birds',
-      color: 'green'
+      icon: Flame,
+      title: 'Hot Springs & Waterfalls',
+      description: 'Relax in natural hot springs heated by Arenal Volcano, then cool off at the stunning La Fortuna Waterfall. Perfect combination of relaxation and adventure.',
+      price: 'From $110',
+      duration: 'Full day (6-8 hours)',
+      image: 'https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/private-shuttle-costa-rica-service.WEBP',
+      highlights: ['Natural hot springs', 'Waterfall swim', 'Lunch included']
     },
     {
-      icon: Waves,
-      title: 'Beach & Water',
-      description: 'Snorkeling, Surfing, Beaches',
-      color: 'cyan'
+      icon: Droplets,
+      title: 'Rio Celeste & Tenorio Park',
+      description: 'Discover the magical turquoise waters of Rio Celeste. Hike through pristine rainforest to waterfalls and volcanic hot springs.',
+      price: 'From $125',
+      duration: 'Full day (8-10 hours)',
+      image: 'https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/aerial-view-conchal-beach.webp',
+      highlights: ['Rio Celeste waterfall', 'Rainforest hike', 'Blue lagoon']
     },
     {
       icon: Trees,
-      title: 'Nature & Hiking',
-      description: 'Rainforest, Waterfalls, Trails',
-      color: 'emerald'
-    }
-  ];
-
-  const popularTours = [
-    {
-      icon: Mountain,
-      title: 'Arenal Volcano Tour',
-      description: 'Explore the iconic volcano, hot springs, and rainforest trails with expert naturalist guides.',
-      price: 'From $95 per person',
-      rating: 5
-    },
-    {
-      icon: Trees,
-      title: 'Monteverde Cloud Forest',
-      description: 'Walk among clouds on hanging bridges, spot exotic birds, and discover unique wildlife.',
-      price: 'From $85 per person',
-      rating: 5
-    },
-    {
-      icon: Waves,
-      title: 'Manuel Antonio Park',
-      description: 'Pristine beaches, monkeys, sloths, and incredible biodiversity in one stunning location.',
-      price: 'From $75 per person',
-      rating: 5
+      title: 'Hanging Bridges & Wildlife',
+      description: 'Walk among the rainforest canopy on suspended bridges up to 150 feet high. Spot sloths, toucans, and monkeys with expert guides.',
+      price: 'From $85',
+      duration: 'Half day (3-4 hours)',
+      image: 'https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/private-shuttle-costa-rica-service.WEBP',
+      highlights: ['Hanging bridges', 'Wildlife viewing', 'Professional photos']
     }
   ];
 
   return (
-    <section className="py-20 bg-gradient-to-b from-white to-gray-50">
-      <div className="container mx-auto px-6 max-w-7xl">
+    <section className="py-20 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
+      <div className="container mx-auto px-4 sm:px-6 max-w-7xl">
+        
         {/* Header */}
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Exclusive Private Tours Across Costa Rica
+          <div className="inline-flex items-center gap-2 px-5 py-2 bg-orange-100 border border-orange-200 rounded-full mb-6">
+            <Mountain className="h-5 w-5 text-orange-600" />
+            <span className="text-orange-700 font-bold text-sm uppercase tracking-wide">
+              We Operate These Tours Directly
+            </span>
+          </div>
+          
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+            Best Private Tours in La Fortuna, Arenal
           </h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Experience Costa Rica's natural wonders with our carefully curated private 
-            tours. Small groups, expert local guides, and unforgettable adventures 
-            designed just for you.
+          
+          <p className="text-gray-600 max-w-3xl mx-auto text-base sm:text-lg leading-relaxed mb-8">
+            Created and operated by us—no third-party reselling. Our expert local guides bring 
+            La Fortuna's natural wonders to life with personalized, small-group experiences.
           </p>
+
+          {/* Why Our Tours - Compact */}
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+              <span className="text-sm sm:text-base font-semibold text-gray-700">100% Operated by Us</span>
+            </div>
+            <span className="text-gray-300">•</span>
+            <div className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-blue-600" />
+              <span className="text-sm sm:text-base font-semibold text-gray-700">Expert Local Guides</span>
+            </div>
+            <span className="text-gray-300">•</span>
+            <div className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-orange-600" />
+              <span className="text-sm sm:text-base font-semibold text-gray-700">Small Groups (Max 6)</span>
+            </div>
+          </div>
         </div>
 
-        {/* Tour Categories */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
-          {tourCategories.map((category, idx) => (
+        {/* Tours Grid - CARDS WITH IMAGES */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          {laFortunaTours.map((tour, idx) => (
             <div
               key={idx}
-              className="bg-white p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-all text-center group cursor-pointer"
+              className="group bg-white rounded-2xl overflow-hidden border-2 border-gray-200 hover:border-blue-400 hover:shadow-2xl transition-all"
             >
-              <div className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4 ${
-                category.color === 'blue' ? 'bg-blue-100' :
-                category.color === 'green' ? 'bg-green-100' :
-                category.color === 'cyan' ? 'bg-cyan-100' :
-                'bg-emerald-100'
-              }`}>
-                <category.icon className={`h-8 w-8 ${
-                  category.color === 'blue' ? 'text-blue-600' :
-                  category.color === 'green' ? 'text-green-600' :
-                  category.color === 'cyan' ? 'text-cyan-600' :
-                  'text-emerald-600'
-                }`} />
+              {/* Image */}
+              <div className="relative h-48 overflow-hidden">
+                <Image
+                  src={tour.image}
+                  alt={tour.title}
+                  fill
+                  className="object-cover group-hover:scale-110 transition-transform duration-500"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  loading="lazy"
+                  quality={80}
+                />
+                {/* Gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                
+                {/* Icon badge */}
+                <div className="absolute top-4 left-4">
+                  <div className="w-12 h-12 rounded-xl bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg">
+                    <tour.icon className="h-6 w-6 text-blue-600" />
+                  </div>
+                </div>
+
+                {/* Duration badge */}
+                <div className="absolute bottom-4 left-4 right-4">
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-lg">
+                    <Clock className="h-4 w-4 text-gray-600" />
+                    <span className="text-xs font-semibold text-gray-700">{tour.duration}</span>
+                  </div>
+                </div>
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">{category.title}</h3>
-              <p className="text-sm text-gray-600">{category.description}</p>
+
+              {/* Content */}
+              <div className="p-5">
+                {/* Title */}
+                <h3 className="font-bold text-gray-900 text-lg mb-2 leading-tight">
+                  {tour.title}
+                </h3>
+
+                {/* Rating */}
+                <div className="flex items-center gap-1 mb-3">
+                  {[1,2,3,4,5].map((star) => (
+                    <Star key={star} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                  ))}
+                </div>
+
+                {/* Description */}
+                <p className="text-sm text-gray-700 mb-4 leading-relaxed line-clamp-3">
+                  {tour.description}
+                </p>
+
+                {/* Highlights */}
+                <div className="mb-4 space-y-1.5">
+                  {tour.highlights.map((highlight, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-blue-600"></div>
+                      <span className="text-xs text-gray-600">{highlight}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Price & Arrow */}
+                <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
+                  <span className="text-base font-bold text-blue-600">{tour.price}</span>
+                  <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
+                </div>
+              </div>
             </div>
           ))}
         </div>
 
-        {/* Why Choose Our Tours */}
-        <div className="grid md:grid-cols-2 gap-12 mb-16 items-center">
-          {/* ✅ OPTIMIZED: Image with lazy loading */}
-          <div className="relative h-[500px] md:h-[600px] rounded-2xl overflow-hidden shadow-xl">
-            <Image
-              src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/private-shuttle-costa-rica-service.WEBP"
-              alt="Private Tours Costa Rica - Expert guides and personalized experiences"
-              fill
-              className="object-cover object-center"
-              sizes="(max-width: 768px) 100vw, 50vw"
-              loading="lazy"
-              quality={80}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-            <div className="absolute bottom-6 left-6 right-6">
-              <div className="flex items-center gap-1 mb-2">
-                {[1,2,3,4,5].map((star) => (
-                  <svg key={star} className="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                  </svg>
-                ))}
-              </div>
-              <p className="text-white text-sm italic">
-                "Exceptional tours with knowledgeable guides and personalized experiences"
-              </p>
-            </div>
-          </div>
-
-          {/* Content */}
-          <div>
-            <h3 className="text-3xl font-bold text-gray-900 mb-6">
-              Why Choose Our Private Tours?
-            </h3>
-            <p className="text-gray-700 mb-6 leading-relaxed">
-              Unlike generic group tours, our private experiences are personally operated by our team 
-              to ensure the highest quality and authentic Costa Rican experiences. We don't sell 
-              third-party tours—we design and lead every adventure ourselves.
-            </p>
-
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center mt-1">
-                  <span className="text-orange-600 text-sm font-bold">✓</span>
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900 mb-1">Operated Directly By Us</h4>
-                  <p className="text-sm text-gray-600">
-                    Every tour is personally operated by our experienced team, not outsourced to third parties
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center mt-1">
-                  <span className="text-blue-600 text-sm font-bold">✓</span>
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900 mb-1">Small Private Groups</h4>
-                  <p className="text-sm text-gray-600">
-                    Maximum 6 people per tour for personalized attention and authentic experiences
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-green-100 flex items-center justify-center mt-1">
-                  <span className="text-green-600 text-sm font-bold">✓</span>
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900 mb-1">Expert Local Guides</h4>
-                  <p className="text-sm text-gray-600">
-                    Certified naturalists and cultural experts who bring Costa Rica's stories to life
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center mt-1">
-                  <span className="text-emerald-600 text-sm font-bold">✓</span>
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900 mb-1">Flexible Schedules</h4>
-                  <p className="text-sm text-gray-600">
-                    Start times and itineraries customized to your preferences and travel plans
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <a
-              href="/private-tours"
-              className="inline-flex items-center gap-2 mt-8 px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg transition-colors"
-            >
-              Browse All Tours
-              <ArrowRight className="h-5 w-5" />
-            </a>
-          </div>
-        </div>
-
-        {/* Most Popular Tours */}
-        <div>
-          <h3 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            Most Popular Private Tours
-          </h3>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {popularTours.map((tour, idx) => (
-              <div
-                key={idx}
-                className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all group cursor-pointer"
-              >
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-                    <tour.icon className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-bold text-gray-900 mb-1">{tour.title}</h4>
-                    <div className="flex items-center gap-0.5">
-                      {[1,2,3,4,5].map((star) => (
-                        <svg key={star} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                          <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                        </svg>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <p className="text-sm text-gray-600 mb-4">
-                  {tour.description}
-                </p>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-bold text-gray-900">{tour.price}</span>
-                  <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-orange-500 transition-colors" />
-                </div>
-              </div>
-            ))}
-          </div>
+        {/* CTA Button - SOLO ESTE */}
+        <div className="text-center">
+          <a
+            href="/private-tours"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-xl transform hover:scale-105 text-base sm:text-lg"
+          >
+            Discover All La Fortuna Tours
+            <ArrowRight className="h-5 w-5" />
+          </a>
         </div>
       </div>
     </section>
+  );
+}
+
+// Star component
+function Star({ className }: { className: string }) {
+  return (
+    <svg className={className} viewBox="0 0 20 20" fill="currentColor">
+      <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+    </svg>
   );
 }
