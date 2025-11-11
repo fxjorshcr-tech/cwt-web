@@ -1,5 +1,5 @@
 // src/components/home/ValueProposition.tsx
-// ✅ OPTIMIZED - SEO natural sin keyword stuffing
+// ✅ RESPONSIVE - Fixed mobile layout
 
 'use client';
 
@@ -171,60 +171,60 @@ export default function ValueProposition() {
   };
 
   return (
-    <section className="py-16 bg-gradient-to-b from-gray-50 to-white">
-      <div className="container mx-auto px-6 max-w-7xl">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 mb-3">
-            <MapPin className="h-5 w-5 text-blue-600" />
-            <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+    <section className="py-12 sm:py-16 bg-gradient-to-b from-gray-50 to-white overflow-x-hidden">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <div className="text-center mb-8 sm:mb-12">
+          <div className="inline-flex items-center gap-2 mb-2 sm:mb-3">
+            <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+            <span className="text-xs sm:text-sm font-semibold text-gray-600 uppercase tracking-wide">
               Popular Routes & Destinations
             </span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4 px-4">
             Most Popular Destinations
           </h2>
-          <p className="text-base text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-sm sm:text-base text-gray-600 max-w-3xl mx-auto leading-relaxed px-4">
             Choose your destination and see transparent pricing with no hidden fees. 
             All transfers include bilingual drivers, modern vehicles (up to 12 passengers), 
             and door-to-door service with flexible schedules.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {ROUTES.map((region, idx) => (
             <div
               key={idx}
               className={`bg-white border-2 ${
                 region.color === 'blue' ? 'border-blue-100' : 'border-orange-100'
-              } rounded-xl p-6 hover:shadow-xl transition-all duration-300`}
+              } rounded-xl p-4 sm:p-6 hover:shadow-xl transition-all duration-300`}
             >
-              <div className="mb-5">
-                <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg mb-3 ${
+              <div className="mb-4 sm:mb-5">
+                <div className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg mb-3 ${
                   region.color === 'blue' ? 'bg-blue-500' : 'bg-orange-500'
                 }`}>
-                  <MapPin className="h-4 w-4 text-white" />
-                  <span className="text-white font-bold text-sm">{region.region}</span>
+                  <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
+                  <span className="text-white font-bold text-xs sm:text-sm">{region.region}</span>
                 </div>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {region.destinations.map((dest: Destination, destIdx: number) => (
                   <button
                     key={destIdx}
                     onClick={() => handleRouteClick(dest.origen, dest.destino)}
-                    className="w-full group flex items-start justify-between gap-3 p-4 min-h-[48px] rounded-lg hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-200 cursor-pointer"
+                    className="w-full group flex items-start justify-between gap-2 sm:gap-3 p-3 sm:p-4 min-h-[48px] rounded-lg hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-200 cursor-pointer"
                     aria-label={`Book shuttle from ${dest.origen} to ${dest.destino}`}
                   >
                     <div className="flex-1 text-left">
-                      <p className="font-semibold text-gray-900 text-sm mb-1 group-hover:text-blue-600 transition-colors">
+                      <p className="font-semibold text-gray-900 text-xs sm:text-sm mb-1 group-hover:text-blue-600 transition-colors leading-tight">
                         {dest.name}
                       </p>
-                      <p className="text-xs text-gray-700">
+                      <p className="text-[10px] sm:text-xs text-gray-700">
                         ⏱️ {dest.time}
                       </p>
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <p className={`text-sm font-bold ${
+                      <p className={`text-xs sm:text-sm font-bold ${
                         region.color === 'blue' ? 'text-blue-600' : 'text-orange-600'
                       }`}>
                         {dest.price}
@@ -235,8 +235,8 @@ export default function ValueProposition() {
                 ))}
               </div>
 
-              <div className="mt-5 pt-5 border-t border-gray-100">
-                <p className="text-xs text-gray-700 italic">
+              <div className="mt-4 sm:mt-5 pt-4 sm:pt-5 border-t border-gray-100">
+                <p className="text-[10px] sm:text-xs text-gray-700 italic">
                   Per vehicle (up to 12 passengers). Includes fees, tolls, and taxes.
                 </p>
               </div>

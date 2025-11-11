@@ -228,6 +228,15 @@ function BookingDetailsContent() {
   }, [currentTripIndex, currentTrip]);
 
   // ============================================
+  // CLEAR ERRORS ON INPUT CHANGE
+  // ============================================
+
+  useEffect(() => {
+    // Limpiar errores cuando el usuario cambia los inputs
+    setErrors({});
+  }, [formData.pickup_address, formData.dropoff_address, formData.pickup_time, formData.flight_number]);
+
+  // ============================================
   // CALCULATE PRICES
   // ============================================
 
@@ -269,6 +278,42 @@ function BookingDetailsContent() {
   // ============================================
   // HANDLERS
   // ============================================
+
+  // ✅ AUTO-SAVE FUNCTION (sin validación estricta para Back button)
+  const saveTripSilently = async (): Promise<boolean> => {
+    if (!currentTrip) return false;
+
+    try {
+      const updateData = {
+        pickup_address: formData.pickup_address ? sanitizeInput(formData.pickup_address) : null,
+        dropoff_address: formData.dropoff_address ? sanitizeInput(formData.dropoff_address) : null,
+        pickup_time: formData.pickup_time || null,
+        flight_number: formData.flight_number ? sanitizeInput(formData.flight_number) : null,
+        airline: formData.airline ? sanitizeInput(formData.airline) : null,
+        special_requests: formData.special_requests ? sanitizeInput(formData.special_requests) : null,
+        children_ages: formData.children_ages.filter((age): age is number => age !== null),
+        add_ons: selectedAddOns.length > 0 ? selectedAddOns : null,
+        night_surcharge: nightSurcharge,
+        final_price: finalPrice,
+        updated_at: new Date().toISOString(),
+      };
+
+      const { error } = await supabase
+        .from('trips')
+        .update(updateData)
+        .eq('id', currentTrip.id);
+
+      if (error) {
+        console.error('Error auto-saving trip:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error in saveTripSilently:', error);
+      return false;
+    }
+  };
 
   const handleNext = async () => {
     if (!validateForm()) {
@@ -320,12 +365,26 @@ function BookingDetailsContent() {
     }
   };
 
-  const handleBack = () => {
+  const handleBack = async () => {
+    // ✅ Auto-guardar antes de cambiar de trip o volver
+    await saveTripSilently();
+    
     if (currentTripIndex > 0) {
+      // Si hay trips anteriores, ir al trip anterior
       setCurrentTripIndex(currentTripIndex - 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
-      router.push('/');
+      // Si estamos en el primer trip, verificar si venimos de summary
+      const params = new URLSearchParams(window.location.search);
+      const fromSummary = params.get('from') === 'summary';
+      
+      if (fromSummary) {
+        // Volver a summary si venimos de ahí
+        router.push(`/summary?booking_id=${bookingId}`);
+      } else {
+        // Ir al home si es la primera vez
+        router.push('/');
+      }
     }
   };
 
@@ -423,7 +482,7 @@ function BookingDetailsContent() {
       )}
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 pb-32 md:pb-28 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 pb-40 md:pb-36 bg-gray-50">
         <div className="max-w-4xl mx-auto">
           
           <div className="space-y-4 md:space-y-6">
@@ -466,7 +525,16 @@ function BookingDetailsContent() {
             <Card>
               <CardHeader className="pb-4">
                 <CardTitle className="text-base md:text-lg">Pickup Details</CardTitle>
-                <CardDescription className="text-xs md:text-sm">Where and when should we pick you up?</CardDescription>
+                <CardDescription className="text-xs md:text-sm flex items-center gap-2 flex-wrap">
+                  <span>Where should we pick you up in</span>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-100 rounded-md border border-blue-200">
+                    <MapPin className="h-3 w-3 text-blue-600" />
+                    <span className="text-xs font-bold text-blue-900">
+                      {currentTrip.from_location}
+                    </span>
+                  </span>
+                  <span>?</span>
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-3 md:space-y-4">
                 <div>
@@ -554,7 +622,16 @@ function BookingDetailsContent() {
             <Card>
               <CardHeader className="pb-4">
                 <CardTitle className="text-base md:text-lg">Drop-off Details</CardTitle>
-                <CardDescription className="text-xs md:text-sm">Where should we drop you off?</CardDescription>
+                <CardDescription className="text-xs md:text-sm flex items-center gap-2 flex-wrap">
+                  <span>Where should we drop you off in</span>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-orange-100 rounded-md border border-orange-200">
+                    <MapPin className="h-3 w-3 text-orange-600" />
+                    <span className="text-xs font-bold text-orange-900">
+                      {currentTrip.to_location}
+                    </span>
+                  </span>
+                  <span>?</span>
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div>

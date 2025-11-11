@@ -395,7 +395,7 @@ function SummaryPageContent() {
                         </Button>
 
                         <Button
-                          onClick={() => router.push(`/booking-details?booking_id=${bookingId}&trip=0`)}
+                          onClick={() => router.push(`/booking-details?booking_id=${bookingId}&trip=0&from=summary`)}
                           variant="outline"
                           className="w-full min-h-[48px]"
                         >
