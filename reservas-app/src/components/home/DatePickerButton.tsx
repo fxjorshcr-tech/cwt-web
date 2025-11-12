@@ -1,5 +1,5 @@
 // src/components/home/DatePickerButton.tsx
-// FIXED: Proper z-index and positioning for mobile & desktop
+// FIXED: Better portal rendering and z-index handling
 
 'use client';
 
@@ -26,25 +26,6 @@ interface DatePickerButtonProps {
   disabled?: boolean;
 }
 
-/**
- * COMPONENTE: DatePickerButton
- * 
- * Selector de fecha con calendario visual (shadcn/ui)
- * 
- * CARACTERÍSTICAS:
- * - Calendario en español
- * - Solo permite fechas futuras (no pasadas)
- * - Integrado con Popover de shadcn/ui
- * - Z-index alto para aparecer sobre todo
- * - Funciona en mobile y desktop
- * 
- * @param date - Fecha actualmente seleccionada
- * @param onDateChange - Callback cuando cambia la fecha
- * @param label - Etiqueta del campo (opcional)
- * @param placeholder - Texto cuando no hay fecha seleccionada
- * @param className - Clases CSS adicionales
- * @param disabled - Si el selector está deshabilitado
- */
 export function DatePickerButton({
   date,
   onDateChange,
@@ -55,33 +36,23 @@ export function DatePickerButton({
 }: DatePickerButtonProps) {
   const [open, setOpen] = useState(false);
 
-  /**
-   * Manejar la selección de fecha
-   * - Actualiza el estado
-   * - Cierra el popover
-   * - Notifica al componente padre
-   */
   const handleDateSelect = (selectedDate: Date | undefined) => {
     onDateChange(selectedDate);
-    setOpen(false); // Cerrar el popover después de seleccionar
+    setOpen(false);
   };
 
-  /**
-   * Obtener la fecha mínima permitida (hoy)
-   * Esto previene que se seleccionen fechas pasadas
-   */
   const today = new Date();
-  today.setHours(0, 0, 0, 0); // Resetear hora para comparación correcta
+  today.setHours(0, 0, 0, 0);
 
   return (
-    <div className="space-y-2 relative">
+    <div className="space-y-2">
       {label && (
         <Label htmlFor="date-picker" className="text-sm font-medium">
           {label}
         </Label>
       )}
       
-      <Popover open={open} onOpenChange={setOpen} modal={true}>
+      <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             id="date-picker"
@@ -102,21 +73,21 @@ export function DatePickerButton({
           </Button>
         </PopoverTrigger>
         
-        {/* CRITICAL FIX: High z-index + proper positioning */}
         <PopoverContent 
-          className="w-auto p-0" 
+          className="w-auto p-0 z-[100]" 
           align="start"
           side="bottom"
           sideOffset={8}
-          style={{ zIndex: 99999 }}
           avoidCollisions={true}
           collisionPadding={20}
+          // Force portal to body for proper stacking
+          container={typeof document !== 'undefined' ? document.body : undefined}
         >
           <Calendar
             mode="single"
             selected={date}
             onSelect={handleDateSelect}
-            disabled={(date) => date < today} // Deshabilitar fechas pasadas
+            disabled={(date) => date < today}
             locale={es}
             initialFocus
             className="rounded-md border"
