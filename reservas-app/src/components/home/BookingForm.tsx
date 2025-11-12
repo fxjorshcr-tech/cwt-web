@@ -1,17 +1,15 @@
 // src/components/home/BookingForm.tsx
-// ✅ VERSIÓN COMPLETA CORREGIDA - Mensaje de 13+ abajo, mejor manejo de errores
+// ✅ CON AUTOCOMPLETE INTELIGENTE
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
-  MapPin,
   Calendar,
   Users,
   Search,
   Loader2,
   AlertCircle,
-  RefreshCw,
   Clock,
   Route as RouteIcon,
   Plus,
@@ -22,6 +20,7 @@ import {
 import { createClient } from '@/lib/supabase/client';
 import { ModernDatePicker } from './ModernDatePicker';
 import { PassengerSelector } from './PassengerSelector';
+import { LocationAutocomplete } from './LocationAutocomplete';
 import { format } from 'date-fns';
 import type { TripInsert, Route as SupabaseRoute } from '@/types/supabase';
 
@@ -29,6 +28,7 @@ interface Route {
   id: number;
   origen: string;
   destino: string;
+  alias: string | null;
   precio1a6: number;
   precio7a9: number;
   precio10a12: number;
@@ -54,7 +54,6 @@ interface TripData extends BookingFormData {
   selectedRoute: Route | null;
 }
 
-// ✅ Skeleton Loading Component
 function FormSkeleton() {
   return (
     <div className="w-full max-w-5xl mx-auto">
@@ -197,6 +196,7 @@ export function BookingForm() {
           id: route.id,
           origen: route.origen,
           destino: route.destino,
+          alias: route.alias,
           precio1a6: route.precio1a6,
           precio7a9: route.precio7a9,
           precio10a12: route.precio10a12,
@@ -230,24 +230,6 @@ export function BookingForm() {
     return route.precio13a18;
   }
 
-  function getOrigins(): string[] {
-    const origins = routes.map((r) => r.origen);
-    return Array.from(new Set(origins)).sort();
-  }
-
-  function getDestinations(origin?: string): string[] {
-    if (!origin) {
-      const destinations = routes.map((r) => r.destino);
-      return Array.from(new Set(destinations)).sort();
-    }
-
-    const destinations = routes
-      .filter((r) => r.origen === origin)
-      .map((r) => r.destino);
-
-    return Array.from(new Set(destinations)).sort();
-  }
-
   function updateTrip(index: number, field: string, value: any) {
     setTrips((prevTrips) => {
       const newTrips = [...prevTrips];
@@ -273,7 +255,6 @@ export function BookingForm() {
         if (trip.from_location && trip.to_location) {
           const totalPassengers = trip.adults + trip.children;
           
-          // ✅ Si son más de 12, no calcular ruta
           if (totalPassengers > 12) {
             newTrips[index].selectedRoute = null;
             newTrips[index].calculatedPrice = 0;
@@ -374,7 +355,6 @@ export function BookingForm() {
     const validationError = validate();
     if (validationError) {
       setError(validationError);
-      // Scroll to top to show error
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
@@ -438,7 +418,6 @@ export function BookingForm() {
     }
   }
 
-  // ✅ Check if any trip has 13+ passengers
   const hasLargeGroup = trips.some(trip => (trip.adults + trip.children) > 12);
 
   if (isLoadingRoutes || !showContent) {
@@ -509,74 +488,29 @@ export function BookingForm() {
                     </div>
                   )}
 
+                  {/* AUTOCOMPLETE LOCATIONS */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-3">
-                    <div className="space-y-1.5">
-                      <label 
-                        htmlFor={`pickup-location-${index}`}
-                        className="flex items-center gap-1.5 text-xs font-medium text-gray-700"
-                      >
-                        <MapPin className="h-3.5 w-3.5 text-blue-600" />
-                        Pick-up Location
-                      </label>
-                      <select
-                        id={`pickup-location-${index}`}
-                        name={`pickup-location-${index}`}
-                        value={trip.from_location}
-                        onChange={(e) =>
-                          updateTrip(index, 'from_location', e.target.value)
-                        }
-                        disabled={!!error}
-                        className="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
-                        required
-                      >
-                        <option value="">
-                          {error
-                            ? 'Error loading routes'
-                            : 'Where are you traveling from?'}
-                        </option>
-                        {!error && getOrigins().map((origin) => (
-                          <option key={origin} value={origin}>
-                            {origin}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                    <LocationAutocomplete
+                      label="Pick-up Location"
+                      placeholder="Where are you traveling from?"
+                      value={trip.from_location}
+                      onChange={(value) => updateTrip(index, 'from_location', value)}
+                      routes={routes}
+                      filterByDestination={trip.to_location}
+                      disabled={!!error}
+                      type="origin"
+                    />
 
-                    <div className="space-y-1.5">
-                      <label 
-                        htmlFor={`dropoff-location-${index}`}
-                        className="flex items-center gap-1.5 text-xs font-medium text-gray-700"
-                      >
-                        <MapPin className="h-3.5 w-3.5 text-orange-600" />
-                        Drop-off Location
-                      </label>
-                      <select
-                        id={`dropoff-location-${index}`}
-                        name={`dropoff-location-${index}`}
-                        value={trip.to_location}
-                        onChange={(e) =>
-                          updateTrip(index, 'to_location', e.target.value)
-                        }
-                        disabled={!trip.from_location || !!error}
-                        className="w-full px-3 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
-                        required
-                      >
-                        <option value="">
-                          {error
-                            ? 'Error loading routes'
-                            : !trip.from_location
-                            ? 'Select origin first'
-                            : 'Where are you going?'}
-                        </option>
-                        {!error && getDestinations(trip.from_location).map(
-                          (destination) => (
-                            <option key={destination} value={destination}>
-                              {destination}
-                            </option>
-                          )
-                        )}
-                      </select>
-                    </div>
+                    <LocationAutocomplete
+                      label="Drop-off Location"
+                      placeholder={!trip.from_location ? 'Select origin first' : 'Where are you going?'}
+                      value={trip.to_location}
+                      onChange={(value) => updateTrip(index, 'to_location', value)}
+                      routes={routes}
+                      filterByOrigin={trip.from_location}
+                      disabled={!trip.from_location || !!error}
+                      type="destination"
+                    />
                   </div>
 
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -683,10 +617,8 @@ export function BookingForm() {
             </div>
           </div>
 
-          {/* ✅ BOTTOM CTA CON MENSAJE DE GRUPOS GRANDES ABAJO */}
           <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
             
-            {/* ✅ MENSAJE PARA GRUPOS GRANDES - AHORA ABAJO Y MÁS VISIBLE EN MOBILE */}
             {hasLargeGroup && (
               <div className="mb-4 bg-gradient-to-r from-blue-50 to-blue-100 border-2 border-blue-400 rounded-xl p-5 shadow-lg animate-in fade-in duration-300">
                 <div className="flex items-start gap-4">
