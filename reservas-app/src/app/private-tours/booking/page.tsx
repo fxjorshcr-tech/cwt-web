@@ -5,13 +5,16 @@ import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { 
-  Users, MapPin, Clock, DollarSign, 
+  Users, MapPin, Clock, 
   CheckCircle, Loader2, AlertCircle, ShoppingCart, CreditCard,
   ArrowLeft, Plus, Minus
 } from 'lucide-react';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import { DatePickerButton } from '@/components/home/DatePickerButton';
 import { getTourBySlug } from '@/lib/tours-data';
+import { createClient } from '@/lib/supabase/client';
+import { useCart } from '@/contexts/CartContext';
+import { toast } from 'sonner';
 
 interface BookingFormData {
   date?: Date;
@@ -24,6 +27,9 @@ interface BookingFormData {
 function TourBookingContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const supabase = createClient();
+  const { addItem } = useCart();
+  
   const tourSlug = searchParams.get('tour');
 
   const [formData, setFormData] = useState<BookingFormData>({
@@ -57,11 +63,9 @@ function TourBookingContent() {
     );
   }
 
-  // Calculate total passengers and price
   const totalPassengers = formData.adults + formData.children;
   const isValidPassengerCount = totalPassengers >= tour.minPassengers && totalPassengers <= tour.maxPassengers;
   
-  // Price calculation
   let totalPrice = 0;
   if (totalPassengers >= tour.minPassengers) {
     if (totalPassengers <= 2) {
@@ -71,7 +75,6 @@ function TourBookingContent() {
     }
   }
 
-  // Validation
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
@@ -91,19 +94,41 @@ function TourBookingContent() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleAddToCart = (e: React.FormEvent) => {
-    e.preventDefault();
+  const saveTourToSupabase = async () => {
+    if (!formData.date) return null;
 
-    if (!validateForm()) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
+    const bookingId = `tour_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+
+    const { data, error } = await supabase
+      .from('tour_bookings')
+      .insert([
+        {
+          booking_id: bookingId,
+          tour_slug: tour.slug,
+          tour_name: tour.name,
+          date: formData.date.toISOString().split('T')[0],
+          adults: formData.adults,
+          children: formData.children,
+          base_price: tour.basePrice,
+          price_per_extra_person: tour.pricePerExtraPerson,
+          total_price: totalPrice,
+          hotel: formData.hotel.trim(),
+          special_requests: formData.specialRequests.trim() || null,
+          status: 'pending',
+        },
+      ])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving tour:', error);
+      throw error;
     }
 
-    // TODO: Add to cart functionality
-    alert('Add to cart functionality - to be implemented with your cart system');
+    return data;
   };
 
-  const handlePayNow = (e: React.FormEvent) => {
+  const handleAddToCart = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) {
@@ -111,34 +136,75 @@ function TourBookingContent() {
       return;
     }
 
-    setIsSubmitting(true);
+    try {
+      setIsSubmitting(true);
 
-    // TODO: Integrate with payment gateway
-    const message = `
-🌟 TOUR BOOKING - PAY NOW
+      const tourData = await saveTourToSupabase();
+      
+      if (tourData) {
+        addItem({
+          type: 'tour',
+          id: tourData.id,
+          tourSlug: tour.slug,
+          tourName: tour.name,
+          date: formData.date!.toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric' 
+          }),
+          adults: formData.adults,
+          children: formData.children,
+          price: totalPrice,
+          hotel: formData.hotel.trim(),
+        });
 
-Tour: ${tour.name}
-Date: ${formData.date?.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-Passengers: ${formData.adults} adults, ${formData.children} children
-Total Price: $${totalPrice}
-
-Pickup Location: ${formData.hotel}
-Special Requests: ${formData.specialRequests || 'None'}
-    `.trim();
-
-    const whatsappUrl = `https://wa.me/50685962438?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
-
-    setTimeout(() => {
+        toast.success('Tour added to cart!');
+        router.push('/private-tours');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('Failed to add tour to cart');
+    } finally {
       setIsSubmitting(false);
-    }, 1000);
+    }
   };
 
-  // Handlers for passenger picker
+  const handlePayNow = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      const tourData = await saveTourToSupabase();
+      
+      if (tourData) {
+        toast.info('WeTravel payment integration - Coming soon!');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('Failed to process booking');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleAdultsChange = (increment: boolean) => {
     const newAdults = increment ? formData.adults + 1 : formData.adults - 1;
     if (newAdults >= 1 && newAdults <= tour.maxPassengers && (newAdults + formData.children) <= tour.maxPassengers) {
       setFormData({ ...formData, adults: newAdults });
+      // Clear passenger error when changing
+      if (errors.passengers) {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors.passengers;
+          return newErrors;
+        });
+      }
     }
   };
 
@@ -146,10 +212,17 @@ Special Requests: ${formData.specialRequests || 'None'}
     const newChildren = increment ? formData.children + 1 : formData.children - 1;
     if (newChildren >= 0 && newChildren <= tour.maxPassengers && (formData.adults + newChildren) <= tour.maxPassengers) {
       setFormData({ ...formData, children: newChildren });
+      // Clear passenger error when changing
+      if (errors.passengers) {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors.passengers;
+          return newErrors;
+        });
+      }
     }
   };
 
-  // Format date for display
   const formatDateDisplay = (date?: Date) => {
     if (!date) return 'Not selected';
     return date.toLocaleDateString('en-US', { 
@@ -164,7 +237,6 @@ Special Requests: ${formData.specialRequests || 'None'}
     <>
       <BookingNavbar />
 
-      {/* Hero Section */}
       <section className="relative h-48 md:h-64 flex items-center justify-center bg-gradient-to-r from-blue-600 to-indigo-700">
         <div className="absolute inset-0 opacity-10">
           <Image
@@ -184,11 +256,9 @@ Special Requests: ${formData.specialRequests || 'None'}
         </div>
       </section>
 
-      {/* Main Content */}
       <section className="py-8 md:py-12 bg-gray-50">
         <div className="container mx-auto px-4 max-w-6xl">
           
-          {/* Error Alert */}
           {Object.keys(errors).length > 0 && (
             <div className="mb-6 bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-start gap-3">
               <AlertCircle className="h-6 w-6 text-red-600 flex-shrink-0 mt-0.5" />
@@ -205,10 +275,8 @@ Special Requests: ${formData.specialRequests || 'None'}
 
           <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
             
-            {/* Left Column - Form */}
             <div className="lg:col-span-2 space-y-6">
               
-              {/* Back Button */}
               <button
                 onClick={() => router.push(`/private-tours/${tour.slug}`)}
                 className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
@@ -219,7 +287,6 @@ Special Requests: ${formData.specialRequests || 'None'}
 
               <form className="space-y-6">
                 
-                {/* Tour Date & Passengers */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-200">
                   <div className="p-6 md:p-8 border-b border-gray-100">
                     <h2 className="text-xl font-bold text-gray-900">
@@ -228,11 +295,20 @@ Special Requests: ${formData.specialRequests || 'None'}
                   </div>
 
                   <div className="p-6 md:p-8 space-y-5">
-                    {/* Travel Date - Using SAME component as shuttles */}
                     <div>
                       <DatePickerButton
                         date={formData.date}
-                        onDateChange={(date) => setFormData({ ...formData, date })}
+                        onDateChange={(date) => {
+                          setFormData({ ...formData, date });
+                          // Clear error when user selects a date
+                          if (date && errors.date) {
+                            setErrors((prev) => {
+                              const newErrors = { ...prev };
+                              delete newErrors.date;
+                              return newErrors;
+                            });
+                          }
+                        }}
                         label="Travel Date"
                         placeholder="Select your tour date"
                         className={errors.date ? 'border-red-300 bg-red-50' : ''}
@@ -245,13 +321,11 @@ Special Requests: ${formData.specialRequests || 'None'}
                       )}
                     </div>
 
-                    {/* Passengers Picker */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Passengers <span className="text-red-500">*</span>
                       </label>
                       
-                      {/* Display Button */}
                       <button
                         type="button"
                         onClick={() => setShowPassengerPicker(!showPassengerPicker)}
@@ -277,11 +351,9 @@ Special Requests: ${formData.specialRequests || 'None'}
                         </div>
                       </button>
 
-                      {/* Passenger Picker Dropdown */}
                       {showPassengerPicker && (
                         <div className="mt-2 bg-white rounded-xl shadow-xl border-2 border-gray-200 p-5">
                           
-                          {/* Adults */}
                           <div className="flex items-center justify-between pb-5 mb-5 border-b border-gray-200">
                             <div>
                               <p className="font-semibold text-gray-900">Adults</p>
@@ -313,7 +385,6 @@ Special Requests: ${formData.specialRequests || 'None'}
                             </div>
                           </div>
 
-                          {/* Children */}
                           <div className="flex items-center justify-between">
                             <div>
                               <p className="font-semibold text-gray-900">Children</p>
@@ -345,7 +416,6 @@ Special Requests: ${formData.specialRequests || 'None'}
                             </div>
                           </div>
 
-                          {/* Limit Warning */}
                           {totalPassengers >= tour.maxPassengers && (
                             <div className="mt-4 pt-4 border-t border-gray-200">
                               <p className="text-xs text-amber-600 text-center flex items-center justify-center gap-1">
@@ -355,7 +425,6 @@ Special Requests: ${formData.specialRequests || 'None'}
                             </div>
                           )}
 
-                          {/* Done Button */}
                           <button
                             type="button"
                             onClick={() => setShowPassengerPicker(false)}
@@ -366,7 +435,6 @@ Special Requests: ${formData.specialRequests || 'None'}
                         </div>
                       )}
 
-                      {/* Passenger Count Info */}
                       <div className={`mt-3 p-3 rounded-lg ${isValidPassengerCount ? 'bg-green-50 border border-green-200' : 'bg-amber-50 border border-amber-200'}`}>
                         <p className={`text-sm font-medium ${isValidPassengerCount ? 'text-green-700' : 'text-amber-700'}`}>
                           {isValidPassengerCount ? (
@@ -387,7 +455,6 @@ Special Requests: ${formData.specialRequests || 'None'}
                   </div>
                 </div>
 
-                {/* Pickup Location */}
                 <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-200">
                   <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                     <MapPin className="h-5 w-5 text-blue-600" />
@@ -404,7 +471,17 @@ Special Requests: ${formData.specialRequests || 'None'}
                         type="text"
                         placeholder="Enter your hotel name or full address in La Fortuna"
                         value={formData.hotel}
-                        onChange={(e) => setFormData({ ...formData, hotel: e.target.value })}
+                        onChange={(e) => {
+                          setFormData({ ...formData, hotel: e.target.value });
+                          // Clear error when user types
+                          if (e.target.value.trim() && errors.hotel) {
+                            setErrors((prev) => {
+                              const newErrors = { ...prev };
+                              delete newErrors.hotel;
+                              return newErrors;
+                            });
+                          }
+                        }}
                         className={`w-full h-14 px-4 text-base rounded-xl border-2 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                           errors.hotel 
                             ? 'border-red-300 bg-red-50' 
@@ -437,45 +514,12 @@ Special Requests: ${formData.specialRequests || 'None'}
                     </div>
                   </div>
                 </div>
-
-                {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <button
-                    type="button"
-                    onClick={handleAddToCart}
-                    disabled={isSubmitting || !isValidPassengerCount}
-                    className="flex-1 h-14 bg-white border-2 border-blue-600 text-blue-600 font-bold rounded-xl hover:bg-blue-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-lg"
-                  >
-                    <ShoppingCart className="h-5 w-5" />
-                    Add to Cart
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handlePayNow}
-                    disabled={isSubmitting || !isValidPassengerCount}
-                    className="flex-1 h-14 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-lg shadow-lg"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                        Processing...
-                      </>
-                    ) : (
-                      <>
-                        <CreditCard className="h-5 w-5" />
-                        Pay Now
-                      </>
-                    )}
-                  </button>
-                </div>
               </form>
             </div>
 
-            {/* Right Column - Booking Summary (Sticky) */}
             <div className="lg:col-span-1">
               <div className="sticky top-4">
                 <div className="bg-white rounded-2xl border-2 border-blue-200 shadow-lg overflow-hidden">
-                  {/* Tour Image */}
                   <div className="relative h-48">
                     <Image
                       src={tour.image}
@@ -492,7 +536,6 @@ Special Requests: ${formData.specialRequests || 'None'}
                   </div>
 
                   <div className="p-6 space-y-4">
-                    {/* Tour Details */}
                     <div className="space-y-3 pb-4 border-b border-gray-200">
                       <div className="flex items-center gap-2 text-sm text-gray-700">
                         <Clock className="h-4 w-4 text-gray-400" />
@@ -514,7 +557,6 @@ Special Requests: ${formData.specialRequests || 'None'}
                       </div>
                     </div>
 
-                    {/* Price Breakdown */}
                     <div className="space-y-3">
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Base price (2 pax)</span>
@@ -538,7 +580,38 @@ Special Requests: ${formData.specialRequests || 'None'}
                       </div>
                     </div>
 
-                    {/* What's Included */}
+                    {/* BOTONES EN LA SECCIÓN DEL TOTAL */}
+                    <div className="pt-4 border-t border-gray-200 flex flex-col gap-3">
+                      <button
+                        type="button"
+                        onClick={handlePayNow}
+                        disabled={isSubmitting || !isValidPassengerCount}
+                        className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base shadow-lg"
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                            Processing...
+                          </>
+                        ) : (
+                          <>
+                            <CreditCard className="h-5 w-5" />
+                            Pay Now
+                          </>
+                        )}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleAddToCart}
+                        disabled={isSubmitting || !isValidPassengerCount}
+                        className="w-full h-14 bg-white border-2 border-blue-600 text-blue-600 font-bold rounded-xl hover:bg-blue-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base"
+                      >
+                        <ShoppingCart className="h-5 w-5" />
+                        Add to Cart & Explore More
+                      </button>
+                    </div>
+
                     <div className="border-t border-gray-200 pt-4">
                       <p className="text-sm font-semibold text-gray-700 mb-3">Included:</p>
                       <ul className="space-y-2">

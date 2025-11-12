@@ -2,10 +2,11 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, X, ShoppingCart } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import CartDropdown from "@/app/cart/CartDropdown";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -25,12 +26,10 @@ export default function BookingNavbar() {
 
   return (
     <>
-      {/* NAVBAR LIMPIO - Sin Blog */}
       <header className="absolute top-0 left-0 right-0 z-50 w-full">
         <div className="container mx-auto px-4 sm:px-6 py-4 max-w-full">
           <div className="flex items-center justify-between gap-2">
             
-            {/* LOGO - Responsive sizes */}
             <Link
               href="/"
               className="flex items-center gap-3"
@@ -48,7 +47,6 @@ export default function BookingNavbar() {
               </div>
             </Link>
 
-            {/* DESKTOP NAVIGATION */}
             <nav className="hidden lg:flex items-center gap-6" aria-label="Main navigation">
               {navLinks.map((link) => (
                 <Link
@@ -60,17 +58,10 @@ export default function BookingNavbar() {
                 </Link>
               ))}
 
-              {/* CART ICON */}
-              <Link
-                href="/cart"
-                className="text-white hover:text-gray-200 transition-colors p-2 rounded-full hover:bg-white/10 relative ml-2"
-                aria-label="Shopping cart"
-              >
-                <ShoppingCart className="h-5 w-5" />
-              </Link>
+              {/* CART DROPDOWN */}
+              <CartDropdown />
             </nav>
 
-            {/* MOBILE MENU BUTTON */}
             <button
               onClick={handleDrawerToggle}
               className="lg:hidden text-white p-3 hover:bg-white/10 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
@@ -88,7 +79,6 @@ export default function BookingNavbar() {
         </div>
       </header>
 
-      {/* MOBILE DRAWER OVERLAY */}
       {mobileOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden animate-in fade-in duration-200"
@@ -97,7 +87,6 @@ export default function BookingNavbar() {
         />
       )}
 
-      {/* MOBILE DRAWER */}
       <aside
         id="mobile-menu"
         className={cn(
@@ -110,7 +99,6 @@ export default function BookingNavbar() {
       >
         <div className="flex flex-col h-full">
           
-          {/* Close Button */}
           <div className="flex justify-end p-4 border-b">
             <button
               onClick={handleDrawerToggle}
@@ -121,7 +109,6 @@ export default function BookingNavbar() {
             </button>
           </div>
 
-          {/* Navigation Links */}
           <nav className="flex-1 p-4 overflow-y-auto" aria-label="Mobile navigation">
             <ul className="space-y-2">
               {navLinks.map((link) => (
@@ -136,15 +123,14 @@ export default function BookingNavbar() {
                 </li>
               ))}
 
-              {/* Cart Link */}
+              {/* Mobile Cart Link */}
               <li>
                 <Link
                   href="/cart"
                   onClick={handleDrawerToggle}
                   className="px-4 py-3 min-h-[52px] text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-medium flex items-center gap-3"
                 >
-                  <ShoppingCart className="h-5 w-5" />
-                  <span>Cart</span>
+                  <span>View Cart</span>
                 </Link>
               </li>
             </ul>

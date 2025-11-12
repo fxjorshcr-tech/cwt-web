@@ -1,8 +1,10 @@
-// src/app/layout.tsx - CON FOOTER CONDICIONAL
+// src/app/layout.tsx - CON FOOTER CONDICIONAL, CART PROVIDER Y TOASTER
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import ConditionalFooter from "@/components/layout/ConditionalFooter";
+import { CartProvider } from "@/contexts/CartContext";
+import { Toaster } from "sonner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -46,12 +48,15 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.className} overflow-x-hidden`}>
-        <div className="min-h-screen flex flex-col overflow-x-hidden">
-          <main className="flex-1 w-full overflow-x-hidden">
-            {children}
-          </main>
-          <ConditionalFooter />
-        </div>
+        <CartProvider>
+          <div className="min-h-screen flex flex-col overflow-x-hidden">
+            <main className="flex-1 w-full overflow-x-hidden">
+              {children}
+            </main>
+            <ConditionalFooter />
+          </div>
+          <Toaster position="top-right" richColors closeButton duration={1000} />
+        </CartProvider>
       </body>
     </html>
   );

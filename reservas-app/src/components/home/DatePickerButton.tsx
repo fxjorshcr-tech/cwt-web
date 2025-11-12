@@ -117,7 +117,7 @@ export function DatePickerButton({
             disabled={(date) => date < today}
             locale={es}
             initialFocus
-            className="rounded-md border"
+            className="rounded-md border min-w-[300px]"
           />
         </PopoverContent>
       </Popover>

@@ -1,5 +1,5 @@
 // src/components/booking/BookingStepper.tsx
-// ✅ CORRECTED - 5 steps in proper order
+// ✅ UPDATED - 4 steps (removed Payment)
 
 'use client';
 
@@ -11,15 +11,14 @@ function cn(...classes: (string | boolean | undefined)[]) {
 }
 
 interface BookingStepperProps {
-  currentStep: number; // 0: Search, 1: Details, 2: Summary, 3: Payment, 4: Confirmation
+  currentStep: number; // 0: Search, 1: Details, 2: Summary, 3: Confirmation
 }
 
 const steps = [
   { id: 0, label: 'Search' },
   { id: 1, label: 'Details' },
   { id: 2, label: 'Summary' },
-  { id: 3, label: 'Payment' },
-  { id: 4, label: 'Confirmation' },
+  { id: 3, label: 'Confirmation' },
 ];
 
 export default function BookingStepper({ currentStep }: BookingStepperProps) {

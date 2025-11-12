@@ -159,6 +159,76 @@ export interface Database {
         }
         Relationships: []
       }
+
+      tour_bookings: {
+        Row: {
+          id: string
+          booking_id: string
+          tour_slug: string
+          tour_name: string
+          date: string
+          adults: number
+          children: number
+          base_price: number
+          price_per_extra_person: number
+          total_price: number
+          hotel: string
+          special_requests: string | null
+          customer_first_name: string | null
+          customer_last_name: string | null
+          customer_email: string | null
+          customer_phone: string | null
+          customer_country: string | null
+          status: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          booking_id: string
+          tour_slug: string
+          tour_name: string
+          date: string
+          adults: number
+          children: number
+          base_price: number
+          price_per_extra_person: number
+          total_price: number
+          hotel: string
+          special_requests?: string | null
+          customer_first_name?: string | null
+          customer_last_name?: string | null
+          customer_email?: string | null
+          customer_phone?: string | null
+          customer_country?: string | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          booking_id?: string
+          tour_slug?: string
+          tour_name?: string
+          date?: string
+          adults?: number
+          children?: number
+          base_price?: number
+          price_per_extra_person?: number
+          total_price?: number
+          hotel?: string
+          special_requests?: string | null
+          customer_first_name?: string | null
+          customer_last_name?: string | null
+          customer_email?: string | null
+          customer_phone?: string | null
+          customer_country?: string | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -185,6 +255,10 @@ export type RouteUpdate = Tables<'routes'>['Update']
 export type Trip = Tables<'trips'>['Row']
 export type TripInsert = Tables<'trips'>['Insert']
 export type TripUpdate = Tables<'trips'>['Update']
+
+export type TourBooking = Tables<'tour_bookings'>['Row']
+export type TourBookingInsert = Tables<'tour_bookings'>['Insert']
+export type TourBookingUpdate = Tables<'tour_bookings'>['Update']
 
 export interface CreateTripData {
   booking_id: string

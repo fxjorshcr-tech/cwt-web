@@ -1,23 +1,22 @@
 // src/app/summary/page.tsx
-// ✅ SUMMARY PAGE - Con Navbar y Hero agregados
+// ✅ FINAL - Un solo botón: Add to Cart & Continue
+
 'use client';
 
 import { useEffect, useState, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ArrowLeft, ArrowRight, Calendar, Users, MapPin, Clock, Loader2, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, Calendar, Users, MapPin, Clock, Loader2, ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import BookingStepper from '@/components/booking/BookingStepper';
+import { useCart } from '@/contexts/CartContext';
+import { toast } from 'sonner';
 
 import { formatDate, formatTime, formatCurrency } from '@/lib/formatters';
 import { PRICING_CONFIG } from '@/lib/pricing-config';
-
-// ============================================
-// TYPES
-// ============================================
 
 interface Trip {
   id: string;
@@ -45,14 +44,11 @@ const ADD_ON_NAMES: Record<string, string> = {
   flex_time: 'Flex Time Protection',
 };
 
-// ============================================
-// MAIN COMPONENT
-// ============================================
-
 function SummaryPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClient();
+  const { addItem } = useCart();
 
   const bookingId = searchParams.get('booking_id');
 
@@ -98,7 +94,7 @@ function SummaryPageContent() {
         setLoading(false);
       } catch (error) {
         console.error('Error loading trips:', error);
-        alert('Failed to load booking summary');
+        toast.error('Failed to load booking summary');
         router.push('/');
       }
     }
@@ -115,6 +111,29 @@ function SummaryPageContent() {
     () => trips.reduce((sum, trip) => sum + trip.adults + trip.children, 0),
     [trips]
   );
+
+  const handleAddToCartAndContinue = () => {
+    trips.forEach((trip, index) => {
+      addItem({
+        type: 'shuttle',
+        id: trip.id,
+        bookingId: trip.booking_id,
+        fromLocation: trip.from_location,
+        toLocation: trip.to_location,
+        date: formatDate(trip.date),
+        pickupTime: formatTime(trip.pickup_time),
+        adults: trip.adults,
+        children: trip.children,
+        price: trip.price,
+        finalPrice: trip.final_price || trip.price,
+        tripNumber: trips.length > 1 ? index + 1 : undefined,
+        totalTrips: trips.length > 1 ? trips.length : undefined,
+      });
+    });
+    
+    toast.success(`${trips.length} shuttle${trips.length > 1 ? 's' : ''} added to cart!`);
+    router.push('/transfers');
+  };
 
   if (loading) {
     return (
@@ -149,10 +168,8 @@ function SummaryPageContent() {
 
   return (
     <>
-      {/* ✅ NAVBAR */}
       <BookingNavbar />
 
-      {/* ✅ HERO SECTION */}
       <section className="relative h-64 md:h-80 w-full overflow-hidden">
         <Image
           src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/puerto-viejo-costa-rica-beach.webp"
@@ -177,7 +194,6 @@ function SummaryPageContent() {
       </section>
 
       <main className="min-h-screen bg-gray-50">
-        {/* Stepper - Step 3: Summary */}
         <div className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
           <div className="max-w-5xl mx-auto px-4 py-8">
             <BookingStepper currentStep={2} />
@@ -189,10 +205,8 @@ function SummaryPageContent() {
 
             <div className="grid lg:grid-cols-3 gap-8">
               
-              {/* LEFT - Trip Details */}
               <div className="lg:col-span-2 space-y-6">
                 
-                {/* Trips */}
                 {trips.map((trip, index) => (
                   <Card key={trip.id}>
                     <CardHeader>
@@ -301,7 +315,6 @@ function SummaryPageContent() {
 
               </div>
 
-              {/* RIGHT - Price Summary (STICKY) */}
               <div className="lg:col-span-1">
                 <div className="sticky top-[140px] space-y-6">
                   
@@ -323,7 +336,6 @@ function SummaryPageContent() {
                         </div>
                       </div>
 
-                      {/* ✅ PRICE BREAKDOWN */}
                       <div className="pt-4 border-t space-y-2">
                         {trips.map((trip, index) => {
                           const basePrice = trip.price;
@@ -384,20 +396,30 @@ function SummaryPageContent() {
                         </p>
                       </div>
 
-                      <div className="pt-4 space-y-2">
+                      <div className="pt-4 space-y-3">
                         <Button
-                          onClick={() => router.push(`/payment?booking_id=${bookingId}`)}
-                          className="w-full min-h-[48px]"
+                          onClick={() => {
+                            toast.info('WeTravel payment integration - Coming soon!');
+                          }}
+                          className="w-full min-h-[48px] bg-green-600 hover:bg-green-700"
                           size="lg"
                         >
-                          Proceed to Payment
-                          <ArrowRight className="h-4 w-4 ml-2" />
+                          💳 Pay Now
+                        </Button>
+
+                        <Button
+                          onClick={handleAddToCartAndContinue}
+                          variant="outline"
+                          className="w-full min-h-[48px] border-blue-600 text-blue-600 hover:bg-blue-50"
+                        >
+                          <ShoppingCart className="h-4 w-4 mr-2" />
+                          Add & Book Another Ride
                         </Button>
 
                         <Button
                           onClick={() => router.push(`/booking-details?booking_id=${bookingId}&trip=0&from=summary`)}
-                          variant="outline"
-                          className="w-full min-h-[48px]"
+                          variant="ghost"
+                          className="w-full min-h-[48px] text-gray-600"
                         >
                           <ArrowLeft className="h-4 w-4 mr-2" />
                           Back to Details
@@ -407,7 +429,6 @@ function SummaryPageContent() {
                     </CardContent>
                   </Card>
 
-                  {/* What's Included */}
                   <Card className="bg-gradient-to-br from-cyan-50 to-blue-50 border-blue-200">
                     <CardHeader className="pb-3">
                       <CardTitle className="text-base text-cyan-900">What's Included?</CardTitle>
@@ -440,7 +461,6 @@ function SummaryPageContent() {
                     </CardContent>
                   </Card>
 
-                  {/* Important Information */}
                   <Card className="bg-gradient-to-br from-slate-50 to-gray-50 border-gray-300">
                     <CardHeader className="pb-3">
                       <CardTitle className="text-base text-gray-900">Important Information</CardTitle>
