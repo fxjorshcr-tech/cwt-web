@@ -1,17 +1,14 @@
 // src/app/private-tours/page.tsx
-'use client';
-
-import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, Clock, Users, MapPin, DollarSign } from 'lucide-react';
 import BookingNavbar from '@/components/booking/BookingNavbar';
-import { FULL_DAY_TOURS, HALF_DAY_TOURS } from '@/lib/tours-data';
+import { getAllTours } from '@/lib/supabase-tours';
 
-export default function PrivateToursPage() {
-  const [activeTab, setActiveTab] = useState<'half-day' | 'full-day'>('half-day');
+export const revalidate = 3600; // Revalidar cada hora
 
-  const displayTours = activeTab === 'half-day' ? HALF_DAY_TOURS : FULL_DAY_TOURS;
+export default async function PrivateToursPage() {
+  const tours = await getAllTours();
 
   return (
     <>
@@ -42,18 +39,18 @@ export default function PrivateToursPage() {
           </h1>
           
           <p className="text-lg md:text-xl text-white/95 max-w-3xl mx-auto drop-shadow-lg leading-relaxed mb-8">
-            Private tours with expert guides. Small groups (max 6), personalized attention, unforgettable adventures.
+            Private tours with expert guides. Small groups (max 12), personalized attention, unforgettable adventures.
           </p>
 
           {/* Quick Stats */}
           <div className="flex flex-wrap justify-center gap-6 text-white">
             <div className="flex items-center gap-2">
               <Users className="h-5 w-5" />
-              <span className="text-sm font-medium">Max 6 People</span>
+              <span className="text-sm font-medium">Max 12 People</span>
             </div>
             <div className="flex items-center gap-2">
               <Clock className="h-5 w-5" />
-              <span className="text-sm font-medium">Half & Full Day Tours</span>
+              <span className="text-sm font-medium">8-10 Hour Tours</span>
             </div>
             <div className="flex items-center gap-2">
               <MapPin className="h-5 w-5" />
@@ -62,34 +59,6 @@ export default function PrivateToursPage() {
           </div>
         </div>
       </section>
-
-      {/* Tour Category Tabs */}
-      <div className="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-md">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex gap-2 justify-center">
-            <button
-              onClick={() => setActiveTab('half-day')}
-              className={`px-8 py-3 rounded-full font-semibold transition-all ${
-                activeTab === 'half-day'
-                  ? 'bg-blue-600 text-white shadow-lg scale-105'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Half Day Tours <span className="text-sm opacity-75">(6 hours)</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('full-day')}
-              className={`px-8 py-3 rounded-full font-semibold transition-all ${
-                activeTab === 'full-day'
-                  ? 'bg-blue-600 text-white shadow-lg scale-105'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Full Day Tours <span className="text-sm opacity-75">(10 hours)</span>
-            </button>
-          </div>
-        </div>
-      </div>
 
       {/* Commitment Note */}
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100">
@@ -107,18 +76,16 @@ export default function PrivateToursPage() {
           {/* Category Title */}
           <div className="mb-12 text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              {activeTab === 'half-day' ? 'Half Day Adventures' : 'Full Day Expeditions'}
+              Our Private Tours
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              {activeTab === 'half-day' 
-                ? 'Perfect for combining with other activities or relaxation time' 
-                : 'Immersive experiences exploring the best of La Fortuna region'}
+              Immersive experiences exploring the best of La Fortuna region
             </p>
           </div>
 
           {/* Tours Cards Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {displayTours.map((tour) => (
+            {tours.map((tour) => (
               <Link
                 key={tour.id}
                 href={`/private-tours/${tour.slug}`}
@@ -163,7 +130,7 @@ export default function PrivateToursPage() {
                 {/* Content */}
                 <div className="p-6">
                   <p className="text-gray-600 mb-4 line-clamp-2">
-                    {tour.shortDescription}
+                    {tour.short_description}
                   </p>
 
                   {/* Highlights */}
@@ -182,11 +149,11 @@ export default function PrivateToursPage() {
                   <div className="flex items-center gap-4 mb-4 text-sm text-gray-600 border-t border-gray-100 pt-4">
                     <div className="flex items-center gap-1">
                       <Users className="h-4 w-4" />
-                      <span>Max {tour.maxPassengers}</span>
+                      <span>Max {tour.max_passengers}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <MapPin className="h-4 w-4" />
-                      <span>Pickup 8AM</span>
+                      <span>Pickup {tour.pickup_time}</span>
                     </div>
                   </div>
 
@@ -196,10 +163,10 @@ export default function PrivateToursPage() {
                       <div>
                         <div className="flex items-baseline gap-1">
                           <DollarSign className="h-5 w-5 text-blue-600" />
-                          <span className="text-2xl font-bold text-blue-600">{tour.basePrice}</span>
+                          <span className="text-2xl font-bold text-blue-600">{tour.base_price}</span>
                         </div>
                         <p className="text-xs text-gray-500">2 people (min)</p>
-                        <p className="text-xs text-gray-500">+${tour.pricePerExtraPerson} per extra person</p>
+                        <p className="text-xs text-gray-500">+${tour.price_per_extra_person} per extra person</p>
                       </div>
                     </div>
                     
@@ -216,14 +183,14 @@ export default function PrivateToursPage() {
           {/* Large Groups CTA */}
           <div className="mt-16 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 md:p-12 border border-blue-100 text-center">
             <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-              Traveling with More Than 6 People?
+              Traveling with More Than 12 People?
             </h3>
             <p className="text-lg text-gray-600 mb-6 max-w-2xl mx-auto">
               We specialize in customizing tours for larger groups and families. 
               Contact us for a personalized quote and we'll create the perfect experience for your group.
             </p>
             <Link
-              href="https://wa.me/50685962438?text=Hi!%20I'm%20interested%20in%20a%20private%20tour%20for%20a%20group%20of%20more%20than%206%20people"
+              href="https://wa.me/50685962438?text=Hi!%20I'm%20interested%20in%20a%20private%20tour%20for%20a%20group%20of%20more%20than%2012%20people"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl transition-colors shadow-lg"
@@ -270,7 +237,7 @@ export default function PrivateToursPage() {
               {
                 icon: '👥',
                 title: 'Small Groups Only',
-                description: 'Maximum 6 people per tour ensures personalized attention and flexibility'
+                description: 'Maximum 12 people per tour ensures personalized attention and flexibility'
               },
               {
                 icon: '🌟',

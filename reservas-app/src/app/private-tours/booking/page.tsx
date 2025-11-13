@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import { DatePickerButton } from '@/components/home/DatePickerButton';
-import { getTourBySlug } from '@/lib/tours-data';
+import { getTourBySlug, Tour } from '@/lib/supabase-tours';
 import { createClient } from '@/lib/supabase/client';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from 'sonner';
@@ -32,6 +32,9 @@ function TourBookingContent() {
   
   const tourSlug = searchParams.get('tour');
 
+  const [tour, setTour] = useState<Tour | null>(null);
+  const [loading, setLoading] = useState(true);
+
   const [formData, setFormData] = useState<BookingFormData>({
     date: undefined,
     adults: 2,
@@ -44,15 +47,28 @@ function TourBookingContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassengerPicker, setShowPassengerPicker] = useState(false);
 
-  const tour = tourSlug ? getTourBySlug(tourSlug) : null;
-
   useEffect(() => {
-    if (!tourSlug || !tour) {
-      router.push('/private-tours');
-    }
-  }, [tourSlug, tour, router]);
+    async function loadTour() {
+      if (!tourSlug) {
+        router.push('/private-tours');
+        return;
+      }
 
-  if (!tour) {
+      const tourData = await getTourBySlug(tourSlug);
+      
+      if (!tourData) {
+        router.push('/private-tours');
+        return;
+      }
+
+      setTour(tourData);
+      setLoading(false);
+    }
+
+    loadTour();
+  }, [tourSlug, router]);
+
+  if (loading || !tour) {
     return (
       <>
         <BookingNavbar />
@@ -64,14 +80,14 @@ function TourBookingContent() {
   }
 
   const totalPassengers = formData.adults + formData.children;
-  const isValidPassengerCount = totalPassengers >= tour.minPassengers && totalPassengers <= tour.maxPassengers;
+  const isValidPassengerCount = totalPassengers >= tour.min_passengers && totalPassengers <= tour.max_passengers;
   
   let totalPrice = 0;
-  if (totalPassengers >= tour.minPassengers) {
+  if (totalPassengers >= tour.min_passengers) {
     if (totalPassengers <= 2) {
-      totalPrice = tour.basePrice;
+      totalPrice = tour.base_price;
     } else {
-      totalPrice = tour.basePrice + ((totalPassengers - 2) * tour.pricePerExtraPerson);
+      totalPrice = tour.base_price + ((totalPassengers - 2) * tour.price_per_extra_person);
     }
   }
 
@@ -83,7 +99,7 @@ function TourBookingContent() {
     }
 
     if (!isValidPassengerCount) {
-      newErrors.passengers = `Tour requires ${tour.minPassengers}-${tour.maxPassengers} passengers`;
+      newErrors.passengers = `Tour requires ${tour.min_passengers}-${tour.max_passengers} passengers`;
     }
 
     if (!formData.hotel.trim()) {
@@ -109,8 +125,8 @@ function TourBookingContent() {
           date: formData.date.toISOString().split('T')[0],
           adults: formData.adults,
           children: formData.children,
-          base_price: tour.basePrice,
-          price_per_extra_person: tour.pricePerExtraPerson,
+          base_price: tour.base_price,
+          price_per_extra_person: tour.price_per_extra_person,
           total_price: totalPrice,
           hotel: formData.hotel.trim(),
           special_requests: formData.specialRequests.trim() || null,
@@ -195,9 +211,8 @@ function TourBookingContent() {
 
   const handleAdultsChange = (increment: boolean) => {
     const newAdults = increment ? formData.adults + 1 : formData.adults - 1;
-    if (newAdults >= 1 && newAdults <= tour.maxPassengers && (newAdults + formData.children) <= tour.maxPassengers) {
+    if (newAdults >= 1 && newAdults <= tour.max_passengers && (newAdults + formData.children) <= tour.max_passengers) {
       setFormData({ ...formData, adults: newAdults });
-      // Clear passenger error when changing
       if (errors.passengers) {
         setErrors((prev) => {
           const newErrors = { ...prev };
@@ -210,9 +225,8 @@ function TourBookingContent() {
 
   const handleChildrenChange = (increment: boolean) => {
     const newChildren = increment ? formData.children + 1 : formData.children - 1;
-    if (newChildren >= 0 && newChildren <= tour.maxPassengers && (formData.adults + newChildren) <= tour.maxPassengers) {
+    if (newChildren >= 0 && newChildren <= tour.max_passengers && (formData.adults + newChildren) <= tour.max_passengers) {
       setFormData({ ...formData, children: newChildren });
-      // Clear passenger error when changing
       if (errors.passengers) {
         setErrors((prev) => {
           const newErrors = { ...prev };
@@ -300,7 +314,6 @@ function TourBookingContent() {
                         date={formData.date}
                         onDateChange={(date) => {
                           setFormData({ ...formData, date });
-                          // Clear error when user selects a date
                           if (date && errors.date) {
                             setErrors((prev) => {
                               const newErrors = { ...prev };
@@ -377,7 +390,7 @@ function TourBookingContent() {
                               <button
                                 type="button"
                                 onClick={() => handleAdultsChange(true)}
-                                disabled={totalPassengers >= tour.maxPassengers}
+                                disabled={totalPassengers >= tour.max_passengers}
                                 className="h-10 w-10 rounded-full border-2 border-gray-300 flex items-center justify-center hover:border-blue-500 hover:bg-blue-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-gray-300 disabled:hover:bg-white"
                               >
                                 <Plus className="h-5 w-5 text-gray-600" />
@@ -388,7 +401,7 @@ function TourBookingContent() {
                           <div className="flex items-center justify-between">
                             <div>
                               <p className="font-semibold text-gray-900">Children</p>
-                              <p className="text-sm text-gray-500">Age {tour.minAge}-12</p>
+                              <p className="text-sm text-gray-500">Age {tour.min_age}-12</p>
                             </div>
                             
                             <div className="flex items-center gap-4">
@@ -408,7 +421,7 @@ function TourBookingContent() {
                               <button
                                 type="button"
                                 onClick={() => handleChildrenChange(true)}
-                                disabled={totalPassengers >= tour.maxPassengers}
+                                disabled={totalPassengers >= tour.max_passengers}
                                 className="h-10 w-10 rounded-full border-2 border-gray-300 flex items-center justify-center hover:border-blue-500 hover:bg-blue-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-gray-300 disabled:hover:bg-white"
                               >
                                 <Plus className="h-5 w-5 text-gray-600" />
@@ -416,11 +429,11 @@ function TourBookingContent() {
                             </div>
                           </div>
 
-                          {totalPassengers >= tour.maxPassengers && (
+                          {totalPassengers >= tour.max_passengers && (
                             <div className="mt-4 pt-4 border-t border-gray-200">
                               <p className="text-xs text-amber-600 text-center flex items-center justify-center gap-1">
                                 <AlertCircle className="h-4 w-4" />
-                                Maximum {tour.maxPassengers} passengers per trip
+                                Maximum {tour.max_passengers} passengers per trip
                               </p>
                             </div>
                           )}
@@ -440,7 +453,7 @@ function TourBookingContent() {
                           {isValidPassengerCount ? (
                             <>✓ Valid passenger count</>
                           ) : (
-                            <>⚠ Tour requires {tour.minPassengers}-{tour.maxPassengers} passengers</>
+                            <>⚠ Tour requires {tour.min_passengers}-{tour.max_passengers} passengers</>
                           )}
                         </p>
                       </div>
@@ -473,7 +486,6 @@ function TourBookingContent() {
                         value={formData.hotel}
                         onChange={(e) => {
                           setFormData({ ...formData, hotel: e.target.value });
-                          // Clear error when user types
                           if (e.target.value.trim() && errors.hotel) {
                             setErrors((prev) => {
                               const newErrors = { ...prev };
@@ -495,7 +507,7 @@ function TourBookingContent() {
                         </p>
                       )}
                       <p className="mt-2 text-sm text-gray-500">
-                        Pickup available from La Fortuna area hotels at {tour.pickupTime}
+                        Pickup available from La Fortuna area hotels at {tour.pickup_time}
                       </p>
                     </div>
 
@@ -543,7 +555,7 @@ function TourBookingContent() {
                       </div>
                       <div className="flex items-center gap-2 text-sm text-gray-700">
                         <MapPin className="h-4 w-4 text-gray-400" />
-                        <span>Pickup: {tour.pickupTime}</span>
+                        <span>Pickup: {tour.pickup_time}</span>
                       </div>
                       {formData.date && (
                         <div className="flex items-center gap-2 text-sm text-gray-700">
@@ -560,12 +572,12 @@ function TourBookingContent() {
                     <div className="space-y-3">
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Base price (2 pax)</span>
-                        <span className="font-semibold text-gray-900">${tour.basePrice}</span>
+                        <span className="font-semibold text-gray-900">${tour.base_price}</span>
                       </div>
                       {totalPassengers > 2 && (
                         <div className="flex justify-between text-sm">
                           <span className="text-gray-600">Extra {totalPassengers - 2} passenger{totalPassengers - 2 !== 1 ? 's' : ''}</span>
-                          <span className="font-semibold text-gray-900">+${(totalPassengers - 2) * tour.pricePerExtraPerson}</span>
+                          <span className="font-semibold text-gray-900">+${(totalPassengers - 2) * tour.price_per_extra_person}</span>
                         </div>
                       )}
                       
@@ -580,7 +592,6 @@ function TourBookingContent() {
                       </div>
                     </div>
 
-                    {/* BOTONES EN LA SECCIÓN DEL TOTAL */}
                     <div className="pt-4 border-t border-gray-200 flex flex-col gap-3">
                       <button
                         type="button"

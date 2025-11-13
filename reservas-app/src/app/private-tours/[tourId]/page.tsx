@@ -1,34 +1,42 @@
 // src/app/private-tours/[tourId]/page.tsx
-'use client';
-
-import { useParams, useRouter } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { 
-  ArrowLeft, ArrowRight, Clock, Users, MapPin, DollarSign, 
-  CheckCircle, XCircle, AlertCircle, Calendar, Star 
+  ArrowLeft, Clock, Users, MapPin, DollarSign, 
+  CheckCircle, XCircle, AlertCircle, Star 
 } from 'lucide-react';
 import BookingNavbar from '@/components/booking/BookingNavbar';
-import { getTourBySlug } from '@/lib/tours-data';
+import { getTourBySlug, getAllTours } from '@/lib/supabase-tours';
 import { TourGallery } from '@/components/tours/TourGallery';
-import { notFound } from 'next/navigation';
 
-export default function TourDetailPage() {
-  const params = useParams();
-  const router = useRouter();
-  const slug = params.tourId as string;
+export const revalidate = 3600;
 
-  const tour = getTourBySlug(slug);
+export async function generateStaticParams() {
+  const tours = await getAllTours();
+  return tours.map((tour) => ({
+    tourId: tour.slug,
+  }));
+}
+
+interface PageProps {
+  params: {
+    tourId: string;
+  };
+}
+
+export default async function TourDetailPage({ params }: PageProps) {
+  const tour = await getTourBySlug(params.tourId);
 
   if (!tour) {
     notFound();
   }
 
-  const difficultyColors = {
-    Easy: 'text-green-600 bg-green-50 border-green-200',
-    Moderate: 'text-yellow-600 bg-yellow-50 border-yellow-200',
-    Challenging: 'text-red-600 bg-red-50 border-red-200'
-  };
+ const difficultyColors: Record<string, string> = {
+  Easy: 'text-green-600 bg-green-50 border-green-200',
+  Moderate: 'text-yellow-600 bg-yellow-50 border-yellow-200',
+  Challenging: 'text-red-600 bg-red-50 border-red-200'
+};
 
   return (
     <>
@@ -51,25 +59,20 @@ export default function TourDetailPage() {
         <div className="relative z-10 w-full pb-12 px-6">
           <div className="container mx-auto max-w-6xl">
             {/* Back Button */}
-            <button
-              onClick={() => router.push('/private-tours')}
+            <Link
+              href="/private-tours"
               className="mb-6 inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-lg text-white transition-all"
             >
               <ArrowLeft className="h-4 w-4" />
               <span>Back to Tours</span>
-            </button>
-
-            {/* Tour Category */}
-            <div className="inline-block px-4 py-1.5 bg-blue-500/90 backdrop-blur-sm rounded-full text-white text-sm font-medium mb-4">
-              {tour.category === 'half-day' ? '6-Hour Half Day Tour' : '10-Hour Full Day Tour'}
-            </div>
+            </Link>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 drop-shadow-2xl">
               {tour.name}
             </h1>
 
             <p className="text-xl text-white/95 max-w-3xl drop-shadow-lg mb-6">
-              {tour.shortDescription}
+              {tour.short_description}
             </p>
 
             {/* Quick Info Badges */}
@@ -80,7 +83,7 @@ export default function TourDetailPage() {
               </div>
               <div className="px-4 py-2 bg-white/95 backdrop-blur-sm rounded-lg flex items-center gap-2">
                 <Users className="h-5 w-5 text-blue-600" />
-                <span className="font-semibold">Max {tour.maxPassengers} people</span>
+                <span className="font-semibold">Max {tour.max_passengers} people</span>
               </div>
               <div className={`px-4 py-2 backdrop-blur-sm rounded-lg flex items-center gap-2 border ${difficultyColors[tour.difficulty]}`}>
                 <AlertCircle className="h-5 w-5" />
@@ -88,7 +91,7 @@ export default function TourDetailPage() {
               </div>
               <div className="px-4 py-2 bg-white/95 backdrop-blur-sm rounded-lg flex items-center gap-2">
                 <MapPin className="h-5 w-5 text-blue-600" />
-                <span className="font-semibold">Pickup {tour.pickupTime}</span>
+                <span className="font-semibold">Pickup {tour.pickup_time}</span>
               </div>
             </div>
           </div>
@@ -107,7 +110,7 @@ export default function TourDetailPage() {
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">Tour Overview</h2>
                 <p className="text-gray-700 leading-relaxed text-lg">
-                  {tour.longDescription}
+                  {tour.long_description}
                 </p>
               </div>
 
@@ -129,32 +132,6 @@ export default function TourDetailPage() {
                         <Star className="h-4 w-4 text-green-600 fill-green-600" />
                       </div>
                       <span className="text-gray-700">{highlight}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Itinerary */}
-              <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Itinerary</h2>
-                <div className="space-y-6">
-                  {tour.itinerary.map((item, index) => (
-                    <div key={index} className="flex gap-4">
-                      <div className="flex-shrink-0">
-                        <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center border-4 border-white shadow-md">
-                          <span className="text-blue-600 font-bold text-sm">{item.time}</span>
-                        </div>
-                      </div>
-                      <div className="flex-1 pt-2">
-                        <h3 className="font-bold text-gray-900 text-lg mb-1">
-                          {item.activity}
-                        </h3>
-                        {item.description && (
-                          <p className="text-gray-600">
-                            {item.description}
-                          </p>
-                        )}
-                      </div>
                     </div>
                   ))}
                 </div>
@@ -185,7 +162,7 @@ export default function TourDetailPage() {
                     Not Included
                   </h3>
                   <ul className="space-y-2">
-                    {tour.notIncluded.map((item, index) => (
+                    {tour.not_included.map((item, index) => (
                       <li key={index} className="flex items-start gap-2 text-gray-700">
                         <XCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
                         <span>{item}</span>
@@ -199,7 +176,7 @@ export default function TourDetailPage() {
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">What to Bring</h2>
                 <div className="grid md:grid-cols-2 gap-3">
-                  {tour.whatToBring.map((item, index) => (
+                  {tour.what_to_bring.map((item, index) => (
                     <div key={index} className="flex items-center gap-2 text-gray-700">
                       <div className="w-2 h-2 rounded-full bg-blue-600"></div>
                       <span>{item}</span>
@@ -215,7 +192,7 @@ export default function TourDetailPage() {
                   Important Information
                 </h2>
                 <ul className="space-y-3">
-                  {tour.importantNotes.map((note, index) => (
+                  {tour.important_notes.map((note, index) => (
                     <li key={index} className="flex items-start gap-2 text-gray-700">
                       <span className="text-amber-600 mt-1">•</span>
                       <span>{note}</span>
@@ -236,13 +213,13 @@ export default function TourDetailPage() {
                     </div>
                     <div className="flex items-baseline justify-center gap-1 mb-2">
                       <DollarSign className="h-8 w-8 text-blue-600" />
-                      <span className="text-5xl font-bold text-blue-600">{tour.basePrice}</span>
+                      <span className="text-5xl font-bold text-blue-600">{tour.base_price}</span>
                     </div>
                     <p className="text-gray-600 font-medium mb-1">
                       For 2 people (minimum)
                     </p>
                     <p className="text-sm text-gray-500">
-                      + ${tour.pricePerExtraPerson} per additional person (max 6)
+                      + ${tour.price_per_extra_person} per additional person (max {tour.max_passengers})
                     </p>
                   </div>
 
@@ -254,15 +231,15 @@ export default function TourDetailPage() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Group size:</span>
-                        <span className="font-semibold">2-{tour.maxPassengers} people</span>
+                        <span className="font-semibold">2-{tour.max_passengers} people</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Pickup time:</span>
-                        <span className="font-semibold">{tour.pickupTime}</span>
+                        <span className="font-semibold">{tour.pickup_time}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Min age:</span>
-                        <span className="font-semibold">{tour.minAge}+ years</span>
+                        <span className="font-semibold">{tour.min_age}+ years</span>
                       </div>
                     </div>
                   </div>
@@ -298,7 +275,7 @@ export default function TourDetailPage() {
                 {/* Need More People */}
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
                   <p className="text-xs text-gray-600 text-center">
-                    <span className="font-semibold">Group larger than 6?</span>
+                    <span className="font-semibold">Group larger than {tour.max_passengers}?</span>
                     <br />
                     Contact us for a custom quote
                   </p>
@@ -326,7 +303,7 @@ export default function TourDetailPage() {
               {
                 icon: '👨‍👩‍👧‍👦',
                 title: 'Small Groups Only',
-                description: 'Maximum 6 people ensures personalized attention and flexibility'
+                description: 'Maximum 12 people ensures personalized attention and flexibility'
               },
               {
                 icon: '💯',
