@@ -1,10 +1,75 @@
 // src/utils/timeHelpers.ts
 /**
  * ==========================================
- * UTILIDADES PARA MANEJO DE TIEMPOS
+ * UTILIDADES PARA MANEJO DE TIEMPOS Y FECHAS
  * ==========================================
  * ✅ NUEVO - Normalización y formateo consistente
  */
+
+// ==========================================
+// FUNCIONES DE FECHAS
+// ==========================================
+
+/**
+ * ✅ CRÍTICO: Convertir Date a string YYYY-MM-DD sin conversión UTC
+ * Evita bug de timezone que causaba pérdida de 1 día
+ * 
+ * @param date - Fecha a convertir
+ * @returns String en formato YYYY-MM-DD en timezone local
+ * 
+ * @example
+ * formatDateToString(new Date(2025, 10, 27)) → "2025-11-27"
+ */
+export function formatDateToString(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+/**
+ * ✅ CRÍTICO: Parsear string YYYY-MM-DD a Date en timezone LOCAL
+ * Evita bug de timezone al cargar fechas desde la base de datos
+ * 
+ * NUNCA usar: new Date("2025-11-27") ❌ (interpreta como UTC)
+ * SIEMPRE usar: parseDateFromString("2025-11-27") ✅ (interpreta como local)
+ * 
+ * @param dateString - String en formato YYYY-MM-DD
+ * @returns Date en timezone local (medianoche)
+ * 
+ * @example
+ * parseDateFromString("2025-11-27") → Date(2025, 10, 27, 0, 0, 0, 0) en timezone local
+ */
+export function parseDateFromString(dateString: string): Date {
+  const [year, month, day] = dateString.split('-').map(Number);
+  return new Date(year, month - 1, day, 0, 0, 0, 0); // Local timezone
+}
+
+/**
+ * Validar si un string es una fecha válida en formato YYYY-MM-DD
+ * 
+ * @param dateString - String a validar
+ * @returns true si es una fecha válida
+ */
+export function isValidDateString(dateString: string | null | undefined): boolean {
+  if (!dateString || typeof dateString !== 'string') return false;
+  
+  const regex = /^\d{4}-\d{2}-\d{2}$/;
+  if (!regex.test(dateString)) return false;
+  
+  const [year, month, day] = dateString.split('-').map(Number);
+  const date = new Date(year, month - 1, day);
+  
+  return (
+    date.getFullYear() === year &&
+    date.getMonth() === month - 1 &&
+    date.getDate() === day
+  );
+}
+
+// ==========================================
+// FUNCIONES DE TIEMPOS
+// ==========================================
 
 /**
  * Normalizar tiempo de cualquier formato a HH:mm

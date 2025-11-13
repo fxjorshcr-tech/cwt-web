@@ -1,5 +1,5 @@
 // src/components/home/BookingForm.tsx
-// ✅ CON AUTOCOMPLETE INTELIGENTE
+// ✅ FIXED: Usa funciones centralizadas de timeHelpers
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -21,7 +21,7 @@ import { createClient } from '@/lib/supabase/client';
 import { ModernDatePicker } from './ModernDatePicker';
 import { PassengerSelector } from './PassengerSelector';
 import { LocationAutocomplete } from './LocationAutocomplete';
-import { format } from 'date-fns';
+import { formatDateToString, parseDateFromString } from '@/utils/timeHelpers';
 import type { TripInsert, Route as SupabaseRoute } from '@/types/supabase';
 
 interface Route {
@@ -488,7 +488,6 @@ export function BookingForm() {
                     </div>
                   )}
 
-                  {/* AUTOCOMPLETE LOCATIONS */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-3">
                     <LocationAutocomplete
                       label="Pick-up Location"
@@ -514,10 +513,11 @@ export function BookingForm() {
                   </div>
 
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                    {/* ✅ FIXED: Parsear fecha al cargar, formatear al guardar */}
                     <ModernDatePicker
-                      value={trip.date ? new Date(trip.date) : null}
+                      value={trip.date ? parseDateFromString(trip.date) : null}
                       onChange={(date) =>
-                        updateTrip(index, 'date', format(date, 'yyyy-MM-dd'))
+                        updateTrip(index, 'date', formatDateToString(date))
                       }
                       label="Travel Date"
                     />

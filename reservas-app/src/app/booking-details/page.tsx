@@ -1,10 +1,10 @@
 // src/app/booking-details/page.tsx
-// ✅ VERSIÓN OPTIMIZADA - useMemo, timeHelpers, validación mejorada
+// ✅ VERSIÓN MEJORADA - padding mobile, notas de aeropuerto
 'use client';
 
 import { useEffect, useState, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ArrowLeft, ArrowRight, Calendar, Users, MapPin, Loader2, AlertCircle, Plane } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Calendar, Users, MapPin, Loader2, AlertCircle, Plane, Info } from 'lucide-react';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,7 +23,7 @@ import {
   isAirport,
   ValidationErrors
 } from '@/utils/bookingValidation';
-import { normalizeTime } from '@/utils/timeHelpers';  // ✅ NUEVO
+import { normalizeTime } from '@/utils/timeHelpers';
 import { formatDate } from '@/lib/formatters';
 import { calculateNightSurcharge, calculateAddOnsPrice, PRICING_CONFIG } from '@/lib/pricing-config';
 
@@ -66,6 +66,23 @@ interface FormData {
 }
 
 // ============================================
+// HELPER FUNCTIONS
+// ============================================
+
+// ✅ NUEVO - Parsear duración del viaje
+const parseDuration = (duration: string | null | undefined): string => {
+  if (!duration) return '2-3';
+  
+  // Si viene como "2 hours" o "2.5 hours"
+  const match = duration.match(/(\d+\.?\d*)/);
+  if (match) {
+    return match[1];
+  }
+  
+  return '2-3';
+};
+
+// ============================================
 // MAIN COMPONENT
 // ============================================
 
@@ -85,7 +102,7 @@ function BookingDetailsContent() {
   const [completedTrips, setCompletedTrips] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);  // ✅ NUEVO - Prevenir saves paralelos
+  const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
   
@@ -124,6 +141,13 @@ function BookingDetailsContent() {
   const currentTrip = trips[currentTripIndex];
 
   // ============================================
+  // ✅ NUEVO - Detectar si pickup/dropoff es aeropuerto
+  // ============================================
+  
+  const isPickupFromAirport = currentTrip && isAirport(currentTrip.from_location);
+  const isDropoffToAirport = currentTrip && isAirport(currentTrip.to_location);
+
+  // ============================================
   // ✅ OPTIMIZACIÓN - Cálculos con useMemo
   // ============================================
   
@@ -141,7 +165,7 @@ function BookingDetailsContent() {
 
     const basePrice = currentTrip.price || 0;
     const nightSurcharge = calculateNightSurcharge(formData.pickup_time, basePrice);
-    const addOnsPrice = calculateAddOnsPrice(selectedAddOns);  // ✅ Usar función centralizada
+    const addOnsPrice = calculateAddOnsPrice(selectedAddOns);
     const subtotal = basePrice + nightSurcharge + addOnsPrice;
     const fees = subtotal * PRICING_CONFIG.FEES_PERCENTAGE;
     const finalPrice = subtotal + fees;
@@ -201,7 +225,7 @@ function BookingDetailsContent() {
           setFormData({
             pickup_address: trip.pickup_address || '',
             dropoff_address: trip.dropoff_address || '',
-            pickup_time: normalizeTime(trip.pickup_time),  // ✅ NORMALIZAR
+            pickup_time: normalizeTime(trip.pickup_time),
             flight_number: trip.flight_number || '',
             airline: trip.airline || '',
             special_requests: trip.special_requests || '',
@@ -237,7 +261,7 @@ function BookingDetailsContent() {
       setFormData({
         pickup_address: currentTrip.pickup_address || '',
         dropoff_address: currentTrip.dropoff_address || '',
-        pickup_time: normalizeTime(currentTrip.pickup_time),  // ✅ NORMALIZAR
+        pickup_time: normalizeTime(currentTrip.pickup_time),
         flight_number: currentTrip.flight_number || '',
         airline: currentTrip.airline || '',
         special_requests: currentTrip.special_requests || '',
@@ -274,8 +298,8 @@ function BookingDetailsContent() {
       flight_number: formData.flight_number,
       from_location: currentTrip.from_location,
       to_location: currentTrip.to_location,
-      children: currentTrip.children,  // ✅ NUEVO
-      children_ages: formData.children_ages,  // ✅ NUEVO
+      children: currentTrip.children,
+      children_ages: formData.children_ages,
     });
 
     setErrors(validationErrors);
@@ -286,9 +310,9 @@ function BookingDetailsContent() {
   // HANDLERS
   // ============================================
 
-  // ✅ AUTO-SAVE FUNCTION (con prevención de saves paralelos)
+  // ✅ AUTO-SAVE FUNCTION
   const saveTripSilently = async (): Promise<boolean> => {
-    if (!currentTrip || isSaving) return false;  // ✅ Prevenir saves paralelos
+    if (!currentTrip || isSaving) return false;
 
     try {
       setIsSaving(true);
@@ -376,7 +400,6 @@ function BookingDetailsContent() {
     }
   };
 
-  // ✅ MEJORADO - handleBack con mejor error handling
   const handleBack = async () => {
     try {
       await saveTripSilently();
@@ -492,8 +515,8 @@ function BookingDetailsContent() {
         </div>
       )}
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 pb-40 md:pb-36 bg-gray-50">
+      {/* Main Content - ✅ AUMENTADO PADDING MOBILE */}
+      <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 pb-56 md:pb-36 bg-gray-50">
         <div className="max-w-4xl mx-auto">
           
           <div className="space-y-4 md:space-y-6">
@@ -550,11 +573,15 @@ function BookingDetailsContent() {
               <CardContent className="space-y-3 md:space-y-4">
                 <div>
                   <Label htmlFor="pickup_address" className="text-sm">
-                    Pickup Address <span className="text-red-500">*</span>
+                    {isPickupFromAirport ? 'Meeting Point at Airport' : 'Pickup Address'} <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id="pickup_address"
-                    placeholder="Enter full pickup address"
+                    placeholder={
+                      isPickupFromAirport 
+                        ? "e.g., Main Gate, or specific meeting point near the airport"
+                        : "Enter full pickup address"
+                    }
                     value={formData.pickup_address}
                     onChange={(e) => setFormData({ ...formData, pickup_address: e.target.value })}
                     className={`min-h-[44px] md:min-h-[48px] ${errors.pickup_address ? 'border-red-500' : ''}`}
@@ -576,6 +603,7 @@ function BookingDetailsContent() {
                     <p className="text-xs text-red-600 mt-1">{errors.pickup_time}</p>
                   )}
                   
+                  {/* Night Surcharge */}
                   {priceCalculation.nightSurcharge > 0 && (
                     <div className="flex items-start gap-2 mt-2 p-2 md:p-3 bg-amber-50 border border-amber-200 rounded-lg">
                       <AlertCircle className="h-4 w-4 md:h-5 md:w-5 text-amber-600 flex-shrink-0 mt-0.5" />
@@ -583,6 +611,20 @@ function BookingDetailsContent() {
                         <p className="font-semibold text-amber-900">Night Surcharge Applied</p>
                         <p className="text-amber-700">
                           Pickups 9 PM - 4 AM: +${priceCalculation.nightSurcharge.toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* ✅ NUEVO - Nota cuando dropoff es a aeropuerto */}
+                  {isDropoffToAirport && (
+                    <div className="flex items-start gap-2 mt-2 p-2.5 bg-orange-50 border border-orange-200 rounded-lg">
+                      <Info className="h-4 w-4 text-orange-600 flex-shrink-0 mt-0.5" />
+                      <div className="text-xs text-orange-900">
+                        <p className="font-semibold">Airport Drop-off Reminder</p>
+                        <p>
+                          Trip duration: ~{parseDuration(currentTrip.duration)} hrs. 
+                          Plan to arrive 3+ hours before your flight.
                         </p>
                       </div>
                     </div>
@@ -602,6 +644,16 @@ function BookingDetailsContent() {
                   <CardDescription className="text-xs md:text-sm">Optional but helps us track your arrival</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3 md:space-y-4">
+                  {/* ✅ NUEVO - Nota de monitoreo cuando pickup es desde aeropuerto */}
+                  {isPickupFromAirport && (
+                    <div className="flex items-start gap-2 p-2.5 bg-blue-50 border border-blue-200 rounded-lg">
+                      <Plane className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                      <p className="text-xs text-blue-900">
+                        We monitor your flight in real-time and adjust for any delays
+                      </p>
+                    </div>
+                  )}
+                  
                   <div>
                     <Label htmlFor="airline" className="text-sm">Airline</Label>
                     <Input
@@ -695,7 +747,6 @@ function BookingDetailsContent() {
                       </div>
                     ))}
                   </div>
-                  {/* ✅ NUEVO - Error para children_ages */}
                   {errors.children_ages && (
                     <p className="text-xs text-red-600 mt-2">{errors.children_ages}</p>
                   )}

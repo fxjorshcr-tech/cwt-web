@@ -1,4 +1,5 @@
 // src/app/private-tours/booking/page.tsx
+// ✅ UPDATED: Usa ModernDatePicker con fix de timezone
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
@@ -10,7 +11,7 @@ import {
   ArrowLeft, Plus, Minus
 } from 'lucide-react';
 import BookingNavbar from '@/components/booking/BookingNavbar';
-import { DatePickerButton } from '@/components/home/DatePickerButton';
+import { ModernDatePicker } from '@/components/home/ModernDatePicker';
 import { getTourBySlug, Tour } from '@/lib/supabase-tours';
 import { createClient } from '@/lib/supabase/client';
 import { useCart } from '@/contexts/CartContext';
@@ -22,6 +23,16 @@ interface BookingFormData {
   children: number;
   hotel: string;
   specialRequests: string;
+}
+
+/**
+ * ✅ NUEVO: Convertir Date a string YYYY-MM-DD sin conversión UTC
+ */
+function formatDateToString(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 function TourBookingContent() {
@@ -115,6 +126,7 @@ function TourBookingContent() {
 
     const bookingId = `tour_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
 
+    // ✅ FIXED: Usar formatDateToString sin conversión UTC
     const { data, error } = await supabase
       .from('tour_bookings')
       .insert([
@@ -122,7 +134,7 @@ function TourBookingContent() {
           booking_id: bookingId,
           tour_slug: tour.slug,
           tour_name: tour.name,
-          date: formData.date.toISOString().split('T')[0],
+          date: formatDateToString(formData.date),
           adults: formData.adults,
           children: formData.children,
           base_price: tour.base_price,
@@ -309,10 +321,11 @@ function TourBookingContent() {
                   </div>
 
                   <div className="p-6 md:p-8 space-y-5">
+                    {/* ✅ UPDATED: Usar ModernDatePicker */}
                     <div>
-                      <DatePickerButton
-                        date={formData.date}
-                        onDateChange={(date) => {
+                      <ModernDatePicker
+                        value={formData.date || null}
+                        onChange={(date) => {
                           setFormData({ ...formData, date });
                           if (date && errors.date) {
                             setErrors((prev) => {
@@ -323,7 +336,6 @@ function TourBookingContent() {
                           }
                         }}
                         label="Travel Date"
-                        placeholder="Select your tour date"
                         className={errors.date ? 'border-red-300 bg-red-50' : ''}
                       />
                       {errors.date && (

@@ -1,11 +1,10 @@
 // src/components/home/DatePickerButton.tsx
-// FIXED: Removed invalid 'container' prop
+// ✅ FIXED: Timezone bug corregido + Cambiado a inglés
 
 'use client';
 
 import { useState } from 'react';
 import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -31,12 +30,16 @@ interface DatePickerButtonProps {
  * 
  * Selector de fecha con calendario visual (shadcn/ui)
  * 
+ * ✅ FIXED: Timezone bug - ahora normaliza fechas a medianoche LOCAL
+ * ✅ FIXED: Idioma cambiado a inglés
+ * 
  * CARACTERÍSTICAS:
- * - Calendario en español
+ * - Calendario en inglés
  * - Solo permite fechas futuras (no pasadas)
  * - Integrado con Popover de shadcn/ui
  * - Z-index alto para aparecer sobre todo
  * - Funciona en mobile y desktop
+ * - Fechas normalizadas a timezone local (sin conversión UTC)
  * 
  * @param date - Fecha actualmente seleccionada
  * @param onDateChange - Callback cuando cambia la fecha
@@ -49,29 +52,51 @@ export function DatePickerButton({
   date,
   onDateChange,
   label,
-  placeholder = 'Selecciona una fecha',
+  placeholder = 'Select a date',
   className,
   disabled = false,
 }: DatePickerButtonProps) {
   const [open, setOpen] = useState(false);
 
   /**
+   * ✅ NUEVO: Normalizar fecha a medianoche LOCAL (evita bug de timezone)
+   * 
+   * Problema anterior:
+   * - Calendar devuelve: 2025-11-13T00:00:00.000Z (UTC)
+   * - En Costa Rica (UTC-6): 2025-11-12T18:00:00 ❌
+   * 
+   * Solución:
+   * - Crear fecha en timezone local usando año/mes/día
+   * - Evitar conversión UTC automática
+   */
+  const normalizeDateToLocal = (date: Date): Date => {
+    const normalized = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    return normalized;
+  };
+
+  /**
    * Manejar la selección de fecha
+   * - Normaliza la fecha a medianoche local
    * - Actualiza el estado
    * - Cierra el popover
    * - Notifica al componente padre
    */
   const handleDateSelect = (selectedDate: Date | undefined) => {
-    onDateChange(selectedDate);
-    setOpen(false); // Cerrar el popover después de seleccionar
+    if (selectedDate) {
+      const normalizedDate = normalizeDateToLocal(selectedDate);
+      onDateChange(normalizedDate);
+    } else {
+      onDateChange(undefined);
+    }
+    setOpen(false);
   };
 
   /**
    * Obtener la fecha mínima permitida (hoy)
-   * Esto previene que se seleccionen fechas pasadas
+   * ✅ FIXED: También normalizada a medianoche local
    */
   const today = new Date();
-  today.setHours(0, 0, 0, 0); // Resetear hora para comparación correcta
+  const normalizedToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
   return (
     <div className="space-y-2 relative">
@@ -95,7 +120,8 @@ export function DatePickerButton({
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
             {date ? (
-              format(date, "EEEE, d 'de' MMMM 'de' yyyy", { locale: es })
+              // ✅ CHANGED: Formato en inglés
+              format(date, "EEEE, MMMM d, yyyy")
             ) : (
               <span>{placeholder}</span>
             )}
@@ -114,8 +140,12 @@ export function DatePickerButton({
             mode="single"
             selected={date}
             onSelect={handleDateSelect}
-            disabled={(date) => date < today}
-            locale={es}
+            disabled={(date) => {
+              // ✅ FIXED: Comparar fechas normalizadas
+              const normalizedDate = normalizeDateToLocal(date);
+              return normalizedDate < normalizedToday;
+            }}
+            // ✅ REMOVED: locale={es} - Ahora usa inglés por defecto
             initialFocus
             className="rounded-md border min-w-[300px]"
           />

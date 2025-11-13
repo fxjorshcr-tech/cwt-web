@@ -1,5 +1,5 @@
 // src/components/home/ModernDatePicker.tsx
-// ✅ WORKING VERSION - Sin template strings anidados
+// ✅ FIXED: Timezone bug corregido - Retorna fechas normalizadas
 
 'use client';
 
@@ -15,6 +15,17 @@ interface ModernDatePickerProps {
   className?: string;
 }
 
+/**
+ * ModernDatePicker
+ * 
+ * ✅ FIXED: Todas las fechas se normalizan a medianoche LOCAL
+ * ✅ FIXED: No hay conversión UTC que cause pérdida de días
+ * ✅ Calendario en inglés
+ * ✅ Solo permite fechas futuras (hasta 1 año adelante)
+ * ✅ Click outside para cerrar
+ * ✅ Escape key para cerrar
+ * ✅ Accesibilidad completa
+ */
 export function ModernDatePicker({
   value,
   onChange,
@@ -25,6 +36,7 @@ export function ModernDatePicker({
   const [currentMonth, setCurrentMonth] = useState(value || new Date());
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Click outside to close
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
@@ -35,6 +47,7 @@ export function ModernDatePicker({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Escape key to close
   useEffect(() => {
     function handleEscape(event: KeyboardEvent) {
       if (event.key === 'Escape') {
@@ -46,6 +59,15 @@ export function ModernDatePicker({
       return () => document.removeEventListener('keydown', handleEscape);
     }
   }, [isOpen]);
+
+  /**
+   * ✅ NUEVO: Normalizar fecha a medianoche LOCAL
+   * Evita bug de timezone al crear Date con año/mes/día directamente
+   */
+  const normalizeDateToLocal = (year: number, month: number, day: number): Date => {
+    const normalized = new Date(year, month, day, 0, 0, 0, 0);
+    return normalized;
+  };
 
   const daysInMonth = (date: Date) => {
     const year = date.getFullYear();
@@ -59,9 +81,14 @@ export function ModernDatePicker({
     return new Date(year, month, 1).getDay();
   };
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  // ✅ Today normalizado a medianoche local
+  const today = normalizeDateToLocal(
+    new Date().getFullYear(),
+    new Date().getMonth(),
+    new Date().getDate()
+  );
 
+  // Max date: 1 año adelante
   const maxDate = new Date();
   maxDate.setFullYear(maxDate.getFullYear() + 1);
   maxDate.setHours(23, 59, 59, 999);
@@ -81,12 +108,12 @@ export function ModernDatePicker({
   };
 
   const handleDateSelect = (day: number) => {
-    const selectedDate = new Date(
+    // ✅ FIXED: Crear fecha normalizada a local
+    const selectedDate = normalizeDateToLocal(
       currentMonth.getFullYear(),
       currentMonth.getMonth(),
       day
     );
-    selectedDate.setHours(0, 0, 0, 0);
     
     if (selectedDate >= today && selectedDate <= maxDate) {
       onChange(selectedDate);
@@ -99,13 +126,19 @@ export function ModernDatePicker({
     const totalDays = daysInMonth(currentMonth);
     const firstDay = firstDayOfMonth(currentMonth);
 
+    // Empty cells for days before month starts
     for (let i = 0; i < firstDay; i++) {
       days.push(<div key={`empty-${i}`} className="h-10" />);
     }
 
+    // Render each day
     for (let day = 1; day <= totalDays; day++) {
-      const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-      date.setHours(0, 0, 0, 0);
+      // ✅ FIXED: Crear fecha normalizada
+      const date = normalizeDateToLocal(
+        currentMonth.getFullYear(),
+        currentMonth.getMonth(),
+        day
+      );
       
       const isPast = date < today;
       const isFuture = date > maxDate;

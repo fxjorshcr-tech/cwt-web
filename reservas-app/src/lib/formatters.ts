@@ -1,10 +1,13 @@
 // src/lib/formatters.ts
+// ✅ FIXED: Usa parseDateFromString de timeHelpers
 /**
  * ==========================================
  * FORMATEADORES CENTRALIZADOS
  * ==========================================
  * Funciones para formatear datos de forma consistente
  */
+
+import { parseDateFromString } from '@/utils/timeHelpers';
 
 /**
  * Formatear Booking ID para mejor legibilidad
@@ -69,7 +72,9 @@ export function formatCurrency(amount: number, showCents: boolean = true): strin
 }
 
 /**
- * Formatear fecha para visualización
+ * ✅ FIXED: Formatear fecha para visualización
+ * Usa parseDateFromString para evitar bug de timezone
+ * 
  * @param dateString - Fecha en formato ISO (YYYY-MM-DD)
  * @param format - Formato deseado: 'short' | 'medium' | 'long'
  * @returns Fecha formateada
@@ -84,7 +89,8 @@ export function formatDate(
 ): string {
   if (!dateString) return 'N/A';
   
-  const date = new Date(dateString);
+  // ✅ FIXED: Usar parseDateFromString en lugar de new Date()
+  const date = parseDateFromString(dateString);
   
   if (isNaN(date.getTime())) {
     return 'Invalid Date';
