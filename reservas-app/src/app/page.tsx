@@ -1,4 +1,4 @@
-// src/app/page.tsx - ✅ FINAL VERSION - SIN FOOTER (viene del layout)
+// src/app/page.tsx
 import { Suspense } from "react";
 import Image from "next/image";
 import { BookingForm } from "@/components/home/BookingForm";
@@ -73,10 +73,10 @@ export const metadata: Metadata = {
 export default async function Home() {
   return (
     <>
-      {/* Skip to content link */}
+      {/* ✅ SKIP LINK HIDDEN - Solo visible con Tab para accesibilidad */}
       <a 
         href="#main-content" 
-        className="absolute -top-96 left-4 z-[9999] px-4 py-2 bg-blue-600 text-white rounded-lg shadow-lg focus:top-4 transition-all"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-lg focus:shadow-lg"
       >
         Skip to main content
       </a>
@@ -102,10 +102,7 @@ export default async function Home() {
 
       <main id="main-content" className="min-h-screen overflow-x-hidden">
         
-        {/* SEO - Structured Data */}
         <StructuredData />
-
-        {/* Navbar */}
         <BookingNavbar />
 
         {/* Hero Section */}
@@ -174,7 +171,6 @@ export default async function Home() {
           </Suspense>
         </section>
 
-        {/* Sections in order */}
         <WhyChooseUs />
         <HowWeWork />
         <GoogleReviews />
@@ -184,11 +180,8 @@ export default async function Home() {
         <TravelGuide />
         <FinalCTA />
 
-        {/* Floating Buttons */}
         <ScrollToBookingButton />
         <WhatsAppButton />
-
-        {/* ✅ FOOTER ELIMINADO - Viene del layout */}
       </main>
     </>
   );
