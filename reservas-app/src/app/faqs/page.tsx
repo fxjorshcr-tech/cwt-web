@@ -1,10 +1,12 @@
 // src/app/faqs/page.tsx
+// ✅ UPDATED: Navbar agregado
 'use client';
 
 import { useEffect, useState } from 'react';
 import { Search, ChevronDown, MessageCircle, HelpCircle } from 'lucide-react';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
+import BookingNavbar from '@/components/booking/BookingNavbar';
 
 interface FAQ {
   id: string;
@@ -90,6 +92,9 @@ export default function FAQsPage() {
 
   return (
     <>
+      {/* ✅ Navbar */}
+      <BookingNavbar />
+      
       {/* Hero Section */}
       <section className="relative h-64 md:h-80 w-full overflow-hidden">
         <Image
