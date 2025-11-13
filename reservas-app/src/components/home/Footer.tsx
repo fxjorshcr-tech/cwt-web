@@ -1,4 +1,5 @@
 // src/components/layout/Footer.tsx
+// ✅ UPDATED: Links activos para Legal pages
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -81,13 +82,13 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Legal */}
+          {/* Legal - ✅ UPDATED */}
           <div>
             <h3 className="font-bold mb-4">Legal</h3>
             <ul className="space-y-2 text-sm text-gray-300">
-              <li className="text-gray-400 text-xs italic">Terms & Conditions - Coming soon</li>
-              <li className="text-gray-400 text-xs italic">Privacy Policy - Coming soon</li>
-              <li className="text-gray-400 text-xs italic">Cancellation Policy - Coming soon</li>
+              <li><Link href="/terms-and-conditions" className="hover:text-white transition">Terms & Conditions</Link></li>
+              <li><Link href="/privacy-policy" className="hover:text-white transition">Privacy Policy</Link></li>
+              <li><Link href="/faqs" className="hover:text-white transition">FAQs</Link></li>
             </ul>
           </div>
 

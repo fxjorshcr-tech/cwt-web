@@ -1,4 +1,5 @@
 // src/types/supabase.ts
+// ✅ UPDATED: Agregadas tablas legal_pages y faqs
 
 export type Json =
   | string
@@ -229,6 +230,74 @@ export interface Database {
         }
         Relationships: []
       }
+
+      legal_pages: {
+        Row: {
+          id: string
+          slug: string
+          title: string
+          content: string
+          last_updated: string
+          is_active: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          slug: string
+          title: string
+          content: string
+          last_updated?: string
+          is_active?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          slug?: string
+          title?: string
+          content?: string
+          last_updated?: string
+          is_active?: boolean
+          created_at?: string
+        }
+        Relationships: []
+      }
+
+      faqs: {
+        Row: {
+          id: string
+          category: string
+          question: string
+          answer: string
+          display_order: number
+          is_featured: boolean
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          category: string
+          question: string
+          answer: string
+          display_order?: number
+          is_featured?: boolean
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          category?: string
+          question?: string
+          answer?: string
+          display_order?: number
+          is_featured?: boolean
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -259,6 +328,14 @@ export type TripUpdate = Tables<'trips'>['Update']
 export type TourBooking = Tables<'tour_bookings'>['Row']
 export type TourBookingInsert = Tables<'tour_bookings'>['Insert']
 export type TourBookingUpdate = Tables<'tour_bookings'>['Update']
+
+export type LegalPage = Tables<'legal_pages'>['Row']
+export type LegalPageInsert = Tables<'legal_pages'>['Insert']
+export type LegalPageUpdate = Tables<'legal_pages'>['Update']
+
+export type FAQ = Tables<'faqs'>['Row']
+export type FAQInsert = Tables<'faqs'>['Insert']
+export type FAQUpdate = Tables<'faqs'>['Update']
 
 export interface CreateTripData {
   booking_id: string
