@@ -1,5 +1,5 @@
 // src/components/home/BookingForm.tsx
-// ✅ FIXED: Usa funciones centralizadas de timeHelpers
+// ✅ FIXED: Soluciona "TypeError: Load Failed" en handleSubmit
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -242,6 +242,7 @@ export function BookingForm() {
         newTrips[index].price = undefined;
         newTrips[index].distance = undefined;
         newTrips[index].duration = undefined;
+        newTrips[index].routeId = undefined;
       }
 
       if (
@@ -261,6 +262,7 @@ export function BookingForm() {
             newTrips[index].price = undefined;
             newTrips[index].distance = undefined;
             newTrips[index].duration = undefined;
+            newTrips[index].routeId = undefined;
             return newTrips;
           }
 
@@ -284,6 +286,7 @@ export function BookingForm() {
             newTrips[index].price = undefined;
             newTrips[index].distance = undefined;
             newTrips[index].duration = undefined;
+            newTrips[index].routeId = undefined;
           }
         }
       }
@@ -337,18 +340,23 @@ export function BookingForm() {
         return `Trip ${i + 1}: For groups larger than 12 passengers, please contact us directly`;
       }
 
-      if (!trip.selectedRoute) {
+      if (!trip.selectedRoute || !trip.routeId) {
         return `Trip ${i + 1}: No route available for this combination`;
       }
 
       if (totalPassengers < 1) {
         return `Trip ${i + 1}: At least 1 passenger required`;
       }
+
+      if (!trip.price) {
+        return `Trip ${i + 1}: Price calculation failed`;
+      }
     }
 
     return null;
   }
 
+  // ✅ FIXED: Función handleSubmit corregida
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
@@ -369,6 +377,7 @@ export function BookingForm() {
         .toString(36)
         .substr(2, 9)}`;
 
+      // ✅ FIXED: Valores por defecto en lugar de null
       const tripsToInsert: TripInsert[] = trips.map((trip) => ({
         booking_id: bookingId,
         from_location: trip.from_location,
@@ -377,13 +386,13 @@ export function BookingForm() {
         adults: trip.adults,
         children: trip.children,
         price: trip.price!,
-        distance: trip.distance ?? null,
-        duration: trip.duration ?? null,
-        pickup_address: null,
-        pickup_instructions: null,
-        dropoff_address: null,
-        dropoff_instructions: null,
-        pickup_time: null,
+        distance: trip.distance ?? 0,           // ✅ 0 en lugar de null
+        duration: trip.duration ?? '',          // ✅ '' en lugar de null
+        pickup_address: '',                     // ✅ '' en lugar de null
+        pickup_instructions: '',                // ✅ '' en lugar de null
+        dropoff_address: '',                    // ✅ '' en lugar de null
+        dropoff_instructions: '',               // ✅ '' en lugar de null
+        pickup_time: null,                      // ✅ '' en lugar de null
         arrival_time: null,
         flight_number: null,
         airline: null,
@@ -395,18 +404,25 @@ export function BookingForm() {
         updated_at: new Date().toISOString(),
       }));
 
+      console.log('Inserting trips:', tripsToInsert); // ✅ Para debug
+
       const { data, error } = await supabase
         .from('trips')
         .insert(tripsToInsert)
         .select();
 
       if (error) {
+        console.error('Supabase error:', error); // ✅ Log completo del error
         throw new Error(`Save error: ${error.message}`);
       }
+
+      console.log('Insert successful:', data); // ✅ Confirmar éxito
 
       router.push(`/booking-details?booking_id=${bookingId}&trip=0`);
       
     } catch (error) {
+      console.error('Full error:', error); // ✅ Log completo
+      
       const errorMessage =
         error instanceof Error
           ? error.message
@@ -513,7 +529,6 @@ export function BookingForm() {
                   </div>
 
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                    {/* ✅ FIXED: Parsear fecha al cargar, formatear al guardar */}
                     <ModernDatePicker
                       value={trip.date ? parseDateFromString(trip.date) : null}
                       onChange={(date) =>
@@ -609,7 +624,7 @@ export function BookingForm() {
                   >
                     Contact us on WhatsApp
                     <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
                     </svg>
                   </a>
                 </div>
