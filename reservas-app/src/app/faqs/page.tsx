@@ -1,5 +1,5 @@
 // src/app/faqs/page.tsx
-// ✅ UPDATED: Navbar agregado
+// ✅ UPDATED: Categorías actualizadas con las 15 nuevas categorías
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -18,11 +18,20 @@ interface FAQ {
 
 const CATEGORY_LABELS: Record<string, string> = {
   booking: '📅 Booking & Reservations',
-  payment: '💳 Payment & Pricing',
-  transfers: '🚐 Transfers & Pickups',
-  tours: '🌴 Private Tours',
-  cancellation: '❌ Cancellation & Changes',
-  general: '❓ General Questions',
+  pricing: '💳 Pricing & Payment',
+  cancellation: '❌ Cancellation & Refunds',
+  pickup: '🚐 Pickup & Dropoff',
+  luggage: '🧳 Luggage & Space',
+  car_seats: '👶 Car Seats & Children',
+  vehicles: '🚗 Vehicles & Comfort',
+  drivers: '👨‍✈️ Drivers & Service',
+  routes: '🗺️ Travel Time & Routes',
+  safety: '🛡️ Safety & Insurance',
+  add_ons: '⭐ Special Add-Ons',
+  groups: '👥 Groups & Special Requests',
+  airports: '✈️ Airports Specific',
+  travel_tips: '🌴 Costa Rica Travel Tips',
+  website: '💻 Technical & Website',
 };
 
 export default function FAQsPage() {
@@ -88,7 +97,10 @@ export default function FAQsPage() {
     return acc;
   }, {} as Record<string, FAQ[]>);
 
-  const categories = Object.keys(CATEGORY_LABELS);
+  // Obtener solo las categorías que existen en los FAQs filtrados
+  const availableCategories = Object.keys(CATEGORY_LABELS).filter(category => 
+    faqs.some(faq => faq.category === category)
+  );
 
   return (
     <>
@@ -151,7 +163,7 @@ export default function FAQsPage() {
               >
                 All Categories
               </button>
-              {categories.map((category) => (
+              {availableCategories.map((category) => (
                 <button
                   key={category}
                   onClick={() => setSelectedCategory(category)}

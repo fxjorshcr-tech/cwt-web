@@ -106,11 +106,11 @@ export default async function TourDetailPage({ params }: PageProps) {
             {/* Left Column - Main Content */}
             <div className="lg:col-span-2 space-y-8">
               
-              {/* Overview */}
+              {/* Overview - Short Description */}
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">Tour Overview</h2>
                 <p className="text-gray-700 leading-relaxed text-lg">
-                  {tour.long_description}
+                  {tour.short_description}
                 </p>
               </div>
 
@@ -135,6 +135,14 @@ export default async function TourDetailPage({ params }: PageProps) {
                     </div>
                   ))}
                 </div>
+              </div>
+
+              {/* Full Description */}
+              <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">About This Tour</h2>
+                <p className="text-gray-700 leading-relaxed text-lg">
+                  {tour.long_description}
+                </p>
               </div>
 
               {/* What's Included / Not Included */}

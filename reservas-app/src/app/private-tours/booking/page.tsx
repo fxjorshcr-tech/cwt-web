@@ -1,5 +1,5 @@
 // src/app/private-tours/booking/page.tsx
-// ✅ UPDATED: Usa ModernDatePicker con fix de timezone
+// ✅ UPDATED: Usa ModernDatePicker con fix de timezone + Terms Checkbox
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import { ModernDatePicker } from '@/components/home/ModernDatePicker';
+import TermsCheckbox from '@/components/booking/TermsCheckbox';
 import { getTourBySlug, Tour } from '@/lib/supabase-tours';
 import { createClient } from '@/lib/supabase/client';
 import { useCart } from '@/contexts/CartContext';
@@ -57,6 +58,7 @@ function TourBookingContent() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassengerPicker, setShowPassengerPicker] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   useEffect(() => {
     async function loadTour() {
@@ -199,6 +201,13 @@ function TourBookingContent() {
 
   const handlePayNow = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validar términos primero
+    if (!termsAccepted) {
+      toast.error('Please accept the terms and conditions');
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      return;
+    }
 
     if (!validateForm()) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -604,11 +613,19 @@ function TourBookingContent() {
                       </div>
                     </div>
 
+                    <div className="pb-4 border-b border-gray-200">
+                      <TermsCheckbox
+                        checked={termsAccepted}
+                        onChange={setTermsAccepted}
+                        error={false}
+                      />
+                    </div>
+
                     <div className="pt-4 border-t border-gray-200 flex flex-col gap-3">
                       <button
                         type="button"
                         onClick={handlePayNow}
-                        disabled={isSubmitting || !isValidPassengerCount}
+                        disabled={isSubmitting || !isValidPassengerCount || !termsAccepted}
                         className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base shadow-lg"
                       >
                         {isSubmitting ? (

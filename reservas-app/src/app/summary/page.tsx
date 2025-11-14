@@ -1,17 +1,19 @@
 // src/app/summary/page.tsx
-// ✅ FINAL - Un solo botón: Add to Cart & Continue
+// ✅ UPDATED: FAQs populares + Modal integrado
 
 'use client';
 
 import { useEffect, useState, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ArrowLeft, Calendar, Users, MapPin, Clock, Loader2, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, Calendar, Users, MapPin, Clock, Loader2, ShoppingCart, ChevronDown, HelpCircle } from 'lucide-react';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import BookingStepper from '@/components/booking/BookingStepper';
+import FAQModal from '@/components/booking/FAQModal';
+import TermsCheckbox from '@/components/booking/TermsCheckbox';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from 'sonner';
 
@@ -44,6 +46,30 @@ const ADD_ON_NAMES: Record<string, string> = {
   flex_time: 'Flex Time Protection',
 };
 
+// FAQs más populares para mostrar en la página
+const POPULAR_FAQS = [
+  {
+    question: 'What is your cancellation policy?',
+    answer: 'Cancellations made at least 48 hours before your scheduled pickup receive a full refund minus 13% taxes and fees. Cancellations within 48 hours are non-refundable. All cancellation requests must be sent by email to mybooking@cantwaittravelcr.com.',
+  },
+  {
+    question: 'Where exactly will the driver meet me at the airport?',
+    answer: 'At SJO Airport: Your driver will meet you just outside the main exit doors with a sign displaying your name. At LIR Airport: Your driver will meet you in the arrivals area with a name sign. We send you driver contact information 24 hours before pickup so you can coordinate via WhatsApp if needed.',
+  },
+  {
+    question: 'How much luggage can I bring?',
+    answer: 'Each passenger can bring: 1 large checked suitcase (up to 50 lbs/23 kg) plus 1 carry-on item (purse, backpack, small bag). Our vehicles have ample space for luggage. If you have oversized items or extra luggage, please inform us at booking.',
+  },
+  {
+    question: 'Do you provide car seats for children?',
+    answer: 'Yes! We provide child car seats and booster seats FREE of charge. You must request them at the time of booking and specify the age/weight of each child. We have seats suitable for children 3 years and up.',
+  },
+  {
+    question: 'What if my flight is delayed or cancelled?',
+    answer: 'Flight delays are not a problem! We monitor your flight status and adjust pickup times accordingly at no extra charge. If your flight is cancelled, please contact us immediately and we\'ll reschedule your transfer.',
+  },
+];
+
 function SummaryPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -54,6 +80,21 @@ function SummaryPageContent() {
 
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showFAQModal, setShowFAQModal] = useState(false);
+  const [openFAQs, setOpenFAQs] = useState<Set<number>>(new Set());
+  const [termsAccepted, setTermsAccepted] = useState(false);
+
+  const toggleFAQ = (index: number) => {
+    setOpenFAQs((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(index)) {
+        newSet.delete(index);
+      } else {
+        newSet.add(index);
+      }
+      return newSet;
+    });
+  };
 
   if (!bookingId) {
     return (
@@ -169,6 +210,7 @@ function SummaryPageContent() {
   return (
     <>
       <BookingNavbar />
+      <FAQModal isOpen={showFAQModal} onClose={() => setShowFAQModal(false)} />
 
       <section className="relative h-64 md:h-80 w-full overflow-hidden">
         <Image
@@ -313,6 +355,59 @@ function SummaryPageContent() {
                   </Card>
                 ))}
 
+                {/* FAQs Section */}
+                <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-cyan-50">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-blue-900">
+                      <HelpCircle className="h-6 w-6" />
+                      Frequently Asked Questions
+                    </CardTitle>
+                    <CardDescription className="text-blue-700">
+                      Quick answers to common questions about your booking
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {POPULAR_FAQS.map((faq, index) => {
+                      const isOpen = openFAQs.has(index);
+                      return (
+                        <div
+                          key={index}
+                          className="bg-white rounded-lg border border-blue-200 overflow-hidden hover:border-blue-400 transition-all"
+                        >
+                          <button
+                            onClick={() => toggleFAQ(index)}
+                            className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-blue-50 transition-colors"
+                          >
+                            <span className="font-semibold text-gray-900 pr-4 text-sm">
+                              {faq.question}
+                            </span>
+                            <ChevronDown
+                              className={`h-5 w-5 text-blue-600 flex-shrink-0 transition-transform ${
+                                isOpen ? 'transform rotate-180' : ''
+                              }`}
+                            />
+                          </button>
+                          {isOpen && (
+                            <div className="px-4 pb-3 text-gray-700 text-sm leading-relaxed border-t border-blue-100 pt-3">
+                              {faq.answer}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+
+                    <div className="pt-4">
+                      <button
+                        onClick={() => setShowFAQModal(true)}
+                        className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+                      >
+                        <HelpCircle className="h-5 w-5" />
+                        View All FAQs ({POPULAR_FAQS.length}+)
+                      </button>
+                    </div>
+                  </CardContent>
+                </Card>
+
               </div>
 
               <div className="lg:col-span-1">
@@ -397,11 +492,23 @@ function SummaryPageContent() {
                       </div>
 
                       <div className="pt-4 space-y-3">
+                        {/* Terms Checkbox */}
+                        <TermsCheckbox
+                          checked={termsAccepted}
+                          onChange={setTermsAccepted}
+                          error={false}
+                        />
+
                         <Button
                           onClick={() => {
+                            if (!termsAccepted) {
+                              toast.error('Please accept the terms and conditions');
+                              return;
+                            }
                             toast.info('WeTravel payment integration - Coming soon!');
                           }}
-                          className="w-full min-h-[48px] bg-green-600 hover:bg-green-700"
+                          disabled={!termsAccepted}
+                          className="w-full min-h-[48px] bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                           size="lg"
                         >
                           💳 Pay Now
