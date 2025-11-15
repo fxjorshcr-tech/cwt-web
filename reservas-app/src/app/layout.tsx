@@ -1,4 +1,5 @@
-// src/app/layout.tsx - CON FOOTER CONDICIONAL, CART PROVIDER Y TOASTER
+﻿// src/app/layout.tsx
+// ✅ OPTIMIZADO: Preloading y prefetching completo
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -38,14 +39,36 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link
-          rel="preconnect"
-          href="https://mmlbslwljvmscbgsqkkq.supabase.co"
+        {/* ✅ DNS Prefetch - Resolve DNS lo antes posible */}
+        <link rel="dns-prefetch" href="https://mmlbslwljvmscbgsqkkq.supabase.co" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        
+        {/* ✅ Preconnect - Establece conexión completa (DNS + TCP + TLS) */}
+        <link 
+          rel="preconnect" 
+          href="https://mmlbslwljvmscbgsqkkq.supabase.co" 
+          crossOrigin="anonymous"
         />
-        <link
-          rel="dns-prefetch"
-          href="https://mmlbslwljvmscbgsqkkq.supabase.co"
+        <link 
+          rel="preconnect" 
+          href="https://fonts.googleapis.com" 
+          crossOrigin="anonymous"
         />
+        
+        {/* ✅ Preload imagen hero - Crítica para LCP */}
+        <link
+          rel="preload"
+          as="image"
+          href="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/aerial-view-conchal-beach.webp"
+          imageSrcSet="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/aerial-view-conchal-beach.webp 1920w"
+          imageSizes="100vw"
+        />
+        
+        {/* ✅ Prefetch rutas críticas del flujo de booking */}
+        <link rel="prefetch" href="/booking-details" />
+        <link rel="prefetch" href="/summary" />
+        <link rel="prefetch" href="/confirmation" />
       </head>
       <body className={`${inter.className} overflow-x-hidden`}>
         <CartProvider>
