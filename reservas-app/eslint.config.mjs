@@ -5,9 +5,25 @@ import nextTs from "eslint-config-next/typescript";
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
-  // Override default ignores of eslint-config-next.
+  
+  // Custom rules to reduce noise
+  {
+    rules: {
+      // Desactivar warnings molestos pero mantener errores críticos
+      "@next/next/no-img-element": "off",
+      "react/no-unescaped-entities": "off",
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-unused-vars": ["warn", { 
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_" 
+      }],
+      "no-console": ["warn", { allow: ["warn", "error"] }],
+      "max-len": "off", // Desactiva el límite de longitud de línea
+      "react/jsx-max-props-per-line": "off",
+    }
+  },
+  
   globalIgnores([
-    // Default ignores of eslint-config-next:
     ".next/**",
     "out/**",
     "build/**",

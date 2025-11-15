@@ -11,7 +11,7 @@ import {
   ArrowLeft, Plus, Minus
 } from 'lucide-react';
 import BookingNavbar from '@/components/booking/BookingNavbar';
-import { ModernDatePicker } from '@/components/home/ModernDatePicker';
+import { ModernDatePicker } from '@/components/forms/ModernDatePicker';
 import TermsCheckbox from '@/components/booking/TermsCheckbox';
 import { getTourBySlug, Tour } from '@/lib/supabase-tours';
 import { createClient } from '@/lib/supabase/client';

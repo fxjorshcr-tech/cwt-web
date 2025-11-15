@@ -4,10 +4,10 @@
 
 import { Suspense, useState, useEffect } from "react";
 import Image from "next/image";
-import { BookingFormWrapper } from '@/components/home/BookingFormWrapper';
+import { BookingFormWrapper } from '@/components/forms/BookingFormWrapper';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import BookingSteps from '@/components/booking/BookingSteps';
-import PaymentMethods from '@/components/home/PaymentMethods';
+import PaymentMethods from '@/components/sections/PaymentMethods';
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { CheckCircle2 } from 'lucide-react';
 

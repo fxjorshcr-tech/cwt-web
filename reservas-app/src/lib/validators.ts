@@ -1,10 +1,13 @@
 // src/lib/validators.ts
+// ✅ FIXED: Usa constantes de VALIDATION_RULES para evitar duplicación
 /**
  * ==========================================
  * VALIDADORES CENTRALIZADOS
  * ==========================================
  * Todas las validaciones robustas de la aplicación
  */
+
+import { VALIDATION_RULES } from './constants';
 
 // ========================================
 // REGEX PATTERNS
@@ -56,8 +59,8 @@ export function validateEmail(email: string): string | null {
   email = email.trim().toLowerCase();
   
   // Validar longitud máxima según RFC 5321
-  if (email.length > 254) {
-    return 'Email is too long (max 254 characters)';
+  if (email.length > VALIDATION_RULES.MAX_EMAIL_LENGTH) {
+    return `Email is too long (max ${VALIDATION_RULES.MAX_EMAIL_LENGTH} characters)`;
   }
   
   // Validar formato
@@ -97,15 +100,15 @@ export function validatePhone(phone: string): string | null {
     return 'Phone number should only contain digits and + symbol';
   }
   
-  // Validar longitud mínima (10 dígitos sin contar el +)
+  // Validar longitud mínima
   const digitsOnly = cleanPhone.replace('+', '');
-  if (digitsOnly.length < 10) {
-    return 'Phone number is too short (minimum 10 digits)';
+  if (digitsOnly.length < VALIDATION_RULES.MIN_PHONE_LENGTH) {
+    return `Phone number is too short (minimum ${VALIDATION_RULES.MIN_PHONE_LENGTH} digits)`;
   }
   
-  // Validar longitud máxima (15 dígitos según E.164)
-  if (digitsOnly.length > 15) {
-    return 'Phone number is too long (maximum 15 digits)';
+  // Validar longitud máxima
+  if (digitsOnly.length > VALIDATION_RULES.MAX_PHONE_LENGTH) {
+    return `Phone number is too long (maximum ${VALIDATION_RULES.MAX_PHONE_LENGTH} digits)`;
   }
   
   // Validar formato general
@@ -130,13 +133,13 @@ export function validateName(name: string, fieldName: string = 'Name'): string |
   const trimmedName = name.trim();
   
   // Validar longitud mínima
-  if (trimmedName.length < 2) {
-    return `${fieldName} is too short (minimum 2 characters)`;
+  if (trimmedName.length < VALIDATION_RULES.MIN_NAME_LENGTH) {
+    return `${fieldName} is too short (minimum ${VALIDATION_RULES.MIN_NAME_LENGTH} characters)`;
   }
   
   // Validar longitud máxima
-  if (trimmedName.length > 50) {
-    return `${fieldName} is too long (maximum 50 characters)`;
+  if (trimmedName.length > VALIDATION_RULES.MAX_NAME_LENGTH) {
+    return `${fieldName} is too long (maximum ${VALIDATION_RULES.MAX_NAME_LENGTH} characters)`;
   }
   
   // Validar caracteres permitidos
@@ -214,19 +217,19 @@ export function validateBookingDate(dateString: string): string | null {
     return 'Cannot book dates in the past';
   }
   
-  // Validar límite máximo (1 año en el futuro)
+  // Validar límite máximo
   const maxDate = new Date();
-  maxDate.setFullYear(maxDate.getFullYear() + 1);
+  maxDate.setDate(maxDate.getDate() + VALIDATION_RULES.MAX_BOOKING_ADVANCE_DAYS);
   
   if (selectedDate > maxDate) {
-    return 'Can only book up to 1 year in advance';
+    return `Can only book up to ${VALIDATION_RULES.MAX_BOOKING_ADVANCE_DAYS} days in advance`;
   }
   
   return null;
 }
 
 /**
- * Validar número de pasajeros
+ * ✅ FIXED: Validar número de pasajeros usando constantes
  * @param adults - Número de adultos
  * @param children - Número de niños
  * @returns Error message o null si es válido
@@ -238,31 +241,31 @@ export function validatePassengers(adults: number, children: number): string | n
   }
   
   // Validar mínimos
-  if (adults < 1) {
-    return 'At least 1 adult is required';
+  if (adults < VALIDATION_RULES.MIN_ADULTS) {
+    return `At least ${VALIDATION_RULES.MIN_ADULTS} adult is required`;
   }
   
-  if (children < 0) {
+  if (children < VALIDATION_RULES.MIN_CHILDREN) {
     return 'Number of children cannot be negative';
   }
   
-  // Validar máximos individuales
-  if (adults > 18) {
-    return 'Maximum 18 adults allowed';
+  // ✅ FIXED: Validar máximos individuales usando constantes
+  if (adults > VALIDATION_RULES.MAX_ADULTS) {
+    return `Maximum ${VALIDATION_RULES.MAX_ADULTS} adults allowed`;
   }
   
-  if (children > 18) {
-    return 'Maximum 18 children allowed';
+  if (children > VALIDATION_RULES.MAX_CHILDREN) {
+    return `Maximum ${VALIDATION_RULES.MAX_CHILDREN} children allowed`;
   }
   
-  // Validar total
+  // ✅ FIXED: Validar total usando constantes
   const total = adults + children;
   if (total < 1) {
     return 'At least 1 passenger is required';
   }
   
-  if (total > 18) {
-    return 'Maximum 18 passengers total';
+  if (total > VALIDATION_RULES.MAX_TOTAL_PASSENGERS) {
+    return `Maximum ${VALIDATION_RULES.MAX_TOTAL_PASSENGERS} passengers total`;
   }
   
   return null;
@@ -282,13 +285,13 @@ export function validateAddress(address: string, fieldName: string = 'Address'):
   const trimmed = address.trim();
   
   // Validar longitud mínima
-  if (trimmed.length < 10) {
-    return `${fieldName} is too short (minimum 10 characters)`;
+  if (trimmed.length < VALIDATION_RULES.MIN_ADDRESS_LENGTH) {
+    return `${fieldName} is too short (minimum ${VALIDATION_RULES.MIN_ADDRESS_LENGTH} characters)`;
   }
   
   // Validar longitud máxima
-  if (trimmed.length > 200) {
-    return `${fieldName} is too long (maximum 200 characters)`;
+  if (trimmed.length > VALIDATION_RULES.MAX_ADDRESS_LENGTH) {
+    return `${fieldName} is too long (maximum ${VALIDATION_RULES.MAX_ADDRESS_LENGTH} characters)`;
   }
   
   return null;

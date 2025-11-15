@@ -15,7 +15,7 @@ import BookingNavbar from '@/components/booking/BookingNavbar';
 import BookingStepper from '@/components/booking/BookingStepper';
 import { TripProgress } from '@/components/booking/TripProgress';
 import { TripAddOns } from '@/components/booking/TripAddOns';
-import { TimePicker } from '@/components/home/TimePicker';
+import { TimePicker } from '@/components/forms/TimePicker';
 
 import { 
   validateBookingDetails,
