@@ -1,6 +1,6 @@
 ﻿// src/components/summary/TripSummaryCard.tsx
-import { Calendar, Users, MapPin, Clock, ShoppingCart } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { MapPin, ShoppingCart, Plane, MessageSquare, Calendar, Clock, Users } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatDate, formatTime, formatCurrency } from '@/lib/formatters';
 
 interface Trip {
@@ -30,104 +30,137 @@ interface TripSummaryCardProps {
 
 export function TripSummaryCard({ trip, tripNumber, totalTrips, addOnNames }: TripSummaryCardProps) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <Card className="overflow-hidden">
+      <CardHeader className="pb-3 border-b bg-white">
+        <CardTitle className="flex items-center gap-2 text-lg font-bold text-gray-900">
           <MapPin className="h-5 w-5 text-blue-600" />
           Trip {tripNumber} of {totalTrips}
         </CardTitle>
-        <CardDescription>
-          {trip.from_location} → {trip.to_location}
-        </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid md:grid-cols-2 gap-4">
-          <div className="flex items-center gap-3">
-            <Calendar className="h-5 w-5 text-gray-400" />
-            <div>
-              <p className="text-sm text-gray-500">Date</p>
-              <p className="font-semibold">{formatDate(trip.date)}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <Clock className="h-5 w-5 text-gray-400" />
-            <div>
-              <p className="text-sm text-gray-500">Pickup Time</p>
-              <p className="font-semibold">{formatTime(trip.pickup_time)}</p>
-            </div>
-          </div>
-        </div>
 
-        <div className="flex items-center gap-3">
-          <Users className="h-5 w-5 text-gray-400" />
+      <CardContent className="space-y-4 pt-4">
+        {/* Date, Time & Passengers */}
+        <div className="grid grid-cols-3 gap-3 text-center">
           <div>
-            <p className="text-sm text-gray-500">Passengers</p>
-            <p className="font-semibold">
-              {trip.adults} Adult{trip.adults !== 1 ? 's' : ''}
-              {trip.children > 0 && `, ${trip.children} Child${trip.children !== 1 ? 'ren' : ''}`}
+            <Calendar className="h-4 w-4 text-gray-400 mx-auto mb-1" />
+            <p className="text-xs text-gray-500">Date</p>
+            <p className="font-semibold text-sm text-gray-900">{formatDate(trip.date)}</p>
+          </div>
+
+          <div>
+            <Clock className="h-4 w-4 text-gray-400 mx-auto mb-1" />
+            <p className="text-xs text-gray-500">Pickup</p>
+            <p className="font-semibold text-sm text-gray-900">{formatTime(trip.pickup_time)}</p>
+          </div>
+
+          <div>
+            <Users className="h-4 w-4 text-gray-400 mx-auto mb-1" />
+            <p className="text-xs text-gray-500">Total</p>
+            <p className="font-semibold text-sm text-gray-900">
+              {trip.adults + trip.children} pax
             </p>
           </div>
         </div>
 
-        <div className="space-y-2 pt-4 border-t">
-          <div>
-            <p className="text-sm text-gray-500 mb-1">Pickup Address</p>
-            <p className="font-medium">{trip.pickup_address || 'N/A'}</p>
+        {/* Pickup & Dropoff */}
+        <div className="relative bg-gray-50 rounded-lg p-3 border border-gray-200">
+          {/* Línea conectora */}
+          <div className="absolute left-6 top-[42px] bottom-[42px] w-0.5 bg-gradient-to-b from-blue-400 to-orange-400" />
+          
+          {/* Pickup */}
+          <div className="relative flex items-start gap-2 mb-4">
+            <div className="bg-blue-600 rounded-full p-1.5 z-10">
+              <MapPin className="h-3 w-3 text-white" />
+            </div>
+            <div className="flex-1 pt-0.5">
+              <div className="flex items-center gap-1.5 mb-1">
+                <span className="text-xs font-bold text-blue-700">PICKUP</span>
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-blue-100 rounded border border-blue-200">
+                  <span className="text-xs font-semibold text-blue-900">{trip.from_location}</span>
+                </span>
+              </div>
+              <p className="text-sm font-medium text-gray-900">{trip.pickup_address}</p>
+            </div>
           </div>
-          <div>
-            <p className="text-sm text-gray-500 mb-1">Drop-off Address</p>
-            <p className="font-medium">{trip.dropoff_address || 'N/A'}</p>
+
+          {/* Dropoff */}
+          <div className="relative flex items-start gap-2">
+            <div className="bg-orange-600 rounded-full p-1.5 z-10">
+              <MapPin className="h-3 w-3 text-white" />
+            </div>
+            <div className="flex-1 pt-0.5">
+              <div className="flex items-center gap-1.5 mb-1">
+                <span className="text-xs font-bold text-orange-700">DROP-OFF</span>
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-orange-100 rounded border border-orange-200">
+                  <span className="text-xs font-semibold text-orange-900">{trip.to_location}</span>
+                </span>
+              </div>
+              <p className="text-sm font-medium text-gray-900">{trip.dropoff_address}</p>
+            </div>
           </div>
         </div>
 
+        {/* Flight Information */}
         {(trip.airline || trip.flight_number) && (
-          <div className="space-y-2 pt-4 border-t">
-            <p className="text-sm font-semibold text-gray-700">Flight Information</p>
-            <div className="grid md:grid-cols-2 gap-2">
+          <div className="border-t pt-3">
+            <div className="flex items-center gap-2 mb-2">
+              <Plane className="h-4 w-4 text-blue-600" />
+              <p className="text-sm font-semibold text-gray-900">Flight Info</p>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-sm">
               {trip.airline && (
                 <div>
-                  <p className="text-sm text-gray-500">Airline</p>
-                  <p className="font-medium">{trip.airline}</p>
+                  <p className="text-xs text-gray-500">Airline</p>
+                  <p className="font-medium text-gray-900">{trip.airline}</p>
                 </div>
               )}
               {trip.flight_number && (
                 <div>
-                  <p className="text-sm text-gray-500">Flight Number</p>
-                  <p className="font-medium">{trip.flight_number}</p>
+                  <p className="text-xs text-gray-500">Flight #</p>
+                  <p className="font-medium text-gray-900">{trip.flight_number}</p>
                 </div>
               )}
             </div>
           </div>
         )}
 
+        {/* Add-ons */}
         {trip.add_ons && trip.add_ons.length > 0 && (
-          <div className="space-y-2 pt-4 border-t">
-            <p className="text-sm font-semibold text-gray-700">Add-ons</p>
-            <ul className="space-y-1">
-              {trip.add_ons.map((addonId) => (
-                <li key={addonId} className="flex items-center gap-2 text-sm">
-                  <ShoppingCart className="h-4 w-4 text-blue-600" />
-                  <span>{addOnNames[addonId] || addonId}</span>
-                </li>
+          <div className="border-t pt-3">
+            <div className="flex items-center gap-2 mb-2">
+              <ShoppingCart className="h-4 w-4 text-blue-600" />
+              <p className="text-sm font-semibold text-gray-900">Add-ons</p>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {trip.add_ons.map((addon) => (
+                <span
+                  key={addon}
+                  className="inline-flex items-center px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs font-medium text-gray-800"
+                >
+                  {addOnNames[addon] || addon}
+                </span>
               ))}
-            </ul>
+            </div>
           </div>
         )}
 
+        {/* Special Requests */}
         {trip.special_requests && (
-          <div className="space-y-2 pt-4 border-t">
-            <p className="text-sm font-semibold text-gray-700">Special Requests</p>
-            <p className="text-sm text-gray-600">{trip.special_requests}</p>
+          <div className="border-t pt-3">
+            <div className="flex items-center gap-2 mb-2">
+              <MessageSquare className="h-4 w-4 text-blue-600" />
+              <p className="text-sm font-semibold text-gray-900">Special Requests</p>
+            </div>
+            <p className="text-sm text-gray-700 bg-gray-50 p-2 rounded border border-gray-200">{trip.special_requests}</p>
           </div>
         )}
 
-        <div className="pt-4 border-t">
-          <div className="flex justify-between items-center">
-            <span className="font-semibold text-gray-700">Trip Price:</span>
-            <span className="text-xl font-bold text-blue-600">
-              {formatCurrency(trip.final_price || trip.price)}
-            </span>
-          </div>
+        {/* Trip Price */}
+        <div className="border-t pt-3 flex items-center justify-between">
+          <span className="text-sm font-medium text-gray-700">Trip Price:</span>
+          <span className="text-lg font-bold text-gray-900">
+            {formatCurrency(trip.final_price || trip.price)}
+          </span>
         </div>
       </CardContent>
     </Card>
