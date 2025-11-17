@@ -1,4 +1,3 @@
-// src/components/booking/BookingNavbar.tsx
 "use client";
 
 import { useState } from "react";
@@ -11,6 +10,7 @@ import CartDropdown from "@/app/cart/CartDropdown";
 const navLinks = [
   { label: "Home", href: "/" },
   { label: "Private Shuttles", href: "/transfers" },
+  { label: "Most Booked", href: "/shuttle", icon: "🔥" },
   { label: "Tailored Tours", href: "/private-tours" },
   { label: "Travel Guide", href: "/travel-guide" },
   { label: "Contact", href: "/contact" },
@@ -29,7 +29,7 @@ export default function BookingNavbar() {
       <header className="absolute top-0 left-0 right-0 z-50 w-full">
         <div className="container mx-auto px-4 sm:px-6 py-4 max-w-full">
           <div className="flex items-center justify-between gap-2">
-            
+
             <Link
               href="/"
               className="flex items-center gap-3"
@@ -52,13 +52,13 @@ export default function BookingNavbar() {
                 <Link
                   key={link.label}
                   href={link.href}
-                  className="text-white text-sm font-medium hover:text-gray-200 transition-colors"
+                  className="text-white text-sm font-medium hover:text-gray-200 transition-colors flex items-center gap-1"
                 >
                   {link.label}
+                  {link.icon && <span>{link.icon}</span>}
                 </Link>
               ))}
 
-              {/* CART DROPDOWN */}
               <CartDropdown />
             </nav>
 
@@ -98,7 +98,7 @@ export default function BookingNavbar() {
         aria-modal="true"
       >
         <div className="flex flex-col h-full">
-          
+
           <div className="flex justify-end p-4 border-b">
             <button
               onClick={handleDrawerToggle}
@@ -116,14 +116,14 @@ export default function BookingNavbar() {
                   <Link
                     href={link.href}
                     onClick={handleDrawerToggle}
-                    className="px-4 py-3 min-h-[52px] text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-medium flex items-center"
+                    className="px-4 py-3 min-h-[52px] text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-medium flex items-center gap-2"
                   >
                     {link.label}
+                    {link.icon && <span>{link.icon}</span>}
                   </Link>
                 </li>
               ))}
 
-              {/* Mobile Cart Link */}
               <li>
                 <Link
                   href="/cart"
