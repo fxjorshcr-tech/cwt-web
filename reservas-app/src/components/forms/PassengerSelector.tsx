@@ -1,10 +1,8 @@
-// src/components/home/PassengerSelector.tsx
-// ✅ CORREGIDO - Límite cambiado de 18 a 12 pasajeros
-
+// src/components/forms/PassengerSelector.tsx
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Users, Plus, Minus } from 'lucide-react';
+import { Users, Plus, Minus, AlertTriangle } from 'lucide-react';
 
 interface PassengerSelectorProps {
   adults: number;
@@ -52,7 +50,6 @@ export function PassengerSelector({
     }
   }, [isOpen]);
 
-  // ✅ CORREGIDO: Cambio de 18 a 12
   const handleAdultsChange = (delta: number) => {
     const newAdults = Math.max(1, Math.min(12, adults + delta));
     if (newAdults + children <= 12) {
@@ -60,7 +57,6 @@ export function PassengerSelector({
     }
   };
 
-  // ✅ CORREGIDO: Cambio de 18 a 12
   const handleChildrenChange = (delta: number) => {
     const newChildren = Math.max(0, Math.min(12, children + delta));
     if (adults + newChildren <= 12) {
@@ -191,12 +187,20 @@ export function PassengerSelector({
             </div>
           </div>
 
-          {/* Limit Info - ✅ CORREGIDO: Texto cambiado a 12 */}
+          {/* Limit Warning */}
           {totalPassengers >= 12 && (
-            <div className="mt-4 pt-4 border-t">
-              <p className="text-xs text-amber-600 text-center" role="alert">
-                ⚠️ Maximum 12 passengers per trip
-              </p>
+            <div className="mt-4 pt-4 border-t border-orange-200 bg-orange-50 -mx-4 -mb-4 px-4 pb-4 rounded-b-xl">
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-semibold text-orange-900 mb-1">
+                    Maximum 12 passengers per trip
+                  </p>
+                  <p className="text-xs text-orange-700">
+                    For groups of 13+, please contact us on WhatsApp
+                  </p>
+                </div>
+              </div>
             </div>
           )}
 

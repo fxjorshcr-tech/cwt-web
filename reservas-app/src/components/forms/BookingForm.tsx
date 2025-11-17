@@ -71,19 +71,24 @@ export function BookingForm() {
 
   useEffect(() => {
     if (routes.length > 0) {
+      const from = searchParams.get('from');
+      const to = searchParams.get('to');
       const origin = searchParams.get('origin');
       const destination = searchParams.get('destination');
 
-      if (origin || destination) {
+      const fromLocation = from || origin;
+      const toLocation = to || destination;
+
+      if (fromLocation || toLocation) {
         setTrips((prevTrips) => {
           const newTrips = [...prevTrips];
 
-          if (origin) {
-            newTrips[0].from_location = origin;
+          if (fromLocation) {
+            newTrips[0].from_location = fromLocation;
           }
 
-          if (destination) {
-            newTrips[0].to_location = destination;
+          if (toLocation) {
+            newTrips[0].to_location = toLocation;
           }
 
           if (newTrips[0].from_location && newTrips[0].to_location) {
@@ -115,14 +120,14 @@ export function BookingForm() {
   async function loadRoutes() {
     try {
       setIsLoadingRoutes(true);
-      setShowContent(false);
       setError(null);
 
       const supabase = createClient();
 
+      // ✅ Optimización: solo seleccionar campos necesarios
       const { data, error: fetchError } = await supabase
         .from('routes')
-        .select('*')
+        .select('id, origen, destino, alias, precio1a6, precio7a9, precio10a12, precio13a18, kilometros, duracion')
         .order('origen');
 
       if (fetchError) {
@@ -175,8 +180,6 @@ export function BookingForm() {
       }
 
       setRoutes(validRoutes);
-
-      await new Promise((resolve) => setTimeout(resolve, 200));
       setShowContent(true);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unknown error';
@@ -300,11 +303,11 @@ export function BookingForm() {
       const totalPassengers = trip.adults + trip.children;
 
       if (totalPassengers > 12) {
-        return `Trip ${i + 1}: For groups larger than 12 passengers, please contact us directly`;
+        return `Trip ${i + 1}: For groups larger than 12 passengers, please contact us directly via WhatsApp`;
       }
 
       if (!trip.selectedRoute || !trip.routeId) {
-        return `Trip ${i + 1}: No route available for this combination`;
+        return `Trip ${i + 1}: No route available for this combination. Please contact us on WhatsApp for assistance.`;
       }
 
       if (totalPassengers < 1) {
