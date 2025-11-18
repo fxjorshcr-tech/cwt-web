@@ -1,5 +1,4 @@
-﻿// src/app/page.tsx
-// ✅ OPTIMIZADO: Con prefetching automático
+// src/app/page.tsx
 import { Suspense } from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
@@ -8,7 +7,6 @@ import BookingNavbar from "@/components/booking/BookingNavbar";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import ScrollToBookingButton from "@/components/ScrollToBookingButton";
 import StructuredData from "@/components/SEO/StructuredData";
-import { PrefetchWrapper } from "@/components/PrefetchWrapper";
 import type { Metadata } from 'next';
 import Script from 'next/script';
 
@@ -24,7 +22,7 @@ const GoogleReviews = dynamic(() => import("@/components/sections/GoogleReviews"
   loading: () => <ComponentSkeleton />,
 });
 
-const ValueProposition = dynamic(() => import("@/components/sections/ValueProposition"), {
+const MostBookedCTA = dynamic(() => import("@/components/sections/MostBookedCTA"), {
   loading: () => <ComponentSkeleton />,
 });
 
@@ -112,8 +110,6 @@ export const metadata: Metadata = {
 export default async function Home() {
   return (
     <>
-      <PrefetchWrapper />
-      
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-lg focus:shadow-lg">
         Skip to main content
       </a>
@@ -171,7 +167,7 @@ export default async function Home() {
         <WhyChooseUs />
         <HowWeWork />
         <GoogleReviews />
-        <ValueProposition />
+        <MostBookedCTA />
         <WhyPrivateShuttle />
         <PrivateTours />
         <TravelGuide />

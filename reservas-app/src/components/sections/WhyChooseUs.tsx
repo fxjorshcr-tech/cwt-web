@@ -10,7 +10,8 @@ import {
   Shield,
   MapPin,
   Award,
-  Heart
+  Heart,
+  CheckCircle2
 } from 'lucide-react';
 
 export default function WhyChooseUs() {
@@ -26,16 +27,17 @@ export default function WhyChooseUs() {
             </span>
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 sm:mb-6 px-4">
-            Why Choose Can't Wait Travel
+            Why Choose Can't Wait Travel CR
           </h2>
           <p className="text-base sm:text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed px-4">
-            As a <strong>100% Costa Rican company</strong>, we understand what travelers need. 
-            Our native drivers bring decades of combined experience, local knowledge, and genuine 
+            We're a <strong>100% Costa Rican company based in La Fortuna, Arenal</strong>—a group of ticos 
+            with over <strong>30 years of combined experience</strong> operating private transfers and tours 
+            throughout Costa Rica. Our native drivers bring local knowledge and genuine 
             <em className="text-blue-600"> pura vida</em> hospitality to every journey.
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center mb-12 md:mb-16">
+        <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-start mb-12 md:mb-16">
           
           <div className="space-y-4 sm:space-y-6">
             <div className="flex items-start gap-3 sm:gap-4 group">
@@ -46,7 +48,7 @@ export default function WhyChooseUs() {
                 <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-1 sm:mb-2">Native Experienced Drivers</h3>
                 <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
                   All our drivers are Costa Rican natives with extensive knowledge of local routes, 
-                  culture, and the best hidden spots along the way.
+                  culture, and the best spots along the way.
                 </p>
               </div>
             </div>
@@ -58,8 +60,8 @@ export default function WhyChooseUs() {
               <div>
                 <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-1 sm:mb-2">Comfortable Capacity</h3>
                 <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-                  We accommodate up to <strong>12 passengers</strong> with one large suitcase each. 
-                  Perfect for families, groups, or travelers with extra luggage.
+                  We accommodate up to <strong>12 passengers</strong> with one large suitcase and 
+                  one carry-on per person.
                 </p>
               </div>
             </div>
@@ -69,10 +71,10 @@ export default function WhyChooseUs() {
                 <Baby className="h-6 w-6 sm:h-7 sm:w-7 text-green-600" />
               </div>
               <div>
-                <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-1 sm:mb-2">Child Seats Available</h3>
+                <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-1 sm:mb-2">Free Child Seats</h3>
                 <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-                  Traveling with little ones? We provide <strong>free child safety seats</strong> for 
-                  all ages. Just let us know when booking.
+                  We provide <strong>complimentary child safety seats</strong> for all ages. 
+                  Just let us know when booking.
                 </p>
               </div>
             </div>
@@ -82,10 +84,9 @@ export default function WhyChooseUs() {
                 <HeadphonesIcon className="h-6 w-6 sm:h-7 sm:w-7 text-purple-600" />
               </div>
               <div>
-                <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-1 sm:mb-2">24/7 Support Available</h3>
+                <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-1 sm:mb-2">24/7 Support</h3>
                 <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-                  Questions? Flight delays? No problem. Our bilingual support team is available 
-                  around the clock via WhatsApp, phone, or email.
+                  Our bilingual support team is available around the clock via WhatsApp, phone, or email.
                 </p>
               </div>
             </div>
@@ -95,10 +96,10 @@ export default function WhyChooseUs() {
                 <CreditCard className="h-6 w-6 sm:h-7 sm:w-7 text-cyan-600" />
               </div>
               <div>
-                <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-1 sm:mb-2">Secure Payment Technology</h3>
+                <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-1 sm:mb-2">Secure Payments</h3>
                 <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-                  We use <strong>Stripe</strong> — the same secure payment system trusted by 
-                  Amazon, Google, and millions worldwide. Your data is always protected.
+                  We use <strong>Stripe</strong>—the same secure payment system trusted by 
+                  Amazon and Google.
                 </p>
               </div>
             </div>
@@ -108,66 +109,50 @@ export default function WhyChooseUs() {
                 <Shield className="h-6 w-6 sm:h-7 sm:w-7 text-indigo-600" />
               </div>
               <div>
-                <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-1 sm:mb-2">Licensed & Fully Insured</h3>
+                <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-1 sm:mb-2">Licensed & Insured</h3>
                 <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
                   Official <strong>ICT License #4121-2025</strong>. All vehicles fully insured 
-                  with commercial liability coverage for your peace of mind.
+                  with commercial liability coverage.
                 </p>
               </div>
             </div>
           </div>
 
           <div className="space-y-4 sm:space-y-6">
-            <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl p-6 sm:p-8 shadow-2xl">
-              <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
-                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border-2 border-white/30">
-                  <Car className="h-7 w-7 sm:h-8 sm:w-8 text-white" />
+            <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-xl border-2 border-gray-200">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
+                  <Award className="h-6 w-6 text-orange-600" />
                 </div>
-                <div className="text-white">
-                  <h3 className="text-xl sm:text-2xl font-bold">Pura Vida</h3>
-                  <p className="text-blue-100 text-xs sm:text-sm">Guaranteed</p>
-                </div>
+                <h3 className="text-xl font-bold text-gray-900">Direct Operation</h3>
               </div>
-              <p className="text-sm sm:text-base text-white/90 leading-relaxed mb-4 sm:mb-6">
-                Experience authentic Costa Rican hospitality from the moment we pick you up 
-                to your final destination.
+              <p className="text-sm text-gray-700 leading-relaxed mb-4">
+                We personally operate every service—no third-party reselling. This means we control 
+                every detail of your experience.
               </p>
               
-              <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2 sm:p-3 border border-white/20 text-center">
-                  <p className="text-xl sm:text-2xl font-bold text-white">500+</p>
-                  <p className="text-[10px] sm:text-xs text-blue-100">Travelers</p>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0" />
+                  <p className="text-sm text-gray-700">Flight monitoring included</p>
                 </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2 sm:p-3 border border-white/20 text-center">
-                  <p className="text-xl sm:text-2xl font-bold text-white">4.9</p>
-                  <p className="text-[10px] sm:text-xs text-blue-100">Rating</p>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0" />
+                  <p className="text-sm text-gray-700">Meet & greet service</p>
                 </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2 sm:p-3 border border-white/20 text-center">
-                  <p className="text-xl sm:text-2xl font-bold text-white">50+</p>
-                  <p className="text-[10px] sm:text-xs text-blue-100">Routes</p>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0" />
+                  <p className="text-sm text-gray-700">Clean, air-conditioned vehicles</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-xl border-2 border-orange-200">
-              <div className="flex items-center gap-3 mb-3 sm:mb-4">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 rounded-xl flex items-center justify-center">
-                  <Award className="h-5 w-5 sm:h-6 sm:w-6 text-orange-600" />
-                </div>
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900">Quality First</h3>
-              </div>
-              <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-                We only offer services we <strong>personally operate</strong>. No third-party 
-                reselling means we control every detail of your experience.
-              </p>
-            </div>
-
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 sm:p-6 border-2 border-green-200">
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border-2 border-green-200">
               <div className="flex items-center gap-3">
-                <Heart className="h-6 w-6 sm:h-8 sm:w-8 text-green-600" />
+                <Heart className="h-8 w-8 text-green-600" />
                 <div>
-                  <p className="font-bold text-gray-900 text-sm sm:text-base">100% Costa Rican</p>
-                  <p className="text-xs sm:text-sm text-gray-700">Locally owned & operated</p>
+                  <p className="font-bold text-gray-900 text-base">100% Costa Rican</p>
+                  <p className="text-sm text-gray-700">Based in La Fortuna, Arenal</p>
                 </div>
               </div>
             </div>

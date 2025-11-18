@@ -21,11 +21,6 @@ export default function HowWeWork() {
           </div>
 
           <div className="prose prose-lg max-w-none">
-            <p className="text-base sm:text-lg text-gray-700 leading-relaxed mb-4 sm:mb-6 text-center px-2">
-              At Can't Wait Travel, we focus on <strong>quality over quantity</strong>. That's why 
-              we only offer services that <strong className="text-blue-600">we personally operate and control</strong>.
-            </p>
-
             <div className="grid md:grid-cols-2 gap-4 sm:gap-6 mt-6 sm:mt-8">
               <div className="bg-white rounded-xl p-4 sm:p-6 shadow-md border border-blue-100">
                 <div className="flex items-start gap-3 mb-3">
@@ -60,10 +55,8 @@ export default function HowWeWork() {
 
             <div className="mt-6 sm:mt-8 p-4 sm:p-6 bg-white rounded-xl border-2 border-blue-200">
               <p className="text-sm sm:text-base text-gray-700 leading-relaxed text-center">
-                <strong className="text-blue-600">Why does this matter?</strong> When you book with us, 
-                you're working with the people who actually provide the service. Every driver is our employee. 
-                Every vehicle is maintained by our team. We're accountable for every detail because 
-                <strong> it's our operation from start to finish</strong>.
+                At Can't Wait Travel CR, we focus on <strong>quality over quantity</strong>. That's why 
+                we only offer services that <strong className="text-blue-600">we personally operate and control</strong>.
               </p>
             </div>
           </div>

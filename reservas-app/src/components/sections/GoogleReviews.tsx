@@ -133,17 +133,21 @@ export default function GoogleReviews() {
           ))}
         </div>
 
-        {/* Trust Message with SEO keywords */}
-        <div className="max-w-3xl mx-auto bg-blue-50 border-2 border-blue-200 rounded-xl p-6 sm:p-8 text-center">
-          <h3 className="font-bold text-gray-900 mb-3 text-lg sm:text-xl">
-            New to Online Booking, Not New to Costa Rica Transportation
-          </h3>
-          <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-            While we recently launched our online booking platform, our team has been providing 
-            reliable private shuttle services across Costa Rica for years. From San José and Liberia 
-            airports to La Fortuna, Manuel Antonio, Tamarindo, and Monteverde—we know every route. 
-            We're building our digital presence, but our commitment to excellent service and local 
-            expertise has always been our priority.
+        {/* Trust Message with SEO keywords - DISEÑO MEJORADO */}
+        <div className="max-w-3xl mx-auto bg-gradient-to-br from-green-50 via-blue-50 to-green-50 border-2 border-green-300 rounded-2xl p-8 sm:p-10 shadow-lg">
+          <div className="text-center mb-6">
+            <div className="text-5xl mb-4">🇨🇷</div>
+            <h3 className="font-bold text-gray-900 mb-3 text-xl sm:text-2xl">
+              The "Pura Vida" Saying Isn't Just for Tourists
+            </h3>
+            <div className="w-20 h-1 bg-gradient-to-r from-blue-500 to-green-500 mx-auto rounded-full mb-4"></div>
+          </div>
+          <p className="text-sm sm:text-base text-gray-700 leading-relaxed text-center mb-4">
+            You've probably heard that Costa Ricans say <span className="font-bold text-green-700">"Pura Vida"</span> for everything—and it's 100% true. 
+            Hello? Pura Vida. Goodbye? Pura Vida. How are you? Pura Vida. Thank you? Pura Vida. You're welcome? Pura Vida. 
+          </p>
+          <p className="text-sm sm:text-base text-gray-700 leading-relaxed text-center italic">
+            It's not a tourist gimmick created for t-shirts and Instagram captions—it's genuinely how we ticos live and communicate every single day.
           </p>
         </div>
       </div>
