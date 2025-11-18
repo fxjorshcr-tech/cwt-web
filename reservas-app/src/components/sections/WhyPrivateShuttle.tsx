@@ -72,8 +72,8 @@ export default function WhyPrivateShuttle() {
                 <div>
                   <h3 className="font-bold text-gray-900 mb-2 text-lg">Flexible & Personalized</h3>
                   <p className="text-gray-600 leading-relaxed">
-                    Want to stop at a scenic viewpoint or local fruit stand? Need extra luggage space for surfboards? 
-                    With private shuttle, you set the schedule and make the rules. It's your journey, your way.
+                    Enjoy the liberty to pause for a scenic vista or explore local flavors at your leisure. Private travel grants you absolute control 
+                    over your itinerary, ensuring an experience perfectly tailored to your preferences
                   </p>
                 </div>
               </div>
@@ -91,9 +91,8 @@ export default function WhyPrivateShuttle() {
                 </div>
               </div>
               <p className="text-sm sm:text-base text-gray-700 leading-relaxed mb-4">
-                As lifelong Costa Ricans with over three decades of combined experience in tourism, we've built our business 
-                on the foundations of trust, flexibility, and personalized service. Our knowledgeable bilingual drivers and 
-                modern, comfortable fleet ensure that every private transfer is seamless, safe, and stress-free.
+                Costa Rica is beautiful, but our roads can sometimes be challenging. We know that reliable transportation can make or break a trip. We want you to feel safe and confident,
+                not worried or overwhelmed. With our 30 years of combined experience, you can trust that you are in safe hands, making your ride as enjoyable as the destination.
               </p>
               
               {/* Quote with Logo */}

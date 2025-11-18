@@ -18,10 +18,6 @@ const HowWeWork = dynamic(() => import("@/components/sections/HowWeWork"), {
   loading: () => <ComponentSkeleton />,
 });
 
-const GoogleReviews = dynamic(() => import("@/components/sections/GoogleReviews"), {
-  loading: () => <ComponentSkeleton />,
-});
-
 const MostBookedCTA = dynamic(() => import("@/components/sections/MostBookedCTA"), {
   loading: () => <ComponentSkeleton />,
 });
@@ -166,7 +162,6 @@ export default async function Home() {
 
         <WhyChooseUs />
         <HowWeWork />
-        <GoogleReviews />
         <MostBookedCTA />
         <WhyPrivateShuttle />
         <PrivateTours />
