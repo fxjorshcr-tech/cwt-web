@@ -1,5 +1,5 @@
 // src/app/about/page.tsx
-// ✅ ABOUT PAGE - Liviana y optimizada
+// ✅ ABOUT PAGE - Actualizada con nueva estructura
 'use client';
 
 import { useState } from 'react';
@@ -61,61 +61,157 @@ export default function AboutPage() {
               Pura Vida Transportation
             </h1>
             
-            <p className="text-lg sm:text-xl text-white/95 max-w-3xl mb-8 drop-shadow-lg">
+            <p className="text-lg sm:text-xl text-white/95 max-w-3xl drop-shadow-lg">
               We're more than a shuttle service – we're your local friends in Costa Rica
             </p>
+          </div>
+        </section>
 
-            <div className="flex flex-wrap items-center justify-center gap-8 mt-4">
-              <div className="text-center">
-                <p className="text-4xl font-bold text-white drop-shadow-lg">500+</p>
-                <p className="text-sm text-white/90">Happy Travelers</p>
+        {/* Section 1: 30+ años de experiencia - FOTO IZQUIERDA */}
+        <section className="py-20 bg-white">
+          <div className="container mx-auto px-6 max-w-6xl">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              
+              {/* Imagen */}
+              <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-2xl">
+                <Image
+                  src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/Beatiful-waterfall-costa-rica-nature.webp"
+                  alt="La Fortuna and Arenal Volcano"
+                  fill
+                  className="object-cover"
+                />
               </div>
-              <div className="text-center">
-                <p className="text-4xl font-bold text-white drop-shadow-lg">6</p>
-                <p className="text-sm text-white/90">Years Experience</p>
-              </div>
-              <div className="text-center">
-                <p className="text-4xl font-bold text-white drop-shadow-lg">4.9</p>
-                <p className="text-sm text-white/90">Average Rating</p>
+
+              {/* Texto */}
+              <div>
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 rounded-full mb-4 border border-blue-200">
+                  <MapPin className="h-5 w-5 text-blue-600" />
+                  <span className="text-blue-700 font-bold text-sm uppercase tracking-wide">
+                    Our Home
+                  </span>
+                </div>
+                
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+                  Ticos with 30+ Years of Experience
+                </h2>
+                
+                <div className="prose prose-lg text-gray-700 space-y-4">
+                  <p className="leading-relaxed">
+                    We're <strong>ticos</strong> – born and raised in <strong>La Fortuna de San Carlos</strong>, right at the 
+                    foot of the majestic <strong>Arenal Volcano</strong>. This isn't just where we work; it's where we grew up, 
+                    where our families live, and where we've spent over <strong>30 combined years</strong> learning every curve 
+                    of these roads.
+                  </p>
+                  
+                  <p className="leading-relaxed">
+                    When you ride with us, you're not hiring a faceless shuttle service. You're getting someone who knows 
+                    which viewpoint has the best sunrise over the volcano, where the quetzals nest during migration season, 
+                    and which family-run restaurant makes the best <em>casado</em> in town. That's the difference local knowledge makes.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Our Story */}
-        <section className="py-20 bg-white">
-          <div className="container mx-auto px-6 max-w-4xl">
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 rounded-full mb-4 border border-blue-200">
-                <Sparkles className="h-5 w-5 text-blue-600" />
-                <span className="text-blue-700 font-bold text-sm uppercase tracking-wide">
-                  Our Story
-                </span>
+        {/* Section 2: Conexiones principales - TEXTO IZQUIERDA */}
+        <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
+          <div className="container mx-auto px-6 max-w-6xl">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              
+              {/* Texto */}
+              <div className="order-2 md:order-1">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-100 rounded-full mb-4 border border-orange-200">
+                  <Sparkles className="h-5 w-5 text-orange-600" />
+                  <span className="text-orange-700 font-bold text-sm uppercase tracking-wide">
+                    Our Mission
+                  </span>
+                </div>
+                
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+                  Obsessed with Showing You the Real Costa Rica
+                </h2>
+                
+                <div className="prose prose-lg text-gray-700 space-y-4">
+                  <p className="leading-relaxed">
+                    We connect Costa Rica's most popular destinations – <strong>SJO and LIR airports, La Fortuna, Manuel Antonio, 
+                    Tamarindo, Monteverde</strong> – with private shuttles that actually feel private. No rushing to fit a shared 
+                    schedule, no unnecessary stops. Just you, your group, and a comfortable ride on your timeline.
+                  </p>
+                  
+                  <p className="leading-relaxed">
+                    Here's what drives us: we genuinely want you to experience <strong>the real Costa Rica</strong>. The one where 
+                    locals stop to help strangers, where a simple drive becomes a conversation about our history, and where 
+                    <em className="text-orange-600">pura vida</em> isn't just a tourist slogan – it's how we actually live.
+                  </p>
+
+                  <p className="leading-relaxed">
+                    We've seen too many travelers leave Costa Rica having only scratched the surface. That's why we make every 
+                    transfer count, turning travel time into an authentic cultural experience you won't find in any guidebook.
+                  </p>
+                </div>
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                Born from a Love for Costa Rica
-              </h2>
+
+              {/* Imagen */}
+              <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-2xl order-1 md:order-2">
+                <Image
+                  src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/Beatiful-waterfall-costa-rica-nature.webp"
+                  alt="Private Shuttle Connections Across Costa Rica"
+                  fill
+                  className="object-cover"
+                />
+              </div>
             </div>
+          </div>
+        </section>
 
-            <div className="prose prose-lg max-w-none text-gray-700 space-y-6">
-              <p className="leading-relaxed">
-                Can't Wait Travel was founded in <strong>2019</strong> by a group of Costa Rican natives who 
-                saw a gap in the transportation market: travelers wanted reliable, safe, and authentic 
-                experiences, but many services felt impersonal or overpriced.
-              </p>
+        {/* Section 3: Pasión por compartir - FOTO IZQUIERDA */}
+        <section className="py-20 bg-white">
+          <div className="container mx-auto px-6 max-w-6xl">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              
+              {/* Imagen */}
+              <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-2xl">
+                <Image
+                  src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/Beatiful-waterfall-costa-rica-nature.webp"
+                  alt="Sharing Costa Rica's Beauty"
+                  fill
+                  className="object-cover"
+                />
+              </div>
 
-              <p className="leading-relaxed">
-                We started with <strong>just two vehicles</strong> and a simple mission: treat every traveler 
-                like family. Our drivers aren't just chauffeurs – they're local experts who share stories, 
-                recommend hidden gems, and ensure you experience the real <em className="text-blue-600">pura vida</em>.
-              </p>
+              {/* Texto */}
+              <div>
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 rounded-full mb-4 border border-green-200">
+                  <Heart className="h-5 w-5 text-green-600" />
+                  <span className="text-green-700 font-bold text-sm uppercase tracking-wide">
+                    Our Passion
+                  </span>
+                </div>
+                
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+                  We Love Sharing Our Country with You
+                </h2>
+                
+                <div className="prose prose-lg text-gray-700 space-y-4">
+                  <p className="leading-relaxed">
+                    Ask any tico what makes them proudest about Costa Rica, and you'll get a two-hour answer. We're no different. 
+                    Transportation is just what we do – <strong>teaching people about our country</strong> is what we love.
+                  </p>
+                  
+                  <p className="leading-relaxed">
+                    Whether it's explaining why we abolished our army in 1948, pointing out a three-toed sloth that most people 
+                    would drive right past, or recommending a <strong>soda</strong> (that's our word for small local restaurants) 
+                    where the gallo pinto tastes like your grandmother made it – these moments matter to us.
+                  </p>
 
-              <p className="leading-relaxed">
-                Today, we're proud to serve <strong>hundreds of travelers monthly</strong>, maintaining our 
-                commitment to personal service while growing our fleet and team. We're licensed by the Costa 
-                Rican Tourism Board (ICT License #4121-2025), fully insured, and dedicated to making your 
-                journey as memorable as your destination.
-              </p>
+                  <p className="leading-relaxed">
+                    Every trip we take, whether it's a quick airport transfer or a full-day private tour from La Fortuna, 
+                    becomes our chance to show you why <strong>we love being Costa Rican</strong>. Your journey is our opportunity 
+                    to share our home, our stories, and our pride in this beautiful country.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -178,121 +274,8 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* Meet the Team */}
-        <section className="py-20 bg-white">
-          <div className="container mx-auto px-6 max-w-6xl">
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 rounded-full mb-4 border border-blue-200">
-                <Users className="h-5 w-5 text-blue-600" />
-                <span className="text-blue-700 font-bold text-sm uppercase tracking-wide">
-                  Our Team
-                </span>
-              </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Meet the People Behind Your Journey
-              </h2>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                Our drivers are experienced Costa Rican natives passionate about sharing their country
-              </p>
-            </div>
-
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              
-              {/* Team Member 1 */}
-              <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow">
-                <div className="h-48 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
-                  <Users className="h-20 w-20 text-white opacity-50" />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">Carlos Rodríguez</h3>
-                  <p className="text-sm text-blue-600 font-semibold mb-3">Founder & CEO</p>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    15+ years in tourism. Carlos started Can't Wait Travel to share authentic 
-                    Costa Rican experiences with the world.
-                  </p>
-                </div>
-              </div>
-
-              {/* Team Member 2 */}
-              <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow">
-                <div className="h-48 bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
-                  <Users className="h-20 w-20 text-white opacity-50" />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">María Sánchez</h3>
-                  <p className="text-sm text-orange-600 font-semibold mb-3">Operations Manager</p>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    Coordinates all bookings and ensures every trip runs smoothly. María's attention 
-                    to detail is unmatched.
-                  </p>
-                </div>
-              </div>
-
-              {/* Team Member 3 */}
-              <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow">
-                <div className="h-48 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
-                  <Users className="h-20 w-20 text-white opacity-50" />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">Luis Morales</h3>
-                  <p className="text-sm text-green-600 font-semibold mb-3">Senior Driver</p>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    10+ years driving Costa Rica's roads. Luis knows every shortcut and the best 
-                    stops along the way.
-                  </p>
-                </div>
-              </div>
-
-              {/* Team Member 4 */}
-              <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow">
-                <div className="h-48 bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
-                  <Users className="h-20 w-20 text-white opacity-50" />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">Ana Vargas</h3>
-                  <p className="text-sm text-purple-600 font-semibold mb-3">Customer Success</p>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    Available 24/7 to answer questions and assist travelers. Ana ensures everyone 
-                    feels supported.
-                  </p>
-                </div>
-              </div>
-
-              {/* Team Member 5 */}
-              <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow">
-                <div className="h-48 bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center">
-                  <Users className="h-20 w-20 text-white opacity-50" />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">Diego Fernández</h3>
-                  <p className="text-sm text-cyan-600 font-semibold mb-3">Driver & Guide</p>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    Born and raised in La Fortuna. Diego shares insider knowledge about volcanoes 
-                    and hot springs.
-                  </p>
-                </div>
-              </div>
-
-              {/* Team Member 6 */}
-              <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow">
-                <div className="h-48 bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center">
-                  <Users className="h-20 w-20 text-white opacity-50" />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">Sofia Ramírez</h3>
-                  <p className="text-sm text-pink-600 font-semibold mb-3">Driver & Translator</p>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    Fluent in English, Spanish, and German. Sofia bridges cultures and makes 
-                    everyone feel at home.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* Why Choose Us */}
-        <section className="py-20 bg-gradient-to-b from-blue-50 to-white">
+        <section className="py-20 bg-white">
           <div className="container mx-auto px-6 max-w-6xl">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
