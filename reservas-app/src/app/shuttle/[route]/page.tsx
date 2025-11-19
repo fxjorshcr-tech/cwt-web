@@ -1,4 +1,5 @@
 // src/app/shuttle/[route]/page.tsx
+// ✅ UPDATED - Removed 13+ pax tier & Adjusted Grid to 3 columns
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
@@ -6,9 +7,9 @@ import Link from 'next/link';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import WhatsAppButton from '@/components/WhatsAppButton';
 import { createClient } from '@/lib/supabase/server';
-import { CheckCircle2, Clock, MapPin, Star } from 'lucide-react';
+import { CheckCircle2, Clock, MapPin, Shield, Users, ArrowRight } from 'lucide-react';
 
-// Definir las rutas populares que queremos indexar
+// Definir las rutas populares
 const POPULAR_ROUTES = [
   // SJO Airport routes
   { from: 'SJO', to: 'La Fortuna', slug: 'sjo-to-la-fortuna' },
@@ -16,7 +17,6 @@ const POPULAR_ROUTES = [
   { from: 'SJO', to: 'Tamarindo', slug: 'sjo-to-tamarindo' },
   { from: 'SJO', to: 'Monteverde', slug: 'sjo-to-monteverde' },
   { from: 'SJO', to: 'Puerto Viejo', slug: 'sjo-to-puerto-viejo' },
-  
   // La Fortuna routes
   { from: 'La Fortuna', to: 'SJO', slug: 'la-fortuna-to-sjo' },
   { from: 'La Fortuna', to: 'LIR', slug: 'la-fortuna-to-lir' },
@@ -28,7 +28,6 @@ const POPULAR_ROUTES = [
   { from: 'La Fortuna', to: 'Samara', slug: 'la-fortuna-to-samara' },
   { from: 'La Fortuna', to: 'Nosara', slug: 'la-fortuna-to-nosara' },
   { from: 'La Fortuna', to: 'Puerto Viejo', slug: 'la-fortuna-to-puerto-viejo' },
-  
   // LIR Airport routes
   { from: 'LIR', to: 'Tamarindo', slug: 'lir-to-tamarindo' },
   { from: 'LIR', to: 'Papagayo', slug: 'lir-to-papagayo' },
@@ -37,7 +36,6 @@ const POPULAR_ROUTES = [
   { from: 'LIR', to: 'Santa Teresa', slug: 'lir-to-santa-teresa' },
   { from: 'LIR', to: 'Monteverde', slug: 'lir-to-monteverde' },
   { from: 'LIR', to: 'Rio Celeste', slug: 'lir-to-rio-celeste' },
-  
   // Monteverde routes
   { from: 'Monteverde', to: 'SJO', slug: 'monteverde-to-sjo' },
   { from: 'Monteverde', to: 'Manuel Antonio', slug: 'monteverde-to-manuel-antonio' },
@@ -55,27 +53,24 @@ export async function generateMetadata({ params }: { params: { route: string } }
   const routeData = POPULAR_ROUTES.find(r => r.slug === params.route);
   
   if (!routeData) {
-    return {
-      title: 'Route Not Found',
-    };
+    return { title: 'Route Not Found' };
   }
 
   return {
-    title: `Private Shuttle from ${routeData.from} to ${routeData.to}`,
-    description: `Book your private door-to-door shuttle service from ${routeData.from} to ${routeData.to}. Professional drivers, modern vehicles, flexible scheduling. Licensed by ICT Costa Rica.`,
+    title: `Private Transfer from ${routeData.from} to ${routeData.to} | Direct Operator`,
+    description: `Book your direct private transfer from ${routeData.from} to ${routeData.to}. 100% operated by us. No middlemen, no hidden fees. Licensed by ICT.`,
     keywords: [
-      `${routeData.from} to ${routeData.to} shuttle`,
-      `private transfer ${routeData.from} ${routeData.to}`,
+      `${routeData.from} to ${routeData.to} private transfer`,
+      `taxi ${routeData.from} ${routeData.to}`,
       `transportation ${routeData.from}`,
-      'Costa Rica private shuttle',
-      'airport transfer Costa Rica'
+      'Costa Rica private driver',
+      'direct transport Costa Rica'
     ],
   };
 }
 
 async function getRouteData(from: string, to: string) {
   const supabase = createClient();
-  
   const { data, error } = await supabase
     .from('routes')
     .select('*')
@@ -83,31 +78,22 @@ async function getRouteData(from: string, to: string) {
     .ilike('destino', `%${to}%`)
     .single();
 
-  if (error || !data) {
-    return null;
-  }
-
+  if (error || !data) return null;
   return data;
 }
 
 export default async function ShuttleRoutePage({ params }: { params: { route: string } }) {
   const routeInfo = POPULAR_ROUTES.find(r => r.slug === params.route);
-  
-  if (!routeInfo) {
-    notFound();
-  }
+  if (!routeInfo) notFound();
 
   const routeData = await getRouteData(routeInfo.from, routeInfo.to);
+  if (!routeData) notFound();
 
-  if (!routeData) {
-    notFound();
-  }
-
+  // ✅ CHANGE 1: Removed precio13a18 from calculation
   const minPrice = Math.min(
     routeData.precio1a6 || Infinity,
     routeData.precio7a9 || Infinity,
-    routeData.precio10a12 || Infinity,
-    routeData.precio13a18 || Infinity
+    routeData.precio10a12 || Infinity
   );
 
   return (
@@ -115,95 +101,119 @@ export default async function ShuttleRoutePage({ params }: { params: { route: st
       <BookingNavbar />
       
       <main className="min-h-screen bg-white">
+        {/* Hero Section */}
         <section className="relative h-[60vh] min-h-[500px]">
           <div className="absolute inset-0 z-0">
             <Image
               src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/aerial-view-conchal-beach.webp?width=1600&quality=70"
-              alt={`Private Shuttle from ${routeInfo.from} to ${routeInfo.to}`}
+              alt={`Private Transfer from ${routeInfo.from} to ${routeInfo.to}`}
               fill
               sizes="100vw"
               className="object-cover"
               priority
               quality={70}
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
+            <div className="absolute inset-0 bg-black/60" />
           </div>
 
           <div className="relative z-10 h-full flex flex-col items-center justify-center px-6">
-            <div className="text-center max-w-4xl">
+            <div className="text-center max-w-5xl">
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6 drop-shadow-2xl">
-                {routeInfo.from} to {routeInfo.to}
+                {routeInfo.from} <span className="text-blue-400">to</span> {routeInfo.to}
               </h1>
               
-              <p className="text-xl sm:text-2xl text-white/95 mb-8 drop-shadow-lg">
-                Private Door-to-Door Shuttle Service
+              <p className="text-xl sm:text-2xl text-white/95 mb-8 drop-shadow-lg font-medium">
+                100% Private. Operated by Us.
               </p>
 
-              <div className="flex flex-wrap items-center justify-center gap-6 mb-8">
-                <div className="flex items-center gap-2 text-white">
-                  <Clock className="h-6 w-6" />
-                  <span className="text-lg font-semibold">{routeData.duracion}</span>
+              <div className="flex-wrap items-center justify-center gap-6 mb-10 bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20 inline-flex">
+                <div className="flex items-center gap-3 text-white px-4">
+                  <Clock className="h-5 w-5 text-blue-300" />
+                  <div className="text-left">
+                    <p className="text-xs text-blue-200 uppercase font-bold tracking-wider">Est. Time</p>
+                    <p className="text-lg font-bold leading-none">{routeData.duracion}</p>
+                  </div>
                 </div>
-                <span className="text-white text-2xl">•</span>
-                <div className="flex items-center gap-2 text-white">
-                  <MapPin className="h-6 w-6" />
-                  <span className="text-lg font-semibold">{routeData.kilometros} km</span>
+                
+                <div className="w-px h-10 bg-white/20 hidden sm:block" />
+                
+                <div className="flex items-center gap-3 text-white px-4">
+                  <MapPin className="h-5 w-5 text-blue-300" />
+                  <div className="text-left">
+                    <p className="text-xs text-blue-200 uppercase font-bold tracking-wider">Distance</p>
+                    <p className="text-lg font-bold leading-none">{routeData.kilometros} km</p>
+                  </div>
                 </div>
-                <span className="text-white text-2xl">•</span>
-                <div className="flex items-center gap-2 text-white">
-                  <span className="text-2xl font-bold">From ${minPrice}</span>
-                  <span className="text-sm">per vehicle</span>
+
+                <div className="w-px h-10 bg-white/20 hidden sm:block" />
+
+                <div className="flex items-center gap-3 text-white px-4">
+                  <div className="text-left">
+                    <p className="text-xs text-blue-200 uppercase font-bold tracking-wider">Per Vehicle</p>
+                    <p className="text-2xl font-black leading-none">${minPrice}</p>
+                  </div>
                 </div>
               </div>
 
               <Link
                 href={`/transfers?from=${encodeURIComponent(routeInfo.from)}&to=${encodeURIComponent(routeInfo.to)}`}
-                className="inline-flex items-center justify-center px-12 py-5 text-lg font-bold text-white bg-blue-600 rounded-xl shadow-2xl hover:bg-blue-700 transition-all transform hover:scale-105"
+                className="inline-flex items-center justify-center px-10 py-4 text-lg font-bold text-gray-900 bg-white rounded-xl shadow-xl hover:scale-105 transition-all"
               >
-                Book This Route Now
+                Reserve This Route
               </Link>
             </div>
           </div>
         </section>
 
-        <section className="py-20 bg-gray-50">
+        {/* Content Split */}
+        <section className="py-20 bg-white">
           <div className="container mx-auto px-6 max-w-6xl">
-            <div className="grid md:grid-cols-2 gap-12">
+            <div className="grid md:grid-cols-2 gap-16 items-start">
               
+              {/* Left Column: The Human Description */}
               <div>
                 <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                  About This Route
+                  The Drive
                 </h2>
-                <p className="text-lg text-gray-700 mb-6 leading-relaxed">
-                  Our professional private shuttle service from {routeInfo.from} to {routeInfo.to} offers 
-                  comfortable, safe, and reliable door-to-door transportation. Perfect for families, groups, 
-                  or anyone seeking a stress-free travel experience across Costa Rica.
+                <p className="text-lg text-gray-600 mb-6 leading-relaxed">
+                  This isn't just a transfer; it's a {routeData.duracion} drive through some of Costa Rica's most beautiful landscapes. 
                 </p>
-                <p className="text-lg text-gray-700 leading-relaxed">
-                  The journey takes approximately {routeData.duracion} and covers {routeData.kilometros} km 
-                  through some of Costa Rica&apos;s most beautiful landscapes. We include a complimentary 1-hour 
-                  stop for photos, bathroom breaks, or snacks along the way.
+                <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+                  <strong>We drive this route daily.</strong> We know exactly how to navigate the winding roads and where the best spots are to stretch your legs. Since this is a private service, you are welcome to ask your driver to stop for photos, fruit stands, or a quick bathroom break at any time.
                 </p>
+
+                <div className="bg-blue-50 border border-blue-100 p-6 rounded-xl">
+                  <h3 className="font-bold text-blue-900 mb-2 flex items-center gap-2">
+                    <Shield className="h-5 w-5" />
+                    Direct Operator Guarantee
+                  </h3>
+                  <p className="text-blue-800 text-sm">
+                    You are booking directly with <strong>Can't Wait Travel CR</strong> (License #4121-2025). No third-party agencies, no "middleman" markups.
+                  </p>
+                </div>
               </div>
 
-              <div className="bg-white p-8 rounded-2xl shadow-lg">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">
-                  What&apos;s Included
+              {/* Right Column: What's Included */}
+              <div className="bg-gray-50 p-10 rounded-3xl border border-gray-100">
+                <h3 className="text-2xl font-bold text-gray-900 mb-8">
+                  What's Included
                 </h3>
-                <ul className="space-y-4">
+                <ul className="space-y-5">
                   {[
-                    'Door-to-door private service',
-                    'Professional licensed driver',
-                    'Modern, air-conditioned vehicle',
+                    'Private vehicle (Just your group)',
+                    'English-speaking local driver',
+                    'Door-to-door service',
                     '1-hour complimentary stop',
                     'Luggage assistance',
-                    'Child seats available (free)',
-                    'Flight monitoring (airport pickups)',
-                    '24/7 customer support'
+                    'Free child seats (on request)',
+                    'Waze/Google Maps navigation',
+                    'A/C & Comfortable seating'
                   ].map((item, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <CheckCircle2 className="h-6 w-6 text-green-600 flex-shrink-0 mt-0.5" />
-                      <span className="text-gray-700">{item}</span>
+                    <li key={index} className="flex items-start gap-4">
+                      <div className="bg-white p-1 rounded-full shadow-sm mt-0.5">
+                        <CheckCircle2 className="h-5 w-5 text-green-600" />
+                      </div>
+                      <span className="text-gray-700 font-medium">{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -212,78 +222,57 @@ export default async function ShuttleRoutePage({ params }: { params: { route: st
           </div>
         </section>
 
-        <section className="py-20 bg-white">
+        {/* Pricing Cards */}
+        <section className="py-20 bg-gray-50 border-t border-gray-200">
           <div className="container mx-auto px-6 max-w-6xl">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12 text-center">
-              Transparent Pricing
-            </h2>
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                One Price per Vehicle
+              </h2>
+              <p className="text-gray-600">
+                Total cost for the whole van. No per-person fees.
+              </p>
+            </div>
             
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* ✅ CHANGE 2: Grid changed to lg:grid-cols-3 and removed 4th item */}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {[
-                { capacity: '1-6 passengers', price: routeData.precio1a6 },
-                { capacity: '7-9 passengers', price: routeData.precio7a9 },
-                { capacity: '10-12 passengers', price: routeData.precio10a12 },
-                { capacity: '13-18 passengers', price: routeData.precio13a18 },
+                { capacity: '1-6 Pass.', price: routeData.precio1a6, icon: <Users className="h-6 w-6" /> },
+                { capacity: '7-9 Pass.', price: routeData.precio7a9, icon: <Users className="h-6 w-6" /> },
+                { capacity: '10-12 Pass.', price: routeData.precio10a12, icon: <Users className="h-6 w-6" /> },
               ].map((tier, index) => (
-                <div key={index} className="bg-gray-50 p-6 rounded-xl border-2 border-gray-200 hover:border-blue-500 transition-colors">
-                  <p className="text-gray-600 mb-2">{tier.capacity}</p>
-                  <p className="text-4xl font-bold text-gray-900">${tier.price}</p>
-                  <p className="text-sm text-gray-500 mt-2">per vehicle</p>
+                <div key={index} className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow text-center border border-gray-100">
+                  <div className="flex justify-center text-blue-600 mb-4">{tier.icon}</div>
+                  <p className="text-gray-500 font-medium mb-2">{tier.capacity}</p>
+                  <p className="text-4xl font-black text-gray-900 tracking-tight">${tier.price}</p>
+                  <p className="text-xs text-gray-400 mt-2 uppercase tracking-wide">Total</p>
                 </div>
               ))}
             </div>
-
-            <p className="text-center text-gray-600 mt-8">
-              All prices are per vehicle, not per person. Pay once for your entire group!
-            </p>
           </div>
         </section>
 
-        <section className="py-16 bg-gray-50">
+        {/* CTA Final */}
+        <section className="py-20 bg-white">
           <div className="container mx-auto px-6 max-w-4xl">
-            <div className="bg-white p-8 rounded-2xl shadow-lg">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-                <div className="text-center md:text-left">
-                  <div className="flex items-center gap-2 mb-2 justify-center md:justify-start">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-6 w-6 text-yellow-500 fill-yellow-500" />
-                    ))}
-                  </div>
-                  <p className="text-3xl font-bold text-gray-900">5.0 Rating</p>
-                  <p className="text-gray-600">on Google Reviews</p>
-                </div>
-                
-                <div className="text-center">
-                  <p className="text-3xl font-bold text-gray-900">ICT Licensed</p>
-                  <p className="text-gray-600">#4121-2025</p>
-                </div>
-
-                <div className="text-center md:text-right">
-                  <p className="text-3xl font-bold text-gray-900">24/7</p>
-                  <p className="text-gray-600">Customer Support</p>
-                </div>
-              </div>
+            <div className="bg-gray-900 rounded-3xl p-12 text-center text-white shadow-2xl">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Ready to ride?
+              </h2>
+              <p className="text-lg text-gray-300 mb-8 max-w-xl mx-auto">
+                Secure your vehicle directly with us. No agents, no complexity.
+              </p>
+              <Link
+                href={`/transfers?from=${encodeURIComponent(routeInfo.from)}&to=${encodeURIComponent(routeInfo.to)}`}
+                className="inline-flex items-center justify-center gap-3 px-10 py-4 text-lg font-bold text-gray-900 bg-white rounded-xl shadow-lg hover:scale-105 transition-all"
+              >
+                Reserve Now
+                <ArrowRight className="h-5 w-5" />
+              </Link>
+              <p className="text-gray-500 mt-6 text-sm">
+                 No Charge Cancellations up to 48 hours
+              </p>
             </div>
-          </div>
-        </section>
-
-        <section className="py-20 bg-gradient-to-b from-white to-gray-50">
-          <div className="container mx-auto px-6 max-w-4xl text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-              Ready to Book Your Shuttle?
-            </h2>
-            <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-              Secure your private shuttle from {routeInfo.from} to {routeInfo.to} now and travel with complete peace of mind
-            </p>
-            <Link
-              href={`/transfers?from=${encodeURIComponent(routeInfo.from)}&to=${encodeURIComponent(routeInfo.to)}`}
-              className="inline-flex items-center justify-center px-12 py-4 text-lg font-semibold text-white bg-blue-600 rounded-xl shadow-xl hover:bg-blue-700 hover:shadow-2xl transition-all transform hover:scale-105"
-            >
-              Book Now
-            </Link>
-            <p className="text-sm text-gray-600 mt-4">
-              Free cancellation up to 48 hours before pickup
-            </p>
           </div>
         </section>
 

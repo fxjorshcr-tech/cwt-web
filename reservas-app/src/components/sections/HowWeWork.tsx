@@ -16,7 +16,7 @@ export default function HowWeWork() {
               </span>
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4 px-4">
-              We Only Sell What We Operate
+              Direct Service. No Middlemen. No Surprises.
             </h2>
           </div>
 
@@ -28,9 +28,9 @@ export default function HowWeWork() {
                   <div>
                     <h3 className="font-bold text-gray-900 mb-2 text-sm sm:text-base">What We Do</h3>
                     <ul className="space-y-2 text-gray-700 text-sm sm:text-base">
-                      <li>✅ Operate our own private shuttles</li>
-                      <li>✅ Run our own private tours</li>
-                      <li>✅ Employ and train our drivers directly</li>
+                     <li>✅ Maintain 100% control of our vehicles</li>
+                     <li>✅ Curate and guide our own experiences</li>
+                     <li>✅ Employ only vetted, professional drivers</li>
                     </ul>
                   </div>
                 </div>
@@ -44,9 +44,9 @@ export default function HowWeWork() {
                   <div>
                     <h3 className="font-bold text-gray-900 mb-2 text-sm sm:text-base">What We Don't Do</h3>
                     <ul className="space-y-2 text-gray-700 text-sm sm:text-base">
-                      <li>❌ Resell tours from other companies</li>
-                      <li>❌ Contract out to third parties</li>
-                      <li>❌ Offer services we don't control</li>
+                     <li>❌ Gamble with unverified freelancers</li>
+                     <li>❌ Outsource to random third parties</li>
+                     <li>❌ Promote crowded, low-quality mass tours</li>
                     </ul>
                   </div>
                 </div>
@@ -55,8 +55,9 @@ export default function HowWeWork() {
 
             <div className="mt-6 sm:mt-8 p-4 sm:p-6 bg-white rounded-xl border-2 border-blue-200">
               <p className="text-sm sm:text-base text-gray-700 leading-relaxed text-center">
-                At Can't Wait Travel CR, we focus on <strong>quality over quantity</strong>. That's why 
-                we only offer services that <strong className="text-blue-600">we personally operate and control</strong>.
+                  We take our commitment to you seriously. By <strong>strictly limiting reservations to match our own fleet’s capacity</strong>, 
+                  we ensure that every confirmed booking is backed by a specific vehicle and driver. <strong className="text-blue-600">If we don't
+                  have the space, we don't take the booking.</strong> It’s that simple.
               </p>
             </div>
           </div>

@@ -57,7 +57,7 @@ export function TripCard({
           <div className="mb-4">
             <div className="bg-gradient-to-r from-blue-50 via-blue-100 to-blue-50 px-5 py-4 rounded-xl border border-blue-200">
               <h3 className="text-lg font-bold text-gray-900 text-center">
-                Private Shuttle Booking Form
+                Start Your Journey
               </h3>
             </div>
           </div>

@@ -9,7 +9,7 @@ import CartDropdown from "@/app/cart/CartDropdown";
 
 const navLinks = [
   { label: "Home", href: "/" },
-  { label: "Private Shuttles", href: "/transfers" },
+  { label: "Private Transfers", href: "/transfers" },
   { label: "Most Booked", href: "/shuttle", icon: "🔥" },
   { label: "Tailored Tours", href: "/private-tours" },
   { label: "Travel Guide", href: "/travel-guide" },

@@ -287,11 +287,12 @@ export default async function TourDetailPage({ params }: PageProps) {
                   </p>
                 </div>
 
-                {/* Contact Card */}
+                {/* Contact Card - UNIFIED */}
                 <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border-2 border-green-200">
-                  <h3 className="font-bold text-gray-900 mb-3">Questions?</h3>
+                  <h3 className="font-bold text-gray-900 text-lg mb-3">Got Questions?</h3>
                   <p className="text-sm text-gray-600 mb-4">
-                    Contact us on WhatsApp for instant answers about this tour or custom requests.
+                    Contact us on WhatsApp for instant answers about this tour or custom requests. 
+                    For groups larger than {tour.max_passengers} people, we can provide a custom quote.
                   </p>
                   <Link
                     href={`https://wa.me/50685962438?text=Hi!%20I%20have%20questions%20about%20the%20${encodeURIComponent(tour.name)}%20tour`}
@@ -302,56 +303,8 @@ export default async function TourDetailPage({ params }: PageProps) {
                     Chat on WhatsApp
                   </Link>
                 </div>
-
-                {/* Need More People */}
-                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                  <p className="text-xs text-gray-600 text-center">
-                    <span className="font-semibold">Group larger than {tour.max_passengers}?</span>
-                    <br />
-                    Contact us for a custom quote
-                  </p>
-                </div>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Benefits Section */}
-      <section className="py-16 bg-white border-t border-gray-200">
-        <div className="container mx-auto px-4 max-w-6xl">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-            Why Book Private Tours with Us?
-          </h2>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                icon: '🏆',
-                title: 'Expert Local Guides',
-                description: 'Bilingual naturalist guides with years of experience and deep local knowledge'
-              },
-              {
-                icon: '👨‍👩‍👧‍👦',
-                title: 'Small Groups Only',
-                description: 'Maximum 12 people ensures personalized attention and flexibility'
-              },
-              {
-                icon: '💯',
-                title: 'All-Inclusive Pricing',
-                description: 'No hidden fees - lunch, entrance fees, equipment, and snacks included'
-              }
-            ].map((benefit, index) => (
-              <div key={index} className="text-center">
-                <div className="text-5xl mb-4">{benefit.icon}</div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  {benefit.title}
-                </h3>
-                <p className="text-gray-600">
-                  {benefit.description}
-                </p>
-              </div>
-            ))}
           </div>
         </div>
       </section>

@@ -136,10 +136,10 @@ export default async function Home() {
 
           <div className="relative z-10 h-full flex flex-col items-center justify-center px-4 sm:px-6">
             <div className="text-center max-w-4xl">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-5 drop-shadow-2xl leading-tight">Private Shuttles & Tours</h1>
-              <p className="text-base sm:text-lg md:text-xl text-white/95 mb-6 drop-shadow-lg max-w-2xl mx-auto font-light px-4">Door-to-Door Transportation & Tailored Experiences Across Costa Rica</p>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-5 drop-shadow-2xl leading-tight">Explore Costa Rica Your Way</h1>
+              <p className="text-base sm:text-lg md:text-xl text-white/95 mb-6 drop-shadow-lg max-w-2xl mx-auto font-light px-4">Private Transfers & Tours Led by Trusted Local Experts</p>
               <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 md:gap-6 px-4">
-                <span className="text-sm sm:text-base md:text-lg font-medium text-white drop-shadow-xl">Trusted</span>
+                <span className="text-sm sm:text-base md:text-lg font-medium text-white drop-shadow-xl">Safe</span>
                 <span className="text-white text-lg">•</span>
                 <span className="text-sm sm:text-base md:text-lg font-medium text-white drop-shadow-xl">Flexible</span>
                 <span className="text-white text-lg">•</span>

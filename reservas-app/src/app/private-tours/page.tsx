@@ -41,43 +41,34 @@ export default async function PrivateToursPage() {
         <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full mb-6 border border-white/20">
             <MapPin className="h-5 w-5 text-white" />
-            <span className="text-white text-sm font-medium">LA FORTUNA PRIVATE TOURS</span>
+            <span className="text-white text-sm font-bold uppercase tracking-wide">📍 LOCAL OPERATOR • LA FORTUNA</span>
           </div>
           
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-4 drop-shadow-2xl">
-            Discover La Fortuna
+            La Fortuna: Unlocked.
           </h1>
           
           <p className="text-lg md:text-xl text-white/95 max-w-3xl mx-auto drop-shadow-lg leading-relaxed mb-8">
-            Private tours with expert guides. Small groups (max 12), personalized attention, unforgettable adventures.
+            Experience the volcano region with the locals who know it best. Private tours, hidden spots, and zero rigid schedules. Just you and the rainforest.
           </p>
 
           {/* Quick Stats */}
           <div className="flex flex-wrap justify-center gap-6 text-white">
             <div className="flex items-center gap-2">
               <Users className="h-5 w-5" />
-              <span className="text-sm font-medium">Max 12 People</span>
+              <span className="text-sm font-medium">Private Groups Only</span>
             </div>
             <div className="flex items-center gap-2">
               <Clock className="h-5 w-5" />
-              <span className="text-sm font-medium">8-10 Hour Tours</span>
+              <span className="text-sm font-medium">Full-Day Adventures</span>
             </div>
             <div className="flex items-center gap-2">
               <MapPin className="h-5 w-5" />
-              <span className="text-sm font-medium">Pickup from La Fortuna</span>
+              <span className="text-sm font-medium">Door-to-Door Pickup</span>
             </div>
           </div>
         </div>
       </section>
-
-      {/* Commitment Note */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100">
-        <div className="container mx-auto px-4 py-3">
-          <p className="text-center text-sm text-gray-700">
-            <span className="font-semibold text-blue-700">All tours depart from La Fortuna at 8:00 AM</span> — Small groups, expert guides, lunch included
-          </p>
-        </div>
-      </div>
 
       {/* Tours Grid */}
       <section className="py-16 bg-gradient-to-b from-gray-50 to-white">
@@ -229,94 +220,29 @@ export default async function PrivateToursPage() {
         </div>
       </section>
 
-      {/* Benefits Section */}
+      {/* SEO Content Section - UPDATED */}
       <section className="py-16 bg-white border-t border-gray-200">
         <div className="container mx-auto px-4 max-w-6xl">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">
             Why Choose Our Private Tours?
           </h2>
-          <p className="text-center text-lg text-gray-600 mb-12 max-w-2xl mx-auto">
-            We're not a marketplace — we directly operate every tour for quality you can trust
-          </p>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                icon: '👥',
-                title: 'Small Groups Only',
-                description: 'Maximum 12 people per tour ensures personalized attention and flexibility'
-              },
-              {
-                icon: '🌟',
-                title: 'Expert Local Guides',
-                description: 'Bilingual naturalist guides with deep knowledge of Costa Rican wildlife and culture'
-              },
-              {
-                icon: '🚐',
-                title: 'Comfortable Transportation',
-                description: 'Private A/C vehicles with pickup from your La Fortuna hotel'
-              },
-              {
-                icon: '🍽️',
-                title: 'Lunch Included',
-                description: 'Traditional Costa Rican meals at every tour, dietary needs accommodated'
-              },
-              {
-                icon: '🎫',
-                title: 'All Inclusive Pricing',
-                description: 'Park entrances, equipment, snacks, and fees included — no hidden costs'
-              },
-              {
-                icon: '⚡',
-                title: 'Flexible & Personal',
-                description: 'We adjust pace to your group and can modify itineraries within reason'
-              }
-            ].map((benefit, index) => (
-              <div key={index} className="bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all">
-                <div className="text-4xl mb-4">{benefit.icon}</div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  {benefit.title}
-                </h3>
-                <p className="text-gray-600">
-                  {benefit.description}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          {/* SEO Content Section */}
-          <div className="mt-16 max-w-4xl mx-auto">
-            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                Discover the Natural Wonders of La Fortuna, Costa Rica
-              </h3>
-              <div className="prose prose-gray max-w-none">
-                <p className="text-gray-700 leading-relaxed mb-4">
-                  La Fortuna is one of Costa Rica's most spectacular destinations, nestled at the base of the majestic 
-                  <strong> Arenal Volcano</strong> and surrounded by pristine rainforests, cascading waterfalls, and incredible biodiversity. 
-                  Our region is home to some of the country's most breathtaking natural attractions — from the turquoise waters of 
-                  <strong> Río Celeste</strong> created by volcanic minerals, to the powerful 70-meter <strong>La Fortuna Waterfall</strong> 
-                  plunging into crystal-clear pools, to ancient cloud forests where suspension bridges offer bird's-eye views of the 
-                  rainforest canopy alive with toucans, howler monkeys, and three-toed sloths.
-                </p>
-                <p className="text-gray-700 leading-relaxed mb-4">
-                  The lush tropical landscape around La Fortuna creates the perfect habitat for Costa Rica's famous wildlife. Walk through 
-                  misty cloud forests draped in moss and orchids, where every turn reveals cascading waterfalls and natural pools. 
-                  Hike volcanic trails offering panoramic views of Arenal's perfect cone rising above the jungle. Cross hanging bridges 
-                  suspended high above the forest floor, where colorful birds and playful monkeys swing through the trees just meters away. 
-                  The region's volcanic geology has created unique ecosystems — hot springs heated by the earth's core, mineral-rich 
-                  waterfalls in impossible shades of blue, and fertile rainforests bursting with life.
-                </p>
-                <p className="text-gray-700 leading-relaxed">
-                  As a <strong>locally owned tour company</strong> with <strong>ICT License #4121-2025</strong>, we don't just show you 
-                  these places — we share the stories, ecology, and hidden details that make each location special. Our certified bilingual 
-                  naturalist guides grew up in this region and know where to find sloths sleeping in specific trees, which trails offer 
-                  the best wildlife sightings, and the perfect swimming spots beneath waterfalls. Every private tour includes traditional 
-                  Costa Rican lunch, round-trip transportation, and all entrance fees, with small groups (maximum 12 people) ensuring you 
-                  experience the tranquility and natural beauty that makes La Fortuna unforgettable.
-                </p>
-              </div>
-            </div>
+          <div className="max-w-4xl mx-auto space-y-6">
+            <p className="text-gray-700 leading-relaxed text-lg">
+              La Fortuna sits at the foot of the Arenal Volcano, a region defined by dense rainforests and volcanic activity. From the chemical reaction that turns Río Celeste turquoise, to the 70-meter drop of La Fortuna Waterfall, this area holds some of Costa Rica's most important ecosystems.
+            </p>
+            
+            <p className="text-gray-700 leading-relaxed text-lg">
+              The landscape here is diverse. You can walk through cloud forests on hanging bridges to spot toucans and howler monkeys, or hike trails that offer clear views of the volcano's cone. It is a place where geothermal hot springs and cold waterfalls coexist within the same forest.
+            </p>
+            
+            <p className="text-gray-700 leading-relaxed text-lg">
+              <strong className="text-gray-900">The Local Difference:</strong> As a fully licensed local operator (ICT #4121-2025), we offer a deeper look into this region. Our certified guides are natives of La Fortuna; they know the history of the volcano, the biology of the rainforest, and exactly where to find wildlife without needing to guess.
+            </p>
+            
+            <p className="text-gray-700 leading-relaxed text-lg">
+              We keep our tours strictly private. We believe you should experience these places at your own pace, not on a bus schedule. The price always includes round-trip transportation, entrance fees, and a traditional lunch, ensuring a complete and seamless experience.
+            </p>
           </div>
         </div>
       </section>

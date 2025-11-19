@@ -1,4 +1,3 @@
-// src/app/contact/page.tsx
 // ✅ FIXED - Email correcto, sin horario, link FAQ arreglado
 'use client';
 

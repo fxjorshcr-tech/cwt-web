@@ -32,7 +32,7 @@ export default function MostBookedCTA() {
             <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 rounded-full shadow-lg">
               <Sparkles className="h-4 w-4 text-white" />
               <span className="text-white font-bold text-sm uppercase tracking-wide">
-                Most Requested
+                MOST REQUESTED
               </span>
             </div>
           </div>
@@ -40,12 +40,12 @@ export default function MostBookedCTA() {
           {/* Heading */}
           <div className="text-center mb-12">
             <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 mb-6 leading-tight">
-              Explore Our Most Booked<br className="hidden sm:block" /> 
-              <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Shuttle Routes</span>
+              Traveler Favorites<br className="hidden sm:block" /> 
+              <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Top Private Connections</span>
             </h2>
             
             <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Discover the routes travelers choose most across Costa Rica. From airports to top destinations—transparent pricing, every time.
+              From airport arrivals to the majestic Arenal Volcano. Discover the most popular private routes connected by our reliable fleet
             </p>
           </div>
 
@@ -76,17 +76,17 @@ export default function MostBookedCTA() {
           <div className="flex flex-wrap items-center justify-center gap-4 mb-10 text-xs text-gray-500">
             <span className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
-              Local Drivers
+              Expert Local Drivers
             </span>
             <span className="text-gray-300">•</span>
             <span className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-              Bilingual Service
+              100% Private
             </span>
             <span className="text-gray-300">•</span>
             <span className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 bg-purple-500 rounded-full"></span>
-              ICT Licensed #4121-2025
+              ICT Certified #4121-2025
             </span>
           </div>
 
@@ -96,7 +96,7 @@ export default function MostBookedCTA() {
               href="/shuttle"
               className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-lg rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
             >
-              View All Routes
+              View All Destinations
               <ArrowRight className="h-6 w-6" />
             </Link>
 
@@ -105,7 +105,7 @@ export default function MostBookedCTA() {
               className="inline-flex items-center gap-3 px-8 py-4 bg-white border-2 border-gray-300 text-gray-700 font-bold text-lg rounded-xl hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-all shadow-md hover:shadow-lg transform hover:scale-105"
             >
               <Search className="h-6 w-6" />
-              Book Your Route Now
+              Search Your Route
             </button>
           </div>
 

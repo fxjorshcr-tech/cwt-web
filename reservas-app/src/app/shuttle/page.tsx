@@ -1,16 +1,17 @@
 // src/app/shuttle/page.tsx
+// ✅ UPDATED - Consistent "Private Operator" branding (No "Shuttles")
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import WhatsAppButton from '@/components/WhatsAppButton';
-import { TrendingUp, Clock, DollarSign, MapPin, Flame, ArrowRight, Star } from 'lucide-react';
+import { TrendingUp, Clock, DollarSign, MapPin, Flame, ArrowRight, Star, Shield, CheckCircle2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
-  title: 'Most Booked Shuttle Routes in Costa Rica',
-  description: 'Discover our most popular private shuttle routes across Costa Rica. Book your door-to-door transfer with confidence - these are our customers\' top choices.',
-  keywords: ['Costa Rica shuttles', 'popular routes', 'most booked transfers', 'airport shuttle', 'private transportation'],
+  title: 'Traveler Favorites | Top Private Routes Costa Rica',
+  description: 'Discover the most requested private routes across Costa Rica. Direct transfers from SJO, Liberia, and La Fortuna with local experts.',
+  keywords: ['Costa Rica private transfers', 'popular routes', 'direct transport', 'SJO airport transfer', 'La Fortuna transport'],
 };
 
 const popularRoutes = [
@@ -115,50 +116,57 @@ export default async function MostBookedPage() {
     <>
       <BookingNavbar />
       
-      <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <main className="min-h-screen bg-white">
         {/* Hero Section */}
-        <section className="relative h-[60vh] min-h-[500px]">
+        <section className="relative h-[50vh] min-h-[400px]">
           <div className="absolute inset-0 z-0">
             <Image
               src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/aerial-view-conchal-beach.webp?width=1600&quality=70"
-              alt="Most Booked Shuttle Routes in Costa Rica"
+              alt="Costa Rica Private Transportation Routes"
               fill
               sizes="100vw"
               className="object-cover"
               priority
               quality={70}
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80" />
+            {/* Darker overlay for better text contrast */}
+            <div className="absolute inset-0 bg-black/60" />
           </div>
 
           <div className="relative z-10 h-full flex flex-col items-center justify-center px-6">
             <div className="text-center max-w-5xl">
-              <div className="inline-flex items-center gap-2 bg-orange-500/20 backdrop-blur-sm px-6 py-3 rounded-full border border-orange-400/30 mb-6">
-                <Flame className="h-6 w-6 text-orange-400" />
-                <span className="text-orange-300 font-bold text-lg uppercase tracking-wide">Trending Routes</span>
+              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-5 py-2 rounded-full border border-white/20 mb-6">
+                <Flame className="h-5 w-5 text-orange-400" />
+                <span className="text-white font-bold text-sm tracking-wide uppercase">Traveler Favorites</span>
               </div>
               
-              <h1 className="text-5xl sm:text-6xl md:text-7xl font-black text-white mb-6 drop-shadow-2xl leading-tight">
-                Most Booked Shuttles
+              {/* ✅ HUMANIZED TITLE: No "Shuttles" */}
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6 drop-shadow-xl leading-tight">
+                Where Our Guests Are Going
               </h1>
               
-              <p className="text-xl sm:text-2xl text-white/90 mb-4 drop-shadow-lg max-w-3xl mx-auto leading-relaxed">
-                Join thousands of happy travelers on Costa Rica&apos;s most popular routes
+              <p className="text-lg sm:text-xl text-white/90 mb-8 drop-shadow-md max-w-2xl mx-auto font-medium">
+                The most requested connections. 
               </p>
               
-              <div className="flex items-center justify-center gap-8 text-white/80">
+              <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 text-white">
                 <div className="flex items-center gap-2">
-                  <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
-                  <span className="text-sm font-semibold">5.0 Rating</span>
-                </div>
-                <span className="text-2xl">•</span>
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-green-400" />
-                  <span className="text-sm font-semibold">10,000+ Rides</span>
-                </div>
-                <span className="text-2xl">•</span>
-                <div className="flex items-center gap-2">
+                  <div className="bg-white/20 p-1.5 rounded-full">
+                    <Shield className="h-4 w-4" />
+                  </div>
                   <span className="text-sm font-semibold">ICT Licensed</span>
+                </div>
+                <div className="flex items-center gap-2">
+                   <div className="bg-white/20 p-1.5 rounded-full">
+                    <CheckCircle2 className="h-4 w-4" />
+                  </div>
+                  <span className="text-sm font-semibold">100% Private</span>
+                </div>
+                <div className="flex items-center gap-2">
+                   <div className="bg-white/20 p-1.5 rounded-full">
+                    <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                  </div>
+                  <span className="text-sm font-semibold">30+ Years of Combined Experience</span>
                 </div>
               </div>
             </div>
@@ -166,20 +174,17 @@ export default async function MostBookedPage() {
         </section>
 
         {/* Routes Grid */}
-        <section className="py-24">
+        <section className="py-20 bg-gray-50">
           <div className="container mx-auto px-6 max-w-7xl">
             
             {routesWithData.map((category, idx) => (
               <div key={idx} className="mb-20 last:mb-0">
-                <div className="flex items-center gap-4 mb-10">
-                  <div className="text-5xl">{category.icon}</div>
+                <div className="flex items-center gap-4 mb-10 border-b border-gray-200 pb-4">
+                  <div className="text-4xl">{category.icon}</div>
                   <div>
-                    <h2 className="text-4xl font-black text-gray-900 flex items-center gap-3">
+                    <h2 className="text-3xl font-bold text-gray-900">
                       {category.category}
                     </h2>
-                    <p className="text-gray-600 mt-1">
-                      {category.routes.filter(r => r.price !== null).length} available routes
-                    </p>
                   </div>
                 </div>
                 
@@ -190,64 +195,52 @@ export default async function MostBookedPage() {
                     <Link
                       key={route.slug}
                       href={`/shuttle/${route.slug}`}
-                      className="group relative bg-white rounded-2xl overflow-hidden border-2 border-gray-100 hover:border-blue-500 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
+                      className="group relative bg-white rounded-xl overflow-hidden border border-gray-200 hover:border-blue-500 hover:shadow-xl transition-all duration-300"
                     >
-                      {/* Hot Badge */}
+                      {/* Hot Badge - Kept simple */}
                       {route.isHot && (
-                        <div className="absolute top-4 right-4 z-10">
-                          <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg">
-                            <Flame className="h-3 w-3" />
-                            HOT
+                        <div className="absolute top-0 right-0 z-10">
+                          <div className="bg-blue-600 text-white px-3 py-1 rounded-bl-xl text-xs font-bold">
+                            POPULAR
                           </div>
                         </div>
                       )}
 
-                      {/* Gradient Background */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-purple-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      
                       <div className="relative p-6">
                         <div className="mb-4">
-                          <div className="flex items-center gap-2 text-gray-500 text-sm mb-2">
-                            <MapPin className="h-4 w-4" />
-                            <span className="font-medium">Route</span>
+                          <div className="flex items-center gap-2 text-gray-400 text-xs font-medium uppercase tracking-wider mb-2">
+                            <MapPin className="h-3 w-3" />
+                            <span>Direct Route</span>
                           </div>
-                          <h3 className="text-2xl font-black text-gray-900 group-hover:text-blue-600 transition-colors">
+                          <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors flex items-center flex-wrap gap-2">
                             {route.from}
-                            <ArrowRight className="inline-block mx-2 h-6 w-6" />
+                            <ArrowRight className="h-4 w-4 text-gray-400" />
                             {route.to}
                           </h3>
                         </div>
 
                         <div className="space-y-3 mb-6">
-                          {route.duration && (
-                            <div className="flex items-center gap-3">
-                              <div className="bg-blue-100 p-2 rounded-lg">
-                                <Clock className="h-4 w-4 text-blue-600" />
-                              </div>
-                              <div>
-                                <p className="text-xs text-gray-500 font-medium">Duration</p>
-                                <p className="text-sm font-bold text-gray-900">{route.duration}</p>
-                              </div>
-                            </div>
-                          )}
-                          {route.price && (
-                            <div className="flex items-center gap-3">
-                              <div className="bg-green-100 p-2 rounded-lg">
-                                <DollarSign className="h-4 w-4 text-green-600" />
-                              </div>
-                              <div>
-                                <p className="text-xs text-gray-500 font-medium">Starting at</p>
-                                <p className="text-2xl font-black text-gray-900">${route.price}</p>
-                              </div>
-                            </div>
-                          )}
+                          <div className="flex justify-between items-end border-t border-gray-100 pt-4">
+                             {route.duration && (
+                                <div>
+                                    <p className="text-xs text-gray-500">Est. Time</p>
+                                    <div className="flex items-center gap-1 text-sm font-semibold text-gray-700">
+                                        <Clock className="h-3 w-3" />
+                                        {route.duration}
+                                    </div>
+                                </div>
+                             )}
+                             {route.price && (
+                                <div className="text-right">
+                                    <p className="text-xs text-gray-500">Private Vehicle</p>
+                                    <p className="text-xl font-black text-gray-900">${route.price}</p>
+                                </div>
+                             )}
+                          </div>
                         </div>
 
-                        <div className="pt-4 border-t border-gray-200 flex items-center justify-between">
-                          <span className="text-blue-600 font-bold group-hover:text-blue-700">
-                            View Details
-                          </span>
-                          <ArrowRight className="h-5 w-5 text-blue-600 transform group-hover:translate-x-1 transition-transform" />
+                        <div className="w-full bg-gray-50 py-2 text-center text-sm font-semibold text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors rounded-lg">
+                           Route Info
                         </div>
                       </div>
                     </Link>
@@ -259,25 +252,27 @@ export default async function MostBookedPage() {
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section className="py-20 bg-gradient-to-br from-blue-600 to-purple-600">
-          <div className="container mx-auto px-6 max-w-4xl text-center">
-            <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
-              Don&apos;t See Your Route?
-            </h2>
-            <p className="text-xl text-white/90 mb-10 leading-relaxed">
-              We service <span className="font-bold">ALL destinations</span> across Costa Rica. Get a custom quote in seconds!
-            </p>
-            <Link
-              href="/transfers"
-              className="inline-flex items-center justify-center gap-3 px-12 py-5 text-xl font-bold text-blue-600 bg-white rounded-2xl shadow-2xl hover:shadow-3xl hover:scale-105 transition-all transform"
-            >
-              Get Custom Quote
-              <ArrowRight className="h-6 w-6" />
-            </Link>
-            <p className="text-white/80 mt-6 text-sm">
-              ✓ Instant confirmation • ✓ Free cancellation • ✓ 24/7 support
-            </p>
+        {/* CTA Section - HUMAN VERSION (Matching previous page) */}
+        <section className="py-20 bg-white">
+          <div className="container mx-auto px-6 max-w-4xl">
+            <div className="bg-gray-900 rounded-3xl p-12 text-center text-white shadow-2xl">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Going somewhere else?
+              </h2>
+              <p className="text-lg text-gray-300 mb-8 max-w-xl mx-auto">
+                We drive everywhere in Costa Rica. If there's a road, we can take you there.
+              </p>
+              <Link
+                href="/transfers"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 text-lg font-semibold text-gray-900 bg-white rounded-xl shadow-lg hover:scale-105 transition-all"
+              >
+                Get a Custom Quote
+                <ArrowRight className="h-5 w-5" />
+              </Link>
+              <p className="text-gray-500 mt-6 text-sm">
+                 Direct Operator • No Hidden Fees
+              </p>
+            </div>
           </div>
         </section>
 

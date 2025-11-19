@@ -75,7 +75,7 @@ export default function BookingSteps() {
             Book Your Transfer in 4 Simple Steps
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Complete your booking in under 3 minutes
+            Follow the instructions
           </p>
         </div>
 

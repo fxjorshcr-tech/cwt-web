@@ -2,7 +2,7 @@
 'use client';
 
 import Image from 'next/image';
-import { MapPin, Mountain, Users, Award, Clock } from 'lucide-react';
+import { MapPin, Mountain, Clock, Camera, Award } from 'lucide-react';
 
 export default function WhyPrivateShuttle() {
   return (
@@ -18,10 +18,10 @@ export default function WhyPrivateShuttle() {
             </span>
           </div>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 leading-tight">
-            Why Private Shuttle?
+            Why Choose Private Transportation?
           </h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Experience the difference of personalized, door-to-door Costa Rica transportation
+            Experience the difference of personalized, stress-free travel across Costa Rica
           </p>
         </div>
 
@@ -30,7 +30,7 @@ export default function WhyPrivateShuttle() {
           {/* Left Side - Text Content */}
           <div className="order-2 lg:order-1">
             <div className="space-y-6 mb-8">
-              {/* Reason 1 */}
+              {/* Reason 1: Master the Mountain Roads */}
               <div className="flex gap-4">
                 <div className="flex-shrink-0">
                   <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
@@ -38,67 +38,73 @@ export default function WhyPrivateShuttle() {
                   </div>
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-2 text-lg">Navigate Costa Rica with Ease</h3>
+                  <h3 className="font-bold text-gray-900 mb-2 text-lg">Master the Mountain Roads</h3>
                   <p className="text-gray-600 leading-relaxed">
-                    Costa Rica's mountain roads and rural routes can be challenging. Our experienced drivers know every turn, 
-                    ensuring you arrive safely and comfortably without the stress of navigating unfamiliar terrain.
+                    Costa Rica's geography is breathtaking but demanding. Our professional drivers handle the 
+                    winding roads, fog, and local traffic patterns, so you can simply relax and enjoy the view 
+                    without the stress behind the wheel.
                   </p>
                 </div>
               </div>
 
-              {/* Reason 2 */}
+              {/* Reason 2: Your Schedule, Not Ours */}
               <div className="flex gap-4">
                 <div className="flex-shrink-0">
                   <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
-                    <Users className="h-6 w-6 text-orange-600" />
+                    <Clock className="h-6 w-6 text-orange-600" />
                   </div>
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-2 text-lg">Comfort & Convenience</h3>
+                  <h3 className="font-bold text-gray-900 mb-2 text-lg">Your Schedule, Not Ours</h3>
                   <p className="text-gray-600 leading-relaxed">
-                    Skip the crowded shared shuttles and complicated schedules. Travel on your time, in air-conditioned comfort, 
-                    with door-to-door service that lets you relax and enjoy the journey.
+                    Forget about waiting for other passengers or strictly fixed timetables. We depart exactly 
+                    when you want. Direct, door-to-door service means you maximize your vacation time.
                   </p>
                 </div>
               </div>
 
-              {/* Reason 3 */}
+              {/* Reason 3: Freedom to Explore */}
               <div className="flex gap-4">
                 <div className="flex-shrink-0">
                   <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                    <Clock className="h-6 w-6 text-green-600" />
+                    <Camera className="h-6 w-6 text-green-600" />
                   </div>
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-2 text-lg">Flexible & Personalized</h3>
+                  <h3 className="font-bold text-gray-900 mb-2 text-lg">Freedom to Explore</h3>
                   <p className="text-gray-600 leading-relaxed">
-                    Enjoy the liberty to pause for a scenic vista or explore local flavors at your leisure. Private travel grants you absolute control 
-                    over your itinerary, ensuring an experience perfectly tailored to your preferences
+                    Want to stop for a photo of a waterfall? Need a quick break for local fruit? Unlike shared buses, 
+                    we run on your rhythm. With us, the transfer is part of the adventure.
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* About Can't Wait Travel */}
+            {/* About Can't Wait Travel - Updated */}
             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 sm:p-8 border-2 border-blue-100">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0">
                   <Award className="h-6 w-6 sm:h-7 sm:w-7 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 text-lg sm:text-xl">Can't Wait Travel</h3>
+                  <h3 className="font-bold text-gray-900 text-lg sm:text-xl">More Than Just a Ride</h3>
                   <p className="text-xs sm:text-sm text-gray-600">Your Local Transportation Partner</p>
                 </div>
               </div>
               <p className="text-sm sm:text-base text-gray-700 leading-relaxed mb-4">
-                Costa Rica is beautiful, but our roads can sometimes be challenging. We know that reliable transportation can make or break a trip. We want you to feel safe and confident,
-                not worried or overwhelmed. With our 30 years of combined experience, you can trust that you are in safe hands, making your ride as enjoyable as the destination.
+                Let's be honest: Costa Rica is a paradise, but our roads can be unpredictable. We believe 
+                your transfer should be the most relaxing part of your day, not a source of worry.
+              </p>
+              <p className="text-sm sm:text-base text-gray-700 leading-relaxed mb-4">
+                With over <strong>30 years of combined experience</strong>, we don't just offer a vehicle; 
+                we offer the certainty that you and your family are in the safest hands possible. We navigate 
+                the challenges so you don't have to.
               </p>
               
               {/* Quote with Logo */}
               <div className="border-t border-blue-200 pt-4 space-y-3">
                 <p className="text-sm sm:text-base text-gray-700 leading-relaxed font-medium italic">
-                  "For us, every trip is a chance to share the Costa Rica we love."
+                  "For us, driving isn't just a job—it's our way of welcoming you to the Costa Rica we love."
                 </p>
                 {/* Logo - Responsive */}
                 <div className="flex justify-end">
@@ -125,7 +131,7 @@ export default function WhyPrivateShuttle() {
               <div className="absolute inset-0 bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100">
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 sm:p-8">
                   <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mb-4 sm:mb-6 shadow-2xl">
-                    <Users className="h-12 w-12 sm:h-16 sm:w-16 text-white" />
+                    <Mountain className="h-12 w-12 sm:h-16 sm:w-16 text-white" />
                   </div>
                   <p className="text-gray-600 text-base sm:text-lg font-semibold mb-2">Team Photo Goes Here</p>
                   <p className="text-gray-500 text-xs sm:text-sm max-w-xs mb-4">

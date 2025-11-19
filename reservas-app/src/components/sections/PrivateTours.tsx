@@ -15,17 +15,16 @@ export default function PrivateTours() {
           <div className="inline-flex items-center gap-2 px-5 py-2 bg-orange-100 border border-orange-200 rounded-full mb-6">
             <Mountain className="h-5 w-5 text-orange-600" />
             <span className="text-orange-700 font-bold text-sm uppercase tracking-wide">
-              We Operate These Tours Directly
+              📍 DEPARTING FROM LA FORTUNA
             </span>
           </div>
           
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-            Memorable Private Tours
+            Signature Private Adventures
           </h2>
           
           <p className="text-gray-600 max-w-3xl mx-auto text-base sm:text-lg leading-relaxed mb-8">
-            Departing from La Fortuna. Created and operated by us—no third-party reselling. Our expert local guides bring 
-            the region's natural wonders to life with personalized, small-group full-day and half-day experiences.
+            Authentic experiences created by Can't Wait Travel CR. Just you, our expert guides, and the magic of the rainforest.
           </p>
 
           {/* Why Our Tours */}
@@ -42,7 +41,7 @@ export default function PrivateTours() {
             <span className="text-gray-300 hidden sm:inline">•</span>
             <div className="flex items-center gap-2">
               <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600" />
-              <span className="text-xs sm:text-base font-semibold text-gray-700">Small Groups (Max 12)</span>
+              <span className="text-xs sm:text-base font-semibold text-gray-700">Private Groups Only</span>
             </div>
           </div>
         </div>
@@ -89,44 +88,6 @@ export default function PrivateTours() {
                     Wildlife & Nature
                   </span>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Why Choose Our Tours Box */}
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 sm:p-8 mb-12 border-2 border-blue-100">
-          <div className="max-w-3xl mx-auto text-center">
-            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">
-              Why Choose Our La Fortuna Tours?
-            </h3>
-            <div className="grid sm:grid-cols-3 gap-6 text-left">
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0" />
-                  <h4 className="font-bold text-gray-900">Small Groups</h4>
-                </div>
-                <p className="text-sm text-gray-600">
-                  Maximum 12 people ensures personalized attention and flexibility
-                </p>
-              </div>
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <Mountain className="h-5 w-5 text-green-600 flex-shrink-0" />
-                  <h4 className="font-bold text-gray-900">Local Experts</h4>
-                </div>
-                <p className="text-sm text-gray-600">
-                  Bilingual naturalist guides with deep knowledge of La Fortuna
-                </p>
-              </div>
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <CheckCircle className="h-5 w-5 text-orange-600 flex-shrink-0" />
-                  <h4 className="font-bold text-gray-900">All-Inclusive</h4>
-                </div>
-                <p className="text-sm text-gray-600">
-                  Lunch, entrance fees, equipment included - no hidden costs
-                </p>
               </div>
             </div>
           </div>
