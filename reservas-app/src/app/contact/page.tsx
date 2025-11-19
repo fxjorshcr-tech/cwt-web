@@ -1,5 +1,5 @@
 // src/app/contact/page.tsx
-// ✅ FIXED - Sin metadata export en client component
+// ✅ FIXED - Email correcto, sin horario, link FAQ arreglado
 'use client';
 
 import { useState } from 'react';
@@ -10,7 +10,6 @@ import {
   Mail,
   Phone,
   MapPin,
-  Clock,
   Send,
   CheckCircle2,
   MessageSquare,
@@ -124,7 +123,7 @@ export default function ContactPage() {
 
               {/* Email */}
               <a
-                href="mailto:info@cantwaittravelcr.com"
+                href="mailto:contact@cantwaittravelcr.com"
                 className="bg-white rounded-xl shadow-lg p-6 border-2 border-blue-200 hover:border-blue-400 hover:shadow-xl transition-all group"
               >
                 <div className="flex items-start gap-4">
@@ -134,7 +133,7 @@ export default function ContactPage() {
                   <div className="flex-1">
                     <h3 className="font-bold text-gray-900 mb-2">Email</h3>
                     <p className="text-sm text-gray-600 mb-2">Response within 2 hours</p>
-                    <p className="text-blue-600 font-semibold text-sm break-all">info@cantwaittravelcr.com</p>
+                    <p className="text-blue-600 font-semibold text-sm break-all">contact@cantwaittravelcr.com</p>
                   </div>
                 </div>
               </a>
@@ -293,43 +292,6 @@ export default function ContactPage() {
               {/* Additional Info */}
               <div className="space-y-8">
                 
-                {/* Office Hours */}
-                <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-200">
-                  <div className="flex items-start gap-4 mb-6">
-                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Clock className="h-6 w-6 text-blue-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-2">Office Hours</h3>
-                      <p className="text-gray-600 text-sm">Available for calls and emails</p>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                      <span className="text-gray-700 font-medium">Monday - Friday</span>
-                      <span className="text-gray-900 font-semibold">7:00 AM - 8:00 PM</span>
-                    </div>
-                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                      <span className="text-gray-700 font-medium">Saturday</span>
-                      <span className="text-gray-900 font-semibold">8:00 AM - 6:00 PM</span>
-                    </div>
-                    <div className="flex justify-between items-center py-2">
-                      <span className="text-gray-700 font-medium">Sunday</span>
-                      <span className="text-gray-900 font-semibold">9:00 AM - 5:00 PM</span>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
-                    <p className="text-sm text-gray-700 flex items-start gap-2">
-                      <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                      <span>
-                        <strong className="text-green-900">WhatsApp available 24/7</strong> for urgent inquiries
-                      </span>
-                    </p>
-                  </div>
-                </div>
-
                 {/* Location */}
                 <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-200">
                   <div className="flex items-start gap-4 mb-6">
@@ -344,7 +306,7 @@ export default function ContactPage() {
                   
                   <p className="text-gray-700 mb-4 leading-relaxed">
                     While our main office is in La Fortuna, we operate throughout Costa Rica with 
-                    pickups from both San José (SJO) and Liberia (LIR) airports.
+                    pickups from both San José (SJO) Liberia (LIR) airports.
                   </p>
 
                   <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
@@ -363,7 +325,7 @@ export default function ContactPage() {
                     cancellations, payments, and more.
                   </p>
                   <a
-                    href="/faq"
+                    href="/faqs"
                     className="inline-flex items-center gap-2 px-6 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:shadow-lg transition-all"
                   >
                     View FAQ
