@@ -10,6 +10,16 @@ export const revalidate = 3600; // Revalidar cada hora
 export default async function PrivateToursPage() {
   const tours = await getAllTours();
 
+  // Helper para determinar tiempo de manejo
+  const getDriveTime = (slug: string) => {
+    const driveTimes: Record<string, string> = {
+      'poas-la-paz-waterfall': '2h drive',
+      'rio-celeste-frog-sloth-tour': '1h drive',
+      'bajos-del-toro-blue-falls': '1.5h drive',
+    };
+    return driveTimes[slug] || null;
+  };
+
   return (
     <>
       <BookingNavbar />
@@ -85,7 +95,10 @@ export default async function PrivateToursPage() {
 
           {/* Tours Cards Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {tours.map((tour) => (
+            {tours.map((tour) => {
+              const driveTime = getDriveTime(tour.slug);
+              
+              return (
               <Link
                 key={tour.id}
                 href={`/private-tours/${tour.slug}`}
@@ -118,6 +131,14 @@ export default async function PrivateToursPage() {
                       {tour.difficulty}
                     </span>
                   </div>
+
+                  {/* Drive Time Badge - NEW */}
+                  {driveTime && (
+                    <div className="absolute top-16 left-4 bg-orange-500/95 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                      <span className="text-white text-xs">🚗</span>
+                      <span className="font-semibold text-xs text-white">{driveTime}</span>
+                    </div>
+                  )}
 
                   {/* Title on Image */}
                   <div className="absolute bottom-4 left-4 right-4">
@@ -177,47 +198,33 @@ export default async function PrivateToursPage() {
                   </div>
                 </div>
               </Link>
-            ))}
+            );
+            })}
           </div>
 
-          {/* Large Groups CTA */}
-          <div className="mt-16 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 md:p-12 border border-blue-100 text-center">
-            <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-              Traveling with More Than 12 People?
-            </h3>
-            <p className="text-lg text-gray-600 mb-6 max-w-2xl mx-auto">
-              We specialize in customizing tours for larger groups and families. 
-              Contact us for a personalized quote and we'll create the perfect experience for your group.
-            </p>
-            <Link
-              href="https://wa.me/50685962438?text=Hi!%20I'm%20interested%20in%20a%20private%20tour%20for%20a%20group%20of%20more%20than%2012%20people"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl transition-colors shadow-lg"
-            >
-              <span>Contact Us on WhatsApp</span>
-              <ArrowRight className="h-5 w-5" />
-            </Link>
-          </div>
-
-          {/* Custom Tour CTA */}
-          <div className="mt-8 bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl p-8 md:p-12 border border-orange-100 text-center">
-            <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-              Don't See What You're Looking For?
-            </h3>
-            <p className="text-lg text-gray-600 mb-6 max-w-2xl mx-auto">
-              We can create custom itineraries combining multiple destinations or activities. 
-              Tell us your interests and we'll design the perfect tour for you.
-            </p>
-            <Link
-              href="https://wa.me/50685962438?text=Hi!%20I'd%20like%20to%20request%20a%20custom%20private%20tour"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl transition-colors shadow-lg"
-            >
-              <span>Request Custom Tour</span>
-              <ArrowRight className="h-5 w-5" />
-            </Link>
+          {/* ✅ Custom Tours CTA - Elegante */}
+          <div className="mt-16 bg-white rounded-2xl p-8 md:p-12 border-2 border-gray-200 shadow-lg">
+            <div className="text-center max-w-2xl mx-auto">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-2xl mb-6">
+                <span className="text-3xl">✨</span>
+              </div>
+              
+              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+                Have Something Specific in Mind?
+              </h3>
+              
+              <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+                We can create custom itineraries combining multiple destinations or activities throughout Costa Rica. Tell us your interests and we'll design the perfect tour for you.
+              </p>
+              
+              <Link
+                href="/contact"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-gray-900 text-white font-semibold rounded-xl hover:bg-gray-800 transition-all shadow-md hover:shadow-xl"
+              >
+                <span>Contact Us</span>
+                <ArrowRight className="h-5 w-5" />
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -275,6 +282,41 @@ export default async function PrivateToursPage() {
                 </p>
               </div>
             ))}
+          </div>
+
+          {/* SEO Content Section */}
+          <div className="mt-16 max-w-4xl mx-auto">
+            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                Discover the Natural Wonders of La Fortuna, Costa Rica
+              </h3>
+              <div className="prose prose-gray max-w-none">
+                <p className="text-gray-700 leading-relaxed mb-4">
+                  La Fortuna is one of Costa Rica's most spectacular destinations, nestled at the base of the majestic 
+                  <strong> Arenal Volcano</strong> and surrounded by pristine rainforests, cascading waterfalls, and incredible biodiversity. 
+                  Our region is home to some of the country's most breathtaking natural attractions — from the turquoise waters of 
+                  <strong> Río Celeste</strong> created by volcanic minerals, to the powerful 70-meter <strong>La Fortuna Waterfall</strong> 
+                  plunging into crystal-clear pools, to ancient cloud forests where suspension bridges offer bird's-eye views of the 
+                  rainforest canopy alive with toucans, howler monkeys, and three-toed sloths.
+                </p>
+                <p className="text-gray-700 leading-relaxed mb-4">
+                  The lush tropical landscape around La Fortuna creates the perfect habitat for Costa Rica's famous wildlife. Walk through 
+                  misty cloud forests draped in moss and orchids, where every turn reveals cascading waterfalls and natural pools. 
+                  Hike volcanic trails offering panoramic views of Arenal's perfect cone rising above the jungle. Cross hanging bridges 
+                  suspended high above the forest floor, where colorful birds and playful monkeys swing through the trees just meters away. 
+                  The region's volcanic geology has created unique ecosystems — hot springs heated by the earth's core, mineral-rich 
+                  waterfalls in impossible shades of blue, and fertile rainforests bursting with life.
+                </p>
+                <p className="text-gray-700 leading-relaxed">
+                  As a <strong>locally owned tour company</strong> with <strong>ICT License #4121-2025</strong>, we don't just show you 
+                  these places — we share the stories, ecology, and hidden details that make each location special. Our certified bilingual 
+                  naturalist guides grew up in this region and know where to find sloths sleeping in specific trees, which trails offer 
+                  the best wildlife sightings, and the perfect swimming spots beneath waterfalls. Every private tour includes traditional 
+                  Costa Rican lunch, round-trip transportation, and all entrance fees, with small groups (maximum 12 people) ensuring you 
+                  experience the tranquility and natural beauty that makes La Fortuna unforgettable.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>

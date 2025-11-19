@@ -9,6 +9,7 @@ import {
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import { getTourBySlug, getAllTours } from '@/lib/supabase-tours';
 import { TourGallery } from '@/components/tours/TourGallery';
+import { TourItinerary } from '@/components/tours/TourItinerary';
 
 export const revalidate = 3600;
 
@@ -31,6 +32,27 @@ export default async function TourDetailPage({ params }: PageProps) {
   if (!tour) {
     notFound();
   }
+
+  // Determinar tiempo de manejo
+  const getDriveTime = (slug: string) => {
+    const driveTimes: Record<string, { time: string; description: string }> = {
+      'poas-la-paz-waterfall': { 
+        time: '2h drive', 
+        description: 'Beautiful 2-hour mountain drive to Poás' 
+      },
+      'rio-celeste-frog-sloth-tour': { 
+        time: '1h drive', 
+        description: 'Scenic 1-hour drive each way from La Fortuna' 
+      },
+      'bajos-del-toro-blue-falls': { 
+        time: '1.5h drive', 
+        description: 'Scenic 1.5-hour drive through mountain countryside' 
+      },
+    };
+    return driveTimes[slug] || null;
+  };
+
+  const driveTimeInfo = getDriveTime(params.tourId);
 
  const difficultyColors: Record<string, string> = {
   Easy: 'text-green-600 bg-green-50 border-green-200',
@@ -93,6 +115,12 @@ export default async function TourDetailPage({ params }: PageProps) {
                 <MapPin className="h-5 w-5 text-blue-600" />
                 <span className="font-semibold">Pickup {tour.pickup_time}</span>
               </div>
+              {driveTimeInfo && (
+                <div className="px-4 py-2 bg-orange-500/95 backdrop-blur-sm rounded-lg flex items-center gap-2">
+                  <span className="text-white">🚗</span>
+                  <span className="font-semibold text-white">{driveTimeInfo.time}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -137,13 +165,8 @@ export default async function TourDetailPage({ params }: PageProps) {
                 </div>
               </div>
 
-              {/* Full Description */}
-              <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">About This Tour</h2>
-                <p className="text-gray-700 leading-relaxed text-lg">
-                  {tour.long_description}
-                </p>
-              </div>
+              {/* Tour Itinerary - UPDATED with new component */}
+              <TourItinerary description={tour.long_description} />
 
               {/* What's Included / Not Included */}
               <div className="grid md:grid-cols-2 gap-6">
