@@ -121,15 +121,18 @@ export default function TravelGuideClient({ destinations, zones }: TravelGuideCl
                   {/* Expandable Content */}
                   {isOpen && (
                     <div className="border-t border-gray-200">
-                      {/* Mini Hero Image */}
+                      {/* Mini Hero Image - OPTIMIZADO */}
                       <div className="relative h-52 md:h-64">
                         <Image
                           src={dest.image}
-                          alt={dest.name}
+                          alt={`${dest.name} - Costa Rica Travel Guide`}
                           fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
                           className="object-cover"
-                          quality={65}
+                          quality={60}
                           loading="lazy"
+                          placeholder="blur"
+                          blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA="
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                       </div>

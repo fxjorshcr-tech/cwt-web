@@ -50,7 +50,7 @@ export default function PrivateTours() {
         <div className="mb-12">
           <div className="relative h-[350px] sm:h-[450px] md:h-[500px] lg:h-[600px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl">
             <Image
-              src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/arenal-volcano-tour-visit.webp"
+              src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/arenal-volcano-mountains-sky-costa-rica.webp"
               alt="Arenal Volcano Tours - La Fortuna Costa Rica"
               fill
               className="object-cover"

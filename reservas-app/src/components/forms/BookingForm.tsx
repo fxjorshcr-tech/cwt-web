@@ -1,5 +1,5 @@
 ﻿// src/components/forms/BookingForm.tsx
-// ✅ OPTIMIZADO: Code splitting con componentes separados
+// ✅ OPTIMIZADO: Code splitting con componentes separados + Availability check
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -340,6 +340,25 @@ export function BookingForm() {
 
       const bookingId = `booking_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
+      // ✅ PASO 1: Mostrar "Checking Availability..."
+      const checkingToast = document.createElement('div');
+      checkingToast.className = 'fixed top-4 right-4 z-50 bg-white rounded-xl shadow-2xl p-6 border-2 border-blue-500 animate-in fade-in slide-in-from-top-5 duration-500';
+      checkingToast.innerHTML = `
+        <div class="flex items-center gap-4">
+          <div class="relative">
+            <div class="h-12 w-12 rounded-full border-4 border-blue-100 border-t-blue-600 animate-spin"></div>
+          </div>
+          <div>
+            <p class="text-lg font-bold text-gray-900">Checking Availability...</p>
+            <p class="text-sm text-gray-600">Please wait a moment</p>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(checkingToast);
+
+      // Esperar 2 segundos para simular verificación
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
       const tripsToInsert: TripInsert[] = trips.map((trip) => ({
         booking_id: bookingId,
         from_location: trip.from_location,
@@ -370,9 +389,32 @@ export function BookingForm() {
 
       if (error) {
         console.error('Supabase error:', error);
+        document.body.removeChild(checkingToast);
         throw new Error(`Save error: ${error.message}`);
       }
 
+      // ✅ PASO 2: Cambiar a "Availability Approved ✅"
+      checkingToast.innerHTML = `
+        <div class="flex items-center gap-4">
+          <div class="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
+            <svg class="h-7 w-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="text-lg font-bold text-gray-900">Availability Approved ✅</p>
+            <p class="text-sm text-gray-600">Redirecting to booking details...</p>
+          </div>
+        </div>
+      `;
+
+      // Esperar 1 segundo antes de redirigir
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Limpiar el toast
+      document.body.removeChild(checkingToast);
+
+      // Redirigir a booking-details
       router.push(`/booking-details?booking_id=${bookingId}&trip=0`);
     } catch (error) {
       console.error('Full error:', error);

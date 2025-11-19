@@ -28,7 +28,7 @@ export default async function PrivateToursPage() {
       <section className="relative h-[70vh] min-h-[500px] flex items-center justify-center">
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/arenal-volcano-tour-visit.webp"
+            src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/arenal-volcano-mountains-sky-costa-rica.webp"
             alt="La Fortuna Private Tours"
             fill
             className="object-cover"
