@@ -1,6 +1,7 @@
 ﻿// src/components/summary/OrderSummaryCard.tsx
-import { ArrowLeft, ShoppingCart } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+// ✅ MEJORADO: Trips destacado en la misma línea del título
+import { ArrowLeft, ShoppingCart, Moon, Sparkles, CreditCard, Info } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import TermsCheckbox from '@/components/booking/TermsCheckbox';
 import { formatCurrency } from '@/lib/formatters';
@@ -26,8 +27,13 @@ interface OrderSummaryCardProps {
 }
 
 const ADD_ON_PRICES: Record<string, number> = {
-  tico_time: 160,
-  flex_time: 45,
+  flex_protection: 59,
+  explorer_upgrade: 195,
+};
+
+const ADD_ON_NAMES: Record<string, string> = {
+  flex_protection: 'Flex Protection',
+  explorer_upgrade: 'Explorer Upgrade',
 };
 
 export function OrderSummaryCard({
@@ -41,99 +47,176 @@ export function OrderSummaryCard({
   onAddToCart,
   onBackToDetails,
 }: OrderSummaryCardProps) {
+  const calculateTripSubtotal = (trip: Trip) => {
+    const basePrice = trip.price;
+    const nightSurcharge = trip.night_surcharge || 0;
+    
+    let addOnsTotal = 0;
+    if (trip.add_ons && trip.add_ons.length > 0) {
+      if (trip.add_ons.includes('explorer_upgrade')) {
+        addOnsTotal = ADD_ON_PRICES['explorer_upgrade'];
+      } else if (trip.add_ons.includes('flex_protection')) {
+        addOnsTotal = ADD_ON_PRICES['flex_protection'];
+      }
+    }
+    
+    return basePrice + nightSurcharge + addOnsTotal;
+  };
+
+  const allTripsSubtotal = trips.reduce((sum, trip) => sum + calculateTripSubtotal(trip), 0);
+  const totalFees = allTripsSubtotal * feesPercentage;
+  const calculatedGrandTotal = allTripsSubtotal + totalFees;
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Order Summary</CardTitle>
-        <CardDescription>
-          {trips.length} trip{trips.length !== 1 ? 's' : ''}
-        </CardDescription>
+    <Card className="shadow-lg">
+      {/* Header - Título y trips en la misma línea */}
+      <CardHeader className="border-b border-gray-200 pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg">Order Summary</CardTitle>
+          <span className="text-base font-bold text-blue-600">
+            {trips.length} {trips.length === 1 ? 'trip' : 'trips'}
+          </span>
+        </div>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-3">
-          <div className="flex justify-between text-sm">
+
+      <CardContent className="p-4 space-y-4">
+        {/* Trip Info + Passengers */}
+        <div className="space-y-2">
+          <div className="flex justify-between text-xs">
             <span className="text-gray-600">Total Passengers</span>
-            <span className="font-semibold">{totalPassengers}</span>
+            <span className="font-semibold text-gray-900">{totalPassengers}</span>
           </div>
-          <div className="flex justify-between text-sm">
+          <div className="flex justify-between text-xs">
             <span className="text-gray-600">Number of Trips</span>
-            <span className="font-semibold">{trips.length}</span>
+            <span className="font-semibold text-gray-900">{trips.length}</span>
           </div>
         </div>
 
-        <div className="pt-4 border-t space-y-2">
+        {/* Separator */}
+        <div className="border-t border-gray-200" />
+
+        {/* Price Breakdown */}
+        <div className="space-y-2.5">
           {trips.map((trip, index) => {
             const basePrice = trip.price;
             const nightSurcharge = trip.night_surcharge || 0;
-            const addOnsTotal =
-              trip.add_ons && trip.add_ons.length > 0
-                ? trip.add_ons.reduce((sum, addonId) => sum + (ADD_ON_PRICES[addonId] || 0), 0)
-                : 0;
+            
+            let addOnsTotal = 0;
+            let addOnName = '';
+            if (trip.add_ons && trip.add_ons.length > 0) {
+              if (trip.add_ons.includes('explorer_upgrade')) {
+                addOnsTotal = ADD_ON_PRICES['explorer_upgrade'];
+                addOnName = ADD_ON_NAMES['explorer_upgrade'];
+              } else if (trip.add_ons.includes('flex_protection')) {
+                addOnsTotal = ADD_ON_PRICES['flex_protection'];
+                addOnName = ADD_ON_NAMES['flex_protection'];
+              }
+            }
 
             return (
-              <div key={trip.id} className="space-y-1.5">
+              <div key={trip.id}>
                 {trips.length > 1 && (
-                  <p className="text-xs font-semibold text-gray-700 mb-1">Trip {index + 1}</p>
+                  <p className="text-xs font-bold text-gray-900 mb-2">Trip {index + 1}</p>
                 )}
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Base Price</span>
-                  <span className="font-semibold">{formatCurrency(basePrice)}</span>
+                
+                {/* Base Price */}
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-xs text-gray-700">Base Price</span>
+                  <span className="text-sm font-semibold text-gray-900">{formatCurrency(basePrice)}</span>
                 </div>
+
+                {/* Night Surcharge */}
                 {nightSurcharge > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-amber-600">Night Surcharge</span>
-                    <span className="font-semibold text-amber-600">
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="flex items-center gap-1.5">
+                      <Moon className="h-3.5 w-3.5 text-gray-500" />
+                      <span className="text-xs text-gray-700">Night Surcharge</span>
+                    </div>
+                    <span className="text-sm font-semibold text-gray-900">
                       +{formatCurrency(nightSurcharge)}
                     </span>
                   </div>
                 )}
+
+                {/* Add-ons */}
                 {addOnsTotal > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-green-600">Add-ons</span>
-                    <span className="font-semibold text-green-600">
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="flex items-center gap-1.5">
+                      <Sparkles className="h-3.5 w-3.5 text-gray-500" />
+                      <span className="text-xs text-gray-700">{addOnName}</span>
+                    </div>
+                    <span className="text-sm font-semibold text-gray-900">
                       +{formatCurrency(addOnsTotal)}
                     </span>
                   </div>
                 )}
-                {trips.length > 1 && (
-                  <div className="flex justify-between text-sm pt-1 border-t border-gray-100">
-                    <span className="text-gray-700 font-medium">Trip Subtotal</span>
-                    <span className="font-semibold">
-                      {formatCurrency(trip.final_price || trip.price)}
-                    </span>
-                  </div>
+
+                {/* Separator between trips */}
+                {trips.length > 1 && index < trips.length - 1 && (
+                  <div className="border-t border-gray-100 my-3" />
                 )}
               </div>
             );
           })}
         </div>
 
-        <div className="pt-4 border-t">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-lg font-bold text-gray-900">Total Amount</span>
-            <span className="text-3xl font-bold text-blue-600">{formatCurrency(grandTotal)}</span>
+        {/* Separator */}
+        <div className="border-t border-gray-200" />
+
+        {/* Subtotal & Fees */}
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-semibold text-gray-900">Subtotal</span>
+            <span className="text-base font-bold text-gray-900">{formatCurrency(allTripsSubtotal)}</span>
           </div>
-          <p className="text-xs text-gray-500">
-            * Includes {(feesPercentage * 100).toFixed(0)}% service fee
-          </p>
+          
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-gray-600">Service Fee ({(feesPercentage * 100).toFixed(0)}%)</span>
+              <div className="relative group">
+                <Info className="h-3.5 w-3.5 text-gray-400 cursor-help" />
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block w-56 p-2.5 bg-gray-900 text-white text-xs rounded-lg shadow-lg z-50">
+                  <p>Includes payment processing, booking management, and 24/7 customer support.</p>
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900"></div>
+                </div>
+              </div>
+            </div>
+            <span className="text-xs font-medium text-gray-600">
+              +{formatCurrency(totalFees)}
+            </span>
+          </div>
         </div>
 
-        <div className="pt-4 space-y-3">
+        {/* Separator */}
+        <div className="border-t border-gray-200" />
+
+        {/* Total Amount */}
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-3">
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-bold text-gray-900">Total Amount</span>
+            <span className="text-2xl font-bold text-blue-600">
+              {formatCurrency(calculatedGrandTotal)}
+            </span>
+          </div>
+        </div>
+
+        {/* Terms & Actions */}
+        <div className="space-y-2.5">
           <TermsCheckbox checked={termsAccepted} onChange={onTermsChange} error={false} />
 
           <Button
             onClick={onPayNow}
             disabled={!termsAccepted}
-            className="w-full min-h-[48px] bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            size="lg"
+            className="w-full h-11 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold shadow-md hover:shadow-lg transition-all"
           >
-            💳 Pay Now
+            <CreditCard className="h-4 w-4 mr-2" />
+            Pay Now
           </Button>
 
           <Button
             onClick={onAddToCart}
             variant="outline"
-            className="w-full min-h-[48px] border-blue-600 text-blue-600 hover:bg-blue-50"
+            className="w-full h-11 border-2 border-blue-600 text-blue-600 hover:bg-blue-50 text-sm font-semibold transition-all"
           >
             <ShoppingCart className="h-4 w-4 mr-2" />
             Add & Book Another Ride
@@ -142,7 +225,7 @@ export function OrderSummaryCard({
           <Button
             onClick={onBackToDetails}
             variant="ghost"
-            className="w-full min-h-[48px] text-gray-600"
+            className="w-full h-11 text-gray-600 hover:text-gray-900 text-sm font-medium transition-all"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Details

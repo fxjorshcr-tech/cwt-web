@@ -1,5 +1,6 @@
 ﻿// src/components/forms/BookingForm.tsx
-// ✅ OPTIMIZADO: Code splitting con componentes separados + Availability check
+// ✅ CORREGIDO: Sin usar kilometros, alias, precio13a18 (campos null)
+// ✅ Sin mostrar precio inicial, solo duración
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -20,12 +21,9 @@ interface Route {
   id: number;
   origen: string;
   destino: string;
-  alias: string | null;
   precio1a6: number;
   precio7a9: number;
   precio10a12: number;
-  precio13a18: number;
-  kilometros: number;
   duracion: string;
 }
 
@@ -37,7 +35,6 @@ interface TripData {
   children: number;
   routeId?: number;
   price?: number;
-  distance?: number;
   duration?: string;
   calculatedPrice: number;
   selectedRoute: Route | null;
@@ -104,7 +101,6 @@ export function BookingForm() {
               newTrips[0].calculatedPrice = price;
               newTrips[0].routeId = route.id;
               newTrips[0].price = price;
-              newTrips[0].distance = route.kilometros;
               newTrips[0].duration = route.duracion;
             }
           }
@@ -124,10 +120,10 @@ export function BookingForm() {
 
       const supabase = createClient();
 
-      // ✅ Optimización: solo seleccionar campos necesarios
+      // ✅ SOLO seleccionar campos que existen y tienen datos
       const { data, error: fetchError } = await supabase
         .from('routes')
-        .select('id, origen, destino, alias, precio1a6, precio7a9, precio10a12, precio13a18, kilometros, duracion')
+        .select('id, origen, destino, precio1a6, precio7a9, precio10a12, duracion')
         .order('origen');
 
       if (fetchError) {
@@ -138,40 +134,25 @@ export function BookingForm() {
         throw new Error('No routes available in database');
       }
 
-      const validRoutes: Route[] = (data as SupabaseRoute[])
-        .filter(
-          (route): route is SupabaseRoute & {
-            origen: string;
-            destino: string;
-            precio1a6: number;
-            precio7a9: number;
-            precio10a12: number;
-            precio13a18: number;
-            kilometros: number;
-            duracion: string;
-          } => {
-            return (
-              route.origen !== null &&
-              route.destino !== null &&
-              route.precio1a6 !== null &&
-              route.precio7a9 !== null &&
-              route.precio10a12 !== null &&
-              route.precio13a18 !== null &&
-              route.kilometros !== null &&
-              route.duracion !== null
-            );
-          }
-        )
+      // ✅ Validar solo los campos que usamos
+      const validRoutes: Route[] = (data as any[])
+        .filter((route): route is Route => {
+          return (
+            route.origen !== null &&
+            route.destino !== null &&
+            route.precio1a6 !== null &&
+            route.precio7a9 !== null &&
+            route.precio10a12 !== null &&
+            route.duracion !== null
+          );
+        })
         .map((route) => ({
           id: route.id,
           origen: route.origen,
           destino: route.destino,
-          alias: route.alias,
           precio1a6: route.precio1a6,
           precio7a9: route.precio7a9,
           precio10a12: route.precio10a12,
-          precio13a18: route.precio13a18,
-          kilometros: route.kilometros,
           duracion: route.duracion,
         }));
 
@@ -194,7 +175,8 @@ export function BookingForm() {
     if (passengers <= 6) return route.precio1a6;
     if (passengers <= 9) return route.precio7a9;
     if (passengers <= 12) return route.precio10a12;
-    return route.precio13a18;
+    // ✅ Para más de 12 pasajeros, retornar 0 (mostraremos mensaje de contacto)
+    return 0;
   }
 
   function updateTrip(index: number, field: string, value: any) {
@@ -207,7 +189,6 @@ export function BookingForm() {
         newTrips[index].selectedRoute = null;
         newTrips[index].calculatedPrice = 0;
         newTrips[index].price = undefined;
-        newTrips[index].distance = undefined;
         newTrips[index].duration = undefined;
         newTrips[index].routeId = undefined;
       }
@@ -227,7 +208,6 @@ export function BookingForm() {
             newTrips[index].selectedRoute = null;
             newTrips[index].calculatedPrice = 0;
             newTrips[index].price = undefined;
-            newTrips[index].distance = undefined;
             newTrips[index].duration = undefined;
             newTrips[index].routeId = undefined;
             return newTrips;
@@ -244,13 +224,11 @@ export function BookingForm() {
             newTrips[index].calculatedPrice = price;
             newTrips[index].routeId = route.id;
             newTrips[index].price = price;
-            newTrips[index].distance = route.kilometros;
             newTrips[index].duration = route.duracion;
           } else {
             newTrips[index].selectedRoute = null;
             newTrips[index].calculatedPrice = 0;
             newTrips[index].price = undefined;
-            newTrips[index].distance = undefined;
             newTrips[index].duration = undefined;
             newTrips[index].routeId = undefined;
           }
@@ -357,7 +335,7 @@ export function BookingForm() {
       document.body.appendChild(checkingToast);
 
       // Esperar 2 segundos para simular verificación
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 1400));
 
       const tripsToInsert: TripInsert[] = trips.map((trip) => ({
         booking_id: bookingId,
@@ -367,7 +345,7 @@ export function BookingForm() {
         adults: trip.adults,
         children: trip.children,
         price: trip.price!,
-        distance: trip.distance ?? 0,
+        distance: 0, // ✅ Ya no usamos kilometros
         duration: trip.duration ?? '',
         pickup_address: '',
         pickup_instructions: '',

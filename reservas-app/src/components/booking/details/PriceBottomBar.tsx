@@ -1,4 +1,5 @@
 ﻿// src/components/booking/details/PriceBottomBar.tsx
+// ✅ CORREGIDO: Sin menciones de fees
 import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -6,7 +7,7 @@ interface PriceCalculation {
   basePrice: number;
   nightSurcharge: number;
   addOnsPrice: number;
-  finalPrice: number;
+  subtotal: number;
 }
 
 interface PriceBottomBarProps {
@@ -42,7 +43,7 @@ export function PriceBottomBar({
             </div>
             {priceCalculation.nightSurcharge > 0 && (
               <div className="flex justify-between text-xs">
-                <span className="text-amber-700">Night Surcharge</span>
+                <span className="text-amber-700">Night:</span>
                 <span className="text-amber-700 font-semibold">
                   +${priceCalculation.nightSurcharge}
                 </span>
@@ -50,8 +51,8 @@ export function PriceBottomBar({
             )}
             {priceCalculation.addOnsPrice > 0 && (
               <div className="flex justify-between text-xs">
-                <span className="text-green-700">Add-ons</span>
-                <span className="text-green-700 font-semibold">
+                <span className="text-blue-700">Add-ons:</span>
+                <span className="text-blue-700 font-semibold">
                   +${priceCalculation.addOnsPrice}
                 </span>
               </div>
@@ -59,7 +60,7 @@ export function PriceBottomBar({
             <div className="pt-1.5 border-t border-gray-200 flex justify-between items-center">
               <span className="text-sm font-bold text-gray-900">Total</span>
               <span className="text-2xl font-bold text-blue-600">
-                ${priceCalculation.finalPrice.toFixed(2)}
+                ${priceCalculation.subtotal.toFixed(2)}
               </span>
             </div>
           </div>
@@ -87,7 +88,7 @@ export function PriceBottomBar({
                 </>
               ) : (
                 <>
-                  {currentTripIndex < totalTrips - 1 ? 'Next Trip' : 'Summary'}
+                  {currentTripIndex < totalTrips - 1 ? 'Next Trip' : 'Continue to Summary'}
                   <ArrowRight className="h-4 w-4 ml-1" />
                 </>
               )}
@@ -104,7 +105,7 @@ export function PriceBottomBar({
               </p>
               <div className="flex items-baseline gap-2">
                 <span className="text-3xl font-bold text-gray-900">
-                  ${priceCalculation.finalPrice.toFixed(2)}
+                  ${priceCalculation.subtotal.toFixed(2)}
                 </span>
               </div>
             </div>
@@ -124,8 +125,8 @@ export function PriceBottomBar({
               )}
               {priceCalculation.addOnsPrice > 0 && (
                 <div>
-                  <span className="text-green-600">Add-ons: </span>
-                  <span className="font-semibold text-green-600">
+                  <span className="text-blue-600">Add-ons: </span>
+                  <span className="font-semibold text-blue-600">
                     +${priceCalculation.addOnsPrice}
                   </span>
                 </div>

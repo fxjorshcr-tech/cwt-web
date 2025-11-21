@@ -1,4 +1,5 @@
 // src/components/home/LocationAutocomplete.tsx
+// ✅ CORREGIDO: Sin usar alias (campo null en DB)
 'use client';
 
 import { useState, useEffect, useRef, useMemo } from 'react';
@@ -8,7 +9,6 @@ interface Route {
   id: number;
   origen: string;
   destino: string;
-  alias: string | null;
 }
 
 interface LocationAutocompleteProps {
@@ -98,7 +98,6 @@ export function LocationAutocomplete({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
-    console.log('Input changed:', newValue);
     setInputValue(newValue);
     setIsOpen(true);
   };

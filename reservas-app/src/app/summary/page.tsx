@@ -1,5 +1,5 @@
 ﻿// src/app/summary/page.tsx
-// ✅ OPTIMIZADO: Code splitting con componentes separados
+// ✅ CORREGIDO: ADD_ON_NAMES actualizados
 'use client';
 
 import { useEffect, useState, useMemo, Suspense } from 'react';
@@ -48,9 +48,10 @@ interface Trip {
   children_ages: number[] | null;
 }
 
+// ✅ CORREGIDO: Nombres actualizados
 const ADD_ON_NAMES: Record<string, string> = {
-  tico_time: 'Tico Time Upgrade',
-  flex_time: 'Flex Time Protection',
+  flex_protection: 'Flex Protection',
+  explorer_upgrade: 'Explorer Upgrade',
 };
 
 const POPULAR_FAQS = [

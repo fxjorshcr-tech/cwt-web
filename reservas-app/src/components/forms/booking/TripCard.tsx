@@ -1,4 +1,5 @@
 ﻿// src/components/forms/booking/TripCard.tsx
+// ✅ CORREGIDO: Sin usar kilometros, alias, precio13a18 + sin mostrar precio inicial
 import { X, ChevronDown } from 'lucide-react';
 import { LocationAutocomplete } from '../LocationAutocomplete';
 import { ModernDatePicker } from '../ModernDatePicker';
@@ -10,12 +11,9 @@ interface Route {
   id: number;
   origen: string;
   destino: string;
-  alias: string | null;
   precio1a6: number;
   precio7a9: number;
   precio10a12: number;
-  precio13a18: number;
-  kilometros: number;
   duracion: string;
 }
 
@@ -128,6 +126,7 @@ export function TripCard({
           />
         </div>
 
+        {/* ✅ Mostrar "From: $precio" y duración */}
         {trip.selectedRoute && (
           <TripRouteInfo route={trip.selectedRoute} price={trip.calculatedPrice} />
         )}

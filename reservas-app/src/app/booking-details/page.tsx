@@ -1,5 +1,5 @@
 ﻿// src/app/booking-details/page.tsx
-// ✅ OPTIMIZADO - Code splitting con componentes separados
+// ✅ CORREGIDO - Sin fees, solo subtotal (Base + Night + Addons)
 'use client';
 
 import { useEffect, useState, useMemo, Suspense } from 'react';
@@ -127,18 +127,16 @@ function BookingDetailsContent() {
   const isPickupFromAirport = currentTrip && isAirport(currentTrip.from_location);
   const isDropoffToAirport = currentTrip && isAirport(currentTrip.to_location);
 
-  // PRICE CALCULATION
+  // ✅ PRICE CALCULATION (sin fees - se agregan en Summary)
   const priceCalculation = useMemo(() => {
     if (!currentTrip) {
-      return { basePrice: 0, nightSurcharge: 0, addOnsPrice: 0, subtotal: 0, fees: 0, finalPrice: 0 };
+      return { basePrice: 0, nightSurcharge: 0, addOnsPrice: 0, subtotal: 0 };
     }
     const basePrice = currentTrip.price || 0;
     const nightSurcharge = calculateNightSurcharge(formData.pickup_time, basePrice);
     const addOnsPrice = calculateAddOnsPrice(selectedAddOns);
     const subtotal = basePrice + nightSurcharge + addOnsPrice;
-    const fees = subtotal * 0.05;
-    const finalPrice = subtotal + fees;
-    return { basePrice, nightSurcharge, addOnsPrice, subtotal, fees, finalPrice };
+    return { basePrice, nightSurcharge, addOnsPrice, subtotal };
   }, [currentTrip?.price, formData.pickup_time, selectedAddOns]);
 
   // LOAD TRIPS
@@ -260,8 +258,9 @@ function BookingDetailsContent() {
         special_requests: formData.special_requests ? sanitizeInput(formData.special_requests) : null,
         children_ages: formData.children_ages.filter((age): age is number => age !== null),
         add_ons: selectedAddOns.length > 0 ? selectedAddOns : null,
+        add_ons_price: priceCalculation.addOnsPrice, // ✅ AGREGADO
         night_surcharge: priceCalculation.nightSurcharge,
-        final_price: priceCalculation.finalPrice,
+        final_price: priceCalculation.subtotal,
         updated_at: new Date().toISOString(),
       };
       const { error } = await supabase.from('trips').update(updateData).eq('id', currentTrip.id);
@@ -294,8 +293,9 @@ function BookingDetailsContent() {
         special_requests: formData.special_requests ? sanitizeInput(formData.special_requests) : null,
         children_ages: formData.children_ages.filter((age): age is number => age !== null),
         add_ons: selectedAddOns.length > 0 ? selectedAddOns : null,
+        add_ons_price: priceCalculation.addOnsPrice, // ✅ AGREGADO
         night_surcharge: priceCalculation.nightSurcharge,
-        final_price: priceCalculation.finalPrice,
+        final_price: priceCalculation.subtotal,
         updated_at: new Date().toISOString(),
       };
       const { error } = await supabase.from('trips').update(updateData).eq('id', currentTrip!.id);

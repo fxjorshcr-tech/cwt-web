@@ -1,36 +1,50 @@
 // src/components/booking/TripAddOns.tsx
-// ✅ MOBILE-OPTIMIZED - Checkbox arreglado, diseño compacto
+// ✅ FINAL CORREGIDO: Sin nota morada + paréntesis en Free Reschedule
 
 'use client';
 
 import React from 'react';
-import { Clock, Shield } from 'lucide-react';
+import { Clock, Gift, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export interface AddOn {
   id: string;
   name: string;
   description: string;
+  details: string[];
   price: number;
   icon: any;
   popular?: boolean;
+  badge?: string;
 }
 
 export const AVAILABLE_ADDONS: AddOn[] = [
   {
-    id: 'tico_time',
-    name: 'Tico Time Upgrade',
-    description: 'Add 3 extra hours to explore Costa Rica! Stop at scenic viewpoints, enjoy a traditional casado lunch, visit local attractions, or capture stunning photos at hidden gems along the way.',
-    price: 160,
+    id: 'flex_protection',
+    name: 'Flex Protection',
+    description: 'Perfect for travelers who want peace of mind',
+    details: [
+      '🕐 **Flex Time Pickup:** Change your pickup time up to 2 hours later, even 1 hour before scheduled pickup',
+      '✈️ **Free Reschedule:** Date/time if flight is delayed or cancelled (for airport pickups)',
+    ],
+    price: 59,
     icon: Clock,
     popular: true,
+    badge: 'POPULAR',
   },
   {
-    id: 'flex_time',
-    name: 'Flex Time Protection',
-    description: 'Life happens! Get up to 2 hours of flexibility if your plans change. Perfect for late checkouts, unexpected delays, or simply wanting to enjoy that last swim.',
-    price: 45,
-    icon: Shield,
+    id: 'explorer_upgrade',
+    name: 'Explorer Upgrade',
+    description: 'Turn your transfer into an adventure',
+    details: [
+      '⭐ **All Flex Protection:** Includes all Flex Protection benefits',
+      '🏞️ **Scenic Stops:** Add 3 hours to your trip to stop at waterfalls, scenic viewpoints, restaurants, or souvenir shops along your route',
+      '🧊 **Complimentary Cooler:** Cooler with National Beers, San Pellegrino, Sodas & Snacks',
+    ],
+    price: 195,
+    icon: Gift,
+    popular: false,
+    badge: 'DELUXE',
   },
 ];
 
@@ -41,65 +55,102 @@ interface TripAddOnsProps {
 
 export function TripAddOns({ selectedAddOns, onAddOnsChange }: TripAddOnsProps) {
   const handleToggleAddOn = (addOnId: string) => {
-    if (selectedAddOns.includes(addOnId)) {
-      onAddOnsChange(selectedAddOns.filter(id => id !== addOnId));
-    } else {
-      onAddOnsChange([...selectedAddOns, addOnId]);
+    // Si selecciona Explorer Upgrade, reemplazar todo con Explorer (incluye Flex)
+    if (addOnId === 'explorer_upgrade' && !selectedAddOns.includes(addOnId)) {
+      onAddOnsChange(['explorer_upgrade']);
+    }
+    // Si deselecciona Explorer Upgrade, quitar todo
+    else if (addOnId === 'explorer_upgrade' && selectedAddOns.includes(addOnId)) {
+      onAddOnsChange([]);
+    }
+    // Si selecciona Flex Protection (y Explorer NO está activo)
+    else if (addOnId === 'flex_protection' && !selectedAddOns.includes('explorer_upgrade')) {
+      if (selectedAddOns.includes('flex_protection')) {
+        onAddOnsChange([]);
+      } else {
+        onAddOnsChange(['flex_protection']);
+      }
     }
   };
 
-  const totalAddOnsPrice = AVAILABLE_ADDONS
-    .filter(addon => selectedAddOns.includes(addon.id))
-    .reduce((sum, addon) => sum + addon.price, 0);
+  // ✅ Calcular precio correcto: Si Explorer está seleccionado, solo contar Explorer
+  const totalAddOnsPrice = selectedAddOns.includes('explorer_upgrade')
+    ? 195  // Solo Explorer
+    : selectedAddOns.includes('flex_protection')
+    ? 59   // Solo Flex
+    : 0;   // Ninguno
+
+  // Helper para renderizar texto con negrita
+  const renderDetail = (detail: string) => {
+    const parts = detail.split('**');
+    return (
+      <>
+        {parts.map((part, idx) => 
+          idx % 2 === 1 ? <strong key={idx}>{part}</strong> : part
+        )}
+      </>
+    );
+  };
 
   return (
-    <Card className="bg-gradient-to-br from-cyan-50 to-blue-50 border-blue-200">
+    <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">
       <CardHeader className="pb-3">
         <CardTitle className="text-base md:text-lg flex items-center gap-2 text-blue-900">
-          <Clock className="h-5 w-5" />
+          <Sparkles className="h-5 w-5" />
           Enhance Your Experience
         </CardTitle>
         <p className="text-xs md:text-sm text-blue-700">
-          Make the most of your journey with our exclusive add-ons
+          Upgrade your transfer with our exclusive add-ons
         </p>
       </CardHeader>
       
       <CardContent className="space-y-3 pt-0">
         {AVAILABLE_ADDONS.map((addon) => {
-          const isSelected = selectedAddOns.includes(addon.id);
+          const isExplorerSelected = selectedAddOns.includes('explorer_upgrade');
+          const isSelected = selectedAddOns.includes(addon.id) || 
+                           (addon.id === 'flex_protection' && isExplorerSelected);
           const Icon = addon.icon;
+          const isDisabled = addon.id === 'flex_protection' && isExplorerSelected;
 
           return (
             <div
               key={addon.id}
-              onClick={() => handleToggleAddOn(addon.id)}
+              onClick={() => !isDisabled && handleToggleAddOn(addon.id)}
               className={`
-                relative p-3 md:p-4 rounded-lg border-2 transition-all cursor-pointer
+                relative p-3 md:p-4 rounded-lg border-2 transition-all
+                ${isDisabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}
                 ${isSelected 
                   ? 'border-blue-500 bg-white shadow-md' 
                   : 'border-blue-200 bg-white/50 hover:border-blue-300 hover:bg-white'
                 }
               `}
             >
-              {/* Badge POPULAR */}
-              {addon.popular && (
-                <div className="absolute -top-2 right-2 bg-gradient-to-r from-orange-500 to-pink-500 text-white text-[10px] md:text-xs font-bold px-2 md:px-3 py-0.5 md:py-1 rounded-full shadow-lg z-10">
-                  POPULAR
+              {/* Badge */}
+              {addon.badge && (
+                <div className={`
+                  absolute -top-2 right-2 text-white text-[10px] md:text-xs font-bold px-2 md:px-3 py-0.5 md:py-1 rounded-full shadow-lg z-10
+                  ${addon.badge === 'POPULAR' 
+                    ? 'bg-gradient-to-r from-orange-500 to-orange-600' 
+                    : 'bg-gradient-to-r from-purple-500 to-purple-600'
+                  }
+                `}>
+                  {addon.badge}
                 </div>
               )}
 
               <div className="flex items-start gap-2 md:gap-3">
-                {/* ✅ CHECKBOX - IZQUIERDA, BIEN POSICIONADO */}
+                {/* Checkbox */}
                 <div className="flex-shrink-0 mt-0.5">
                   <input
                     type="checkbox"
                     checked={isSelected}
+                    disabled={isDisabled}
                     onChange={(e) => {
                       e.stopPropagation();
-                      handleToggleAddOn(addon.id);
+                      if (!isDisabled) handleToggleAddOn(addon.id);
                     }}
                     onClick={(e) => e.stopPropagation()}
-                    className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                    className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
                   />
                 </div>
 
@@ -113,12 +164,11 @@ export function TripAddOns({ selectedAddOns, onAddOnsChange }: TripAddOnsProps) 
 
                 {/* Content */}
                 <div className="flex-1 min-w-0 pr-2">
-                  {/* Title y Precio en la misma línea */}
+                  {/* Title y Precio */}
                   <div className="flex items-start justify-between gap-2 mb-1">
                     <h4 className={`font-semibold text-sm md:text-base ${isSelected ? 'text-blue-900' : 'text-gray-900'}`}>
                       {addon.name}
                     </h4>
-                    {/* ✅ PRECIO - DERECHA, SIN OVERLAP */}
                     <div className={`
                       text-base md:text-lg font-bold whitespace-nowrap flex-shrink-0
                       ${isSelected ? 'text-blue-600' : 'text-gray-600'}
@@ -128,9 +178,18 @@ export function TripAddOns({ selectedAddOns, onAddOnsChange }: TripAddOnsProps) 
                   </div>
                   
                   {/* Description */}
-                  <p className="text-xs md:text-sm text-gray-600 leading-relaxed">
+                  <p className="text-xs md:text-sm text-gray-700 font-medium mb-2">
                     {addon.description}
                   </p>
+
+                  {/* Details con emojis y títulos en negrita */}
+                  <ul className="space-y-1">
+                    {addon.details.map((detail, idx) => (
+                      <li key={idx} className="text-xs md:text-sm text-gray-600 leading-relaxed">
+                        {renderDetail(detail)}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
             </div>
@@ -155,11 +214,14 @@ export function TripAddOns({ selectedAddOns, onAddOnsChange }: TripAddOnsProps) 
   );
 }
 
-// Helper to calculate add-ons price
+// ✅ Helper corregido: Si Explorer está seleccionado, solo contar Explorer
 export function calculateAddOnsPrice(addOnIds: string[]): number {
-  return AVAILABLE_ADDONS
-    .filter(addon => addOnIds.includes(addon.id))
-    .reduce((sum, addon) => sum + addon.price, 0);
+  if (addOnIds.includes('explorer_upgrade')) {
+    return 195;  // Solo Explorer (incluye Flex)
+  } else if (addOnIds.includes('flex_protection')) {
+    return 59;   // Solo Flex
+  }
+  return 0;
 }
 
 // Helper to get add-on names for display
