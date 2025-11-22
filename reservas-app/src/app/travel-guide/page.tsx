@@ -28,7 +28,7 @@ export default async function TravelGuidePage() {
       
       <main className="min-h-screen bg-white">
         {/* Hero Section */}
-        <section className="relative h-[65vh] min-h-[450px] flex items-center justify-center">
+        <section className="relative h-[65vh] min-h-[450px] max-h-[700px] flex items-center justify-center">
           <div className="absolute inset-0 z-0">
             <Image
               src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/Beatiful-waterfall-costa-rica-nature.webp"
@@ -41,17 +41,17 @@ export default async function TravelGuidePage() {
             <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/70" />
           </div>
 
-          <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
+          <div className="relative z-10 text-center px-6 max-w-5xl mx-auto pt-20 sm:pt-0">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full mb-6 border border-white/20">
-              <Compass className="h-5 w-5 text-white" />
-              <span className="text-white text-sm font-medium">EXPLORE COSTA RICA 2026</span>
+              <Compass className="h-4 sm:h-5 w-4 sm:w-5 text-white" />
+              <span className="text-white text-xs sm:text-sm font-medium uppercase tracking-wide">EXPLORE COSTA RICA</span>
             </div>
-            
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-4 drop-shadow-2xl">
+
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4 drop-shadow-2xl">
               Costa Rica Travel Guide
             </h1>
-            
-            <p className="text-lg md:text-xl text-white/95 max-w-3xl mx-auto drop-shadow-lg leading-relaxed">
+
+            <p className="text-base sm:text-lg md:text-xl text-white/95 max-w-3xl mx-auto drop-shadow-lg leading-relaxed">
               Expert guides to {destinations.length} destinations. Practical tips from locals who live here.
             </p>
           </div>

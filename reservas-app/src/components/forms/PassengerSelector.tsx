@@ -106,7 +106,7 @@ export function PassengerSelector({
       {/* Passenger Dropdown */}
       {isOpen && (
         <div 
-          className="absolute z-50 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 p-4 w-full min-w-[280px]"
+          className="absolute z-50 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 p-4 w-full min-w-[260px] sm:min-w-[280px] max-w-[calc(100vw-2rem)]"
           role="dialog"
           aria-label="Passenger selector"
         >
