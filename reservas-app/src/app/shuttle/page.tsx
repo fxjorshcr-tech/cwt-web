@@ -142,12 +142,12 @@ export default async function MostBookedPage() {
               </div>
               
               {/* ✅ HUMANIZED TITLE: No "Shuttles" */}
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6 drop-shadow-xl leading-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-6 drop-shadow-xl leading-tight">
                 Where Our Guests Are Going
               </h1>
-              
-              <p className="text-lg sm:text-xl text-white/90 mb-8 drop-shadow-md max-w-2xl mx-auto font-medium">
-                The most requested connections. 
+
+              <p className="text-base sm:text-lg text-white/90 mb-8 drop-shadow-md max-w-2xl mx-auto font-medium">
+                The most requested connections.
               </p>
               
               <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 text-white">
@@ -181,9 +181,9 @@ export default async function MostBookedPage() {
             {routesWithData.map((category, idx) => (
               <div key={idx} className="mb-20 last:mb-0">
                 <div className="flex items-center gap-4 mb-10 border-b border-gray-200 pb-4">
-                  <div className="text-4xl">{category.icon}</div>
+                  <div className="text-3xl">{category.icon}</div>
                   <div>
-                    <h2 className="text-3xl font-bold text-gray-900">
+                    <h2 className="text-2xl font-bold text-gray-900">
                       {category.category}
                     </h2>
                   </div>
@@ -213,7 +213,7 @@ export default async function MostBookedPage() {
                             <MapPin className="h-3 w-3" />
                             <span>Direct Route</span>
                           </div>
-                          <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors flex items-center flex-wrap gap-2">
+                          <h3 className="text-base font-bold text-gray-900 group-hover:text-blue-600 transition-colors flex items-center flex-wrap gap-2">
                             {route.from}
                             <ArrowRight className="h-4 w-4 text-gray-400" />
                             {route.to}
@@ -234,7 +234,7 @@ export default async function MostBookedPage() {
                              {route.price && (
                                 <div className="text-right">
                                     <p className="text-xs text-gray-500">Private Vehicle</p>
-                                    <p className="text-xl font-black text-gray-900">${route.price}</p>
+                                    <p className="text-lg font-black text-gray-900">${route.price}</p>
                                 </div>
                              )}
                           </div>
@@ -257,10 +257,10 @@ export default async function MostBookedPage() {
         <section className="py-20 bg-white">
           <div className="container mx-auto px-6 max-w-4xl">
             <div className="bg-gray-900 rounded-3xl p-12 text-center text-white shadow-2xl">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              <h2 className="text-2xl md:text-3xl font-bold mb-4">
                 Going somewhere else?
               </h2>
-              <p className="text-lg text-gray-300 mb-8 max-w-xl mx-auto">
+              <p className="text-base text-gray-300 mb-8 max-w-xl mx-auto">
                 We drive everywhere in Costa Rica. If there's a road, we can take you there.
               </p>
               <Link

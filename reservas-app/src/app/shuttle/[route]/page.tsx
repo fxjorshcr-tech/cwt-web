@@ -118,11 +118,11 @@ export default async function ShuttleRoutePage({ params }: { params: { route: st
 
           <div className="relative z-10 h-full flex flex-col items-center justify-center px-6">
             <div className="text-center max-w-5xl">
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6 drop-shadow-2xl">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-6 drop-shadow-2xl">
                 {routeInfo.from} <span className="text-blue-400">to</span> {routeInfo.to}
               </h1>
-              
-              <p className="text-xl sm:text-2xl text-white/95 mb-8 drop-shadow-lg font-medium">
+
+              <p className="text-base sm:text-lg text-white/95 mb-8 drop-shadow-lg font-medium">
                 100% Private. Operated by Us.
               </p>
 
@@ -131,17 +131,17 @@ export default async function ShuttleRoutePage({ params }: { params: { route: st
                   <Clock className="h-5 w-5 text-blue-300" />
                   <div className="text-left">
                     <p className="text-xs text-blue-200 uppercase font-bold tracking-wider">Est. Time</p>
-                    <p className="text-lg font-bold leading-none">{routeData.duracion}</p>
+                    <p className="text-base font-bold leading-none">{routeData.duracion}</p>
                   </div>
                 </div>
-                
+
                 <div className="w-px h-10 bg-white/20 hidden sm:block" />
-                
+
                 <div className="flex items-center gap-3 text-white px-4">
                   <MapPin className="h-5 w-5 text-blue-300" />
                   <div className="text-left">
                     <p className="text-xs text-blue-200 uppercase font-bold tracking-wider">Distance</p>
-                    <p className="text-lg font-bold leading-none">{routeData.kilometros} km</p>
+                    <p className="text-base font-bold leading-none">{routeData.kilometros} km</p>
                   </div>
                 </div>
 
@@ -150,7 +150,7 @@ export default async function ShuttleRoutePage({ params }: { params: { route: st
                 <div className="flex items-center gap-3 text-white px-4">
                   <div className="text-left">
                     <p className="text-xs text-blue-200 uppercase font-bold tracking-wider">Per Vehicle</p>
-                    <p className="text-2xl font-black leading-none">${minPrice}</p>
+                    <p className="text-lg font-black leading-none">${minPrice}</p>
                   </div>
                 </div>
               </div>
@@ -172,13 +172,13 @@ export default async function ShuttleRoutePage({ params }: { params: { route: st
               
               {/* Left Column: The Human Description */}
               <div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">
                   The Drive
                 </h2>
-                <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-                  This isn't just a transfer; it's a {routeData.duracion} drive through some of Costa Rica's most beautiful landscapes. 
+                <p className="text-base text-gray-600 mb-6 leading-relaxed">
+                  This isn't just a transfer; it's a {routeData.duracion} drive through some of Costa Rica's most beautiful landscapes.
                 </p>
-                <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+                <p className="text-base text-gray-600 mb-8 leading-relaxed">
                   <strong>We drive this route daily.</strong> We know exactly how to navigate the winding roads and where the best spots are to stretch your legs. Since this is a private service, you are welcome to ask your driver to stop for photos, fruit stands, or a quick bathroom break at any time.
                 </p>
 
@@ -195,7 +195,7 @@ export default async function ShuttleRoutePage({ params }: { params: { route: st
 
               {/* Right Column: What's Included */}
               <div className="bg-gray-50 p-10 rounded-3xl border border-gray-100">
-                <h3 className="text-2xl font-bold text-gray-900 mb-8">
+                <h3 className="text-xl font-bold text-gray-900 mb-8">
                   What's Included
                 </h3>
                 <ul className="space-y-5">
@@ -226,10 +226,10 @@ export default async function ShuttleRoutePage({ params }: { params: { route: st
         <section className="py-20 bg-gray-50 border-t border-gray-200">
           <div className="container mx-auto px-6 max-w-6xl">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
                 One Price per Vehicle
               </h2>
-              <p className="text-gray-600">
+              <p className="text-sm text-gray-600">
                 Total cost for the whole van. No per-person fees.
               </p>
             </div>
@@ -244,7 +244,7 @@ export default async function ShuttleRoutePage({ params }: { params: { route: st
                 <div key={index} className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow text-center border border-gray-100">
                   <div className="flex justify-center text-blue-600 mb-4">{tier.icon}</div>
                   <p className="text-gray-500 font-medium mb-2">{tier.capacity}</p>
-                  <p className="text-4xl font-black text-gray-900 tracking-tight">${tier.price}</p>
+                  <p className="text-2xl font-black text-gray-900 tracking-tight">${tier.price}</p>
                   <p className="text-xs text-gray-400 mt-2 uppercase tracking-wide">Total</p>
                 </div>
               ))}
@@ -256,10 +256,10 @@ export default async function ShuttleRoutePage({ params }: { params: { route: st
         <section className="py-20 bg-white">
           <div className="container mx-auto px-6 max-w-4xl">
             <div className="bg-gray-900 rounded-3xl p-12 text-center text-white shadow-2xl">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              <h2 className="text-2xl md:text-3xl font-bold mb-4">
                 Ready to ride?
               </h2>
-              <p className="text-lg text-gray-300 mb-8 max-w-xl mx-auto">
+              <p className="text-base text-gray-300 mb-8 max-w-xl mx-auto">
                 Secure your vehicle directly with us. No agents, no complexity.
               </p>
               <Link
