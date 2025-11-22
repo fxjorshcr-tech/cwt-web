@@ -174,6 +174,7 @@ export function BookingForm() {
         }
 
         setRoutes(validRoutes);
+        setIsLoadingRoutes(false); // ✅ Stop loading on success
         setShowContent(true);
         return; // Success, exit retry loop
       } catch (err) {
