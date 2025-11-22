@@ -4,6 +4,13 @@
 
 ### 🐛 Critical Bug Fixes
 
+#### Latest Fix (2025-01-22 - Commit ac21b9e)
+- **Fixed dropdown pre-population from URL params**: LocationAutocomplete now syncs `inputValue` with `value` prop changes
+  - Users clicking "Reserve This Route" from /shuttle pages now see pre-selected locations in dropdowns
+  - Added useEffect to watch value prop and update inputValue state
+  - Fixes visual display issue where state was set correctly but UI didn't reflect it
+  - Works for all 26 routes with exact DB name matching
+
 #### UX & Navigation
 - **Fixed scroll issue on booking-details**: Added `useEffect` to scroll to top when switching between trips on mobile
 - **Updated summary page title**: Changed from "Review Your Booking" to "Booking Summary" for clarity
