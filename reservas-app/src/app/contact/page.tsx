@@ -78,19 +78,19 @@ export default function ContactPage() {
             <div className="absolute inset-0 bg-black/60" />
           </div>
 
-          <div className="relative z-10 h-full flex flex-col items-center justify-center px-6 text-center">
+          <div className="relative z-10 h-full flex flex-col items-center justify-center px-6 text-center pt-20 sm:pt-0">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full mb-6 border border-white/20">
-              <MessageSquare className="h-5 w-5 text-white" />
-              <span className="text-white font-semibold text-sm uppercase tracking-wide">
+              <MessageSquare className="h-4 sm:h-5 w-4 sm:w-5 text-white" />
+              <span className="text-white font-semibold text-xs sm:text-sm uppercase tracking-wide">
                 We're Here to Help
               </span>
             </div>
             
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6 drop-shadow-2xl">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 drop-shadow-2xl">
               Get in Touch
             </h1>
-            
-            <p className="text-lg sm:text-xl text-white/95 max-w-2xl drop-shadow-lg">
+
+            <p className="text-base sm:text-lg md:text-xl text-white/95 max-w-2xl drop-shadow-lg">
               Questions about your transfer? Need help planning your trip? We're available 24/7
             </p>
           </div>

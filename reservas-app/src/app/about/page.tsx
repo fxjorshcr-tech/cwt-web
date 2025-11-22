@@ -45,19 +45,19 @@ export default function AboutPage() {
             <div className="absolute inset-0 bg-black/60" />
           </div>
 
-          <div className="relative z-10 h-full flex flex-col items-center justify-center px-6 text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full mb-6 border border-white/20">
-              <Heart className="h-5 w-5 text-red-400 fill-red-400" />
-              <span className="text-white font-bold text-sm uppercase tracking-wide">
+          <div className="relative z-10 h-full flex flex-col items-center justify-center px-6 text-center pt-20 sm:pt-0">
+            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white/10 backdrop-blur-md rounded-full mb-6 border border-white/20">
+              <Heart className="h-4 sm:h-5 w-4 sm:w-5 text-red-400 fill-red-400" />
+              <span className="text-white font-bold text-xs sm:text-sm uppercase tracking-wide">
                 100% Costa Rican Owned
               </span>
             </div>
-            
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6 drop-shadow-2xl">
+
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 drop-shadow-2xl">
               More Than Drivers. <br className="hidden md:block" /> Your Local Hosts.
             </h1>
-            
-            <p className="text-lg sm:text-xl text-white/95 max-w-2xl drop-shadow-lg font-medium">
+
+            <p className="text-base sm:text-lg md:text-xl text-white/95 max-w-2xl drop-shadow-lg font-medium">
               We are a family of operators dedicated to showing you the real Costa Rica.
             </p>
           </div>
