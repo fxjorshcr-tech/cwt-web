@@ -39,6 +39,11 @@ export function LocationAutocomplete({
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Sync inputValue with value prop when it changes (e.g., from URL params)
+  useEffect(() => {
+    setInputValue(value);
+  }, [value]);
+
   // Get all available locations (WITHOUT search filter here)
   const availableLocations = useMemo(() => {
     let filteredRoutes = routes;
