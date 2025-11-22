@@ -101,8 +101,8 @@ export default async function ShuttleRoutePage({ params }: { params: { route: st
       <BookingNavbar />
       
       <main className="min-h-screen bg-white">
-        {/* Hero Section */}
-        <section className="relative h-[60vh] min-h-[500px] max-h-[700px]">
+        {/* Hero Section - Simplified */}
+        <section className="relative h-[50vh] min-h-[400px] max-h-[500px]">
           <div className="absolute inset-0 z-0">
             <Image
               src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/aerial-view-conchal-beach.webp?width=1600&quality=70"
@@ -117,47 +117,61 @@ export default async function ShuttleRoutePage({ params }: { params: { route: st
           </div>
 
           <div className="relative z-10 h-full flex flex-col items-center justify-center px-6">
-            <div className="text-center max-w-5xl">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-6 drop-shadow-2xl">
-                {routeInfo.from} <span className="text-blue-400">to</span> {routeInfo.to}
-              </h1>
-
-              <p className="text-base sm:text-lg text-white/95 mb-8 drop-shadow-lg font-medium">
+            <div className="text-center max-w-3xl">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-2xl">
                 100% Private. Operated by Us.
+              </h1>
+              <p className="text-base sm:text-lg text-white/90 drop-shadow-lg">
+                Direct transfers across Costa Rica
               </p>
+            </div>
+          </div>
+        </section>
 
-              <div className="flex-wrap items-center justify-center gap-6 mb-10 bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20 inline-flex">
-                <div className="flex items-center gap-3 text-white px-4">
-                  <Clock className="h-5 w-5 text-blue-300" />
-                  <div className="text-left">
-                    <p className="text-xs text-blue-200 uppercase font-bold tracking-wider">Est. Time</p>
-                    <p className="text-base font-bold leading-none">{routeData.duracion}</p>
-                  </div>
+        {/* Route Info Section - Below Hero */}
+        <section className="py-12 bg-white border-b border-gray-200">
+          <div className="container mx-auto px-6 max-w-6xl">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+                {routeInfo.from} <span className="text-blue-600">→</span> {routeInfo.to}
+              </h2>
+              <p className="text-sm text-gray-500">Direct Route</p>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-center gap-8 mb-8">
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-2 text-gray-600 mb-1">
+                  <Clock className="h-4 w-4" />
+                  <span className="text-xs font-semibold uppercase tracking-wider">Est. Time</span>
                 </div>
-
-                <div className="w-px h-10 bg-white/20 hidden sm:block" />
-
-                <div className="flex items-center gap-3 text-white px-4">
-                  <MapPin className="h-5 w-5 text-blue-300" />
-                  <div className="text-left">
-                    <p className="text-xs text-blue-200 uppercase font-bold tracking-wider">Distance</p>
-                    <p className="text-base font-bold leading-none">{routeData.kilometros} km</p>
-                  </div>
-                </div>
-
-                <div className="w-px h-10 bg-white/20 hidden sm:block" />
-
-                <div className="flex items-center gap-3 text-white px-4">
-                  <div className="text-left">
-                    <p className="text-xs text-blue-200 uppercase font-bold tracking-wider">Per Vehicle</p>
-                    <p className="text-lg font-black leading-none">${minPrice}</p>
-                  </div>
-                </div>
+                <p className="text-lg font-bold text-gray-900">{routeData.duracion}</p>
               </div>
 
+              <div className="w-px h-12 bg-gray-200 hidden sm:block" />
+
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-2 text-gray-600 mb-1">
+                  <MapPin className="h-4 w-4" />
+                  <span className="text-xs font-semibold uppercase tracking-wider">Distance</span>
+                </div>
+                <p className="text-lg font-bold text-gray-900">{routeData.kilometros} km</p>
+              </div>
+
+              <div className="w-px h-12 bg-gray-200 hidden sm:block" />
+
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-2 text-gray-600 mb-1">
+                  <Users className="h-4 w-4" />
+                  <span className="text-xs font-semibold uppercase tracking-wider">Starting at</span>
+                </div>
+                <p className="text-2xl font-black text-gray-900">${minPrice}</p>
+              </div>
+            </div>
+
+            <div className="text-center">
               <Link
                 href={`/transfers?from=${encodeURIComponent(routeInfo.from)}&to=${encodeURIComponent(routeInfo.to)}`}
-                className="inline-flex items-center justify-center px-10 py-4 text-lg font-bold text-gray-900 bg-white rounded-xl shadow-xl hover:scale-105 transition-all"
+                className="inline-flex items-center justify-center px-8 py-3 text-base font-bold text-white bg-blue-600 rounded-lg shadow-lg hover:bg-blue-700 transition-all"
               >
                 Reserve This Route
               </Link>

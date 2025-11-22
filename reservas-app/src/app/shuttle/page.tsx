@@ -189,60 +189,43 @@ export default async function MostBookedPage() {
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                <div className="space-y-3">
                   {category.routes
                     .filter(route => route.price !== null)
                     .map((route) => (
                     <Link
                       key={route.slug}
                       href={`/shuttle/${route.slug}`}
-                      className="group relative bg-white rounded-xl overflow-hidden border border-gray-200 hover:border-blue-500 hover:shadow-xl transition-all duration-300"
+                      className="group relative bg-white rounded-lg overflow-hidden border border-gray-200 hover:border-blue-500 hover:shadow-lg transition-all duration-200 block"
                     >
-                      {/* Hot Badge - Kept simple */}
-                      {route.isHot && (
-                        <div className="absolute top-0 right-0 z-10">
-                          <div className="bg-blue-600 text-white px-3 py-1 rounded-bl-xl text-xs font-bold">
-                            POPULAR
+                      <div className="flex items-center justify-between p-4 gap-4">
+                        {/* Left: Route Info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            {route.isHot && (
+                              <span className="bg-blue-600 text-white px-2 py-0.5 rounded text-xs font-bold">
+                                POPULAR
+                              </span>
+                            )}
                           </div>
-                        </div>
-                      )}
-
-                      <div className="relative p-6">
-                        <div className="mb-4">
-                          <div className="flex items-center gap-2 text-gray-400 text-xs font-medium uppercase tracking-wider mb-2">
-                            <MapPin className="h-3 w-3" />
-                            <span>Direct Route</span>
-                          </div>
-                          <h3 className="text-base font-bold text-gray-900 group-hover:text-blue-600 transition-colors flex items-center flex-wrap gap-2">
-                            {route.from}
-                            <ArrowRight className="h-4 w-4 text-gray-400" />
-                            {route.to}
+                          <h3 className="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition-colors truncate">
+                            {route.from} → {route.to}
                           </h3>
+                          {route.duration && (
+                            <p className="text-xs text-gray-500 mt-1">
+                              <Clock className="h-3 w-3 inline mr-1" />
+                              {route.duration}
+                            </p>
+                          )}
                         </div>
 
-                        <div className="space-y-3 mb-6">
-                          <div className="flex justify-between items-end border-t border-gray-100 pt-4">
-                             {route.duration && (
-                                <div>
-                                    <p className="text-xs text-gray-500">Est. Time</p>
-                                    <div className="flex items-center gap-1 text-sm font-semibold text-gray-700">
-                                        <Clock className="h-3 w-3" />
-                                        {route.duration}
-                                    </div>
-                                </div>
-                             )}
-                             {route.price && (
-                                <div className="text-right">
-                                    <p className="text-xs text-gray-500">Private Vehicle</p>
-                                    <p className="text-lg font-black text-gray-900">${route.price}</p>
-                                </div>
-                             )}
+                        {/* Right: Price */}
+                        {route.price && (
+                          <div className="text-right flex-shrink-0">
+                            <p className="text-xs text-gray-500">From</p>
+                            <p className="text-xl font-black text-gray-900">${route.price}</p>
                           </div>
-                        </div>
-
-                        <div className="w-full bg-gray-50 py-2 text-center text-sm font-semibold text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors rounded-lg">
-                           Route Info
-                        </div>
+                        )}
                       </div>
                     </Link>
                   ))}
