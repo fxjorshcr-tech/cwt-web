@@ -14,55 +14,56 @@ export const metadata: Metadata = {
   keywords: ['Costa Rica private transfers', 'popular routes', 'direct transport', 'SJO airport transfer', 'La Fortuna transport'],
 };
 
+// NOMBRES EXACTOS de la base de datos para matching perfecto
 const popularRoutes = [
   {
     category: 'From SJO Airport',
     icon: '✈️',
     routes: [
-      { from: 'SJO', to: 'La Fortuna', slug: 'sjo-to-la-fortuna', isHot: true },
-      { from: 'SJO', to: 'Manuel Antonio', slug: 'sjo-to-manuel-antonio', isHot: true },
-      { from: 'SJO', to: 'Tamarindo', slug: 'sjo-to-tamarindo' },
-      { from: 'SJO', to: 'Monteverde', slug: 'sjo-to-monteverde' },
-      { from: 'SJO', to: 'Puerto Viejo', slug: 'sjo-to-puerto-viejo' },
+      { from: 'SJO - Juan Santamaria Int. Airport (or Alajuela City & Downtown San Jose)', to: 'La Fortuna, Arenal Volcano & El Castillo', slug: 'sjo-to-la-fortuna', isHot: true },
+      { from: 'SJO - Juan Santamaria Int. Airport (or Alajuela City & Downtown San Jose)', to: 'Manuel Antonio (National Park Area) Quepos', slug: 'sjo-to-manuel-antonio', isHot: true },
+      { from: 'SJO - Juan Santamaria Int. Airport (or Alajuela City & Downtown San Jose)', to: 'Tamarindo / Flamingo / Conchal (Guanacaste Beaches)', slug: 'sjo-to-tamarindo' },
+      { from: 'SJO - Juan Santamaria Int. Airport (or Alajuela City & Downtown San Jose)', to: 'Monteverde (Cloud Forest)', slug: 'sjo-to-monteverde' },
+      { from: 'SJO - Juan Santamaria Int. Airport (or Alajuela City & Downtown San Jose)', to: 'Puerto Viejo de Talamanca (Caribbean Coast)', slug: 'sjo-to-puerto-viejo' },
     ]
   },
   {
     category: 'From La Fortuna',
     icon: '🌋',
     routes: [
-      { from: 'La Fortuna', to: 'SJO', slug: 'la-fortuna-to-sjo', isHot: true },
-      { from: 'La Fortuna', to: 'LIR', slug: 'la-fortuna-to-lir' },
-      { from: 'La Fortuna', to: 'Monteverde', slug: 'la-fortuna-to-monteverde', isHot: true },
-      { from: 'La Fortuna', to: 'Papagayo', slug: 'la-fortuna-to-papagayo' },
-      { from: 'La Fortuna', to: 'Tamarindo', slug: 'la-fortuna-to-tamarindo' },
-      { from: 'La Fortuna', to: 'Manuel Antonio', slug: 'la-fortuna-to-manuel-antonio', isHot: true },
-      { from: 'La Fortuna', to: 'Jaco', slug: 'la-fortuna-to-jaco' },
-      { from: 'La Fortuna', to: 'Samara', slug: 'la-fortuna-to-samara' },
-      { from: 'La Fortuna', to: 'Nosara', slug: 'la-fortuna-to-nosara' },
-      { from: 'La Fortuna', to: 'Puerto Viejo', slug: 'la-fortuna-to-puerto-viejo' },
+      { from: 'La Fortuna, Arenal Volcano & El Castillo', to: 'SJO - Juan Santamaria Int. Airport (or Alajuela City & Downtown San Jose)', slug: 'la-fortuna-to-sjo', isHot: true },
+      { from: 'La Fortuna, Arenal Volcano & El Castillo', to: 'LIR - Liberia International Airport', slug: 'la-fortuna-to-lir' },
+      { from: 'La Fortuna, Arenal Volcano & El Castillo', to: 'Monteverde (Cloud Forest)', slug: 'la-fortuna-to-monteverde', isHot: true },
+      { from: 'La Fortuna, Arenal Volcano & El Castillo', to: 'Papagayo Peninsula, Guanacaste', slug: 'la-fortuna-to-papagayo' },
+      { from: 'La Fortuna, Arenal Volcano & El Castillo', to: 'Tamarindo / Flamingo / Conchal (Guanacaste Beaches)', slug: 'la-fortuna-to-tamarindo' },
+      { from: 'La Fortuna, Arenal Volcano & El Castillo', to: 'Manuel Antonio (National Park Area) Quepos', slug: 'la-fortuna-to-manuel-antonio', isHot: true },
+      { from: 'La Fortuna, Arenal Volcano & El Castillo', to: 'Jaco / Playa Hermosa (Central Pacific)', slug: 'la-fortuna-to-jaco' },
+      { from: 'La Fortuna, Arenal Volcano & El Castillo', to: 'Samara (Playa Samara Beach)', slug: 'la-fortuna-to-samara' },
+      { from: 'La Fortuna, Arenal Volcano & El Castillo', to: 'Nosara (Playa Guiones Area)', slug: 'la-fortuna-to-nosara' },
+      { from: 'La Fortuna, Arenal Volcano & El Castillo', to: 'Puerto Viejo de Talamanca (Caribbean Coast)', slug: 'la-fortuna-to-puerto-viejo' },
     ]
   },
   {
     category: 'From LIR Airport',
     icon: '🛬',
     routes: [
-      { from: 'LIR', to: 'Tamarindo', slug: 'lir-to-tamarindo', isHot: true },
-      { from: 'LIR', to: 'Papagayo', slug: 'lir-to-papagayo', isHot: true },
-      { from: 'LIR', to: 'La Fortuna', slug: 'lir-to-la-fortuna' },
-      { from: 'LIR', to: 'Nosara', slug: 'lir-to-nosara' },
-      { from: 'LIR', to: 'Santa Teresa', slug: 'lir-to-santa-teresa' },
-      { from: 'LIR', to: 'Monteverde', slug: 'lir-to-monteverde' },
-      { from: 'LIR', to: 'Rio Celeste', slug: 'lir-to-rio-celeste' },
+      { from: 'LIR - Liberia International Airport', to: 'Tamarindo / Flamingo / Conchal (Guanacaste Beaches)', slug: 'lir-to-tamarindo', isHot: true },
+      { from: 'LIR - Liberia International Airport', to: 'Papagayo Peninsula, Guanacaste', slug: 'lir-to-papagayo', isHot: true },
+      { from: 'LIR - Liberia International Airport', to: 'La Fortuna, Arenal Volcano & El Castillo', slug: 'lir-to-la-fortuna' },
+      { from: 'LIR - Liberia International Airport', to: 'Nosara (Playa Guiones Area)', slug: 'lir-to-nosara' },
+      { from: 'LIR - Liberia International Airport', to: 'Santa Teresa / Malpais/ Montezuma Area', slug: 'lir-to-santa-teresa' },
+      { from: 'LIR - Liberia International Airport', to: 'Monteverde (Cloud Forest)', slug: 'lir-to-monteverde' },
+      { from: 'LIR - Liberia International Airport', to: 'Rio Celeste (Tenorio Volcano National Park)', slug: 'lir-to-rio-celeste' },
     ]
   },
   {
     category: 'From Monteverde',
     icon: '🌿',
     routes: [
-      { from: 'Monteverde', to: 'SJO', slug: 'monteverde-to-sjo' },
-      { from: 'Monteverde', to: 'Manuel Antonio', slug: 'monteverde-to-manuel-antonio' },
-      { from: 'Monteverde', to: 'Tamarindo', slug: 'monteverde-to-tamarindo' },
-      { from: 'Monteverde', to: 'La Fortuna', slug: 'monteverde-to-la-fortuna' },
+      { from: 'Monteverde (Cloud Forest)', to: 'SJO - Juan Santamaria Int. Airport (or Alajuela City & Downtown San Jose)', slug: 'monteverde-to-sjo' },
+      { from: 'Monteverde (Cloud Forest)', to: 'Manuel Antonio (National Park Area) Quepos', slug: 'monteverde-to-manuel-antonio' },
+      { from: 'Monteverde (Cloud Forest)', to: 'Tamarindo / Flamingo / Conchal (Guanacaste Beaches)', slug: 'monteverde-to-tamarindo' },
+      { from: 'Monteverde (Cloud Forest)', to: 'La Fortuna, Arenal Volcano & El Castillo', slug: 'monteverde-to-la-fortuna' },
     ]
   },
 ];

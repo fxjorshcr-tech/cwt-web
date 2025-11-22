@@ -7,7 +7,6 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Search, Loader2, AlertCircle, Plus, X } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import { matchLocation } from '@/utils/locationHelpers';
 
 // ✅ Imports de componentes divididos
 import {
@@ -89,9 +88,9 @@ export function BookingForm() {
           }
 
           if (newTrips[0].from_location && newTrips[0].to_location) {
-            // ✅ Use fuzzy matching instead of exact match
+            // ✅ Exact match - nombres coinciden exactamente con DB
             const route = routes.find(
-              (r) => matchLocation(r.origen, newTrips[0].from_location) && matchLocation(r.destino, newTrips[0].to_location)
+              (r) => r.origen === newTrips[0].from_location && r.destino === newTrips[0].to_location
             );
 
             if (route) {
@@ -241,9 +240,9 @@ export function BookingForm() {
             return newTrips;
           }
 
-          // ✅ Use fuzzy matching instead of exact match
+          // ✅ Exact match - nombres coinciden exactamente con DB
           const route = routes.find(
-            (r) => matchLocation(r.origen, trip.from_location) && matchLocation(r.destino, trip.to_location)
+            (r) => r.origen === trip.from_location && r.destino === trip.to_location
           );
 
           if (route) {
