@@ -74,7 +74,7 @@ export default async function PrivateToursPage() {
       </section>
 
       {/* Tours Grid */}
-      <section className="py-16 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-10 sm:py-16 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-4 max-w-7xl">
           
           {/* Category Title */}
@@ -224,7 +224,7 @@ export default async function PrivateToursPage() {
       </section>
 
       {/* SEO Content Section - UPDATED */}
-      <section className="py-16 bg-white border-t border-gray-200">
+      <section className="py-10 sm:py-16 bg-white border-t border-gray-200">
         <div className="container mx-auto px-4 max-w-6xl">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">
             Why Choose Our Private Tours?

@@ -158,7 +158,7 @@ export default function ContactPage() {
         </section>
 
         {/* Main Content: Form + Info */}
-        <section className="py-16 bg-gradient-to-b from-white to-gray-50">
+        <section className="py-10 sm:py-16 bg-gradient-to-b from-white to-gray-50">
           <div className="container mx-auto px-6 max-w-6xl">
             <div className="grid lg:grid-cols-2 gap-12">
               

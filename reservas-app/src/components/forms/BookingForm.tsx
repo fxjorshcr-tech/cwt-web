@@ -196,10 +196,13 @@ export function BookingForm() {
   }
 
   function calculatePrice(route: Route, passengers: number): number {
+    // ✅ Validate BEFORE calculating
+    if (passengers > 12 || passengers < 1) return 0;
+
     if (passengers <= 6) return route.precio1a6;
     if (passengers <= 9) return route.precio7a9;
     if (passengers <= 12) return route.precio10a12;
-    // ✅ Para más de 12 pasajeros, retornar 0 (mostraremos mensaje de contacto)
+
     return 0;
   }
 
