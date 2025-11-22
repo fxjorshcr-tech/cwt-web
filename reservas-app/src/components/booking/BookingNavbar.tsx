@@ -35,12 +35,12 @@ export default function BookingNavbar() {
               className="flex items-center gap-3"
               aria-label="Can't Wait Travel - Home"
             >
-              <div className="relative w-64 h-16 sm:w-80 sm:h-20 md:w-96 md:h-24 lg:w-[28rem] lg:h-28">
+              <div className="relative w-40 h-10 sm:w-52 sm:h-14 md:w-64 md:h-16 lg:w-80 lg:h-20">
                 <Image
                   src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/logo-cant-wait-travel.webp"
                   alt="Can't Wait Travel - Costa Rica Private Shuttle Service"
                   fill
-                  sizes="(max-width: 640px) 256px, (max-width: 768px) 320px, (max-width: 1024px) 384px, 448px"
+                  sizes="(max-width: 640px) 160px, (max-width: 768px) 208px, (max-width: 1024px) 256px, 320px"
                   className="object-contain"
                   priority
                 />

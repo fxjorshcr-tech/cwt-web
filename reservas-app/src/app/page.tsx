@@ -106,7 +106,7 @@ export const metadata: Metadata = {
 export default async function Home() {
   return (
     <>
-      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-lg focus:shadow-lg">
+      <a href="#main-content" className="sr-only focus-visible:not-sr-only focus-visible:absolute focus-visible:top-4 focus-visible:left-4 focus-visible:z-[9999] focus-visible:px-4 focus-visible:py-2 focus-visible:bg-blue-600 focus-visible:text-white focus-visible:rounded-lg focus-visible:shadow-lg">
         Skip to main content
       </a>
 
@@ -128,7 +128,7 @@ export default async function Home() {
         <StructuredData />
         <BookingNavbar />
 
-        <section className="relative h-screen overflow-x-hidden max-w-full">
+        <section className="relative h-screen max-h-[800px] overflow-x-hidden max-w-full">
           <div className="absolute inset-0 z-0 max-w-full">
             <Image src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/aerial-view-conchal-beach.webp" alt="Private Shuttle Costa Rica - Beach Transportation Service" fill sizes="100vw" className="object-cover" priority quality={75} placeholder="blur" blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA=" />
             <div className="absolute inset-0 bg-black/50" />

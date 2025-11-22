@@ -25,7 +25,7 @@ export default async function PrivateToursPage() {
       <BookingNavbar />
 
       {/* Hero Section */}
-      <section className="relative h-[70vh] min-h-[500px] flex items-center justify-center">
+      <section className="relative h-[70vh] min-h-[500px] max-h-[750px] flex items-center justify-center">
         <div className="absolute inset-0 z-0">
           <Image
             src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/arenal-volcano-mountains-sky-costa-rica.webp"
@@ -38,13 +38,16 @@ export default async function PrivateToursPage() {
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
         </div>
 
-        <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
+        <div className="relative z-10 text-center px-6 max-w-5xl mx-auto pt-20 sm:pt-0">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full mb-6 border border-white/20">
             <MapPin className="h-5 w-5 text-white" />
-            <span className="text-white text-sm font-bold uppercase tracking-wide">📍 LOCAL OPERATOR • LA FORTUNA</span>
+            <span className="text-white text-xs sm:text-sm font-bold uppercase tracking-wide">
+              <span className="hidden sm:inline">📍 LOCAL OPERATOR • </span>
+              <span className="sm:hidden">📍 </span>LA FORTUNA
+            </span>
           </div>
           
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-4 drop-shadow-2xl">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4 drop-shadow-2xl">
             La Fortuna: Unlocked.
           </h1>
           
@@ -71,7 +74,7 @@ export default async function PrivateToursPage() {
       </section>
 
       {/* Tours Grid */}
-      <section className="py-16 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-10 sm:py-16 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-4 max-w-7xl">
           
           {/* Category Title */}
@@ -221,7 +224,7 @@ export default async function PrivateToursPage() {
       </section>
 
       {/* SEO Content Section - UPDATED */}
-      <section className="py-16 bg-white border-t border-gray-200">
+      <section className="py-10 sm:py-16 bg-white border-t border-gray-200">
         <div className="container mx-auto px-4 max-w-6xl">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">
             Why Choose Our Private Tours?

@@ -26,6 +26,18 @@ import {
 
 import { formatDate, formatTime } from '@/lib/formatters';
 import { PRICING_CONFIG } from '@/lib/pricing-config';
+import {
+  loadBookingFromLocalStorage,
+  removeBookingFromLocalStorage,
+  filterChildrenAges,
+  type LocalStorageBooking,
+} from '@/utils/localStorageHelpers';
+import {
+  checkExistingTrips,
+  loadTripsFromSupabase,
+  insertTripsWithRetry,
+  prepareTripForSupabase,
+} from '@/utils/supabaseHelpers';
 
 interface Trip {
   id: string;
@@ -51,34 +63,7 @@ interface Trip {
   routeId?: number;
 }
 
-interface LocalStorageBooking {
-  bookingId: string;
-  trips: Array<{
-    from_location: string;
-    to_location: string;
-    date: string;
-    adults: number;
-    children: number;
-    price: number;
-    duration: string;
-    routeId?: number;
-    calculatedPrice: number;
-  }>;
-  createdAt: string;
-  tripDetails?: Array<{
-    pickup_address: string;
-    dropoff_address: string;
-    pickup_time: string;
-    flight_number: string;
-    airline: string;
-    special_requests: string;
-    children_ages: (number | null)[];
-    add_ons: string[];
-    night_surcharge: number;
-    add_ons_price: number;
-    final_price: number;
-  }>;
-}
+// LocalStorageBooking type is imported from utils/localStorageHelpers
 
 // ✅ CORREGIDO: Nombres actualizados
 const ADD_ON_NAMES: Record<string, string> = {
@@ -155,16 +140,14 @@ function SummaryPageContent() {
       try {
         setLoading(true);
 
-        // ✅ Cargar de localStorage
-        const localDataStr = localStorage.getItem(`booking_${bookingId}`);
+        // ✅ Load booking from localStorage using helper
+        const localData = loadBookingFromLocalStorage(bookingId as string);
 
-        if (!localDataStr) {
+        if (!localData) {
           throw new Error('Booking not found. Please start a new search.');
         }
 
-        const localData: LocalStorageBooking = JSON.parse(localDataStr);
-
-        // Convertir datos de localStorage a formato Trip
+        // Convert localStorage data to Trip format
         const loadedTrips: Trip[] = localData.trips.map((trip, index) => {
           const details = localData.tripDetails?.[index];
 
@@ -172,13 +155,10 @@ function SummaryPageContent() {
             throw new Error('Incomplete booking details. Please complete all steps.');
           }
 
-          // Filtrar children_ages para remover nulls
-          const filteredChildrenAges = details.children_ages.filter(
-            (age): age is number => age !== null
-          );
+          const filteredChildrenAges = filterChildrenAges(details.children_ages);
 
           const tripData: Trip = {
-            id: `temp_${localData.bookingId}_${index}`, // ID temporal
+            id: `temp_${localData.bookingId}_${index}`,
             booking_id: localData.bookingId,
             from_location: trip.from_location,
             to_location: trip.to_location,
@@ -194,7 +174,7 @@ function SummaryPageContent() {
             flight_number: details.flight_number || null,
             airline: details.airline || null,
             special_requests: details.special_requests || null,
-            children_ages: filteredChildrenAges.length > 0 ? filteredChildrenAges : null,
+            children_ages: filteredChildrenAges,
             add_ons: details.add_ons.length > 0 ? details.add_ons : null,
             night_surcharge: details.night_surcharge,
             add_ons_price: details.add_ons_price,
@@ -231,29 +211,16 @@ function SummaryPageContent() {
     try {
       setIsSavingToSupabase(true);
 
-      // ✅ VERIFICAR: ¿Ya existe en Supabase?
-      const { data: existingTrips, error: checkError } = await supabase
-        .from('trips')
-        .select('id')
-        .eq('booking_id', bookingId as string)
-        .limit(1);
+      // ✅ Check if already exists in Supabase
+      const existingTripIds = await checkExistingTrips(supabase, bookingId as string);
 
-      if (checkError) {
-        console.error('Error checking existing trips:', checkError);
-      }
-
-      // Si ya existe, solo actualizar los IDs en el estado local y retornar
-      if (existingTrips && existingTrips.length > 0) {
+      if (existingTripIds.length > 0) {
         console.log('Booking already saved in Supabase, skipping insert');
-        
-        // Cargar los trips completos desde Supabase
-        const { data: fullTrips, error: loadError } = await supabase
-          .from('trips')
-          .select('*')
-          .eq('booking_id', bookingId as string)
-          .order('created_at', { ascending: true });
 
-        if (!loadError && fullTrips && fullTrips.length > 0) {
+        // Load full trips from Supabase
+        const fullTrips = await loadTripsFromSupabase(supabase, bookingId as string);
+
+        if (fullTrips && fullTrips.length > 0) {
           setTrips((prevTrips) =>
             prevTrips.map((trip, index) => ({
               ...trip,
@@ -263,12 +230,11 @@ function SummaryPageContent() {
         }
 
         setIsSavingToSupabase(false);
-        return true; // Ya estaba guardado
+        return true;
       }
 
-      // ✅ NO EXISTE: Proceder a guardar
-      // Preparar datos para insertar en Supabase
-      const tripsToInsert = trips.map((trip) => ({
+      // ✅ Prepare trips for Supabase insertion
+      const tripsToInsert = trips.map((trip) => prepareTripForSupabase({
         booking_id: bookingId as string,
         from_location: trip.from_location,
         to_location: trip.to_location,
@@ -276,14 +242,10 @@ function SummaryPageContent() {
         adults: trip.adults,
         children: trip.children,
         price: trip.price,
-        distance: 0, // No usamos kilometros
-        duration: trip.duration || '',
-        pickup_address: trip.pickup_address || '',
-        pickup_instructions: '', // Opcional
-        dropoff_address: trip.dropoff_address || '',
-        dropoff_instructions: '', // Opcional
+        duration: trip.duration,
+        pickup_address: trip.pickup_address,
+        dropoff_address: trip.dropoff_address,
         pickup_time: trip.pickup_time,
-        arrival_time: null, // Calculado después si es necesario
         flight_number: trip.flight_number,
         airline: trip.airline,
         special_requests: trip.special_requests,
@@ -291,35 +253,28 @@ function SummaryPageContent() {
         add_ons: trip.add_ons,
         add_ons_price: trip.add_ons_price,
         night_surcharge: trip.night_surcharge,
-        fees: null, // Se calculan en backend si es necesario
-        final_price: trip.final_price || trip.price,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        final_price: trip.final_price,
       }));
 
-      // ✅ Insertar en Supabase
-      const { data, error } = await supabase
-        .from('trips')
-        .insert(tripsToInsert)
-        .select();
+      // ✅ Insert with retry logic
+      const insertedTrips = await insertTripsWithRetry(supabase, tripsToInsert);
 
-      if (error) {
-        console.error('Supabase error:', error);
-        throw new Error(`Failed to save booking: ${error.message}`);
+      if (!insertedTrips) {
+        throw new Error('Failed to save booking after retries');
       }
 
-      // ✅ Actualizar los IDs temporales con los IDs reales de Supabase
-      if (data && data.length > 0) {
+      // ✅ Update local state with real Supabase IDs
+      if (insertedTrips.length > 0) {
         setTrips((prevTrips) =>
           prevTrips.map((trip, index) => ({
             ...trip,
-            id: data[index].id,
+            id: insertedTrips[index].id,
           }))
         );
       }
 
-      // ✅ LIMPIAR LOCALSTORAGE
-      localStorage.removeItem(`booking_${bookingId}`);
+      // ✅ Clean up localStorage
+      removeBookingFromLocalStorage(bookingId as string);
 
       setIsSavingToSupabase(false);
       return true;
@@ -432,10 +387,10 @@ function SummaryPageContent() {
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center text-white px-4">
             <h1 className="text-3xl md:text-5xl font-bold mb-2 drop-shadow-lg">
-              Review Your Booking
+              Booking Summary
             </h1>
             <p className="text-lg md:text-xl drop-shadow-md">
-              Please review all details before proceeding to payment
+              Review your reservation details before confirming
             </p>
           </div>
         </div>

@@ -7,37 +7,22 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Search, Loader2, AlertCircle, Plus, X } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-
-// ✅ Imports de componentes divididos
 import {
   TripCard,
   LargeGroupNotice,
   FormInfoBanner,
   FormSkeleton,
 } from './booking';
-
-interface Route {
-  id: number;
-  origen: string;
-  destino: string;
-  precio1a6: number;
-  precio7a9: number;
-  precio10a12: number;
-  duracion: string;
-}
-
-interface TripData {
-  from_location: string;
-  to_location: string;
-  date: string;
-  adults: number;
-  children: number;
-  routeId?: number;
-  price?: number;
-  duration?: string;
-  calculatedPrice: number;
-  selectedRoute: Route | null;
-}
+import {
+  type Route,
+  type TripData,
+  loadRoutesFromSupabase,
+  applyUrlParamsToTrip,
+  updateTripInArray,
+  validateTrips,
+  generateBookingId,
+  createBookingData,
+} from '@/utils/bookingFormHelpers';
 
 export function BookingForm() {
   const router = useRouter();
@@ -78,32 +63,7 @@ export function BookingForm() {
       if (fromLocation || toLocation) {
         setTrips((prevTrips) => {
           const newTrips = [...prevTrips];
-
-          if (fromLocation) {
-            newTrips[0].from_location = fromLocation;
-          }
-
-          if (toLocation) {
-            newTrips[0].to_location = toLocation;
-          }
-
-          if (newTrips[0].from_location && newTrips[0].to_location) {
-            const route = routes.find(
-              (r) => r.origen === newTrips[0].from_location && r.destino === newTrips[0].to_location
-            );
-
-            if (route) {
-              const totalPassengers = newTrips[0].adults + newTrips[0].children;
-              const price = calculatePrice(route, totalPassengers);
-
-              newTrips[0].selectedRoute = route;
-              newTrips[0].calculatedPrice = price;
-              newTrips[0].routeId = route.id;
-              newTrips[0].price = price;
-              newTrips[0].duration = route.duracion;
-            }
-          }
-
+          newTrips[0] = applyUrlParamsToTrip(newTrips[0], fromLocation, toLocation, routes);
           return newTrips;
         });
 
@@ -112,131 +72,31 @@ export function BookingForm() {
     }
   }, [routes, searchParams]);
 
-  // ✅ MANTENER: Solo para LEER rutas de Supabase, NO para guardar bookings
+  // ✅ Load routes from Supabase
   async function loadRoutes() {
-    try {
-      setIsLoadingRoutes(true);
-      setError(null);
+    setIsLoadingRoutes(true);
+    setError(null);
 
-      const supabase = createClient();
+    const supabase = createClient();
+    const { routes: loadedRoutes, error: loadError } = await loadRoutesFromSupabase(supabase);
 
-      // ✅ SOLO seleccionar campos que existen y tienen datos
-      const { data, error: fetchError } = await supabase
-        .from('routes')
-        .select('id, origen, destino, precio1a6, precio7a9, precio10a12, duracion')
-        .order('origen');
-
-      if (fetchError) {
-        throw new Error(fetchError.message);
-      }
-
-      if (!data || data.length === 0) {
-        throw new Error('No routes available in database');
-      }
-
-      // ✅ Validar solo los campos que usamos
-      const validRoutes: Route[] = (data as any[])
-        .filter((route): route is Route => {
-          return (
-            route.origen !== null &&
-            route.destino !== null &&
-            route.precio1a6 !== null &&
-            route.precio7a9 !== null &&
-            route.precio10a12 !== null &&
-            route.duracion !== null
-          );
-        })
-        .map((route) => ({
-          id: route.id,
-          origen: route.origen,
-          destino: route.destino,
-          precio1a6: route.precio1a6,
-          precio7a9: route.precio7a9,
-          precio10a12: route.precio10a12,
-          duracion: route.duracion,
-        }));
-
-      if (validRoutes.length === 0) {
-        throw new Error('No valid routes available');
-      }
-
-      setRoutes(validRoutes);
+    if (loadError) {
+      setError(loadError);
       setShowContent(true);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      setError(message);
-      setShowContent(true);
-    } finally {
       setIsLoadingRoutes(false);
+      return;
     }
-  }
 
-  function calculatePrice(route: Route, passengers: number): number {
-    if (passengers <= 6) return route.precio1a6;
-    if (passengers <= 9) return route.precio7a9;
-    if (passengers <= 12) return route.precio10a12;
-    // ✅ Para más de 12 pasajeros, retornar 0 (mostraremos mensaje de contacto)
-    return 0;
+    if (loadedRoutes) {
+      setRoutes(loadedRoutes);
+      setShowContent(true);
+    }
+
+    setIsLoadingRoutes(false);
   }
 
   function updateTrip(index: number, field: string, value: any) {
-    setTrips((prevTrips) => {
-      const newTrips = [...prevTrips];
-      newTrips[index] = { ...newTrips[index], [field]: value };
-
-      if (field === 'from_location') {
-        newTrips[index].to_location = '';
-        newTrips[index].selectedRoute = null;
-        newTrips[index].calculatedPrice = 0;
-        newTrips[index].price = undefined;
-        newTrips[index].duration = undefined;
-        newTrips[index].routeId = undefined;
-      }
-
-      if (
-        field === 'from_location' ||
-        field === 'to_location' ||
-        field === 'adults' ||
-        field === 'children'
-      ) {
-        const trip = newTrips[index];
-
-        if (trip.from_location && trip.to_location) {
-          const totalPassengers = trip.adults + trip.children;
-
-          if (totalPassengers > 12) {
-            newTrips[index].selectedRoute = null;
-            newTrips[index].calculatedPrice = 0;
-            newTrips[index].price = undefined;
-            newTrips[index].duration = undefined;
-            newTrips[index].routeId = undefined;
-            return newTrips;
-          }
-
-          const route = routes.find(
-            (r) => r.origen === trip.from_location && r.destino === trip.to_location
-          );
-
-          if (route) {
-            const price = calculatePrice(route, totalPassengers);
-
-            newTrips[index].selectedRoute = route;
-            newTrips[index].calculatedPrice = price;
-            newTrips[index].routeId = route.id;
-            newTrips[index].price = price;
-            newTrips[index].duration = route.duracion;
-          } else {
-            newTrips[index].selectedRoute = null;
-            newTrips[index].calculatedPrice = 0;
-            newTrips[index].price = undefined;
-            newTrips[index].duration = undefined;
-            newTrips[index].routeId = undefined;
-          }
-        }
-      }
-
-      return newTrips;
-    });
+    setTrips((prevTrips) => updateTripInArray(prevTrips, index, field, value, routes));
   }
 
   function addTrip() {
@@ -263,50 +123,7 @@ export function BookingForm() {
   }
 
   function validate(): string | null {
-    for (let i = 0; i < trips.length; i++) {
-      const trip = trips[i];
-
-      if (!trip.from_location) {
-        return `Trip ${i + 1}: Please select an origin`;
-      }
-
-      if (!trip.to_location) {
-        return `Trip ${i + 1}: Please select a destination`;
-      }
-
-      if (!trip.date) {
-        return `Trip ${i + 1}: Please select a date`;
-      }
-
-      // ✅ Validar fecha futura
-      const tripDate = new Date(trip.date);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      if (tripDate < today) {
-        return `Trip ${i + 1}: Date must be in the future`;
-      }
-
-      const totalPassengers = trip.adults + trip.children;
-
-      if (totalPassengers > 12) {
-        return `Trip ${i + 1}: For groups larger than 12 passengers, please contact us directly via WhatsApp`;
-      }
-
-      if (!trip.selectedRoute || !trip.routeId) {
-        return `Trip ${i + 1}: No route available for this combination. Please contact us on WhatsApp for assistance.`;
-      }
-
-      if (totalPassengers < 1) {
-        return `Trip ${i + 1}: At least 1 passenger required`;
-      }
-
-      if (!trip.price) {
-        return `Trip ${i + 1}: Price calculation failed`;
-      }
-    }
-
-    return null;
+    return validateTrips(trips);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -323,27 +140,10 @@ export function BookingForm() {
     setError(null);
 
     try {
-      // ✅ Generar booking ID único
-      const bookingId = `booking_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const bookingId = generateBookingId();
+      const bookingData = createBookingData(trips, bookingId);
 
-      // ✅ NUEVO: Guardar en localStorage en vez de Supabase
-      const bookingData = {
-        bookingId,
-        trips: trips.map((trip) => ({
-          from_location: trip.from_location,
-          to_location: trip.to_location,
-          date: trip.date,
-          adults: trip.adults,
-          children: trip.children,
-          price: trip.price!,
-          duration: trip.duration ?? '',
-          routeId: trip.routeId,
-          calculatedPrice: trip.calculatedPrice,
-        })),
-        createdAt: new Date().toISOString(),
-      };
-
-      // ✅ Guardar en localStorage (NO en Supabase)
+      // Save to localStorage
       localStorage.setItem(`booking_${bookingId}`, JSON.stringify(bookingData));
 
       // ✅ PASO 1: Mostrar "Checking Availability..."

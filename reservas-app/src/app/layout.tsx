@@ -6,6 +6,7 @@ import "./globals.css";
 import ConditionalFooter from "@/components/layout/ConditionalFooter";
 import { CartProvider } from "@/contexts/CartContext";
 import { Toaster } from "sonner";
+import LocalStorageCleanup from "@/components/LocalStorageCleanup";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -72,6 +73,7 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className} overflow-x-hidden`}>
         <CartProvider>
+          <LocalStorageCleanup />
           <div className="min-h-screen flex flex-col overflow-x-hidden">
             <main className="flex-1 w-full overflow-x-hidden">
               {children}

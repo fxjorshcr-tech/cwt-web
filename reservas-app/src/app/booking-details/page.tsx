@@ -34,6 +34,13 @@ import {
 } from '@/utils/bookingValidation';
 import { normalizeTime } from '@/utils/timeHelpers';
 import { calculateNightSurcharge, calculateAddOnsPrice } from '@/lib/pricing-config';
+import {
+  loadBookingFromLocalStorage,
+  saveBookingDetailsToLocalStorage,
+  removeBookingFromLocalStorage,
+  filterChildrenAges,
+  type LocalStorageBooking,
+} from '@/utils/localStorageHelpers';
 
 // ============================================
 // TYPES
@@ -73,35 +80,7 @@ interface FormData {
   children_ages: (number | null)[];
 }
 
-interface LocalStorageBooking {
-  bookingId: string;
-  trips: Array<{
-    from_location: string;
-    to_location: string;
-    date: string;
-    adults: number;
-    children: number;
-    price: number;
-    duration: string;
-    routeId?: number;
-    calculatedPrice: number;
-  }>;
-  createdAt: string;
-  // Campos completados en booking-details
-  tripDetails?: Array<{
-    pickup_address: string;
-    dropoff_address: string;
-    pickup_time: string;
-    flight_number: string;
-    airline: string;
-    special_requests: string;
-    children_ages: (number | null)[];
-    add_ons: string[];
-    night_surcharge: number;
-    add_ons_price: number;
-    final_price: number;
-  }>;
-}
+// LocalStorageBooking type is imported from utils/localStorageHelpers
 
 // ============================================
 // MAIN COMPONENT
@@ -141,6 +120,11 @@ function BookingDetailsContent() {
       }
     }
   }, [searchParams]);
+
+  // ✅ FIX: Scroll to top when trip changes (mobile fix)
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentTripIndex]);
 
   // VALIDACIÓN TEMPRANA
   if (!bookingId) {
@@ -191,91 +175,81 @@ function BookingDetailsContent() {
       try {
         setLoading(true);
 
-        // ✅ PRIMERO: Intentar cargar de localStorage
-        const localDataStr = localStorage.getItem(`booking_${bookingId}`);
+        // ✅ Load booking from localStorage using helper
+        const localData = loadBookingFromLocalStorage(bookingId);
 
-        if (localDataStr) {
-          const localData: LocalStorageBooking = JSON.parse(localDataStr);
-
-          // Convertir datos de localStorage a formato Trip
-          const loadedTrips: Trip[] = localData.trips.map((trip, index) => {
-            const savedDetails = localData.tripDetails?.[index];
-
-            // Filtrar children_ages para remover nulls
-            const filteredChildrenAges = savedDetails?.children_ages 
-              ? savedDetails.children_ages.filter((age): age is number => age !== null)
-              : null;
-
-            const tripData: Trip = {
-              id: `temp_${localData.bookingId}_${index}`, // ID temporal
-              booking_id: localData.bookingId,
-              from_location: trip.from_location,
-              to_location: trip.to_location,
-              date: trip.date,
-              adults: trip.adults,
-              children: trip.children,
-              price: trip.price,
-              duration: trip.duration,
-              routeId: trip.routeId,
-              // Campos completados (si existen)
-              pickup_address: savedDetails?.pickup_address || null,
-              dropoff_address: savedDetails?.dropoff_address || null,
-              pickup_time: savedDetails?.pickup_time || null,
-              flight_number: savedDetails?.flight_number || null,
-              airline: savedDetails?.airline || null,
-              special_requests: savedDetails?.special_requests || null,
-              children_ages: filteredChildrenAges && filteredChildrenAges.length > 0 
-                ? filteredChildrenAges 
-                : null,
-              add_ons: savedDetails?.add_ons || null,
-              night_surcharge: savedDetails?.night_surcharge || null,
-              add_ons_price: savedDetails?.add_ons_price || null,
-              final_price: savedDetails?.final_price || null,
-            };
-
-            return tripData;
-          });
-
-          setTrips(loadedTrips);
-
-          // Determinar qué trips están completos
-          const completed = loadedTrips
-            .map((trip, idx) =>
-              trip.pickup_time && trip.pickup_address && trip.dropoff_address ? idx : null
-            )
-            .filter((idx): idx is number => idx !== null);
-          setCompletedTrips(completed);
-
-          // Cargar datos del primer trip
-          if (loadedTrips[0]) {
-            const trip = loadedTrips[0];
-            const initialAges =
-              trip.children_ages && trip.children_ages.length > 0
-                ? trip.children_ages
-                : Array(trip.children).fill(null);
-
-            setFormData({
-              pickup_address: trip.pickup_address || '',
-              dropoff_address: trip.dropoff_address || '',
-              pickup_time: normalizeTime(trip.pickup_time),
-              flight_number: trip.flight_number || '',
-              airline: trip.airline || '',
-              special_requests: trip.special_requests || '',
-              children_ages: initialAges,
-            });
-
-            if (trip.add_ons && Array.isArray(trip.add_ons)) {
-              setSelectedAddOns(trip.add_ons);
-            }
-          }
-
-          setLoading(false);
-          return;
+        if (!localData) {
+          throw new Error('Booking not found. Please start a new search.');
         }
 
-        // Si no está en localStorage, el booking no existe
-        throw new Error('Booking not found. Please start a new search.');
+        // Convert localStorage data to Trip format
+        const loadedTrips: Trip[] = localData.trips.map((trip, index) => {
+          const savedDetails = localData.tripDetails?.[index];
+          const filteredChildrenAges = savedDetails?.children_ages
+            ? filterChildrenAges(savedDetails.children_ages)
+            : null;
 
+          const tripData: Trip = {
+            id: `temp_${localData.bookingId}_${index}`,
+            booking_id: localData.bookingId,
+            from_location: trip.from_location,
+            to_location: trip.to_location,
+            date: trip.date,
+            adults: trip.adults,
+            children: trip.children,
+            price: trip.price,
+            duration: trip.duration,
+            routeId: trip.routeId,
+            pickup_address: savedDetails?.pickup_address || null,
+            dropoff_address: savedDetails?.dropoff_address || null,
+            pickup_time: savedDetails?.pickup_time || null,
+            flight_number: savedDetails?.flight_number || null,
+            airline: savedDetails?.airline || null,
+            special_requests: savedDetails?.special_requests || null,
+            children_ages: filteredChildrenAges,
+            add_ons: savedDetails?.add_ons || null,
+            night_surcharge: savedDetails?.night_surcharge || null,
+            add_ons_price: savedDetails?.add_ons_price || null,
+            final_price: savedDetails?.final_price || null,
+          };
+
+          return tripData;
+        });
+
+        setTrips(loadedTrips);
+
+        // Determine which trips are complete
+        const completed = loadedTrips
+          .map((trip, idx) =>
+            trip.pickup_time && trip.pickup_address && trip.dropoff_address ? idx : null
+          )
+          .filter((idx): idx is number => idx !== null);
+        setCompletedTrips(completed);
+
+        // Load first trip data
+        if (loadedTrips[0]) {
+          const trip = loadedTrips[0];
+          const initialAges =
+            trip.children_ages && trip.children_ages.length > 0
+              ? trip.children_ages
+              : Array(trip.children).fill(null);
+
+          setFormData({
+            pickup_address: trip.pickup_address || '',
+            dropoff_address: trip.dropoff_address || '',
+            pickup_time: normalizeTime(trip.pickup_time),
+            flight_number: trip.flight_number || '',
+            airline: trip.airline || '',
+            special_requests: trip.special_requests || '',
+            children_ages: initialAges,
+          });
+
+          if (trip.add_ons && Array.isArray(trip.add_ons)) {
+            setSelectedAddOns(trip.add_ons);
+          }
+        }
+
+        setLoading(false);
       } catch (error) {
         console.error('Error loading booking:', error);
         alert('Failed to load booking details. Please start a new search.');
@@ -336,36 +310,27 @@ function BookingDetailsContent() {
 
   // ✅ SAVE TO LOCALSTORAGE (NOT SUPABASE)
   const saveToLocalStorage = () => {
-    try {
-      const localDataStr = localStorage.getItem(`booking_${bookingId}`);
-      if (!localDataStr) return;
+    if (!bookingId) return;
 
-      const localData: LocalStorageBooking = JSON.parse(localDataStr);
+    const tripDetails = {
+      pickup_address: formData.pickup_address,
+      dropoff_address: formData.dropoff_address,
+      pickup_time: formData.pickup_time,
+      flight_number: formData.flight_number,
+      airline: formData.airline,
+      special_requests: formData.special_requests,
+      children_ages: formData.children_ages,
+      add_ons: selectedAddOns,
+      night_surcharge: priceCalculation.nightSurcharge,
+      add_ons_price: priceCalculation.addOnsPrice,
+      final_price: priceCalculation.subtotal,
+    };
 
-      // Inicializar tripDetails si no existe
-      if (!localData.tripDetails) {
-        localData.tripDetails = [];
-      }
+    // Save to localStorage using helper
+    const success = saveBookingDetailsToLocalStorage(bookingId, currentTripIndex, tripDetails);
 
-      // Actualizar el trip actual con los datos del formulario
-      localData.tripDetails[currentTripIndex] = {
-        pickup_address: formData.pickup_address,
-        dropoff_address: formData.dropoff_address,
-        pickup_time: formData.pickup_time,
-        flight_number: formData.flight_number,
-        airline: formData.airline,
-        special_requests: formData.special_requests,
-        children_ages: formData.children_ages,
-        add_ons: selectedAddOns,
-        night_surcharge: priceCalculation.nightSurcharge,
-        add_ons_price: priceCalculation.addOnsPrice,
-        final_price: priceCalculation.subtotal,
-      };
-
-      // Guardar de vuelta a localStorage
-      localStorage.setItem(`booking_${bookingId}`, JSON.stringify(localData));
-
-      // Actualizar el estado local también
+    if (success) {
+      // Update local state as well
       setTrips((prevTrips) => {
         const newTrips = [...prevTrips];
         newTrips[currentTripIndex] = {
@@ -376,7 +341,7 @@ function BookingDetailsContent() {
           flight_number: formData.flight_number,
           airline: formData.airline,
           special_requests: formData.special_requests,
-          children_ages: formData.children_ages.filter((age): age is number => age !== null),
+          children_ages: filterChildrenAges(formData.children_ages),
           add_ons: selectedAddOns,
           night_surcharge: priceCalculation.nightSurcharge,
           add_ons_price: priceCalculation.addOnsPrice,
@@ -384,9 +349,6 @@ function BookingDetailsContent() {
         };
         return newTrips;
       });
-
-    } catch (error) {
-      console.error('Error saving to localStorage:', error);
     }
   };
 
@@ -440,9 +402,11 @@ function BookingDetailsContent() {
 
   // ✅ Confirmar salida - SIEMPRE va al home
   const confirmLeaveBooking = () => {
-    // Limpiar localStorage (el usuario está saliendo)
-    localStorage.removeItem(`booking_${bookingId}`);
-    
+    if (bookingId) {
+      // Clean up localStorage using helper
+      removeBookingFromLocalStorage(bookingId);
+    }
+
     // SIEMPRE ir al home
     router.push('/');
   };

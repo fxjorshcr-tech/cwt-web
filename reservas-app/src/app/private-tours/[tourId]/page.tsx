@@ -78,7 +78,7 @@ export default async function TourDetailPage({ params }: PageProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/30" />
         </div>
 
-        <div className="relative z-10 w-full pb-12 px-6">
+        <div className="relative z-10 w-full pb-12 px-6 pt-20 sm:pt-0">
           <div className="container mx-auto max-w-6xl">
             {/* Back Button */}
             <Link
@@ -89,36 +89,36 @@ export default async function TourDetailPage({ params }: PageProps) {
               <span>Back to Tours</span>
             </Link>
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 drop-shadow-2xl">
+            <h1 className="text-4xl sm:text-5xl md:text-5xl lg:text-6xl font-bold text-white mb-4 drop-shadow-2xl">
               {tour.name}
             </h1>
 
-            <p className="text-xl text-white/95 max-w-3xl drop-shadow-lg mb-6">
+            <p className="text-base sm:text-lg md:text-xl text-white/95 max-w-3xl drop-shadow-lg mb-6">
               {tour.short_description}
             </p>
 
             {/* Quick Info Badges */}
-            <div className="flex flex-wrap gap-3">
-              <div className="px-4 py-2 bg-white/95 backdrop-blur-sm rounded-lg flex items-center gap-2">
-                <Clock className="h-5 w-5 text-blue-600" />
-                <span className="font-semibold">{tour.duration}</span>
+            <div className="flex flex-wrap gap-2 sm:gap-3">
+              <div className="px-3 sm:px-4 py-2 bg-white/95 backdrop-blur-sm rounded-lg flex items-center gap-2">
+                <Clock className="h-4 sm:h-5 w-4 sm:w-5 text-blue-600" />
+                <span className="font-semibold text-sm sm:text-base">{tour.duration}</span>
               </div>
-              <div className="px-4 py-2 bg-white/95 backdrop-blur-sm rounded-lg flex items-center gap-2">
-                <Users className="h-5 w-5 text-blue-600" />
-                <span className="font-semibold">Max {tour.max_passengers} people</span>
+              <div className="px-3 sm:px-4 py-2 bg-white/95 backdrop-blur-sm rounded-lg flex items-center gap-2">
+                <Users className="h-4 sm:h-5 w-4 sm:w-5 text-blue-600" />
+                <span className="font-semibold text-sm sm:text-base">Max {tour.max_passengers}</span>
               </div>
-              <div className={`px-4 py-2 backdrop-blur-sm rounded-lg flex items-center gap-2 border ${difficultyColors[tour.difficulty]}`}>
-                <AlertCircle className="h-5 w-5" />
-                <span className="font-semibold">{tour.difficulty}</span>
+              <div className={`px-3 sm:px-4 py-2 backdrop-blur-sm rounded-lg flex items-center gap-2 border ${difficultyColors[tour.difficulty]}`}>
+                <AlertCircle className="h-4 sm:h-5 w-4 sm:w-5" />
+                <span className="font-semibold text-sm sm:text-base">{tour.difficulty}</span>
               </div>
-              <div className="px-4 py-2 bg-white/95 backdrop-blur-sm rounded-lg flex items-center gap-2">
-                <MapPin className="h-5 w-5 text-blue-600" />
-                <span className="font-semibold">Pickup {tour.pickup_time}</span>
+              <div className="px-3 sm:px-4 py-2 bg-white/95 backdrop-blur-sm rounded-lg flex items-center gap-2">
+                <MapPin className="h-4 sm:h-5 w-4 sm:w-5 text-blue-600" />
+                <span className="font-semibold text-sm sm:text-base truncate max-w-[100px] sm:max-w-none">{tour.pickup_time}</span>
               </div>
               {driveTimeInfo && (
-                <div className="px-4 py-2 bg-orange-500/95 backdrop-blur-sm rounded-lg flex items-center gap-2">
-                  <span className="text-white">🚗</span>
-                  <span className="font-semibold text-white">{driveTimeInfo.time}</span>
+                <div className="px-3 sm:px-4 py-2 bg-orange-500/95 backdrop-blur-sm rounded-lg flex items-center gap-2">
+                  <span className="text-white text-sm sm:text-base">🚗</span>
+                  <span className="font-semibold text-white text-sm sm:text-base truncate max-w-[120px] sm:max-w-none">{driveTimeInfo.time}</span>
                 </div>
               )}
             </div>
