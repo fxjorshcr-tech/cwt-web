@@ -142,6 +142,11 @@ function BookingDetailsContent() {
     }
   }, [searchParams]);
 
+  // ✅ FIX: Scroll to top when trip changes (mobile fix)
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentTripIndex]);
+
   // VALIDACIÓN TEMPRANA
   if (!bookingId) {
     return (

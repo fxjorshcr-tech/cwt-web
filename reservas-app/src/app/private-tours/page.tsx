@@ -38,13 +38,16 @@ export default async function PrivateToursPage() {
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
         </div>
 
-        <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
+        <div className="relative z-10 text-center px-6 max-w-5xl mx-auto pt-20 sm:pt-0">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full mb-6 border border-white/20">
             <MapPin className="h-5 w-5 text-white" />
-            <span className="text-white text-sm font-bold uppercase tracking-wide">📍 LOCAL OPERATOR • LA FORTUNA</span>
+            <span className="text-white text-xs sm:text-sm font-bold uppercase tracking-wide">
+              <span className="hidden sm:inline">📍 LOCAL OPERATOR • </span>
+              <span className="sm:hidden">📍 </span>LA FORTUNA
+            </span>
           </div>
           
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-4 drop-shadow-2xl">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4 drop-shadow-2xl">
             La Fortuna: Unlocked.
           </h1>
           

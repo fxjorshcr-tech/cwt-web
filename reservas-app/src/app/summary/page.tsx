@@ -297,14 +297,29 @@ function SummaryPageContent() {
         updated_at: new Date().toISOString(),
       }));
 
-      // ✅ Insertar en Supabase
-      const { data, error } = await supabase
-        .from('trips')
-        .insert(tripsToInsert)
-        .select();
+      // ✅ Insertar en Supabase with retry logic
+      let data, error;
+      const maxRetries = 3;
+
+      for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        const result = await supabase
+          .from('trips')
+          .insert(tripsToInsert)
+          .select();
+
+        data = result.data;
+        error = result.error;
+
+        if (!error) break; // Success
+
+        if (attempt < maxRetries) {
+          console.log(`Retry attempt ${attempt + 1}/${maxRetries}`);
+          await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt + 1) * 1000));
+        }
+      }
 
       if (error) {
-        console.error('Supabase error:', error);
+        console.error('Supabase error after retries:', error);
         throw new Error(`Failed to save booking: ${error.message}`);
       }
 
@@ -432,10 +447,10 @@ function SummaryPageContent() {
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center text-white px-4">
             <h1 className="text-3xl md:text-5xl font-bold mb-2 drop-shadow-lg">
-              Review Your Booking
+              Booking Summary
             </h1>
             <p className="text-lg md:text-xl drop-shadow-md">
-              Please review all details before proceeding to payment
+              Review your reservation details before confirming
             </p>
           </div>
         </div>

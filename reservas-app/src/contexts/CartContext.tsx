@@ -61,15 +61,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isHydrated, setIsHydrated] = useState(false);
 
-  // Load from localStorage on mount
+  // ✅ Load from localStorage on mount with validation
   useEffect(() => {
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
       try {
         const parsed = JSON.parse(savedCart);
-        setItems(parsed);
+        // ✅ Validate parsed data before setting
+        if (Array.isArray(parsed)) {
+          setItems(parsed);
+        } else {
+          console.error('Invalid cart data in localStorage');
+          localStorage.removeItem('cart');
+        }
       } catch (error) {
         console.error('Error loading cart:', error);
+        // ✅ Clear corrupted localStorage
+        localStorage.removeItem('cart');
       }
     }
     setIsHydrated(true);
@@ -118,8 +126,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const value: CartContextType = {
     items,
-    itemCount,
-    totalAmount,
+    itemCount: isHydrated ? itemCount : 0, // ✅ Return 0 until hydrated to prevent mismatch
+    totalAmount: isHydrated ? totalAmount : 0,
     addItem,
     removeItem,
     clearCart,

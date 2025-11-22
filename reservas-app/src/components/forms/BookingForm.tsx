@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Search, Loader2, AlertCircle, Plus, X } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { matchLocation } from '@/utils/locationHelpers';
 
 // ✅ Imports de componentes divididos
 import {
@@ -88,8 +89,9 @@ export function BookingForm() {
           }
 
           if (newTrips[0].from_location && newTrips[0].to_location) {
+            // ✅ Use fuzzy matching instead of exact match
             const route = routes.find(
-              (r) => r.origen === newTrips[0].from_location && r.destino === newTrips[0].to_location
+              (r) => matchLocation(r.origen, newTrips[0].from_location) && matchLocation(r.destino, newTrips[0].to_location)
             );
 
             if (route) {
@@ -114,60 +116,82 @@ export function BookingForm() {
 
   // ✅ MANTENER: Solo para LEER rutas de Supabase, NO para guardar bookings
   async function loadRoutes() {
-    try {
-      setIsLoadingRoutes(true);
-      setError(null);
+    const maxRetries = 3;
+    const timeout = 10000; // 10 seconds
 
-      const supabase = createClient();
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        setIsLoadingRoutes(true);
+        setError(null);
 
-      // ✅ SOLO seleccionar campos que existen y tienen datos
-      const { data, error: fetchError } = await supabase
-        .from('routes')
-        .select('id, origen, destino, precio1a6, precio7a9, precio10a12, duracion')
-        .order('origen');
+        const supabase = createClient();
 
-      if (fetchError) {
-        throw new Error(fetchError.message);
+        // ✅ Add timeout to prevent infinite loading
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Request timeout - please refresh the page')), timeout)
+        );
+
+        const fetchPromise = supabase
+          .from('routes')
+          .select('id, origen, destino, precio1a6, precio7a9, precio10a12, duracion')
+          .order('origen');
+
+        const result = await Promise.race([fetchPromise, timeoutPromise]) as any;
+        const { data, error: fetchError } = result;
+
+        if (fetchError) {
+          throw new Error(fetchError.message);
+        }
+
+        if (!data || data.length === 0) {
+          throw new Error('No routes available in database');
+        }
+
+        // ✅ Validar solo los campos que usamos
+        const validRoutes: Route[] = (data as any[])
+          .filter((route): route is Route => {
+            return (
+              route.origen !== null &&
+              route.destino !== null &&
+              route.precio1a6 !== null &&
+              route.precio7a9 !== null &&
+              route.precio10a12 !== null &&
+              route.duracion !== null
+            );
+          })
+          .map((route) => ({
+            id: route.id,
+            origen: route.origen,
+            destino: route.destino,
+            precio1a6: route.precio1a6,
+            precio7a9: route.precio7a9,
+            precio10a12: route.precio10a12,
+            duracion: route.duracion,
+          }));
+
+        if (validRoutes.length === 0) {
+          throw new Error('No valid routes available');
+        }
+
+        setRoutes(validRoutes);
+        setShowContent(true);
+        return; // Success, exit retry loop
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Unknown error';
+
+        // If last attempt, show error
+        if (attempt === maxRetries) {
+          setError(`${message}. Please refresh the page to try again.`);
+          setShowContent(true);
+        } else {
+          // Wait before retry (exponential backoff: 2s, 4s, 8s)
+          await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt + 1) * 1000));
+        }
+      } finally {
+        if (attempt === maxRetries) {
+          setIsLoadingRoutes(false);
+        }
       }
-
-      if (!data || data.length === 0) {
-        throw new Error('No routes available in database');
-      }
-
-      // ✅ Validar solo los campos que usamos
-      const validRoutes: Route[] = (data as any[])
-        .filter((route): route is Route => {
-          return (
-            route.origen !== null &&
-            route.destino !== null &&
-            route.precio1a6 !== null &&
-            route.precio7a9 !== null &&
-            route.precio10a12 !== null &&
-            route.duracion !== null
-          );
-        })
-        .map((route) => ({
-          id: route.id,
-          origen: route.origen,
-          destino: route.destino,
-          precio1a6: route.precio1a6,
-          precio7a9: route.precio7a9,
-          precio10a12: route.precio10a12,
-          duracion: route.duracion,
-        }));
-
-      if (validRoutes.length === 0) {
-        throw new Error('No valid routes available');
-      }
-
-      setRoutes(validRoutes);
-      setShowContent(true);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      setError(message);
-      setShowContent(true);
-    } finally {
-      setIsLoadingRoutes(false);
     }
   }
 
@@ -213,8 +237,9 @@ export function BookingForm() {
             return newTrips;
           }
 
+          // ✅ Use fuzzy matching instead of exact match
           const route = routes.find(
-            (r) => r.origen === trip.from_location && r.destino === trip.to_location
+            (r) => matchLocation(r.origen, trip.from_location) && matchLocation(r.destino, trip.to_location)
           );
 
           if (route) {
