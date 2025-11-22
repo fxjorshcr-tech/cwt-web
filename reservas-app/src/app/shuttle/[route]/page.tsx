@@ -102,7 +102,7 @@ export default async function ShuttleRoutePage({ params }: { params: { route: st
       
       <main className="min-h-screen bg-white">
         {/* Hero Section */}
-        <section className="relative h-[60vh] min-h-[500px]">
+        <section className="relative h-[60vh] min-h-[500px] max-h-[700px]">
           <div className="absolute inset-0 z-0">
             <Image
               src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/aerial-view-conchal-beach.webp?width=1600&quality=70"
@@ -235,7 +235,7 @@ export default async function ShuttleRoutePage({ params }: { params: { route: st
             </div>
             
             {/* ✅ CHANGE 2: Grid changed to lg:grid-cols-3 and removed 4th item */}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
               {[
                 { capacity: '1-6 Pass.', price: routeData.precio1a6, icon: <Users className="h-6 w-6" /> },
                 { capacity: '7-9 Pass.', price: routeData.precio7a9, icon: <Users className="h-6 w-6" /> },

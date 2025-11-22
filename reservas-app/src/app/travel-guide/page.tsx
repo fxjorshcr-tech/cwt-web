@@ -28,7 +28,7 @@ export default async function TravelGuidePage() {
       
       <main className="min-h-screen bg-white">
         {/* Hero Section */}
-        <section className="relative h-[65vh] min-h-[450px] flex items-center justify-center">
+        <section className="relative h-[65vh] min-h-[450px] max-h-[700px] flex items-center justify-center">
           <div className="absolute inset-0 z-0">
             <Image
               src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/Beatiful-waterfall-costa-rica-nature.webp"

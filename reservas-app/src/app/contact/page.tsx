@@ -64,7 +64,7 @@ export default function ContactPage() {
       <main className="min-h-screen bg-white">
         
         {/* Hero Section */}
-        <section className="relative h-[50vh] min-h-[400px]">
+        <section className="relative h-[50vh] min-h-[400px] max-h-[600px]">
           <div className="absolute inset-0 z-0">
             <Image
               src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/aerial-view-conchal-beach.webp"
@@ -160,7 +160,7 @@ export default function ContactPage() {
         {/* Main Content: Form + Info */}
         <section className="py-10 sm:py-16 bg-gradient-to-b from-white to-gray-50">
           <div className="container mx-auto px-6 max-w-6xl">
-            <div className="grid lg:grid-cols-2 gap-12">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
               
               {/* Contact Form */}
               <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-200">

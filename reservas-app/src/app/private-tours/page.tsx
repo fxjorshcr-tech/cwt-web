@@ -25,7 +25,7 @@ export default async function PrivateToursPage() {
       <BookingNavbar />
 
       {/* Hero Section */}
-      <section className="relative h-[70vh] min-h-[500px] flex items-center justify-center">
+      <section className="relative h-[70vh] min-h-[500px] max-h-[750px] flex items-center justify-center">
         <div className="absolute inset-0 z-0">
           <Image
             src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/arenal-volcano-mountains-sky-costa-rica.webp"

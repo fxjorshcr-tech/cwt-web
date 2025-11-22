@@ -31,7 +31,7 @@ export default function AboutPage() {
       <main className="min-h-screen bg-white">
         
         {/* Hero Section */}
-        <section className="relative h-[60vh] min-h-[500px]">
+        <section className="relative h-[60vh] min-h-[500px] max-h-[700px]">
           <div className="absolute inset-0 z-0">
             <Image
               src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/aerial-view-conchal-beach.webp?width=1600&quality=60"
@@ -140,7 +140,7 @@ export default function AboutPage() {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
               
               {/* Mission */}
               <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 border-t-4 border-blue-600">

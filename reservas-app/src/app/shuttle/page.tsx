@@ -118,7 +118,7 @@ export default async function MostBookedPage() {
       
       <main className="min-h-screen bg-white">
         {/* Hero Section */}
-        <section className="relative h-[50vh] min-h-[400px]">
+        <section className="relative h-[50vh] min-h-[400px] max-h-[600px]">
           <div className="absolute inset-0 z-0">
             <Image
               src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/aerial-view-conchal-beach.webp?width=1600&quality=70"
@@ -188,7 +188,7 @@ export default async function MostBookedPage() {
                   </div>
                 </div>
                 
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                   {category.routes
                     .filter(route => route.price !== null)
                     .map((route) => (
