@@ -6,19 +6,22 @@
  * Maps alternative names to canonical forms
  */
 const LOCATION_ALIASES: Record<string, string[]> = {
-  'sjo': ['sjo', 'san jose', 'san josé', 'juan santamaria'],
+  'sjo': ['sjo', 'san jose', 'san josé', 'juan santamaria', 'alajuela', 'downtown san jose'],
   'lir': ['lir', 'liberia', 'daniel oduber'],
-  'la fortuna': ['fortuna', 'la fortuna', 'fortuna de san carlos', 'la fortuna de san carlos'],
+  'la fortuna': ['fortuna', 'la fortuna', 'arenal', 'el castillo', 'fortuna de san carlos', 'la fortuna de san carlos', 'arenal volcano'],
   'monteverde': ['monteverde', 'monte verde', 'cloud forest'],
-  'tamarindo': ['tamarindo', 'tamarindo beach'],
-  'manuel antonio': ['manuel antonio', 'quepos', 'quepos-manuel antonio'],
+  'tamarindo': ['tamarindo', 'flamingo', 'conchal', 'tamarindo beach', 'guanacaste beaches'],
+  'manuel antonio': ['manuel antonio', 'quepos', 'quepos-manuel antonio', 'national park area'],
   'puerto viejo': ['puerto viejo', 'puerto viejo de talamanca'],
-  'papagayo': ['papagayo', 'gulf of papagayo', 'peninsula papagayo'],
-  'jaco': ['jaco', 'jacó', 'jaco beach'],
-  'nosara': ['nosara', 'playa nosara'],
+  'papagayo': ['papagayo', 'gulf of papagayo', 'peninsula papagayo', 'papagayo peninsula'],
+  'jaco': ['jaco', 'jacó', 'jaco beach', 'playa hermosa', 'central pacific'],
+  'nosara': ['nosara', 'playa nosara', 'playa guiones', 'guiones'],
   'samara': ['samara', 'playa samara'],
-  'santa teresa': ['santa teresa', 'mal pais', 'malpais'],
-  'rio celeste': ['rio celeste', 'río celeste', 'celeste'],
+  'santa teresa': ['santa teresa', 'mal pais', 'malpais', 'montezuma'],
+  'rio celeste': ['rio celeste', 'río celeste', 'celeste', 'tenorio'],
+  'dominical': ['dominical', 'beach town'],
+  'uvita': ['uvita', 'marino ballena'],
+  'coco': ['coco', 'playas del coco', 'hermosa', 'ocotal'],
 };
 
 /**
