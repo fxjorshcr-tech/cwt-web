@@ -1,13 +1,12 @@
 ﻿// src/components/forms/BookingForm.tsx
-// ✅ CORREGIDO: Sin usar kilometros, alias, precio13a18 (campos null)
-// ✅ Sin mostrar precio inicial, solo duración
+// ✅ CORREGIDO: Usa localStorage en vez de Supabase para guardar bookings temporales
+// ✅ Solo se guarda en Supabase cuando usuario confirma en Summary (Pay Now / Add to Cart)
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Search, Loader2, AlertCircle, Plus, X } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import type { TripInsert, Route as SupabaseRoute } from '@/types/supabase';
 
 // ✅ Imports de componentes divididos
 import {
@@ -113,6 +112,7 @@ export function BookingForm() {
     }
   }, [routes, searchParams]);
 
+  // ✅ MANTENER: Solo para LEER rutas de Supabase, NO para guardar bookings
   async function loadRoutes() {
     try {
       setIsLoadingRoutes(true);
@@ -278,6 +278,15 @@ export function BookingForm() {
         return `Trip ${i + 1}: Please select a date`;
       }
 
+      // ✅ Validar fecha futura
+      const tripDate = new Date(trip.date);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (tripDate < today) {
+        return `Trip ${i + 1}: Date must be in the future`;
+      }
+
       const totalPassengers = trip.adults + trip.children;
 
       if (totalPassengers > 12) {
@@ -314,9 +323,28 @@ export function BookingForm() {
     setError(null);
 
     try {
-      const supabase = createClient();
-
+      // ✅ Generar booking ID único
       const bookingId = `booking_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+      // ✅ NUEVO: Guardar en localStorage en vez de Supabase
+      const bookingData = {
+        bookingId,
+        trips: trips.map((trip) => ({
+          from_location: trip.from_location,
+          to_location: trip.to_location,
+          date: trip.date,
+          adults: trip.adults,
+          children: trip.children,
+          price: trip.price!,
+          duration: trip.duration ?? '',
+          routeId: trip.routeId,
+          calculatedPrice: trip.calculatedPrice,
+        })),
+        createdAt: new Date().toISOString(),
+      };
+
+      // ✅ Guardar en localStorage (NO en Supabase)
+      localStorage.setItem(`booking_${bookingId}`, JSON.stringify(bookingData));
 
       // ✅ PASO 1: Mostrar "Checking Availability..."
       const checkingToast = document.createElement('div');
@@ -334,42 +362,8 @@ export function BookingForm() {
       `;
       document.body.appendChild(checkingToast);
 
-      // Esperar 2 segundos para simular verificación
+      // Esperar 1.4 segundos para simular verificación
       await new Promise(resolve => setTimeout(resolve, 1400));
-
-      const tripsToInsert: TripInsert[] = trips.map((trip) => ({
-        booking_id: bookingId,
-        from_location: trip.from_location,
-        to_location: trip.to_location,
-        date: trip.date,
-        adults: trip.adults,
-        children: trip.children,
-        price: trip.price!,
-        distance: 0, // ✅ Ya no usamos kilometros
-        duration: trip.duration ?? '',
-        pickup_address: '',
-        pickup_instructions: '',
-        dropoff_address: '',
-        dropoff_instructions: '',
-        pickup_time: null,
-        arrival_time: null,
-        flight_number: null,
-        airline: null,
-        special_requests: null,
-        night_surcharge: null,
-        fees: null,
-        final_price: trip.price!,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      }));
-
-      const { data, error } = await supabase.from('trips').insert(tripsToInsert).select();
-
-      if (error) {
-        console.error('Supabase error:', error);
-        document.body.removeChild(checkingToast);
-        throw new Error(`Save error: ${error.message}`);
-      }
 
       // ✅ PASO 2: Cambiar a "Availability Approved ✅"
       checkingToast.innerHTML = `
@@ -392,8 +386,9 @@ export function BookingForm() {
       // Limpiar el toast
       document.body.removeChild(checkingToast);
 
-      // Redirigir a booking-details
+      // ✅ Redirigir a booking-details (datos en localStorage, NO en Supabase)
       router.push(`/booking-details?booking_id=${bookingId}&trip=0`);
+      
     } catch (error) {
       console.error('Full error:', error);
 

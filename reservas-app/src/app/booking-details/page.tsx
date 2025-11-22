@@ -1,20 +1,21 @@
 ﻿// src/app/booking-details/page.tsx
-// ✅ CORREGIDO - Sin fees, solo subtotal (Base + Night + Addons)
+// ✅ CORREGIDO: Lee de localStorage y actualiza localStorage (NO Supabase)
+// ✅ Solo guarda en Supabase cuando usuario confirma en Summary
 'use client';
 
 import { useEffect, useState, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
-import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import BookingStepper from '@/components/booking/BookingStepper';
 import { TripProgress } from '@/components/booking/TripProgress';
 import { TripAddOns } from '@/components/booking/TripAddOns';
+import { ConfirmBackDialog } from '@/components/booking/ConfirmBackDialog';
 
-// ✅ NUEVO - Imports de componentes divididos
+// ✅ Imports de componentes divididos
 import {
   TripSummaryCard,
   PickupDetailsCard,
@@ -39,7 +40,7 @@ import { calculateNightSurcharge, calculateAddOnsPrice } from '@/lib/pricing-con
 // ============================================
 
 interface Trip {
-  id: string;
+  id: string; // Puede ser temporal "temp_xxx"
   booking_id: string;
   from_location: string;
   to_location: string;
@@ -49,17 +50,17 @@ interface Trip {
   children: number;
   children_ages?: number[] | null;
   price: number;
+  duration?: string | null;
+  routeId?: number;
   pickup_address: string | null;
   dropoff_address: string | null;
   flight_number: string | null;
   airline: string | null;
   special_requests: string | null;
-  created_at: string | null;
   final_price: number | null;
   night_surcharge: number | null;
   add_ons?: string[] | null;
-  distance?: number | null;
-  duration?: string | null;
+  add_ons_price?: number | null;
 }
 
 interface FormData {
@@ -72,6 +73,36 @@ interface FormData {
   children_ages: (number | null)[];
 }
 
+interface LocalStorageBooking {
+  bookingId: string;
+  trips: Array<{
+    from_location: string;
+    to_location: string;
+    date: string;
+    adults: number;
+    children: number;
+    price: number;
+    duration: string;
+    routeId?: number;
+    calculatedPrice: number;
+  }>;
+  createdAt: string;
+  // Campos completados en booking-details
+  tripDetails?: Array<{
+    pickup_address: string;
+    dropoff_address: string;
+    pickup_time: string;
+    flight_number: string;
+    airline: string;
+    special_requests: string;
+    children_ages: (number | null)[];
+    add_ons: string[];
+    night_surcharge: number;
+    add_ons_price: number;
+    final_price: number;
+  }>;
+}
+
 // ============================================
 // MAIN COMPONENT
 // ============================================
@@ -79,7 +110,6 @@ interface FormData {
 function BookingDetailsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const supabase = createClient();
   const bookingId = searchParams.get('booking_id');
 
   // STATE
@@ -88,9 +118,9 @@ function BookingDetailsContent() {
   const [completedTrips, setCompletedTrips] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
+  const [showBackConfirmDialog, setShowBackConfirmDialog] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     pickup_address: '',
     dropoff_address: '',
@@ -100,6 +130,17 @@ function BookingDetailsContent() {
     special_requests: '',
     children_ages: [],
   });
+
+  // ✅ Leer parámetro 'trip' de la URL para saber en qué trip empezar
+  useEffect(() => {
+    const tripParam = searchParams.get('trip');
+    if (tripParam) {
+      const tripIndex = parseInt(tripParam, 10);
+      if (!isNaN(tripIndex) && tripIndex >= 0) {
+        setCurrentTripIndex(tripIndex);
+      }
+    }
+  }, [searchParams]);
 
   // VALIDACIÓN TEMPRANA
   if (!bookingId) {
@@ -127,7 +168,7 @@ function BookingDetailsContent() {
   const isPickupFromAirport = currentTrip && isAirport(currentTrip.from_location);
   const isDropoffToAirport = currentTrip && isAirport(currentTrip.to_location);
 
-  // ✅ PRICE CALCULATION (sin fees - se agregan en Summary)
+  // ✅ PRICE CALCULATION
   const priceCalculation = useMemo(() => {
     if (!currentTrip) {
       return { basePrice: 0, nightSurcharge: 0, addOnsPrice: 0, subtotal: 0 };
@@ -139,64 +180,113 @@ function BookingDetailsContent() {
     return { basePrice, nightSurcharge, addOnsPrice, subtotal };
   }, [currentTrip?.price, formData.pickup_time, selectedAddOns]);
 
-  // LOAD TRIPS
+  // ✅ LOAD TRIPS FROM LOCALSTORAGE
   useEffect(() => {
     async function loadTrips() {
       if (!bookingId) {
         router.push('/');
         return;
       }
+
       try {
         setLoading(true);
-        const { data, error } = await supabase
-          .from('trips')
-          .select('*')
-          .eq('booking_id', bookingId)
-          .order('created_at', { ascending: true });
 
-        if (error) throw error;
-        if (!data || data.length === 0) throw new Error('No trips found');
+        // ✅ PRIMERO: Intentar cargar de localStorage
+        const localDataStr = localStorage.getItem(`booking_${bookingId}`);
 
-        setTrips(data as any);
-        const completed = data
-          .map((trip, idx) =>
-            trip.pickup_time && trip.pickup_address && trip.dropoff_address ? idx : null
-          )
-          .filter((idx): idx is number => idx !== null);
-        setCompletedTrips(completed);
+        if (localDataStr) {
+          const localData: LocalStorageBooking = JSON.parse(localDataStr);
 
-        if (data[0]) {
-          const trip = data[0];
-          const initialAges =
-            trip.children_ages && trip.children_ages.length > 0
-              ? trip.children_ages
-              : Array(trip.children).fill(null);
+          // Convertir datos de localStorage a formato Trip
+          const loadedTrips: Trip[] = localData.trips.map((trip, index) => {
+            const savedDetails = localData.tripDetails?.[index];
 
-          setFormData({
-            pickup_address: trip.pickup_address || '',
-            dropoff_address: trip.dropoff_address || '',
-            pickup_time: normalizeTime(trip.pickup_time),
-            flight_number: trip.flight_number || '',
-            airline: trip.airline || '',
-            special_requests: trip.special_requests || '',
-            children_ages: initialAges,
+            // Filtrar children_ages para remover nulls
+            const filteredChildrenAges = savedDetails?.children_ages 
+              ? savedDetails.children_ages.filter((age): age is number => age !== null)
+              : null;
+
+            const tripData: Trip = {
+              id: `temp_${localData.bookingId}_${index}`, // ID temporal
+              booking_id: localData.bookingId,
+              from_location: trip.from_location,
+              to_location: trip.to_location,
+              date: trip.date,
+              adults: trip.adults,
+              children: trip.children,
+              price: trip.price,
+              duration: trip.duration,
+              routeId: trip.routeId,
+              // Campos completados (si existen)
+              pickup_address: savedDetails?.pickup_address || null,
+              dropoff_address: savedDetails?.dropoff_address || null,
+              pickup_time: savedDetails?.pickup_time || null,
+              flight_number: savedDetails?.flight_number || null,
+              airline: savedDetails?.airline || null,
+              special_requests: savedDetails?.special_requests || null,
+              children_ages: filteredChildrenAges && filteredChildrenAges.length > 0 
+                ? filteredChildrenAges 
+                : null,
+              add_ons: savedDetails?.add_ons || null,
+              night_surcharge: savedDetails?.night_surcharge || null,
+              add_ons_price: savedDetails?.add_ons_price || null,
+              final_price: savedDetails?.final_price || null,
+            };
+
+            return tripData;
           });
 
-          if (trip.add_ons && Array.isArray(trip.add_ons)) {
-            setSelectedAddOns(trip.add_ons);
+          setTrips(loadedTrips);
+
+          // Determinar qué trips están completos
+          const completed = loadedTrips
+            .map((trip, idx) =>
+              trip.pickup_time && trip.pickup_address && trip.dropoff_address ? idx : null
+            )
+            .filter((idx): idx is number => idx !== null);
+          setCompletedTrips(completed);
+
+          // Cargar datos del primer trip
+          if (loadedTrips[0]) {
+            const trip = loadedTrips[0];
+            const initialAges =
+              trip.children_ages && trip.children_ages.length > 0
+                ? trip.children_ages
+                : Array(trip.children).fill(null);
+
+            setFormData({
+              pickup_address: trip.pickup_address || '',
+              dropoff_address: trip.dropoff_address || '',
+              pickup_time: normalizeTime(trip.pickup_time),
+              flight_number: trip.flight_number || '',
+              airline: trip.airline || '',
+              special_requests: trip.special_requests || '',
+              children_ages: initialAges,
+            });
+
+            if (trip.add_ons && Array.isArray(trip.add_ons)) {
+              setSelectedAddOns(trip.add_ons);
+            }
           }
+
+          setLoading(false);
+          return;
         }
-        setLoading(false);
+
+        // Si no está en localStorage, el booking no existe
+        throw new Error('Booking not found. Please start a new search.');
+
       } catch (error) {
-        console.error('Error loading trips:', error);
-        alert('Failed to load booking details. Please try again.');
+        console.error('Error loading booking:', error);
+        alert('Failed to load booking details. Please start a new search.');
         router.push('/');
       }
     }
-    loadTrips();
-  }, [bookingId, supabase, router]);
 
-  // UPDATE FORM WHEN TRIP CHANGES
+    loadTrips();
+  }, [bookingId, router]);
+
+  // ✅ UPDATE FORM WHEN TRIP CHANGES
   useEffect(() => {
     if (currentTrip) {
       const initialAges =
@@ -244,73 +334,89 @@ function BookingDetailsContent() {
     return Object.keys(validationErrors).length === 0;
   };
 
-  // HANDLERS
-  const saveTripSilently = async (): Promise<boolean> => {
-    if (!currentTrip || isSaving) return false;
+  // ✅ SAVE TO LOCALSTORAGE (NOT SUPABASE)
+  const saveToLocalStorage = () => {
     try {
-      setIsSaving(true);
-      const updateData = {
-        pickup_address: formData.pickup_address ? sanitizeInput(formData.pickup_address) : null,
-        dropoff_address: formData.dropoff_address ? sanitizeInput(formData.dropoff_address) : null,
-        pickup_time: formData.pickup_time || null,
-        flight_number: formData.flight_number ? sanitizeInput(formData.flight_number) : null,
-        airline: formData.airline ? sanitizeInput(formData.airline) : null,
-        special_requests: formData.special_requests ? sanitizeInput(formData.special_requests) : null,
-        children_ages: formData.children_ages.filter((age): age is number => age !== null),
-        add_ons: selectedAddOns.length > 0 ? selectedAddOns : null,
-        add_ons_price: priceCalculation.addOnsPrice, // ✅ AGREGADO
-        night_surcharge: priceCalculation.nightSurcharge,
-        final_price: priceCalculation.subtotal,
-        updated_at: new Date().toISOString(),
-      };
-      const { error } = await supabase.from('trips').update(updateData).eq('id', currentTrip.id);
-      if (error) {
-        console.error('Error auto-saving trip:', error);
-        return false;
+      const localDataStr = localStorage.getItem(`booking_${bookingId}`);
+      if (!localDataStr) return;
+
+      const localData: LocalStorageBooking = JSON.parse(localDataStr);
+
+      // Inicializar tripDetails si no existe
+      if (!localData.tripDetails) {
+        localData.tripDetails = [];
       }
-      return true;
+
+      // Actualizar el trip actual con los datos del formulario
+      localData.tripDetails[currentTripIndex] = {
+        pickup_address: formData.pickup_address,
+        dropoff_address: formData.dropoff_address,
+        pickup_time: formData.pickup_time,
+        flight_number: formData.flight_number,
+        airline: formData.airline,
+        special_requests: formData.special_requests,
+        children_ages: formData.children_ages,
+        add_ons: selectedAddOns,
+        night_surcharge: priceCalculation.nightSurcharge,
+        add_ons_price: priceCalculation.addOnsPrice,
+        final_price: priceCalculation.subtotal,
+      };
+
+      // Guardar de vuelta a localStorage
+      localStorage.setItem(`booking_${bookingId}`, JSON.stringify(localData));
+
+      // Actualizar el estado local también
+      setTrips((prevTrips) => {
+        const newTrips = [...prevTrips];
+        newTrips[currentTripIndex] = {
+          ...newTrips[currentTripIndex],
+          pickup_address: formData.pickup_address,
+          dropoff_address: formData.dropoff_address,
+          pickup_time: formData.pickup_time,
+          flight_number: formData.flight_number,
+          airline: formData.airline,
+          special_requests: formData.special_requests,
+          children_ages: formData.children_ages.filter((age): age is number => age !== null),
+          add_ons: selectedAddOns,
+          night_surcharge: priceCalculation.nightSurcharge,
+          add_ons_price: priceCalculation.addOnsPrice,
+          final_price: priceCalculation.subtotal,
+        };
+        return newTrips;
+      });
+
     } catch (error) {
-      console.error('Error in saveTripSilently:', error);
-      return false;
-    } finally {
-      setIsSaving(false);
+      console.error('Error saving to localStorage:', error);
     }
   };
 
+  // ✅ HANDLE NEXT - Guardar en localStorage y avanzar
   const handleNext = async () => {
     if (!validateForm()) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
+
     try {
       setSaving(true);
-      const updateData = {
-        pickup_address: sanitizeInput(formData.pickup_address),
-        dropoff_address: sanitizeInput(formData.dropoff_address),
-        pickup_time: formData.pickup_time,
-        flight_number: formData.flight_number ? sanitizeInput(formData.flight_number) : null,
-        airline: formData.airline ? sanitizeInput(formData.airline) : null,
-        special_requests: formData.special_requests ? sanitizeInput(formData.special_requests) : null,
-        children_ages: formData.children_ages.filter((age): age is number => age !== null),
-        add_ons: selectedAddOns.length > 0 ? selectedAddOns : null,
-        add_ons_price: priceCalculation.addOnsPrice, // ✅ AGREGADO
-        night_surcharge: priceCalculation.nightSurcharge,
-        final_price: priceCalculation.subtotal,
-        updated_at: new Date().toISOString(),
-      };
-      const { error } = await supabase.from('trips').update(updateData).eq('id', currentTrip!.id);
-      if (error) throw error;
 
+      // ✅ Guardar en localStorage (NO en Supabase)
+      saveToLocalStorage();
+
+      // Marcar como completado
       if (!completedTrips.includes(currentTripIndex)) {
         setCompletedTrips([...completedTrips, currentTripIndex]);
       }
 
+      // Navegar al siguiente trip o al summary
       if (currentTripIndex < trips.length - 1) {
         setCurrentTripIndex(currentTripIndex + 1);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
+        // ✅ Todos los trips completados, ir al summary
         router.push(`/summary?booking_id=${bookingId}`);
       }
+
       setSaving(false);
     } catch (error) {
       console.error('Error saving trip details:', error);
@@ -319,24 +425,26 @@ function BookingDetailsContent() {
     }
   };
 
-  const handleBack = async () => {
-    try {
-      await saveTripSilently();
-    } catch (error) {
-      console.error('Auto-save failed on back:', error);
-    }
+  // ✅ HANDLE BACK - Mejorado con modal de confirmación
+  const handleBack = () => {
     if (currentTripIndex > 0) {
+      // Retroceder al trip anterior - guardar progreso primero
+      saveToLocalStorage();
       setCurrentTripIndex(currentTripIndex - 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
-      const params = new URLSearchParams(window.location.search);
-      const fromSummary = params.get('from') === 'summary';
-      if (fromSummary) {
-        router.push(`/summary?booking_id=${bookingId}`);
-      } else {
-        router.push('/');
-      }
+      // Está en Trip 1 - mostrar modal de confirmación
+      setShowBackConfirmDialog(true);
     }
+  };
+
+  // ✅ Confirmar salida - SIEMPRE va al home
+  const confirmLeaveBooking = () => {
+    // Limpiar localStorage (el usuario está saliendo)
+    localStorage.removeItem(`booking_${bookingId}`);
+    
+    // SIEMPRE ir al home
+    router.push('/');
   };
 
   // LOADING STATE
@@ -384,6 +492,13 @@ function BookingDetailsContent() {
   return (
     <>
       <BookingNavbar />
+
+      {/* Modal de confirmación - simple */}
+      <ConfirmBackDialog
+        isOpen={showBackConfirmDialog}
+        onClose={() => setShowBackConfirmDialog(false)}
+        onConfirm={confirmLeaveBooking}
+      />
 
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 w-full overflow-hidden">

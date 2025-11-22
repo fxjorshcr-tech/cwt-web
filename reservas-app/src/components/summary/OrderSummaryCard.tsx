@@ -1,6 +1,6 @@
 ﻿// src/components/summary/OrderSummaryCard.tsx
-// ✅ MEJORADO: Trips destacado en la misma línea del título
-import { ArrowLeft, ShoppingCart, Moon, Sparkles, CreditCard, Info } from 'lucide-react';
+// ✅ ACTUALIZADO: Agregado isSaving prop para mostrar loading state
+import { ArrowLeft, ShoppingCart, Moon, Sparkles, CreditCard, Info, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import TermsCheckbox from '@/components/booking/TermsCheckbox';
@@ -20,6 +20,7 @@ interface OrderSummaryCardProps {
   grandTotal: number;
   termsAccepted: boolean;
   feesPercentage: number;
+  isSaving?: boolean; // ✅ NUEVO
   onTermsChange: (checked: boolean) => void;
   onPayNow: () => void;
   onAddToCart: () => void;
@@ -42,6 +43,7 @@ export function OrderSummaryCard({
   grandTotal,
   termsAccepted,
   feesPercentage,
+  isSaving = false, // ✅ NUEVO
   onTermsChange,
   onPayNow,
   onAddToCart,
@@ -204,28 +206,49 @@ export function OrderSummaryCard({
         <div className="space-y-2.5">
           <TermsCheckbox checked={termsAccepted} onChange={onTermsChange} error={false} />
 
+          {/* ✅ ACTUALIZADO: Mostrar loading state */}
           <Button
             onClick={onPayNow}
-            disabled={!termsAccepted}
+            disabled={!termsAccepted || isSaving}
             className="w-full h-11 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold shadow-md hover:shadow-lg transition-all"
           >
-            <CreditCard className="h-4 w-4 mr-2" />
-            Pay Now
+            {isSaving ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <CreditCard className="h-4 w-4 mr-2" />
+                Pay Now
+              </>
+            )}
           </Button>
 
           <Button
             onClick={onAddToCart}
+            disabled={isSaving}
             variant="outline"
-            className="w-full h-11 border-2 border-blue-600 text-blue-600 hover:bg-blue-50 text-sm font-semibold transition-all"
+            className="w-full h-11 border-2 border-blue-600 text-blue-600 hover:bg-blue-50 text-sm font-semibold transition-all disabled:opacity-50"
           >
-            <ShoppingCart className="h-4 w-4 mr-2" />
-            Add & Book Another Ride
+            {isSaving ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <ShoppingCart className="h-4 w-4 mr-2" />
+                Add & Book Another Ride
+              </>
+            )}
           </Button>
 
           <Button
             onClick={onBackToDetails}
+            disabled={isSaving}
             variant="ghost"
-            className="w-full h-11 text-gray-600 hover:text-gray-900 text-sm font-medium transition-all"
+            className="w-full h-11 text-gray-600 hover:text-gray-900 text-sm font-medium transition-all disabled:opacity-50"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Details
