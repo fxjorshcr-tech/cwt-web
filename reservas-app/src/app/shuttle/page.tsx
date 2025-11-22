@@ -189,41 +189,76 @@ export default async function MostBookedPage() {
                   </div>
                 </div>
                 
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {category.routes
                     .filter(route => route.price !== null)
                     .map((route) => (
                     <Link
                       key={route.slug}
                       href={`/shuttle/${route.slug}`}
-                      className="group relative bg-white rounded-lg overflow-hidden border border-gray-200 hover:border-blue-500 hover:shadow-lg transition-all duration-200 block"
+                      className="group relative bg-white rounded-xl overflow-hidden border border-gray-200 hover:border-blue-500 hover:shadow-lg transition-all duration-200 block"
                     >
-                      <div className="flex items-center justify-between p-4 gap-4">
-                        {/* Left: Route Info */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
+                      <div className="p-5">
+                        {/* Top: Badge and Price */}
+                        <div className="flex items-start justify-between mb-4">
+                          <div>
                             {route.isHot && (
-                              <span className="bg-blue-600 text-white px-2 py-0.5 rounded text-xs font-bold">
+                              <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold">
                                 POPULAR
                               </span>
                             )}
                           </div>
-                          <h3 className="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition-colors truncate">
-                            {route.from} → {route.to}
-                          </h3>
-                          {route.duration && (
-                            <p className="text-xs text-gray-500 mt-1">
-                              <Clock className="h-3 w-3 inline mr-1" />
-                              {route.duration}
-                            </p>
+                          {route.price && (
+                            <div className="text-right">
+                              <p className="text-xs text-gray-500">From</p>
+                              <p className="text-2xl font-black text-gray-900">${route.price}</p>
+                            </div>
                           )}
                         </div>
 
-                        {/* Right: Price */}
-                        {route.price && (
-                          <div className="text-right flex-shrink-0">
-                            <p className="text-xs text-gray-500">From</p>
-                            <p className="text-xl font-black text-gray-900">${route.price}</p>
+                        {/* Route Display - Vertical on mobile, horizontal on larger screens */}
+                        <div className="space-y-3">
+                          {/* From Location */}
+                          <div className="flex items-start gap-3">
+                            <div className="bg-blue-100 p-2 rounded-lg flex-shrink-0 mt-1">
+                              <MapPin className="h-4 w-4 text-blue-600" />
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">From</p>
+                              <p className="text-sm font-bold text-gray-900 leading-snug">
+                                {route.from}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Arrow Separator */}
+                          <div className="flex items-center justify-center">
+                            <div className="bg-gray-100 p-2 rounded-full">
+                              <ArrowRight className="h-5 w-5 text-gray-600" />
+                            </div>
+                          </div>
+
+                          {/* To Location */}
+                          <div className="flex items-start gap-3">
+                            <div className="bg-green-100 p-2 rounded-lg flex-shrink-0 mt-1">
+                              <MapPin className="h-4 w-4 text-green-600" />
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">To</p>
+                              <p className="text-sm font-bold text-gray-900 leading-snug">
+                                {route.to}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Duration */}
+                        {route.duration && (
+                          <div className="mt-4 pt-4 border-t border-gray-100">
+                            <p className="text-xs text-gray-500 flex items-center gap-2">
+                              <Clock className="h-4 w-4" />
+                              <span>{route.duration}</span>
+                            </p>
                           </div>
                         )}
                       </div>
