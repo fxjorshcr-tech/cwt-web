@@ -106,7 +106,11 @@ export const metadata: Metadata = {
 export default async function Home() {
   return (
     <>
-      <a href="#main-content" className="sr-only focus-visible:not-sr-only focus-visible:absolute focus-visible:top-4 focus-visible:left-4 focus-visible:z-[9999] focus-visible:px-4 focus-visible:py-2 focus-visible:bg-blue-600 focus-visible:text-white focus-visible:rounded-lg focus-visible:shadow-lg">
+      <a
+        href="#main-content"
+        className="absolute left-[-9999px] top-4 z-[9999] px-4 py-2 bg-blue-600 text-white rounded-lg shadow-lg focus:left-4 outline-none focus:outline-2 focus:outline-offset-2 focus:outline-blue-600"
+        tabIndex={0}
+      >
         Skip to main content
       </a>
 
