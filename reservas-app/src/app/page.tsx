@@ -106,14 +106,6 @@ export const metadata: Metadata = {
 export default async function Home() {
   return (
     <>
-      <a
-        href="#main-content"
-        className="absolute left-[-9999px] top-4 z-[9999] px-4 py-2 bg-blue-600 text-white rounded-lg shadow-lg focus:left-4 outline-none focus:outline-2 focus:outline-offset-2 focus:outline-blue-600"
-        tabIndex={0}
-      >
-        Skip to main content
-      </a>
-
       {process.env.NEXT_PUBLIC_GA_ID && (
         <>
           <Script src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`} strategy="afterInteractive" async />
