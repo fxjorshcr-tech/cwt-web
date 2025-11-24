@@ -9,7 +9,7 @@ import StructuredData from "@/components/SEO/StructuredData";
 import type { Metadata } from 'next';
 import Script from 'next/script';
 
-const BookingFormWrapper = dynamic(() => import("@/components/forms/BookingFormWrapper"), {
+const BookingFormWrapper = dynamic(() => import("@/components/forms/BookingFormWrapper").then(mod => mod.BookingFormWrapper), {
   loading: () => <ComponentSkeleton />,
   ssr: false,
 });
