@@ -7,7 +7,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import {
   ArrowLeft, Clock, Users, MapPin, AlertCircle, Star,
-  CheckCircle, XCircle, Loader2
+  CheckCircle, XCircle, Loader2, ChevronDown
 } from 'lucide-react';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import { getTourBySlug, Tour } from '@/lib/supabase-tours';
@@ -62,6 +62,18 @@ export default function TourDetailPage({ params }: PageProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassengerPicker, setShowPassengerPicker] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+
+  // Accordion states
+  const [accordions, setAccordions] = useState({
+    included: false,
+    notIncluded: false,
+    whatToBring: false,
+    importantInfo: false,
+  });
+
+  const toggleAccordion = (key: keyof typeof accordions) => {
+    setAccordions(prev => ({ ...prev, [key]: !prev[key] }));
+  };
 
   useEffect(() => {
     async function loadTour() {
@@ -412,68 +424,124 @@ export default function TourDetailPage({ params }: PageProps) {
               {/* Tour Itinerary */}
               <TourItinerary description={tour.long_description} />
 
-              {/* What's Included / Not Included */}
+              {/* What's Included / Not Included - Accordions */}
               <div className="grid md:grid-cols-2 gap-6">
-                {/* Included */}
-                <div className="bg-green-50 rounded-2xl p-6 border-2 border-green-200">
-                  <h3 className="text-xl font-bold text-green-900 mb-4 flex items-center gap-2">
-                    <CheckCircle className="h-6 w-6" />
-                    What's Included
-                  </h3>
-                  <ul className="space-y-2">
-                    {tour.included.map((item, index) => (
-                      <li key={index} className="flex items-start gap-2 text-gray-700">
-                        <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Not Included */}
-                <div className="bg-red-50 rounded-2xl p-6 border-2 border-red-200">
-                  <h3 className="text-xl font-bold text-red-900 mb-4 flex items-center gap-2">
-                    <XCircle className="h-6 w-6" />
-                    Not Included
-                  </h3>
-                  <ul className="space-y-2">
-                    {tour.not_included.map((item, index) => (
-                      <li key={index} className="flex items-start gap-2 text-gray-700">
-                        <XCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              {/* What to Bring */}
-              <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-200">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">What to Bring</h2>
-                <div className="grid md:grid-cols-2 gap-3">
-                  {tour.what_to_bring.map((item, index) => (
-                    <div key={index} className="flex items-center gap-2 text-gray-700">
-                      <div className="w-2 h-2 rounded-full bg-blue-600"></div>
-                      <span>{item}</span>
+                {/* Included Accordion */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                  <button
+                    onClick={() => toggleAccordion('included')}
+                    className="w-full px-6 py-4 flex items-center justify-between bg-green-50 hover:bg-green-100 transition-colors border-b border-green-200"
+                  >
+                    <h3 className="text-lg font-bold text-green-900 flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5" />
+                      What's Included
+                    </h3>
+                    <ChevronDown
+                      className={`h-5 w-5 text-green-700 transition-transform ${
+                        accordions.included ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+                  {accordions.included && (
+                    <div className="p-6 bg-green-50">
+                      <ul className="space-y-2">
+                        {tour.included.map((item, index) => (
+                          <li key={index} className="flex items-start gap-2 text-gray-700">
+                            <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                            <span className="text-sm">{item}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
-                  ))}
+                  )}
+                </div>
+
+                {/* Not Included Accordion */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                  <button
+                    onClick={() => toggleAccordion('notIncluded')}
+                    className="w-full px-6 py-4 flex items-center justify-between bg-red-50 hover:bg-red-100 transition-colors border-b border-red-200"
+                  >
+                    <h3 className="text-lg font-bold text-red-900 flex items-center gap-2">
+                      <XCircle className="h-5 w-5" />
+                      Not Included
+                    </h3>
+                    <ChevronDown
+                      className={`h-5 w-5 text-red-700 transition-transform ${
+                        accordions.notIncluded ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+                  {accordions.notIncluded && (
+                    <div className="p-6 bg-red-50">
+                      <ul className="space-y-2">
+                        {tour.not_included.map((item, index) => (
+                          <li key={index} className="flex items-start gap-2 text-gray-700">
+                            <XCircle className="h-4 w-4 text-red-600 flex-shrink-0 mt-0.5" />
+                            <span className="text-sm">{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {/* Important Notes */}
-              <div className="bg-amber-50 rounded-2xl p-6 md:p-8 border-2 border-amber-200">
-                <h2 className="text-2xl font-bold text-amber-900 mb-6 flex items-center gap-2">
-                  <AlertCircle className="h-6 w-6" />
-                  Important Information
-                </h2>
-                <ul className="space-y-3">
-                  {tour.important_notes.map((note, index) => (
-                    <li key={index} className="flex items-start gap-2 text-gray-700">
-                      <span className="text-amber-600 mt-1">•</span>
-                      <span>{note}</span>
-                    </li>
-                  ))}
-                </ul>
+              {/* What to Bring - Accordion */}
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                <button
+                  onClick={() => toggleAccordion('whatToBring')}
+                  className="w-full px-6 py-4 flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition-colors"
+                >
+                  <h3 className="text-lg font-bold text-gray-900">What to Bring</h3>
+                  <ChevronDown
+                    className={`h-5 w-5 text-gray-700 transition-transform ${
+                      accordions.whatToBring ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+                {accordions.whatToBring && (
+                  <div className="p-6 border-t border-gray-200">
+                    <div className="grid md:grid-cols-2 gap-3">
+                      {tour.what_to_bring.map((item, index) => (
+                        <div key={index} className="flex items-center gap-2 text-gray-700">
+                          <div className="w-2 h-2 rounded-full bg-blue-600 flex-shrink-0"></div>
+                          <span className="text-sm">{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Important Information - Accordion */}
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                <button
+                  onClick={() => toggleAccordion('importantInfo')}
+                  className="w-full px-6 py-4 flex items-center justify-between bg-amber-50 hover:bg-amber-100 transition-colors border-b border-amber-200"
+                >
+                  <h3 className="text-lg font-bold text-amber-900 flex items-center gap-2">
+                    <AlertCircle className="h-5 w-5" />
+                    Important Information
+                  </h3>
+                  <ChevronDown
+                    className={`h-5 w-5 text-amber-700 transition-transform ${
+                      accordions.importantInfo ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+                {accordions.importantInfo && (
+                  <div className="p-6 bg-amber-50">
+                    <ul className="space-y-2">
+                      {tour.important_notes.map((note, index) => (
+                        <li key={index} className="flex items-start gap-2 text-gray-700">
+                          <span className="text-amber-600 mt-0.5 text-sm">•</span>
+                          <span className="text-sm">{note}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
 
               {/* FAQs Section - ONLY ON MOBILE */}
