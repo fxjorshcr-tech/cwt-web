@@ -291,7 +291,7 @@ export default function TourDetailPage({ params }: PageProps) {
       <BookingNavbar />
 
       {/* Hero Section */}
-      <section className="relative h-[70vh] min-h-[500px] flex items-end">
+      <section className="relative h-[60vh] sm:h-[70vh] min-h-[450px] sm:min-h-[500px] flex items-end">
         <div className="absolute inset-0 z-0">
           <Image
             src={tour.image}
@@ -304,47 +304,50 @@ export default function TourDetailPage({ params }: PageProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/30" />
         </div>
 
-        <div className="relative z-10 w-full pb-12 px-6 pt-20 sm:pt-0">
+        <div className="relative z-10 w-full pb-8 sm:pb-12 px-4 sm:px-6 pt-20 sm:pt-0">
           <div className="container mx-auto max-w-6xl">
             {/* Back Button */}
             <Link
               href="/private-tours"
-              className="mb-6 inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-lg text-white transition-all"
+              className="mb-4 sm:mb-6 inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-lg text-white transition-all text-sm"
             >
               <ArrowLeft className="h-4 w-4" />
-              <span>Back to Tours</span>
+              <span className="hidden sm:inline">Back to Tours</span>
+              <span className="sm:hidden">Back</span>
             </Link>
 
-            <h1 className="text-4xl sm:text-5xl md:text-5xl lg:text-6xl font-bold text-white mb-4 drop-shadow-2xl">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3 sm:mb-4 drop-shadow-2xl leading-tight">
               {tour.name}
             </h1>
 
-            <p className="text-base sm:text-lg md:text-xl text-white/95 max-w-3xl drop-shadow-lg mb-6">
+            <p className="text-sm sm:text-base md:text-lg text-white/95 max-w-3xl drop-shadow-lg mb-4 sm:mb-6 line-clamp-2 sm:line-clamp-none">
               {tour.short_description}
             </p>
 
-            {/* Quick Info Badges */}
-            <div className="flex flex-wrap gap-2 sm:gap-3">
-              <div className="px-3 sm:px-4 py-2 bg-white/95 backdrop-blur-sm rounded-lg flex items-center gap-2">
-                <Clock className="h-4 sm:h-5 w-4 sm:w-5 text-blue-600" />
-                <span className="font-semibold text-sm sm:text-base">{tour.duration}</span>
+            {/* Quick Info Badges - Optimizado para móvil */}
+            <div className="flex flex-wrap gap-1.5 sm:gap-2 md:gap-3">
+              <div className="px-2.5 sm:px-3 md:px-4 py-1.5 sm:py-2 bg-white/95 backdrop-blur-sm rounded-lg flex items-center gap-1.5 sm:gap-2">
+                <Clock className="h-3.5 sm:h-4 md:h-5 w-3.5 sm:w-4 md:w-5 text-blue-600 flex-shrink-0" />
+                <span className="font-semibold text-xs sm:text-sm md:text-base whitespace-nowrap">{tour.duration}</span>
               </div>
-              <div className="px-3 sm:px-4 py-2 bg-white/95 backdrop-blur-sm rounded-lg flex items-center gap-2">
-                <Users className="h-4 sm:h-5 w-4 sm:w-5 text-blue-600" />
-                <span className="font-semibold text-sm sm:text-base">Max {tour.max_passengers}</span>
+              <div className="px-2.5 sm:px-3 md:px-4 py-1.5 sm:py-2 bg-white/95 backdrop-blur-sm rounded-lg flex items-center gap-1.5 sm:gap-2">
+                <Users className="h-3.5 sm:h-4 md:h-5 w-3.5 sm:w-4 md:w-5 text-blue-600 flex-shrink-0" />
+                <span className="font-semibold text-xs sm:text-sm md:text-base whitespace-nowrap">Max {tour.max_passengers}</span>
               </div>
-              <div className={`px-3 sm:px-4 py-2 backdrop-blur-sm rounded-lg flex items-center gap-2 border ${difficultyColors[tour.difficulty]}`}>
-                <AlertCircle className="h-4 sm:h-5 w-4 sm:w-5" />
-                <span className="font-semibold text-sm sm:text-base">{tour.difficulty}</span>
+              <div className={`px-2.5 sm:px-3 md:px-4 py-1.5 sm:py-2 backdrop-blur-sm rounded-lg flex items-center gap-1.5 sm:gap-2 border ${difficultyColors[tour.difficulty]}`}>
+                <AlertCircle className="h-3.5 sm:h-4 md:h-5 w-3.5 sm:w-4 md:w-5 flex-shrink-0" />
+                <span className="font-semibold text-xs sm:text-sm md:text-base whitespace-nowrap">{tour.difficulty}</span>
               </div>
-              <div className="px-3 sm:px-4 py-2 bg-white/95 backdrop-blur-sm rounded-lg flex items-center gap-2">
-                <MapPin className="h-4 sm:h-5 w-4 sm:w-5 text-blue-600" />
-                <span className="font-semibold text-sm sm:text-base truncate max-w-[100px] sm:max-w-none">{tour.pickup_time}</span>
+              {/* Pickup time - visible en todos los tamaños pero más compacto */}
+              <div className="px-2.5 sm:px-3 md:px-4 py-1.5 sm:py-2 bg-white/95 backdrop-blur-sm rounded-lg flex items-center gap-1.5 sm:gap-2">
+                <MapPin className="h-3.5 sm:h-4 md:h-5 w-3.5 sm:w-4 md:w-5 text-blue-600 flex-shrink-0" />
+                <span className="font-semibold text-xs sm:text-sm md:text-base truncate max-w-[80px] sm:max-w-none">{tour.pickup_time}</span>
               </div>
+              {/* Drive time - solo visible en pantallas medianas y grandes */}
               {driveTimeInfo && (
-                <div className="px-3 sm:px-4 py-2 bg-orange-500/95 backdrop-blur-sm rounded-lg flex items-center gap-2">
-                  <span className="text-white text-sm sm:text-base">🚗</span>
-                  <span className="font-semibold text-white text-sm sm:text-base truncate max-w-[120px] sm:max-w-none">{driveTimeInfo.time}</span>
+                <div className="hidden md:flex px-2.5 sm:px-3 md:px-4 py-1.5 sm:py-2 bg-orange-500/95 backdrop-blur-sm rounded-lg items-center gap-1.5 sm:gap-2">
+                  <span className="text-white text-xs sm:text-sm md:text-base">🚗</span>
+                  <span className="font-semibold text-white text-xs sm:text-sm md:text-base whitespace-nowrap">{driveTimeInfo.time}</span>
                 </div>
               )}
             </div>
