@@ -26,22 +26,6 @@ export function PickupLocationForm({
       </h2>
 
       <div className="space-y-4">
-        {/* Pickup Time Card - Destacado */}
-        <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 mb-4">
-          <div className="flex items-center gap-3">
-            <div className="bg-blue-600 rounded-full p-2">
-              <MapPin className="h-5 w-5 text-white" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-blue-900">Pickup Time</p>
-              <p className="text-xl font-bold text-blue-600">{pickupTime}</p>
-            </div>
-          </div>
-          <p className="mt-2 text-xs text-blue-700">
-            We'll pick you up from your hotel in La Fortuna area
-          </p>
-        </div>
-
         <div>
           <label htmlFor="hotel" className="block text-sm font-medium text-gray-700 mb-2">
             Hotel Name or Address <span className="text-red-500">*</span>
@@ -62,6 +46,13 @@ export function PickupLocationForm({
               {errors.hotel}
             </p>
           )}
+          {/* Pickup Time Badge - Pequeño y elegante */}
+          <div className="mt-2 inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-lg">
+            <MapPin className="h-3.5 w-3.5 text-blue-600" />
+            <span className="text-sm text-gray-700">
+              Pickup: <span className="font-semibold text-blue-600">{pickupTime}</span>
+            </span>
+          </div>
         </div>
 
         <div>
