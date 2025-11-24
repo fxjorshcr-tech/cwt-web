@@ -8,8 +8,8 @@ import { createClient } from '@/lib/supabase/client';
 
 interface Route {
   id: string;
-  from_location: string;
-  to_location: string;
+  origen: string;
+  destino: string;
 }
 
 export default function HeroBookingWidget() {
@@ -28,9 +28,8 @@ export default function HeroBookingWidget() {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('routes')
-      .select('id, from_location, to_location')
-      .eq('active', true)
-      .order('from_location');
+      .select('id, origen, destino')
+      .order('origen');
 
     if (!error && data) {
       setRoutes(data);
@@ -44,10 +43,10 @@ export default function HeroBookingWidget() {
     }
   }
 
-  const fromLocations = Array.from(new Set(routes.map(r => r.from_location))).sort();
+  const fromLocations = Array.from(new Set(routes.map(r => r.origen))).sort();
   const toLocations = from
-    ? Array.from(new Set(routes.filter(r => r.from_location === from).map(r => r.to_location))).sort()
-    : Array.from(new Set(routes.map(r => r.to_location))).sort();
+    ? Array.from(new Set(routes.filter(r => r.origen === from).map(r => r.destino))).sort()
+    : Array.from(new Set(routes.map(r => r.destino))).sort();
 
   const today = new Date().toISOString().split('T')[0];
 
