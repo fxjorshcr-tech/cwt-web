@@ -177,31 +177,6 @@ export default function ComparisonTable() {
           </table>
         </div>
 
-        {/* Price Comparison Banner */}
-        <div className="mt-8 p-6 sm:p-8 bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl shadow-xl text-white">
-          <h3 className="text-xl sm:text-2xl font-bold mb-3 text-center">Price Comparison Example</h3>
-          <div className="grid sm:grid-cols-3 gap-4 text-center">
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-              <p className="text-sm text-blue-100 mb-1">Shared Shuttle</p>
-              <p className="text-2xl sm:text-3xl font-bold">$240</p>
-              <p className="text-xs text-blue-200 mt-1">Family of 4 × $60/person</p>
-              <p className="text-xs text-blue-200">+ 6 hours with stops</p>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-              <p className="text-sm text-blue-100 mb-1">Rental Car</p>
-              <p className="text-2xl sm:text-3xl font-bold">$280+</p>
-              <p className="text-xs text-blue-200 mt-1">$40/day + insurance + gas</p>
-              <p className="text-xs text-blue-200">+ driving stress</p>
-            </div>
-            <div className="bg-white rounded-xl p-4 border-4 border-yellow-400 shadow-2xl">
-              <p className="text-sm text-blue-600 mb-1 font-bold">Private Transfer (Us)</p>
-              <p className="text-2xl sm:text-3xl font-bold text-blue-600">$180</p>
-              <p className="text-xs text-blue-700 mt-1">Whole group, direct route</p>
-              <p className="text-xs text-green-600 font-bold">+ Comfort & Peace of Mind</p>
-            </div>
-          </div>
-        </div>
-
       </div>
     </section>
   );

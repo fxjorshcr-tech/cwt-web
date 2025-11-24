@@ -20,7 +20,7 @@ export default function WhyBookDirect() {
             Why Book Direct With Us?
           </h2>
           <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            When you book with Can't Wait Travel, you're working directly with the people who will drive you.
+            When you book with Can't Wait Travel CR, you're working directly with the people who will drive you.
             No middlemen, no outsourcing, no surprises.
           </p>
         </div>
@@ -42,17 +42,17 @@ export default function WhyBookDirect() {
             </p>
           </div>
 
-          {/* Card 2: La Fortuna Based */}
+          {/* Card 2: Nationwide Coverage */}
           <div className="group bg-gradient-to-br from-green-50 to-white border-2 border-green-200 rounded-2xl p-6 sm:p-8 hover:shadow-xl transition-all hover:-translate-y-1">
             <div className="h-14 w-14 bg-green-600 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
               <MapPin className="h-7 w-7 text-white" />
             </div>
             <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">
-              La Fortuna Based
+              Nationwide Coverage
             </h3>
             <p className="text-gray-700 leading-relaxed">
-              We live here, we work here, we know these roads personally. Our drivers are from Arenal—not imported from San José.
-              <strong className="text-green-600"> We know which routes flood, where construction is, and shortcuts only locals use.</strong>
+              Based in La Fortuna with vehicles strategically located in SJO, Manuel Antonio, Guanacaste, and Monteverde.
+              <strong className="text-green-600"> We know every route personally—which roads flood, where construction is, and shortcuts only locals use.</strong>
             </p>
           </div>
 
@@ -84,17 +84,17 @@ export default function WhyBookDirect() {
             </p>
           </div>
 
-          {/* Card 5: Direct Communication */}
+          {/* Card 5: Quick Support */}
           <div className="group bg-gradient-to-br from-cyan-50 to-white border-2 border-cyan-200 rounded-2xl p-6 sm:p-8 hover:shadow-xl transition-all hover:-translate-y-1">
             <div className="h-14 w-14 bg-cyan-600 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
               <MessageCircle className="h-7 w-7 text-white" />
             </div>
             <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">
-              Text/WhatsApp the Owner Directly
+              Fast WhatsApp Support
             </h3>
             <p className="text-gray-700 leading-relaxed">
-              No call centers, no automated responses. Message us on WhatsApp and get answers from the owner personally.
-              <strong className="text-cyan-600"> You're not just a booking number to us.</strong>
+              No call centers, no automated responses. Message us on WhatsApp and get real answers as soon as possible from our team.
+              <strong className="text-cyan-600"> We're here to help whenever you need us.</strong>
             </p>
           </div>
 

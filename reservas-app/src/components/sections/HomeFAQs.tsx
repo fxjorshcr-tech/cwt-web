@@ -1,62 +1,78 @@
 // src/components/sections/HomeFAQs.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronDown, HelpCircle } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 interface FAQ {
+  id: number;
   question: string;
   answer: string;
+  category?: string;
 }
 
-const faqs: FAQ[] = [
-  {
-    question: "How far in advance should I book my private transfer?",
-    answer: "We recommend booking at least 48-72 hours in advance, especially during high season (December-April). However, we can often accommodate last-minute bookings if we have availability. Contact us via WhatsApp for urgent requests."
-  },
-  {
-    question: "What happens if my flight is delayed?",
-    answer: "We track all flights automatically. If your flight is delayed, we'll adjust your pickup time accordingly at no extra charge. You won't be stranded—we'll wait for you."
-  },
-  {
-    question: "Is the price per person or for the whole group?",
-    answer: "All our prices are for the entire vehicle, not per person. Whether you're 1 person or 8 people, you pay the same price. This makes private transfers very cost-effective for families and groups."
-  },
-  {
-    question: "Can I cancel or modify my reservation?",
-    answer: "Yes! You can cancel up to 24 hours before your transfer for a full refund. If you need to modify your booking (change date, time, or pickup location), just contact us via WhatsApp and we'll make the adjustments."
-  },
-  {
-    question: "Do you provide car seats for children?",
-    answer: "Yes, we provide free car seats and booster seats for children. Just let us know the ages of your children when booking so we can prepare the appropriate seats."
-  },
-  {
-    question: "How much luggage can we bring?",
-    answer: "Our vehicles have plenty of space for luggage. Typically, we can accommodate 2-3 large suitcases plus carry-ons for up to 6 passengers. If you're traveling with surfboards, bikes, or extra-large items, let us know in advance and we'll make arrangements."
-  },
-  {
-    question: "Are your drivers bilingual?",
-    answer: "Yes, all our drivers speak English and Spanish. They're also happy to share local knowledge and recommendations about Costa Rica during your journey."
-  },
-  {
-    question: "What if I need to stop along the way (bathroom, food, ATM)?",
-    answer: "No problem! We can make reasonable stops along the route at your request. Just let your driver know. Common stops include bathrooms, restaurants, ATMs, or grocery stores."
-  },
-  {
-    question: "How do I pay for my transfer?",
-    answer: "We accept credit/debit cards (Visa, Mastercard, American Express) through our secure online payment system. You can also pay cash (USD or Costa Rican colones) directly to the driver."
-  },
-  {
-    question: "What's the difference between your service and a shared shuttle?",
-    answer: "Private transfers go direct from point A to point B with no stops for other passengers. Shared shuttles pick up multiple groups, making 4-6+ stops, which can turn a 3-hour trip into 6 hours. With us, you save time, get privacy, and control your schedule."
-  }
-];
-
 export default function HomeFAQs() {
+  const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    loadFAQs();
+  }, []);
+
+  async function loadFAQs() {
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from('faqs')
+        .select('id, question, answer, category')
+        .eq('is_active', true)
+        .eq('is_featured', true)
+        .order('display_order', { ascending: true })
+        .limit(10);
+
+      if (!error && data) {
+        setFaqs(data);
+      }
+    } catch (error) {
+      console.error('Error loading FAQs:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   function toggleFAQ(index: number) {
     setOpenIndex(openIndex === index ? null : index);
+  }
+
+  if (isLoading) {
+    return (
+      <section className="py-16 sm:py-20 bg-white">
+        <div className="container mx-auto px-4 sm:px-6 max-w-4xl">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 border border-blue-200 rounded-full mb-6">
+              <HelpCircle className="h-5 w-5 text-blue-600" />
+              <span className="text-blue-700 font-bold text-sm uppercase tracking-wide">
+                Common Questions
+              </span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Frequently Asked Questions
+            </h2>
+          </div>
+          <div className="space-y-4">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="bg-gray-100 rounded-xl h-20 animate-pulse"></div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (faqs.length === 0) {
+    return null;
   }
 
   return (
@@ -75,7 +91,7 @@ export default function HomeFAQs() {
             Frequently Asked Questions
           </h2>
           <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
-            Everything you need to know about booking private transfers with Can't Wait Travel
+            Everything you need to know about booking private transfers with Can't Wait Travel CR
           </p>
         </div>
 
@@ -83,7 +99,7 @@ export default function HomeFAQs() {
         <div className="space-y-4">
           {faqs.map((faq, index) => (
             <div
-              key={index}
+              key={faq.id}
               className="bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:border-blue-300 transition-all"
             >
               <button
@@ -121,7 +137,7 @@ export default function HomeFAQs() {
             Still have questions?
           </p>
           <p className="text-gray-600 text-sm sm:text-base mb-4">
-            WhatsApp us directly and we'll answer within minutes
+            WhatsApp us and we'll answer as soon as possible
           </p>
           <a
             href="https://wa.me/50689361553"

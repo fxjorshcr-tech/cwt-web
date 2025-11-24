@@ -36,20 +36,20 @@ export default function Guarantees() {
               Free Cancellation
             </h3>
             <p className="text-sm text-gray-700 leading-relaxed">
-              Cancel up to <strong className="text-green-600">24 hours</strong> before your transfer for a full refund. Plans change—we understand.
+              Cancel up to <strong className="text-green-600">48 hours</strong> before your transfer for a full refund. Plans change—we understand.
             </p>
           </div>
 
-          {/* Flight Delay Coverage */}
+          {/* Flight Delay Protection */}
           <div className="bg-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1">
             <div className="h-12 w-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
               <Plane className="h-6 w-6 text-blue-600" />
             </div>
             <h3 className="text-lg font-bold text-gray-900 mb-2">
-              Flight Delayed? We Wait
+              Flight Delay Protection
             </h3>
             <p className="text-sm text-gray-700 leading-relaxed">
-              We track your flight. If it's delayed, <strong className="text-blue-600">we'll wait for you—no extra charge.</strong> You won't be stranded.
+              We track your flight automatically. <strong className="text-blue-600">Optional travel insurance available</strong> for added protection against delays and cancellations. Ask us about coverage options!
             </p>
           </div>
 

@@ -6,9 +6,13 @@ import BookingNavbar from "@/components/booking/BookingNavbar";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import ScrollToBookingButton from "@/components/ScrollToBookingButton";
 import StructuredData from "@/components/SEO/StructuredData";
-import HeroBookingWidget from "@/components/sections/HeroBookingWidget";
 import type { Metadata } from 'next';
 import Script from 'next/script';
+
+const BookingFormWrapper = dynamic(() => import("@/components/forms/BookingFormWrapper"), {
+  loading: () => <ComponentSkeleton />,
+  ssr: false,
+});
 
 const WhyBookDirect = dynamic(() => import("@/components/sections/WhyBookDirect"), {
   loading: () => <ComponentSkeleton />,
@@ -177,8 +181,12 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Booking Widget - Right After Hero */}
-        <HeroBookingWidget />
+        {/* Booking Form - Right After Hero */}
+        <section className="relative bg-gray-50 py-12 sm:py-16 -mt-12">
+          <div className="container mx-auto px-4 sm:px-6 max-w-5xl">
+            <BookingFormWrapper />
+          </div>
+        </section>
 
         {/* New Optimized Structure - Transfers First */}
         <WhyBookDirect />

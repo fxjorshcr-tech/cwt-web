@@ -30,8 +30,8 @@ export default function WhyChooseUs() {
             The Best Way to Travel Between Destinations in Costa Rica
           </h2>
           <p className="text-base sm:text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed px-4">
-            When it comes to moving from point A to point B in Costa Rica, <strong>private transfers with a trusted company like Can't Wait Travel</strong> are the best option for travelers who value <em>peace of mind and security</em>.
-            Unlike shared shuttles or ride-sharing apps, our <strong>100% Costa Rican team</strong> based in <strong>La Fortuna, Arenal</strong> offers direct, private transportation with <strong>over 30 years of combined experience</strong>.
+            When it comes to moving from point A to point B in Costa Rica, <strong>private transfers with a trusted company like Can't Wait Travel CR</strong> are the best option for travelers who value <em>peace of mind and security</em>.
+            Unlike shared shuttles or ride-sharing apps, our <strong>100% Costa Rican team</strong> offers direct, private transportation with <strong>over 30 years of combined experience</strong>.
             We know every curve of these roads and combine the warmth of <em className="text-blue-600">Pura Vida</em> hospitality with the strict professionalism
             of a licensed transport operator, ensuring you arrive safely and comfortably every time.
           </p>
@@ -158,7 +158,7 @@ export default function WhyChooseUs() {
                 <Heart className="h-8 w-8 text-green-600" />
                 <div>
                   <p className="font-bold text-gray-900 text-base">100% Costa Rican</p>
-                  <p className="text-sm text-gray-700">Based in La Fortuna (Arenal Volcano) </p>
+                  <p className="text-sm text-gray-700">Nationwide coverage across Costa Rica</p>
                 </div>
               </div>
             </div>
