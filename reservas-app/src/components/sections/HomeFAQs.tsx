@@ -6,7 +6,7 @@ import { ChevronDown, HelpCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
 interface FAQ {
-  id: number;
+  id: string;
   question: string;
   answer: string;
   category?: string;
