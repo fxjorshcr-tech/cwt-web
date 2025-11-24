@@ -53,18 +53,18 @@ export default function TransfersPage() {
               </h1>
 
               <p className="text-base sm:text-lg md:text-xl text-white/95 mb-8 drop-shadow-md max-w-3xl mx-auto font-medium">
-                100% Private Service. Direct Operator. Stress-Free Travel.
+                Direct Operator | Stress-Free Travel
               </p>
 
               <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8">
                 {/* Tags unificados visualmente */}
                 <div className="flex items-center gap-2 text-white bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
                   <Shield className="h-4 w-4 text-green-400" />
-                  <span className="text-sm font-semibold">ICT Certified #4121-2025</span>
+                  <span className="text-sm font-semibold">ICT Certified</span>
                 </div>
                 <div className="flex items-center gap-2 text-white bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
                   <Users className="h-4 w-4 text-orange-400" />
-                  <span className="text-sm font-semibold">Expert Local Drivers</span>
+                  <span className="text-sm font-semibold">Local Experts</span>
                 </div>
                 <div className="flex items-center gap-2 text-white bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
                   <CheckCircle2 className="h-4 w-4 text-blue-400" />
