@@ -1,12 +1,12 @@
 // src/app/page.tsx
-import { Suspense } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import dynamic from "next/dynamic";
-import { BookingForm } from "@/components/forms/BookingForm";
 import BookingNavbar from "@/components/booking/BookingNavbar";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import ScrollToBookingButton from "@/components/ScrollToBookingButton";
 import StructuredData from "@/components/SEO/StructuredData";
+import { ArrowRight, MapPin } from 'lucide-react';
 import type { Metadata } from 'next';
 import Script from 'next/script';
 
@@ -170,11 +170,157 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Booking Form - Moved out of hero */}
-        <section id="booking-form" className="relative bg-gray-50 py-16 px-4 sm:px-6">
-          <Suspense fallback={<div className="w-full max-w-5xl mx-auto"><div className="bg-white rounded-xl shadow-lg border border-gray-200 p-12"><div className="flex flex-col items-center justify-center gap-4"><div className="animate-spin h-12 w-12 border-4 border-blue-600 border-t-transparent rounded-full" /><p className="text-gray-600">Loading booking form...</p></div></div></div>}>
-            <BookingForm />
-          </Suspense>
+        {/* Two Service Options */}
+        <section className="relative bg-gradient-to-b from-gray-50 to-white py-20 px-4 sm:px-6">
+          <div className="container mx-auto max-w-7xl">
+
+            {/* Section Header */}
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+                Two Ways to Explore Costa Rica
+              </h2>
+              <p className="text-base md:text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                Can't Wait Travel CR connects you to Costa Rica's most popular routes with private transfers and hand-picked tours. Based in La Fortuna, we bring you complete transportation solutions across the country.
+              </p>
+            </div>
+
+            {/* Two Cards Side by Side */}
+            <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+
+              {/* Private Transfers Card */}
+              <div className="group bg-white rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-500 overflow-hidden border border-gray-200 hover:border-blue-400 hover:-translate-y-2">
+                {/* Image Section */}
+                <div className="relative h-64 w-full overflow-hidden">
+                  <Image
+                    src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/puerto-viejo-caribean-coast-sunny-costa-rica.webp"
+                    alt="Private Shuttle Van - Can't Wait Travel CR"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover group-hover:scale-110 transition-transform duration-700"
+                    quality={85}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+
+                  {/* Small Info Badges */}
+                  <div className="absolute top-4 left-4 flex gap-2">
+                    <div className="bg-blue-600/90 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                      30+ Routes
+                    </div>
+                    <div className="bg-white/90 backdrop-blur-sm text-blue-600 text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                      100% Private
+                    </div>
+                  </div>
+
+                  {/* Icon Badge on Image */}
+                  <div className="absolute bottom-4 left-4 h-16 w-16 bg-white/95 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-xl">
+                    <MapPin className="h-8 w-8 text-blue-600" />
+                  </div>
+                </div>
+
+                {/* Content Section */}
+                <div className="p-8 md:p-10">
+                  <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+                    Private Transfers
+                  </h3>
+
+                  <p className="text-gray-600 mb-6 leading-relaxed text-base">
+                    Our core service. Point-to-point private transportation connecting Costa Rica's most beautiful destinations.
+                    From SJO and Liberia airports to La Fortuna, Manuel Antonio, Tamarindo, and beyond.
+                  </p>
+
+                  <ul className="space-y-3 mb-8">
+                    <li className="flex items-start gap-3 text-gray-700">
+                      <span className="text-blue-600 mt-1 text-lg font-bold">✓</span>
+                      <span className="text-base">Direct routes across Costa Rica</span>
+                    </li>
+                    <li className="flex items-start gap-3 text-gray-700">
+                      <span className="text-blue-600 mt-1 text-lg font-bold">✓</span>
+                      <span className="text-base">100% private service, just your group</span>
+                    </li>
+                    <li className="flex items-start gap-3 text-gray-700">
+                      <span className="text-blue-600 mt-1 text-lg font-bold">✓</span>
+                      <span className="text-base">Licensed, experienced local drivers</span>
+                    </li>
+                  </ul>
+
+                  <Link
+                    href="/transfers"
+                    className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold text-lg rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-2xl group-hover:scale-105 duration-300"
+                  >
+                    Book Your Transfer
+                    <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                </div>
+              </div>
+
+              {/* Hand Picked Tours Card */}
+              <div className="group bg-white rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-500 overflow-hidden border border-gray-200 hover:border-orange-400 hover:-translate-y-2">
+                {/* Image Section */}
+                <div className="relative h-64 w-full overflow-hidden">
+                  <Image
+                    src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/puerto-viejo-caribean-coast-sunny-costa-rica.webp"
+                    alt="Private Tours - Can't Wait Travel CR"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover group-hover:scale-110 transition-transform duration-700"
+                    quality={85}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+
+                  {/* Small Info Badges */}
+                  <div className="absolute top-4 left-4 flex gap-2">
+                    <div className="bg-orange-600/90 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                      From La Fortuna
+                    </div>
+                    <div className="bg-white/90 backdrop-blur-sm text-orange-600 text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                      Local Experts
+                    </div>
+                  </div>
+
+                  {/* Icon Badge on Image */}
+                  <div className="absolute bottom-4 left-4 h-16 w-16 bg-white/95 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-xl">
+                    <MapPin className="h-8 w-8 text-orange-600" />
+                  </div>
+                </div>
+
+                {/* Content Section */}
+                <div className="p-8 md:p-10">
+                  <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+                    Hand Picked Tours
+                  </h3>
+
+                  <p className="text-gray-600 mb-6 leading-relaxed text-base">
+                    Our newest offering. Curated experiences departing from La Fortuna, designed by locals who know Costa Rica inside out.
+                    Discover hidden gems, unique adventures, and authentic culture.
+                  </p>
+
+                  <ul className="space-y-3 mb-8">
+                    <li className="flex items-start gap-3 text-gray-700">
+                      <span className="text-orange-600 mt-1 text-lg font-bold">✓</span>
+                      <span className="text-base">Expertly crafted itineraries</span>
+                    </li>
+                    <li className="flex items-start gap-3 text-gray-700">
+                      <span className="text-orange-600 mt-1 text-lg font-bold">✓</span>
+                      <span className="text-base">Private tours with local insights</span>
+                    </li>
+                    <li className="flex items-start gap-3 text-gray-700">
+                      <span className="text-orange-600 mt-1 text-lg font-bold">✓</span>
+                      <span className="text-base">Departing from La Fortuna</span>
+                    </li>
+                  </ul>
+
+                  <Link
+                    href="/private-tours"
+                    className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-orange-600 to-orange-700 text-white font-bold text-lg rounded-xl hover:from-orange-700 hover:to-orange-800 transition-all shadow-lg hover:shadow-2xl group-hover:scale-105 duration-300"
+                  >
+                    Explore Tours
+                    <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                </div>
+              </div>
+
+            </div>
+          </div>
         </section>
 
         <WhyChooseUs />
