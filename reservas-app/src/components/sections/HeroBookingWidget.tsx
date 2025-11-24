@@ -7,9 +7,9 @@ import { MapPin, Calendar, Users, ArrowRight } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
 interface Route {
-  id: string;
-  origen: string;
-  destino: string;
+  id: number;
+  origen: string | null;
+  destino: string | null;
 }
 
 export default function HeroBookingWidget() {
@@ -43,10 +43,10 @@ export default function HeroBookingWidget() {
     }
   }
 
-  const fromLocations = Array.from(new Set(routes.map(r => r.origen))).sort();
+  const fromLocations = Array.from(new Set(routes.map(r => r.origen).filter((loc): loc is string => loc !== null))).sort();
   const toLocations = from
-    ? Array.from(new Set(routes.filter(r => r.origen === from).map(r => r.destino))).sort()
-    : Array.from(new Set(routes.map(r => r.destino))).sort();
+    ? Array.from(new Set(routes.filter(r => r.origen === from).map(r => r.destino).filter((loc): loc is string => loc !== null))).sort()
+    : Array.from(new Set(routes.map(r => r.destino).filter((loc): loc is string => loc !== null))).sort();
 
   const today = new Date().toISOString().split('T')[0];
 
