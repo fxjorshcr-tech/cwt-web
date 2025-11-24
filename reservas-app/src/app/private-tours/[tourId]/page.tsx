@@ -447,7 +447,7 @@ export default function TourDetailPage({ params }: PageProps) {
                       <ul className="space-y-2">
                         {tour.included.map((item, index) => (
                           <li key={index} className="flex items-start gap-2 text-gray-700">
-                            <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                            <span className="text-green-600 mt-0.5 text-sm font-bold">•</span>
                             <span className="text-sm">{item}</span>
                           </li>
                         ))}
@@ -477,7 +477,7 @@ export default function TourDetailPage({ params }: PageProps) {
                       <ul className="space-y-2">
                         {tour.not_included.map((item, index) => (
                           <li key={index} className="flex items-start gap-2 text-gray-700">
-                            <XCircle className="h-4 w-4 text-red-600 flex-shrink-0 mt-0.5" />
+                            <span className="text-red-600 mt-0.5 text-sm font-bold">•</span>
                             <span className="text-sm">{item}</span>
                           </li>
                         ))}
@@ -504,8 +504,8 @@ export default function TourDetailPage({ params }: PageProps) {
                   <div className="p-6 border-t border-gray-200">
                     <div className="grid md:grid-cols-2 gap-3">
                       {tour.what_to_bring.map((item, index) => (
-                        <div key={index} className="flex items-center gap-2 text-gray-700">
-                          <div className="w-2 h-2 rounded-full bg-blue-600 flex-shrink-0"></div>
+                        <div key={index} className="flex items-start gap-2 text-gray-700">
+                          <span className="text-blue-600 mt-0.5 text-sm font-bold">•</span>
                           <span className="text-sm">{item}</span>
                         </div>
                       ))}
@@ -553,6 +553,14 @@ export default function TourDetailPage({ params }: PageProps) {
             {/* Right Column - Booking Form (Sticky) */}
             <div className="lg:col-span-1">
               <div className="sticky top-4 space-y-6">
+                {/* Booking Section Header */}
+                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg">
+                  <h2 className="text-2xl font-bold mb-2">Book This Adventure</h2>
+                  <p className="text-blue-100 text-sm">
+                    Fill in the details below to reserve your spot on this amazing tour
+                  </p>
+                </div>
+
                 {/* Booking Form */}
                 <form className="space-y-6">
                   <TourDatePassengerForm
