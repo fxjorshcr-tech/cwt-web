@@ -130,14 +130,47 @@ export default async function ShuttleRoutePage({ params }: { params: { route: st
 
         {/* Route Info Section - Below Hero */}
         <section className="py-12 bg-white border-b border-gray-200">
-          <div className="container mx-auto px-6 max-w-6xl">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-                {routeInfo.from} <span className="text-blue-600">→</span> {routeInfo.to}
-              </h2>
-              <p className="text-sm text-gray-500">Direct Route</p>
+          <div className="container mx-auto px-6 max-w-4xl">
+
+            {/* Route Display - Same style as listing page */}
+            <div className="bg-gray-50 rounded-2xl p-6 sm:p-8 mb-8 border border-gray-200">
+              <div className="space-y-4">
+                {/* From Location */}
+                <div className="flex items-start gap-3">
+                  <div className="bg-blue-100 p-2.5 rounded-lg flex-shrink-0 mt-1">
+                    <MapPin className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">From</p>
+                    <p className="text-base sm:text-lg font-bold text-gray-900 leading-snug">
+                      {routeInfo.from}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Arrow Separator */}
+                <div className="flex items-center justify-center">
+                  <div className="bg-gray-200 p-2 rounded-full">
+                    <ArrowRight className="h-6 w-6 text-gray-600" />
+                  </div>
+                </div>
+
+                {/* To Location */}
+                <div className="flex items-start gap-3">
+                  <div className="bg-green-100 p-2.5 rounded-lg flex-shrink-0 mt-1">
+                    <MapPin className="h-5 w-5 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">To</p>
+                    <p className="text-base sm:text-lg font-bold text-gray-900 leading-snug">
+                      {routeInfo.to}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
 
+            {/* Duration and Price Info */}
             <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12 mb-8">
               <div className="text-center">
                 <div className="flex items-center justify-center gap-2 text-gray-600 mb-2">

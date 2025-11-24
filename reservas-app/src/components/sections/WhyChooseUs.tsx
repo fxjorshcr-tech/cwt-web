@@ -27,13 +27,13 @@ export default function WhyChooseUs() {
             </span>
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 sm:mb-6 px-4">
-            Why Trust Can't Wait Travel CR for Your Private Transfers in Costa Rica?
+            The Best Way to Travel Between Destinations in Costa Rica
           </h2>
           <p className="text-base sm:text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed px-4">
-            We are a <strong>100% Costa Rican team</strong> based in the heart of <strong>La Fortuna, Arenal</strong>.
-            With over <strong>30 years of combined experience in private transfers</strong>, we know every curve of these roads. We combine
-            the warmth of <em className="text-blue-600">Pura Vida</em> hospitality with the strict professionalism
-            of a top-tier transport operator, connecting Costa Rica's most popular routes daily.
+            When it comes to moving from point A to point B in Costa Rica, <strong>private transfers with a trusted company like Can't Wait Travel</strong> are the best option for travelers who value <em>peace of mind and security</em>.
+            Unlike shared shuttles or ride-sharing apps, our <strong>100% Costa Rican team</strong> based in <strong>La Fortuna, Arenal</strong> offers direct, private transportation with <strong>over 30 years of combined experience</strong>.
+            We know every curve of these roads and combine the warmth of <em className="text-blue-600">Pura Vida</em> hospitality with the strict professionalism
+            of a licensed transport operator, ensuring you arrive safely and comfortably every time.
           </p>
         </div>
 

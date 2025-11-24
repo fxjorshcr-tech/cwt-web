@@ -144,21 +144,21 @@ export default async function Home() {
 
           <div className="relative z-10 h-full flex flex-col items-center justify-center px-4 sm:px-6">
             <div className="text-center max-w-4xl">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 drop-shadow-2xl leading-tight">
+              <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 drop-shadow-2xl leading-tight">
                 Explore Costa Rica Your Way
               </h1>
-              <p className="text-base sm:text-lg md:text-xl text-white/95 mb-8 drop-shadow-lg max-w-2xl mx-auto font-medium px-4">
+              <p className="text-sm sm:text-base md:text-xl text-white/95 mb-6 sm:mb-8 drop-shadow-lg max-w-2xl mx-auto font-medium px-4">
                 Private Transfers powered by Local Experts
               </p>
-              <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8">
-                <div className="flex items-center gap-2 text-white bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
-                  <span className="text-sm font-semibold">100% Private Service</span>
+              <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 md:gap-8">
+                <div className="flex items-center gap-2 text-white bg-white/10 backdrop-blur-md px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-white/20">
+                  <span className="text-xs sm:text-sm font-semibold">100% Private</span>
                 </div>
-                <div className="flex items-center gap-2 text-white bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
-                  <span className="text-sm font-semibold">Direct Operator</span>
+                <div className="flex items-center gap-2 text-white bg-white/10 backdrop-blur-md px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-white/20">
+                  <span className="text-xs sm:text-sm font-semibold">Direct Operator</span>
                 </div>
-                <div className="flex items-center gap-2 text-white bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
-                  <span className="text-sm font-semibold">ICT Certified</span>
+                <div className="flex items-center gap-2 text-white bg-white/10 backdrop-blur-md px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-white/20">
+                  <span className="text-xs sm:text-sm font-semibold">ICT Certified</span>
                 </div>
               </div>
             </div>
@@ -180,7 +180,9 @@ export default async function Home() {
                 Two Ways to Explore Costa Rica
               </h2>
               <p className="text-base md:text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                Can't Wait Travel CR connects you to Costa Rica's most popular routes with private transfers and hand-picked tours. Based in La Fortuna, we bring you complete transportation solutions across the country.
+                <strong>With over 30 years of combined experience</strong> in Costa Rican tourism, we know exactly what travelers need: <em>reliable transportation and authentic experiences</em>.
+                Based in La Fortuna, we personally operate every private transfer and handpick every tour guide.
+                When you book with us, you're working directly with the people who will drive you and guide you—<strong>no middlemen, no surprises</strong>.
               </p>
             </div>
 
