@@ -83,8 +83,12 @@ export function TourBookingSummary({
 
           <div className="space-y-3">
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Base price (2 pax)</span>
-              <span className="font-semibold text-gray-900">${tour.base_price}</span>
+              <span className="text-gray-600">Base price (2 people minimum)</span>
+              <span className="font-semibold text-gray-900">${tour.base_price * 2}</span>
+            </div>
+            <div className="flex justify-between text-sm text-gray-500">
+              <span>Extra person price:</span>
+              <span className="font-medium">${tour.price_per_extra_person} each</span>
             </div>
             {totalPassengers > 2 && (
               <div className="flex justify-between text-sm">

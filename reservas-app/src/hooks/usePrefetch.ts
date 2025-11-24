@@ -33,6 +33,5 @@ export function usePrefetchBookingFlow() {
 export function usePrefetchTours() {
   usePrefetch([
     '/private-tours',
-    '/private-tours/booking',
   ]);
 }

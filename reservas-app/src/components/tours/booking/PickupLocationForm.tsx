@@ -46,9 +46,13 @@ export function PickupLocationForm({
               {errors.hotel}
             </p>
           )}
-          <p className="mt-2 text-sm text-gray-500">
-            Pickup available from La Fortuna area hotels at {pickupTime}
-          </p>
+          {/* Pickup Time Badge - Pequeño y elegante */}
+          <div className="mt-2 inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-lg">
+            <MapPin className="h-3.5 w-3.5 text-blue-600" />
+            <span className="text-sm text-gray-700">
+              Pickup: <span className="font-semibold text-blue-600">{pickupTime}</span>
+            </span>
+          </div>
         </div>
 
         <div>
