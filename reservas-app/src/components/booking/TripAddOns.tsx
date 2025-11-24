@@ -99,9 +99,6 @@ export function TripAddOns({ selectedAddOns, onAddOnsChange }: TripAddOnsProps) 
           <Sparkles className="h-5 w-5" />
           Enhance Your Experience
         </CardTitle>
-        <p className="text-xs md:text-sm text-blue-700">
-          Upgrade your transfer with our exclusive add-ons
-        </p>
       </CardHeader>
       
       <CardContent className="space-y-3 pt-0">

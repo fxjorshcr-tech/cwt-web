@@ -68,10 +68,10 @@ export default function PaymentMethods() {
             </span>
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Powered by Stripe
+            Safe & Secure Checkout
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            The same payment technology trusted by millions of businesses worldwide
+            All transactions processed securely through Stripe
           </p>
         </div>
 
@@ -81,20 +81,19 @@ export default function PaymentMethods() {
           {/* LEFT: Payment Methods */}
           <div className="space-y-6">
             
-            {/* Stripe Info Card */}
+            {/* Stripe Info Card - Simplified */}
             <div className="bg-gradient-to-br from-indigo-600 to-blue-600 rounded-2xl p-8 shadow-lg text-white">
-              <div className="flex items-start gap-4 mb-6">
+              <div className="flex items-start gap-4">
                 <div className="h-12 w-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30">
-                  <CreditCard className="h-6 w-6 text-white" />
+                  <Lock className="h-6 w-6 text-white" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <h3 className="text-xl font-bold">Stripe Payment Processing</h3>
+                    <h3 className="text-xl font-bold">Bank-Level Security</h3>
                     <CheckCircle2 className="h-5 w-5 text-green-300" />
                   </div>
                   <p className="text-sm text-blue-100 leading-relaxed">
-                    Your payment information is processed directly by Stripe and never stored on our servers. 
-                    All transactions are protected with bank-level security.
+                    Payments processed securely through Stripe. Your card information is encrypted and never stored on our servers.
                   </p>
                 </div>
               </div>
