@@ -49,11 +49,11 @@ export default function TransfersPage() {
           <div className="relative z-10 h-full flex flex-col items-center justify-center px-6">
             <div className="text-center max-w-4xl">
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-xl leading-tight">
-                Premium Private Transportation
+                Private Transportation in Costa Rica
               </h1>
-              
+
               <p className="text-base sm:text-lg md:text-xl text-white/95 mb-8 drop-shadow-md max-w-3xl mx-auto font-medium">
-                100% Operated by Us. Just Stress-Free Travel.
+                100% Private Service. Direct Operator. Stress-Free Travel.
               </p>
 
               <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8">
@@ -120,7 +120,7 @@ export default function TransfersPage() {
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">100% Private Fleet</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Your schedule, your rules. Enjoy the comfort of our modern, air-conditioned vans exclusively for your group.
+                  Enjoy the comfort of our modern, air-conditioned vans exclusively for your group.
                 </p>
               </div>
 

@@ -141,13 +141,13 @@ export default async function MostBookedPage() {
                 <span className="text-white font-bold text-sm tracking-wide uppercase">Traveler Favorites</span>
               </div>
               
-              {/* ✅ HUMANIZED TITLE: No "Shuttles" */}
+              {/* ✅ UPDATED: Removed "Where Our Guests Are Going" */}
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-6 drop-shadow-xl leading-tight">
-                Where Our Guests Are Going
+                Top Connections Across Costa Rica
               </h1>
 
               <p className="text-base sm:text-lg text-white/90 mb-8 drop-shadow-md max-w-2xl mx-auto font-medium">
-                The most requested connections.
+                The most requested routes by our travelers.
               </p>
               
               <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 text-white">
@@ -271,25 +271,25 @@ export default async function MostBookedPage() {
           </div>
         </section>
 
-        {/* CTA Section - HUMAN VERSION (Matching previous page) */}
+        {/* CTA Section - Search All Routes */}
         <section className="py-20 bg-white">
           <div className="container mx-auto px-6 max-w-4xl">
-            <div className="bg-gray-900 rounded-3xl p-12 text-center text-white shadow-2xl">
+            <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-12 text-center text-white shadow-2xl">
               <h2 className="text-2xl md:text-3xl font-bold mb-4">
-                Going somewhere else?
+                Don't See Your Route?
               </h2>
-              <p className="text-base text-gray-300 mb-8 max-w-xl mx-auto">
-                We drive everywhere in Costa Rica. If there's a road, we can take you there.
+              <p className="text-base text-blue-100 mb-8 max-w-xl mx-auto">
+                Search all available routes in Costa Rica using our booking form. We connect destinations from coast to coast.
               </p>
               <Link
                 href="/transfers"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 text-lg font-semibold text-gray-900 bg-white rounded-xl shadow-lg hover:scale-105 transition-all"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 text-lg font-semibold text-blue-600 bg-white rounded-xl shadow-lg hover:scale-105 transition-all"
               >
-                Get a Custom Quote
+                Search All Routes
                 <ArrowRight className="h-5 w-5" />
               </Link>
-              <p className="text-gray-500 mt-6 text-sm">
-                 Direct Operator • No Hidden Fees
+              <p className="text-blue-200 mt-6 text-sm">
+                 Direct Operator • 100% Private Service
               </p>
             </div>
           </div>

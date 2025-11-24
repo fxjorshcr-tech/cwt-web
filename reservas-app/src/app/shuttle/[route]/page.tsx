@@ -7,7 +7,7 @@ import Link from 'next/link';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import WhatsAppButton from '@/components/WhatsAppButton';
 import { createClient } from '@/lib/supabase/server';
-import { CheckCircle2, Clock, MapPin, Shield, Users, ArrowRight } from 'lucide-react';
+import { CheckCircle2, Clock, MapPin, Shield, Users, ArrowRight, Sparkles } from 'lucide-react';
 
 // Definir las rutas populares - NOMBRES EXACTOS de la base de datos
 const POPULAR_ROUTES = [
@@ -138,33 +138,24 @@ export default async function ShuttleRoutePage({ params }: { params: { route: st
               <p className="text-sm text-gray-500">Direct Route</p>
             </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-8 mb-8">
+            <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12 mb-8">
               <div className="text-center">
-                <div className="flex items-center justify-center gap-2 text-gray-600 mb-1">
-                  <Clock className="h-4 w-4" />
-                  <span className="text-xs font-semibold uppercase tracking-wider">Est. Time</span>
+                <div className="flex items-center justify-center gap-2 text-gray-600 mb-2">
+                  <Clock className="h-5 w-5" />
+                  <span className="text-sm font-semibold uppercase tracking-wider">Duration</span>
                 </div>
-                <p className="text-lg font-bold text-gray-900">{routeData.duracion}</p>
+                <p className="text-xl font-bold text-gray-900">{routeData.duracion}</p>
               </div>
 
-              <div className="w-px h-12 bg-gray-200 hidden sm:block" />
+              <div className="w-px h-16 bg-gray-300 hidden sm:block" />
 
               <div className="text-center">
-                <div className="flex items-center justify-center gap-2 text-gray-600 mb-1">
-                  <MapPin className="h-4 w-4" />
-                  <span className="text-xs font-semibold uppercase tracking-wider">Distance</span>
+                <div className="flex items-center justify-center gap-2 text-gray-600 mb-2">
+                  <Users className="h-5 w-5" />
+                  <span className="text-sm font-semibold uppercase tracking-wider">Starting at</span>
                 </div>
-                <p className="text-lg font-bold text-gray-900">{routeData.kilometros} km</p>
-              </div>
-
-              <div className="w-px h-12 bg-gray-200 hidden sm:block" />
-
-              <div className="text-center">
-                <div className="flex items-center justify-center gap-2 text-gray-600 mb-1">
-                  <Users className="h-4 w-4" />
-                  <span className="text-xs font-semibold uppercase tracking-wider">Starting at</span>
-                </div>
-                <p className="text-2xl font-black text-gray-900">${minPrice}</p>
+                <p className="text-3xl font-black text-blue-600">${minPrice}</p>
+                <p className="text-xs text-gray-500 mt-1">per vehicle</p>
               </div>
             </div>
 
@@ -184,25 +175,54 @@ export default async function ShuttleRoutePage({ params }: { params: { route: st
           <div className="container mx-auto px-6 max-w-6xl">
             <div className="grid md:grid-cols-2 gap-16 items-start">
               
-              {/* Left Column: The Human Description */}
+              {/* Left Column: Enhanced Description */}
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                  The Drive
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">
+                  The Journey
                 </h2>
-                <p className="text-base text-gray-600 mb-6 leading-relaxed">
-                  This isn't just a transfer; it's a {routeData.duracion} drive through some of Costa Rica's most beautiful landscapes.
+                <p className="text-base text-gray-700 mb-4 leading-relaxed">
+                  This {routeData.duracion} journey is more than just a transfer—it's your first immersion into Costa Rica's natural beauty.
+                  Expect winding mountain roads, lush rainforest canopies, and stunning coastal views that'll have you reaching for your camera.
                 </p>
-                <p className="text-base text-gray-600 mb-8 leading-relaxed">
-                  <strong>We drive this route daily.</strong> We know exactly how to navigate the winding roads and where the best spots are to stretch your legs. Since this is a private service, you are welcome to ask your driver to stop for photos, fruit stands, or a quick bathroom break at any time.
+                <p className="text-base text-gray-700 mb-4 leading-relaxed">
+                  <strong className="text-blue-600">We drive this route daily.</strong> Our drivers know every curve, every scenic pullout, and the perfect spots for a coffee break or quick photo opportunity.
+                  This is a <strong>100% private service</strong>—your vehicle, your schedule. Want to stop at a roadside fruit stand? Need a bathroom break? Just ask.
+                </p>
+                <p className="text-base text-gray-700 mb-8 leading-relaxed">
+                  Unlike shared shuttles with rigid schedules, you control the experience. We're here to get you there safely and comfortably while making the journey itself memorable.
                 </p>
 
-                <div className="bg-blue-50 border border-blue-100 p-6 rounded-xl">
+                <div className="bg-blue-50 border-2 border-blue-200 p-6 rounded-xl mb-6">
                   <h3 className="font-bold text-blue-900 mb-2 flex items-center gap-2">
                     <Shield className="h-5 w-5" />
                     Direct Operator Guarantee
                   </h3>
-                  <p className="text-blue-800 text-sm">
-                    You are booking directly with <strong>Can't Wait Travel CR</strong> (License #4121-2025). No third-party agencies, no "middleman" markups.
+                  <p className="text-blue-800 text-sm leading-relaxed">
+                    You are booking directly with <strong>Can't Wait Travel CR</strong> (ICT License #4121-2025). No third-party agencies, no hidden fees, no middleman markups.
+                  </p>
+                </div>
+
+                {/* Add-ons Promotion */}
+                <div className="bg-gradient-to-br from-orange-50 to-amber-50 border-2 border-orange-200 p-6 rounded-xl">
+                  <h3 className="font-bold text-orange-900 mb-3 flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-orange-600" />
+                    Enhance Your Transfer
+                  </h3>
+                  <p className="text-orange-900 text-sm mb-4 leading-relaxed">
+                    Make this journey even more special with our exclusive add-ons:
+                  </p>
+                  <ul className="space-y-2 text-sm text-orange-800">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-orange-600 mt-0.5 flex-shrink-0" />
+                      <span><strong>Flex Protection:</strong> Change pickup time up to 1 hour before departure</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-orange-600 mt-0.5 flex-shrink-0" />
+                      <span><strong>Explorer Upgrade:</strong> Add 3 hours for scenic stops, waterfalls & complimentary cooler</span>
+                    </li>
+                  </ul>
+                  <p className="text-xs text-orange-700 mt-4 italic">
+                    Available during booking checkout
                   </p>
                 </div>
               </div>

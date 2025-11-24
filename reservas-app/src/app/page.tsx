@@ -124,22 +124,42 @@ export default async function Home() {
         <StructuredData />
         <BookingNavbar />
 
-        <section className="relative h-screen max-h-[800px] overflow-x-hidden max-w-full">
-          <div className="absolute inset-0 z-0 max-w-full">
-            <Image src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/aerial-view-conchal-beach.webp" alt="Private Shuttle Costa Rica - Beach Transportation Service" fill sizes="100vw" className="object-cover" priority quality={75} placeholder="blur" blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA=" />
+        {/* Hero Section - Reduced height, larger logo */}
+        <section className="relative h-[60vh] min-h-[500px] max-h-[650px] overflow-hidden">
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/aerial-view-conchal-beach.webp"
+              alt="Private Shuttle Costa Rica - Beach Transportation Service"
+              fill
+              sizes="100vw"
+              className="object-cover"
+              priority
+              quality={75}
+              placeholder="blur"
+              blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA="
+            />
             <div className="absolute inset-0 bg-black/50" />
+            <div className="absolute inset-0 bg-gradient-to-t from-blue-900/40 via-transparent to-transparent" />
           </div>
 
           <div className="relative z-10 h-full flex flex-col items-center justify-center px-4 sm:px-6">
             <div className="text-center max-w-4xl">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-5 drop-shadow-2xl leading-tight">Explore Costa Rica Your Way</h1>
-              <p className="text-base sm:text-lg md:text-xl text-white/95 mb-6 drop-shadow-lg max-w-2xl mx-auto font-light px-4">Private Transfers & Tours Led by Trusted Local Experts</p>
-              <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 md:gap-6 px-4">
-                <span className="text-sm sm:text-base md:text-lg font-medium text-white drop-shadow-xl">Safe</span>
-                <span className="text-white text-lg">•</span>
-                <span className="text-sm sm:text-base md:text-lg font-medium text-white drop-shadow-xl">Flexible</span>
-                <span className="text-white text-lg">•</span>
-                <span className="text-sm sm:text-base md:text-lg font-medium text-white drop-shadow-xl">Authentic</span>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 drop-shadow-2xl leading-tight">
+                Explore Costa Rica Your Way
+              </h1>
+              <p className="text-base sm:text-lg md:text-xl text-white/95 mb-8 drop-shadow-lg max-w-2xl mx-auto font-medium px-4">
+                Private Transfers powered by Local Experts
+              </p>
+              <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8">
+                <div className="flex items-center gap-2 text-white bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
+                  <span className="text-sm font-semibold">100% Private Service</span>
+                </div>
+                <div className="flex items-center gap-2 text-white bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
+                  <span className="text-sm font-semibold">Direct Operator</span>
+                </div>
+                <div className="flex items-center gap-2 text-white bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
+                  <span className="text-sm font-semibold">ICT Certified</span>
+                </div>
               </div>
             </div>
             <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
@@ -150,7 +170,8 @@ export default async function Home() {
           </div>
         </section>
 
-        <section id="booking-form" className="relative -mt-32 z-20 px-4 sm:px-6 pb-20">
+        {/* Booking Form - Moved out of hero */}
+        <section id="booking-form" className="relative bg-gray-50 py-16 px-4 sm:px-6">
           <Suspense fallback={<div className="w-full max-w-5xl mx-auto"><div className="bg-white rounded-xl shadow-lg border border-gray-200 p-12"><div className="flex flex-col items-center justify-center gap-4"><div className="animate-spin h-12 w-12 border-4 border-blue-600 border-t-transparent rounded-full" /><p className="text-gray-600">Loading booking form...</p></div></div></div>}>
             <BookingForm />
           </Suspense>

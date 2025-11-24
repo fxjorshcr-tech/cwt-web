@@ -10,7 +10,7 @@ import CartDropdown from "@/app/cart/CartDropdown";
 const navLinks = [
   { label: "Home", href: "/" },
   { label: "Private Transfers", href: "/transfers" },
-  { label: "Most Booked", href: "/shuttle", icon: "🔥" },
+  { label: "Top Connections", href: "/shuttle", icon: "🔥" },
   { label: "Tailored Tours", href: "/private-tours" },
   { label: "Travel Guide", href: "/travel-guide" },
   { label: "Contact", href: "/contact" },
@@ -35,12 +35,12 @@ export default function BookingNavbar() {
               className="flex items-center gap-3"
               aria-label="Can't Wait Travel - Home"
             >
-              <div className="relative w-40 h-10 sm:w-52 sm:h-14 md:w-64 md:h-16 lg:w-80 lg:h-20">
+              <div className="relative w-48 h-12 sm:w-64 sm:h-16 md:w-80 md:h-20 lg:w-96 lg:h-24">
                 <Image
                   src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/logo-cant-wait-travel.webp"
                   alt="Can't Wait Travel - Costa Rica Private Shuttle Service"
                   fill
-                  sizes="(max-width: 640px) 160px, (max-width: 768px) 208px, (max-width: 1024px) 256px, 320px"
+                  sizes="(max-width: 640px) 192px, (max-width: 768px) 256px, (max-width: 1024px) 320px, 384px"
                   className="object-contain"
                   priority
                 />
