@@ -6,7 +6,7 @@ import BookingNavbar from "@/components/booking/BookingNavbar";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import ScrollToBookingButton from "@/components/ScrollToBookingButton";
 import StructuredData from "@/components/SEO/StructuredData";
-import { ArrowRight, MapPin, Sparkles } from 'lucide-react';
+import { ArrowRight, MapPin } from 'lucide-react';
 import type { Metadata } from 'next';
 import Script from 'next/script';
 
@@ -180,7 +180,7 @@ export default async function Home() {
                 Two Ways to Explore Costa Rica
               </h2>
               <p className="text-base md:text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                Can't Wait Travel brings you complete transportation solutions for Costa Rica. Based in La Fortuna, we offer private transfers across the country and hand-picked tours departing from our home base in Arenal.
+                Can't Wait Travel CR connects you to Costa Rica's most popular routes with private transfers and hand-picked tours. Based in La Fortuna, we bring you complete transportation solutions across the country.
               </p>
             </div>
 
@@ -193,13 +193,23 @@ export default async function Home() {
                 <div className="relative h-64 w-full overflow-hidden">
                   <Image
                     src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/puerto-viejo-caribean-coast-sunny-costa-rica.webp"
-                    alt="Private Shuttle Van - Can't Wait Travel"
+                    alt="Private Shuttle Van - Can't Wait Travel CR"
                     fill
                     sizes="(max-width: 768px) 100vw, 50vw"
                     className="object-cover group-hover:scale-110 transition-transform duration-700"
                     quality={85}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+
+                  {/* Small Info Badges */}
+                  <div className="absolute top-4 left-4 flex gap-2">
+                    <div className="bg-blue-600/90 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                      30+ Routes
+                    </div>
+                    <div className="bg-white/90 backdrop-blur-sm text-blue-600 text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                      100% Private
+                    </div>
+                  </div>
 
                   {/* Icon Badge on Image */}
                   <div className="absolute bottom-4 left-4 h-16 w-16 bg-white/95 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-xl">
@@ -249,7 +259,7 @@ export default async function Home() {
                 <div className="relative h-64 w-full overflow-hidden">
                   <Image
                     src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/puerto-viejo-caribean-coast-sunny-costa-rica.webp"
-                    alt="Private Tours - Can't Wait Travel"
+                    alt="Private Tours - Can't Wait Travel CR"
                     fill
                     sizes="(max-width: 768px) 100vw, 50vw"
                     className="object-cover group-hover:scale-110 transition-transform duration-700"
@@ -257,14 +267,19 @@ export default async function Home() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
-                  {/* NEW Badge */}
-                  <div className="absolute top-4 right-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-sm font-black px-4 py-2 rounded-full shadow-2xl animate-pulse">
-                    NEW
+                  {/* Small Info Badges */}
+                  <div className="absolute top-4 left-4 flex gap-2">
+                    <div className="bg-orange-600/90 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                      From La Fortuna
+                    </div>
+                    <div className="bg-white/90 backdrop-blur-sm text-orange-600 text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                      Local Experts
+                    </div>
                   </div>
 
                   {/* Icon Badge on Image */}
                   <div className="absolute bottom-4 left-4 h-16 w-16 bg-white/95 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-xl">
-                    <Sparkles className="h-8 w-8 text-orange-600" />
+                    <MapPin className="h-8 w-8 text-orange-600" />
                   </div>
                 </div>
 
