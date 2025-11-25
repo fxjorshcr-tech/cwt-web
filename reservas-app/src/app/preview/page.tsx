@@ -17,6 +17,10 @@ import {
   Edit2,
   Check,
   AlertCircle,
+  Shield,
+  Car,
+  Globe,
+  Headphones,
 } from 'lucide-react';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import BookingStepper from '@/components/booking/BookingStepper';
@@ -395,7 +399,7 @@ function PreviewPageContent() {
       </div>
 
       {/* Main Content */}
-      <main className="min-h-screen bg-gray-50 py-8">
+      <main className="bg-gray-50 py-8 pb-24">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid lg:grid-cols-3 gap-6">
             {/* Left Column: Trips */}
@@ -573,6 +577,40 @@ function PreviewPageContent() {
                 {/* Important Info */}
                 <ImportantInfo />
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Trust Badges */}
+        <div className="mt-12 border-t border-gray-200 pt-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-200">
+              <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
+                <Car className="h-6 w-6 text-blue-600" />
+              </div>
+              <h3 className="font-bold text-gray-900 text-sm">100% Private</h3>
+              <p className="text-xs text-gray-500 mt-1">No shared shuttles, just you and your group</p>
+            </div>
+            <div className="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-200">
+              <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-3">
+                <Shield className="h-6 w-6 text-green-600" />
+              </div>
+              <h3 className="font-bold text-gray-900 text-sm">Fully Insured</h3>
+              <p className="text-xs text-gray-500 mt-1">Complete coverage for your peace of mind</p>
+            </div>
+            <div className="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-200">
+              <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-3">
+                <Globe className="h-6 w-6 text-purple-600" />
+              </div>
+              <h3 className="font-bold text-gray-900 text-sm">Bilingual Drivers</h3>
+              <p className="text-xs text-gray-500 mt-1">English & Spanish speaking professionals</p>
+            </div>
+            <div className="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-200">
+              <div className="h-12 w-12 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-3">
+                <Headphones className="h-6 w-6 text-orange-600" />
+              </div>
+              <h3 className="font-bold text-gray-900 text-sm">24/7 Support</h3>
+              <p className="text-xs text-gray-500 mt-1">WhatsApp & phone support anytime</p>
             </div>
           </div>
         </div>

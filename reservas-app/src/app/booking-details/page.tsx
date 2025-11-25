@@ -4,7 +4,7 @@
 
 import { useEffect, useState, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Loader2, MapPin, Calendar, Users, Clock, ArrowRight, Plane, AlertCircle, Info, ChevronDown, ChevronUp } from 'lucide-react';
+import { Loader2, MapPin, Calendar, Users, Clock, ArrowRight, Plane, AlertCircle, Info } from 'lucide-react';
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -76,7 +76,6 @@ function BookingDetailsContent() {
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
-  const [showAddOns, setShowAddOns] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     pickup_address: '',
     dropoff_address: '',
@@ -212,7 +211,6 @@ function BookingDetailsContent() {
 
           if (trip.add_ons && Array.isArray(trip.add_ons)) {
             setSelectedAddOns(trip.add_ons);
-            setShowAddOns(trip.add_ons.length > 0);
           }
         }
 
@@ -246,7 +244,6 @@ function BookingDetailsContent() {
 
       if (currentTrip.add_ons && Array.isArray(currentTrip.add_ons)) {
         setSelectedAddOns(currentTrip.add_ons);
-        setShowAddOns(currentTrip.add_ons.length > 0);
       } else {
         setSelectedAddOns([]);
       }
@@ -442,33 +439,37 @@ function BookingDetailsContent() {
       <div className="max-w-4xl mx-auto px-4 py-6 pb-40 bg-gray-50 min-h-screen">
 
         {/* Trip Header - Compact */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-t-xl px-4 py-3 flex items-center gap-3">
-          <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center text-white font-bold">
-            {currentTripIndex + 1}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-white font-semibold text-sm md:text-base truncate">
-              {currentTrip.from_location} → {currentTrip.to_location}
-            </p>
-            <p className="text-blue-100 text-xs flex items-center gap-3 flex-wrap">
-              <span className="flex items-center gap-1">
-                <Calendar className="h-3 w-3" />
-                {formatDate(currentTrip.date)}
-              </span>
-              <span className="flex items-center gap-1">
-                <Users className="h-3 w-3" />
-                {currentTrip.adults + currentTrip.children} pax
-              </span>
-              {currentTrip.duration && (
-                <span className="flex items-center gap-1">
-                  <Clock className="h-3 w-3" />
-                  {currentTrip.duration}
-                </span>
-              )}
-            </p>
-          </div>
-          <div className="text-right">
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-t-xl px-4 py-3">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <div className="h-7 w-7 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-sm">
+                {currentTripIndex + 1}
+              </div>
+              <span className="text-white/80 text-xs font-medium">Transfer {currentTripIndex + 1}</span>
+            </div>
             <p className="text-white font-bold text-lg">${currentTrip.price}</p>
+          </div>
+          <div className="flex items-center gap-2 text-white text-sm font-semibold">
+            <MapPin className="h-3.5 w-3.5 text-blue-200 flex-shrink-0" />
+            <span className="truncate">{currentTrip.from_location}</span>
+            <ArrowRight className="h-3.5 w-3.5 text-blue-200 flex-shrink-0" />
+            <span className="truncate">{currentTrip.to_location}</span>
+          </div>
+          <div className="flex items-center gap-4 mt-2 text-blue-100 text-xs">
+            <span className="flex items-center gap-1">
+              <Calendar className="h-3 w-3" />
+              {formatDate(currentTrip.date)}
+            </span>
+            <span className="flex items-center gap-1">
+              <Users className="h-3 w-3" />
+              {currentTrip.adults + currentTrip.children} pax
+            </span>
+            {currentTrip.duration && (
+              <span className="flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                {currentTrip.duration}
+              </span>
+            )}
           </div>
         </div>
 
@@ -645,33 +646,9 @@ function BookingDetailsContent() {
           </CardContent>
         </Card>
 
-        {/* Add-ons Section - Collapsible */}
+        {/* Add-ons Section - Always visible */}
         <div className="mt-4">
-          <button
-            type="button"
-            onClick={() => setShowAddOns(!showAddOns)}
-            className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-xl hover:from-blue-100 hover:to-cyan-100 transition-colors"
-          >
-            <span className="font-semibold text-blue-900 flex items-center gap-2">
-              ✨ Enhance Your Trip
-              {selectedAddOns.length > 0 && (
-                <span className="bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full">
-                  +${priceCalculation.addOnsPrice}
-                </span>
-              )}
-            </span>
-            {showAddOns ? (
-              <ChevronUp className="h-5 w-5 text-blue-600" />
-            ) : (
-              <ChevronDown className="h-5 w-5 text-blue-600" />
-            )}
-          </button>
-
-          {showAddOns && (
-            <div className="mt-2">
-              <TripAddOns selectedAddOns={selectedAddOns} onAddOnsChange={setSelectedAddOns} />
-            </div>
-          )}
+          <TripAddOns selectedAddOns={selectedAddOns} onAddOnsChange={setSelectedAddOns} />
         </div>
 
         {/* Bottom Navigation Bar */}
