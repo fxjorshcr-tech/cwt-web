@@ -31,7 +31,7 @@ export default function WhyChooseUs() {
           </h2>
           <p className="text-base sm:text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed px-4 mb-6">
             When it comes to moving from point A to point B in Costa Rica, <strong>private transfers with a trusted company like Can't Wait Travel CR</strong> are the best option for travelers who value <em>peace of mind and security</em>.
-            Our <strong>100% Costa Rican team</strong> offers direct, private transportation with <strong>over 30 years of combined experience</strong> in Costa Rican tourism.
+            Our team of local experts offers direct, private transportation with <strong>over 30 years of combined experience</strong> in Costa Rican tourism.
             We know every curve of these roads and combine the warmth of <em className="text-blue-600">Pura Vida</em> hospitality with the strict professionalism
             of a licensed transport operator, ensuring you arrive safely and comfortably every time.
           </p>

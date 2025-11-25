@@ -30,8 +30,9 @@ const HowWeWork = dynamic(() => import("@/components/sections/HowWeWork"), {
   loading: () => <ComponentSkeleton />,
 });
 
-const MostBookedCTA = dynamic(() => import("@/components/sections/MostBookedCTA"), {
+const MostBookedCTAServer = dynamic(() => import("@/components/sections/MostBookedCTAServer"), {
   loading: () => <ComponentSkeleton />,
+  ssr: true,
 });
 
 const ComparisonTable = dynamic(() => import("@/components/sections/ComparisonTable"), {
@@ -74,8 +75,8 @@ function ComponentSkeleton() {
 }
 
 export const metadata: Metadata = {
-  title: 'Costa Rica Private Shuttle & Airport Transfers | Can\'t Wait Travel',
-  description: 'Book reliable private shuttle service in Costa Rica. Airport transfers from SJO and Liberia to La Fortuna, Manuel Antonio, Tamarindo, and more. Professional bilingual drivers, modern vehicles, fully licensed.',
+  title: 'Costa Rica Private Shuttle & Airport Transfers | Can\'t Wait Travel CR',
+  description: 'Book reliable private shuttle and airport transfer service in Costa Rica. Direct service from SJO and Liberia to La Fortuna, Manuel Antonio, Tamarindo, and more. Professional bilingual drivers, modern vehicles, ICT licensed #4121-2025.',
   keywords: [
     'private shuttle costa rica',
     'costa rica airport transfer',
@@ -88,10 +89,10 @@ export const metadata: Metadata = {
     'can\'t wait travel'
   ],
   openGraph: {
-    title: 'Private Shuttle Costa Rica | Can\'t Wait Travel',
-    description: 'Professional private shuttle service with bilingual drivers. Book your Costa Rica airport transfer today.',
+    title: 'Private Shuttle & Airport Transfers Costa Rica | Can\'t Wait Travel CR',
+    description: 'Professional private shuttle and airport transfer service with bilingual drivers. Book your Costa Rica transfer today.',
     url: 'https://cantwaittravelcr.com',
-    siteName: 'Can\'t Wait Travel',
+    siteName: 'Can\'t Wait Travel CR',
     images: [{
       url: 'https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/aerial-view-conchal-beach.webp',
       width: 1200,
@@ -103,8 +104,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Private Shuttle Costa Rica | Can\'t Wait Travel',
-    description: 'Professional airport transfers and private shuttle service across Costa Rica.',
+    title: 'Private Shuttle & Airport Transfers Costa Rica | Can\'t Wait Travel CR',
+    description: 'Professional airport transfers and private shuttle service across Costa Rica. Over 400+ routes available.',
     images: ['https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/aerial-view-conchal-beach.webp'],
   },
   robots: {
@@ -165,7 +166,7 @@ export default async function Home() {
           <div className="relative z-10 h-full flex flex-col items-center justify-center px-4 sm:px-6">
             <div className="text-center max-w-5xl">
               <h1 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6 drop-shadow-2xl leading-tight">
-                Private Transfers Across Costa Rica
+                Private Shuttle & Airport Transfers Across Costa Rica
               </h1>
               <p className="text-base sm:text-lg md:text-xl text-white/95 mb-6 sm:mb-8 drop-shadow-lg max-w-2xl mx-auto font-medium px-4">
                 100% private, professional drivers, direct service from main destinations in CR
@@ -197,7 +198,7 @@ export default async function Home() {
         <WhyChooseUs />
         <HomeAddons />
         <HowWeWork />
-        <MostBookedCTA />
+        <MostBookedCTAServer />
         <ComparisonTable />
         <Guarantees />
         <PrivateTours />
