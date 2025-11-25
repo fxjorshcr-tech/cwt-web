@@ -7,6 +7,7 @@ import ConditionalFooter from "@/components/layout/ConditionalFooter";
 import { CartProvider } from "@/contexts/CartContext";
 import { Toaster } from "sonner";
 import LocalStorageCleanup from "@/components/LocalStorageCleanup";
+import WhatsAppButton from "@/components/WhatsAppButton";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -80,6 +81,7 @@ export default function RootLayout({
             </main>
             <ConditionalFooter />
           </div>
+          <WhatsAppButton />
           <Toaster position="top-right" richColors closeButton duration={1000} />
         </CartProvider>
       </body>

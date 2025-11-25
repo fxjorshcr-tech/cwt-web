@@ -1,29 +1,40 @@
 // src/app/transfers/page.tsx
-// ✅ UPDATED - Lightweight QuickSearchForm
+// ✅ UPDATED - Lightweight QuickSearchForm with URL prefill support
 'use client';
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, Suspense } from "react";
+import { useSearchParams } from 'next/navigation';
 import Image from "next/image";
 import { QuickSearchForm } from '@/components/forms/QuickSearchForm';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import BookingSteps from '@/components/booking/BookingSteps';
 import PaymentMethods from '@/components/sections/PaymentMethods';
-import { CheckCircle2, Shield, MapPin, Users } from 'lucide-react';
+import { CheckCircle2, Shield, MapPin, Users, Loader2 } from 'lucide-react';
 
-export default function TransfersPage() {
+function TransfersContent() {
+  const searchParams = useSearchParams();
   const bookingFormRef = useRef<HTMLDivElement>(null);
 
-  // Handle hash navigation on mount
+  // Get initial values from URL params (for indexed routes)
+  const initialOrigin = searchParams.get('from') || '';
+  const initialDestination = searchParams.get('to') || '';
+
+  // Handle hash navigation and auto-scroll when coming from indexed routes
   useEffect(() => {
-    // Check if there's a hash in the URL
-    if (typeof window !== 'undefined' && window.location.hash === '#booking-form') {
-      // Small delay to ensure the form is rendered
-      const timer = setTimeout(() => {
-        bookingFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
-      return () => clearTimeout(timer);
+    // Check if there's a hash or URL params (meaning user came from an indexed route)
+    if (typeof window !== 'undefined') {
+      const hasHash = window.location.hash === '#booking-form';
+      const hasParams = initialOrigin && initialDestination;
+
+      if (hasHash || hasParams) {
+        // Scroll to booking form
+        const timer = setTimeout(() => {
+          bookingFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+        return () => clearTimeout(timer);
+      }
     }
-  }, []);
+  }, [initialOrigin, initialDestination]);
 
   return (
     <>
@@ -85,7 +96,10 @@ export default function TransfersPage() {
           className="relative -mt-16 z-20 px-4 sm:px-6 pb-16"
         >
           <div className="max-w-4xl mx-auto">
-            <QuickSearchForm />
+            <QuickSearchForm
+              initialOrigin={initialOrigin}
+              initialDestination={initialDestination}
+            />
           </div>
         </section>
 
@@ -148,5 +162,20 @@ export default function TransfersPage() {
         <PaymentMethods />
       </main>
     </>
+  );
+}
+
+// Wrapper with Suspense for useSearchParams
+export default function TransfersPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
+        </div>
+      }
+    >
+      <TransfersContent />
+    </Suspense>
   );
 }
