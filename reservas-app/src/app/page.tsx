@@ -3,13 +3,12 @@ import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import BookingNavbar from "@/components/booking/BookingNavbar";
-import WhatsAppButton from "@/components/WhatsAppButton";
 import ScrollToBookingButton from "@/components/ScrollToBookingButton";
 import StructuredData from "@/components/SEO/StructuredData";
 import type { Metadata } from 'next';
 import Script from 'next/script';
 
-const BookingFormWrapper = dynamic(() => import("@/components/forms/BookingFormWrapper").then(mod => mod.BookingFormWrapper), {
+const QuickSearchForm = dynamic(() => import("@/components/forms/QuickSearchForm").then(mod => mod.QuickSearchForm), {
   loading: () => <ComponentSkeleton />,
   ssr: false,
 });
@@ -187,9 +186,9 @@ export default async function Home() {
         </section>
 
         {/* Booking Form - Right After Hero */}
-        <section className="relative bg-gray-50 py-12 sm:py-16 -mt-12">
-          <div className="container mx-auto px-4 sm:px-6 max-w-5xl">
-            <BookingFormWrapper />
+        <section className="relative bg-gray-50 py-10 sm:py-14 -mt-10">
+          <div className="container mx-auto px-4 sm:px-6 max-w-4xl">
+            <QuickSearchForm />
           </div>
         </section>
 
@@ -207,7 +206,6 @@ export default async function Home() {
         <FinalCTA />
 
         <ScrollToBookingButton />
-        <WhatsAppButton />
       </main>
     </>
   );

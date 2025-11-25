@@ -1,14 +1,13 @@
 // src/app/transfers/page.tsx
-// ✅ UPDATED - Consistent Colors & Fixed Missing Text
+// ✅ UPDATED - Lightweight QuickSearchForm
 'use client';
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { BookingFormWrapper } from '@/components/forms/BookingFormWrapper';
+import { QuickSearchForm } from '@/components/forms/QuickSearchForm';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import BookingSteps from '@/components/booking/BookingSteps';
 import PaymentMethods from '@/components/sections/PaymentMethods';
-import WhatsAppButton from "@/components/WhatsAppButton";
 import { CheckCircle2, Shield, MapPin, Users } from 'lucide-react'; 
 
 export default function TransfersPage() {
@@ -76,13 +75,13 @@ export default function TransfersPage() {
         </section>
 
         {/* Booking Form */}
-        <section id="booking-form" className="relative -mt-20 z-20 px-6 pb-20">
-          <div 
-            className={`transition-opacity duration-500 ${
+        <section id="booking-form" className="relative -mt-16 z-20 px-4 sm:px-6 pb-16">
+          <div
+            className={`max-w-4xl mx-auto transition-opacity duration-500 ${
               isPageReady ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            <BookingFormWrapper />
+            <QuickSearchForm />
           </div>
         </section>
 
@@ -143,8 +142,6 @@ export default function TransfersPage() {
 
         {/* Payment Methods */}
         <PaymentMethods />
-        
-        <WhatsAppButton />
       </main>
     </>
   );
