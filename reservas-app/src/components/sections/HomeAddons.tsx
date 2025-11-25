@@ -28,9 +28,9 @@ export default function HomeAddons() {
         <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
 
           {/* Flex Protection */}
-          <div className="relative bg-white rounded-2xl shadow-xl border-2 border-orange-300 overflow-hidden hover:shadow-2xl transition-all hover:-translate-y-1">
+          <div className="relative bg-white rounded-2xl shadow-xl border-2 border-orange-300 overflow-visible hover:shadow-2xl transition-all hover:-translate-y-1">
             {/* Popular Badge */}
-            <div className="absolute -top-2 right-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg z-10">
+            <div className="absolute -top-3 right-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg z-10">
               POPULAR
             </div>
 
@@ -77,9 +77,9 @@ export default function HomeAddons() {
           </div>
 
           {/* Explorer Upgrade */}
-          <div className="relative bg-gradient-to-br from-purple-50 to-white rounded-2xl shadow-xl border-2 border-purple-300 overflow-hidden hover:shadow-2xl transition-all hover:-translate-y-1">
+          <div className="relative bg-gradient-to-br from-purple-50 to-white rounded-2xl shadow-xl border-2 border-purple-300 overflow-visible hover:shadow-2xl transition-all hover:-translate-y-1">
             {/* Deluxe Badge */}
-            <div className="absolute -top-2 right-4 bg-gradient-to-r from-purple-500 to-purple-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg z-10">
+            <div className="absolute -top-3 right-4 bg-gradient-to-r from-purple-500 to-purple-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg z-10">
               DELUXE
             </div>
 

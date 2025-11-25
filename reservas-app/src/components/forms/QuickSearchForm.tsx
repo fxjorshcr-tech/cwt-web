@@ -15,9 +15,15 @@ import { formatDateToString } from '@/utils/timeHelpers';
 
 interface QuickSearchFormProps {
   className?: string;
+  initialOrigin?: string;
+  initialDestination?: string;
 }
 
-export function QuickSearchForm({ className = '' }: QuickSearchFormProps) {
+export function QuickSearchForm({
+  className = '',
+  initialOrigin = '',
+  initialDestination = '',
+}: QuickSearchFormProps) {
   const router = useRouter();
 
   const [routes, setRoutes] = useState<Route[]>([]);
@@ -25,12 +31,18 @@ export function QuickSearchForm({ className = '' }: QuickSearchFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Form state
-  const [origin, setOrigin] = useState('');
-  const [destination, setDestination] = useState('');
+  // Form state - use initial values if provided
+  const [origin, setOrigin] = useState(initialOrigin);
+  const [destination, setDestination] = useState(initialDestination);
   const [date, setDate] = useState<Date | null>(null);
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
+
+  // Update origin/destination when initial values change (from URL params)
+  useEffect(() => {
+    if (initialOrigin) setOrigin(initialOrigin);
+    if (initialDestination) setDestination(initialDestination);
+  }, [initialOrigin, initialDestination]);
 
   // Load routes
   useEffect(() => {
@@ -49,15 +61,21 @@ export function QuickSearchForm({ className = '' }: QuickSearchFormProps) {
     loadRoutes();
   }, []);
 
-  // Reset destination when origin changes
+  // Reset destination when origin changes (but NOT when values come from URL params)
   useEffect(() => {
+    // Skip validation if origin/destination came from URL params (initialOrigin/initialDestination)
+    // This prevents resetting the destination when routes are loaded
+    if (initialOrigin && initialDestination) {
+      return; // Don't reset - values came from indexed route page
+    }
+
     if (origin && destination) {
       const validRoute = routes.find(r => r.origen === origin && r.destino === destination);
       if (!validRoute) {
         setDestination('');
       }
     }
-  }, [origin, destination, routes]);
+  }, [origin, destination, routes, initialOrigin, initialDestination]);
 
   // Handle passengers change
   const handlePassengersChange = (newAdults: number, newChildren: number) => {
