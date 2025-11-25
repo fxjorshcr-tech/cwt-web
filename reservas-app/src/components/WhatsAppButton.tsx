@@ -1,9 +1,17 @@
 // src/components/WhatsAppButton.tsx
 'use client';
 
+import { usePathname } from 'next/navigation';
 import { MessageCircle } from 'lucide-react';
 
 export default function WhatsAppButton() {
+  const pathname = usePathname();
+
+  // Don't show on homepage - social buttons are inside the hero there
+  if (pathname === '/') {
+    return null;
+  }
+
   const phoneNumber = '50685962438'; // Your WhatsApp number
   const message = 'Hello! I would like to book a private shuttle in Costa Rica.';
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
@@ -21,10 +29,10 @@ export default function WhatsAppButton() {
         <div className="bg-green-500 hover:bg-green-600 text-white rounded-full p-4 shadow-2xl transition-all duration-300 group-hover:scale-110 flex items-center justify-center">
           <MessageCircle className="h-7 w-7" />
         </div>
-        
+
         {/* Pulse Animation */}
         <div className="absolute inset-0 bg-green-500 rounded-full animate-ping opacity-20"></div>
-        
+
         {/* Tooltip */}
         <div className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
           Chat with us on WhatsApp
