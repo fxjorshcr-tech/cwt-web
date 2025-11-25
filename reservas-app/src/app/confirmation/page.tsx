@@ -2,7 +2,7 @@
 // ✅ CONFIRMATION PAGE - Final landing page (Step 4)
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, Suspense, useCallback, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckCircle, Calendar, Users, MapPin, Mail, Phone, User, Loader2, Home, Download } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
@@ -35,12 +35,45 @@ interface Trip {
 function ConfirmationPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const supabase = createClient();
+
+  // Create supabase client once with useMemo to avoid recreation on every render
+  const supabase = useMemo(() => createClient(), []);
 
   const bookingId = searchParams.get('booking_id');
 
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Memoize the loadTrips function
+  const loadTrips = useCallback(async () => {
+    if (!bookingId) {
+      router.push('/');
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const { data, error } = await supabase
+        .from('trips')
+        .select('*')
+        .eq('booking_id', bookingId)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+      if (!data || data.length === 0) throw new Error('No trips found');
+
+      setTrips(data as Trip[]);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error loading trips:', error);
+      router.push('/');
+    }
+  }, [bookingId, supabase, router]);
+
+  useEffect(() => {
+    loadTrips();
+  }, [loadTrips]);
 
   if (!bookingId) {
     return (
@@ -62,37 +95,6 @@ function ConfirmationPageContent() {
       </>
     );
   }
-
-  useEffect(() => {
-    async function loadTrips() {
-      if (!bookingId) {
-        router.push('/');
-        return;
-      }
-
-      try {
-        setLoading(true);
-
-        const { data, error } = await supabase
-          .from('trips')
-          .select('*')
-          .eq('booking_id', bookingId)
-          .order('created_at', { ascending: true });
-
-        if (error) throw error;
-        if (!data || data.length === 0) throw new Error('No trips found');
-
-        setTrips(data as Trip[]);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error loading trips:', error);
-        alert('Failed to load confirmation');
-        router.push('/');
-      }
-    }
-
-    loadTrips();
-  }, [bookingId, supabase, router]);
 
   const grandTotal = trips.reduce((sum, trip) => sum + (trip.final_price || trip.price), 0);
   const customerInfo = trips[0];

@@ -4,6 +4,9 @@
 const TTL_HOURS = 24; // 24 hours
 const BOOKING_PREFIX = 'booking_';
 
+// Store interval ID to prevent memory leaks
+let cleanupIntervalId: ReturnType<typeof setInterval> | null = null;
+
 /**
  * Cleans old bookings from localStorage
  * Removes bookings older than TTL_HOURS
@@ -45,12 +48,7 @@ export function cleanOldBookings(): void {
     // Remove old bookings
     keysToRemove.forEach(key => {
       localStorage.removeItem(key);
-      console.log(`[Cleanup] Removed old booking: ${key}`);
     });
-
-    if (keysToRemove.length > 0) {
-      console.log(`[Cleanup] Removed ${keysToRemove.length} old booking(s)`);
-    }
   } catch (error) {
     console.error('[Cleanup] Error cleaning localStorage:', error);
   }
@@ -59,13 +57,27 @@ export function cleanOldBookings(): void {
 /**
  * Initializes localStorage cleanup
  * Call this on app startup
+ * Returns a cleanup function to stop the interval
  */
-export function initLocalStorageCleanup(): void {
-  if (typeof window === 'undefined') return;
+export function initLocalStorageCleanup(): () => void {
+  if (typeof window === 'undefined') return () => {};
+
+  // Clear any existing interval to prevent duplicates
+  if (cleanupIntervalId !== null) {
+    clearInterval(cleanupIntervalId);
+  }
 
   // Run immediately
   cleanOldBookings();
 
   // Run every hour
-  setInterval(cleanOldBookings, 60 * 60 * 1000);
+  cleanupIntervalId = setInterval(cleanOldBookings, 60 * 60 * 1000);
+
+  // Return cleanup function
+  return () => {
+    if (cleanupIntervalId !== null) {
+      clearInterval(cleanupIntervalId);
+      cleanupIntervalId = null;
+    }
+  };
 }

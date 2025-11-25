@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import { X, FileText, Loader2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { sanitizeHtml } from '@/lib/sanitize-html';
 
 interface TermsModalProps {
   isOpen: boolean;
@@ -49,8 +50,9 @@ export default function TermsModal({ isOpen, onClose }: TermsModalProps) {
         .single();
 
       if (fetchError) throw fetchError;
-      
-      setTermsContent(data?.content || '');
+
+      // Sanitize HTML content to prevent XSS
+      setTermsContent(sanitizeHtml(data?.content || ''));
     } catch (err) {
       console.error('Error loading terms:', err);
       setError(true);

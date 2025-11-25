@@ -2,11 +2,12 @@
 // ✅ FINAL: Con estilos Tailwind puros que SÍ funcionan
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { FileText, Loader2, AlertCircle, ArrowLeft, MessageCircle } from 'lucide-react';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
+import { sanitizeHtml } from '@/lib/sanitize-html';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 
 interface LegalPage {
@@ -201,7 +202,7 @@ export default function LegalPage() {
               `}} />
               <div
                 className="legal-content"
-                dangerouslySetInnerHTML={{ __html: page.content }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content) }}
               />
             </div>
 

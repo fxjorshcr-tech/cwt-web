@@ -125,13 +125,21 @@ export default function PrivateToursPage() {
                   className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all hover:-translate-y-1 border border-gray-100"
                 >
                   {/* Image */}
-                  <div className="relative h-56 overflow-hidden">
-                    <Image
-                      src={tour.hero_image}
-                      alt={tour.title}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
+                  <div className="relative h-56 overflow-hidden bg-gray-100">
+                    {tour.image ? (
+                      <Image
+                        src={tour.image}
+                        alt={tour.name}
+                        fill
+                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full text-gray-400">
+                        No image available
+                      </div>
+                    )}
                     {driveTime && (
                       <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold text-gray-700 flex items-center gap-1.5">
                         <MapPin className="h-3 w-3" />
@@ -143,7 +151,7 @@ export default function PrivateToursPage() {
                   {/* Content */}
                   <div className="p-5">
                     <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
-                      {tour.title}
+                      {tour.name}
                     </h3>
                     <p className="text-sm text-gray-600 mb-4 line-clamp-2">
                       {tour.short_description}
@@ -164,7 +172,7 @@ export default function PrivateToursPage() {
                     {/* Price & CTA */}
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-2xl font-bold text-blue-600">${tour.price_per_person}</p>
+                        <p className="text-2xl font-bold text-blue-600">${tour.base_price}</p>
                         <p className="text-xs text-gray-500">per person</p>
                       </div>
                       <div className="flex items-center gap-2 text-blue-600 font-semibold group-hover:gap-3 transition-all">

@@ -3,7 +3,7 @@
 // ✅ Solo se guarda en Supabase cuando usuario confirma en Summary (Pay Now / Add to Cart)
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Search, Loader2, AlertCircle, Plus, X } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
@@ -126,6 +126,23 @@ export function BookingForm() {
     return validateTrips(trips);
   }
 
+  // Ref to track if component is mounted (for safe async operations)
+  const isMountedRef = useRef(true);
+  const toastRef = useRef<HTMLDivElement | null>(null);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      // Clean up toast if it exists
+      if (toastRef.current && document.body.contains(toastRef.current)) {
+        document.body.removeChild(toastRef.current);
+        toastRef.current = null;
+      }
+    };
+  }, []);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
@@ -146,7 +163,7 @@ export function BookingForm() {
       // Save to localStorage
       localStorage.setItem(`booking_${bookingId}`, JSON.stringify(bookingData));
 
-      // ✅ PASO 1: Mostrar "Checking Availability..."
+      // Create toast element and store in ref for safe cleanup
       const checkingToast = document.createElement('div');
       checkingToast.className = 'fixed top-4 right-4 z-50 bg-white rounded-xl shadow-2xl p-6 border-2 border-blue-500 animate-in fade-in slide-in-from-top-5 duration-500';
       checkingToast.innerHTML = `
@@ -160,44 +177,62 @@ export function BookingForm() {
           </div>
         </div>
       `;
+      toastRef.current = checkingToast;
       document.body.appendChild(checkingToast);
 
-      // Esperar 1.4 segundos para simular verificación
       await new Promise(resolve => setTimeout(resolve, 1400));
 
-      // ✅ PASO 2: Cambiar a "Availability Approved ✅"
-      checkingToast.innerHTML = `
-        <div class="flex items-center gap-4">
-          <div class="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
-            <svg class="h-7 w-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-            </svg>
-          </div>
-          <div>
-            <p class="text-lg font-bold text-gray-900">Availability Approved ✅</p>
-            <p class="text-sm text-gray-600">Redirecting to booking details...</p>
-          </div>
-        </div>
-      `;
+      // Check if still mounted before continuing
+      if (!isMountedRef.current) return;
 
-      // Esperar 1 segundo antes de redirigir
+      // Update toast content
+      if (toastRef.current && document.body.contains(toastRef.current)) {
+        toastRef.current.innerHTML = `
+          <div class="flex items-center gap-4">
+            <div class="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
+              <svg class="h-7 w-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+            <div>
+              <p class="text-lg font-bold text-gray-900">Availability Approved</p>
+              <p class="text-sm text-gray-600">Redirecting to booking details...</p>
+            </div>
+          </div>
+        `;
+      }
+
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Limpiar el toast
-      document.body.removeChild(checkingToast);
+      // Check if still mounted before continuing
+      if (!isMountedRef.current) return;
 
-      // ✅ Redirigir a booking-details (datos en localStorage, NO en Supabase)
+      // Clean up toast safely
+      if (toastRef.current && document.body.contains(toastRef.current)) {
+        document.body.removeChild(toastRef.current);
+        toastRef.current = null;
+      }
+
+      // Redirect to booking-details
       router.push(`/booking-details?booking_id=${bookingId}&trip=0`);
-      
+
     } catch (error) {
       console.error('Full error:', error);
+
+      // Clean up toast on error
+      if (toastRef.current && document.body.contains(toastRef.current)) {
+        document.body.removeChild(toastRef.current);
+        toastRef.current = null;
+      }
 
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error processing booking';
 
-      setError(errorMessage);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      setIsSubmitting(false);
+      if (isMountedRef.current) {
+        setError(errorMessage);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setIsSubmitting(false);
+      }
     }
   }
 
