@@ -245,53 +245,61 @@ function PreviewPageContent() {
   // Render edit/add form
   function renderEditForm(isNewTrip: boolean) {
     return (
-      <div className="p-5 space-y-4">
-        <div className="grid sm:grid-cols-2 gap-4">
+      <div className="p-5 space-y-4 relative" style={{ minHeight: '320px' }}>
+        <div className="grid sm:grid-cols-2 gap-4 relative z-30">
           {/* Origin */}
-          <LocationAutocomplete
-            label="Pick-up Location"
-            placeholder="Where from?"
-            value={editOrigin}
-            onChange={(val) => {
-              setEditOrigin(val);
-              // Reset destination if origin changes
-              if (val !== editOrigin) {
-                setEditDestination('');
-              }
-            }}
-            routes={routes}
-            filterByDestination={editDestination}
-            type="origin"
-          />
+          <div className="relative z-40">
+            <LocationAutocomplete
+              label="Pick-up Location"
+              placeholder="Where from?"
+              value={editOrigin}
+              onChange={(val) => {
+                setEditOrigin(val);
+                // Reset destination if origin changes
+                if (val !== editOrigin) {
+                  setEditDestination('');
+                }
+              }}
+              routes={routes}
+              filterByDestination={editDestination}
+              type="origin"
+            />
+          </div>
 
           {/* Destination */}
-          <LocationAutocomplete
-            label="Drop-off Location"
-            placeholder={editOrigin ? "Where to?" : "Select origin first"}
-            value={editDestination}
-            onChange={setEditDestination}
-            routes={routes}
-            filterByOrigin={editOrigin}
-            disabled={!editOrigin}
-            type="destination"
-          />
+          <div className="relative z-30">
+            <LocationAutocomplete
+              label="Drop-off Location"
+              placeholder={editOrigin ? "Where to?" : "Select origin first"}
+              value={editDestination}
+              onChange={setEditDestination}
+              routes={routes}
+              filterByOrigin={editOrigin}
+              disabled={!editOrigin}
+              type="destination"
+            />
+          </div>
         </div>
 
-        <div className="grid sm:grid-cols-2 gap-4">
+        <div className="grid sm:grid-cols-2 gap-4 relative z-20">
           {/* Date */}
-          <ModernDatePicker
-            label="Travel Date"
-            value={editDate}
-            onChange={setEditDate}
-          />
+          <div className="relative z-20">
+            <ModernDatePicker
+              label="Travel Date"
+              value={editDate}
+              onChange={setEditDate}
+            />
+          </div>
 
           {/* Passengers */}
-          <PassengerSelector
-            label="Passengers"
-            adults={editAdults}
-            children={editChildren}
-            onPassengersChange={handleEditPassengersChange}
-          />
+          <div className="relative z-10">
+            <PassengerSelector
+              label="Passengers"
+              adults={editAdults}
+              children={editChildren}
+              onPassengersChange={handleEditPassengersChange}
+            />
+          </div>
         </div>
 
         {/* Actions */}
