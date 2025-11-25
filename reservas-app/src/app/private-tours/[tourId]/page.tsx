@@ -9,7 +9,6 @@ import {
   ArrowLeft, Clock, Users, MapPin, AlertCircle, Star,
   CheckCircle, XCircle, Loader2, ChevronDown, MessageCircle
 } from 'lucide-react';
-import { FaWhatsapp, FaFacebookF, FaInstagram } from 'react-icons/fa';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import { getTourBySlug, Tour } from '@/lib/supabase-tours';
 import { TourGallery } from '@/components/tours/TourGallery';
@@ -355,37 +354,6 @@ export default function TourDetailPage({ params }: PageProps) {
             quality={90}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/30" />
-        </div>
-
-        {/* Social Media Icons - Top Right */}
-        <div className="absolute top-20 sm:top-24 right-4 sm:right-6 z-20 flex flex-col gap-2">
-          <a
-            href="https://wa.me/50685962438"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-9 h-9 sm:w-10 sm:h-10 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center transition-all shadow-lg hover:scale-110"
-            aria-label="WhatsApp"
-          >
-            <FaWhatsapp className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-          </a>
-          <a
-            href="https://www.facebook.com/cantwaittravelcr"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-9 h-9 sm:w-10 sm:h-10 bg-blue-600 hover:bg-blue-700 rounded-full flex items-center justify-center transition-all shadow-lg hover:scale-110"
-            aria-label="Facebook"
-          >
-            <FaFacebookF className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-          </a>
-          <a
-            href="https://www.instagram.com/cantwaittravelcr"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 hover:opacity-90 rounded-full flex items-center justify-center transition-all shadow-lg hover:scale-110"
-            aria-label="Instagram"
-          >
-            <FaInstagram className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-          </a>
         </div>
 
         <div className="relative z-10 w-full pb-8 sm:pb-12 px-4 sm:px-6 pt-20 sm:pt-0">
