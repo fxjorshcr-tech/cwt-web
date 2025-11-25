@@ -79,8 +79,8 @@ export default function WhyBookDirect() {
               30+ Years Combined Experience
             </h3>
             <p className="text-gray-700 leading-relaxed">
-              After three decades working in Costa Rican tourism for big companies, we started Can't Wait Travel to offer the service
-              <strong className="text-orange-600"> WE would want as travelers—</strong>reliable, personal, and without the corporate markup.
+              After three decades working in Costa Rican tourism for big companies, we started Can't Wait Travel CR to offer the service
+              <strong className="text-orange-600"> WE would want as travelers—</strong>reliable, responsible, and authentic.
             </p>
           </div>
 
@@ -98,17 +98,17 @@ export default function WhyBookDirect() {
             </p>
           </div>
 
-          {/* Card 6: Small Team, Big Attention */}
+          {/* Card 6: Secure Online Payments */}
           <div className="group bg-gradient-to-br from-pink-50 to-white border-2 border-pink-200 rounded-2xl p-6 sm:p-8 hover:shadow-xl transition-all hover:-translate-y-1">
             <div className="h-14 w-14 bg-pink-600 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
               <Heart className="h-7 w-7 text-white" />
             </div>
             <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">
-              Small Team, Big Attention to Detail
+              Secure Online Payments
             </h3>
             <p className="text-gray-700 leading-relaxed">
-              We're a family-run business where you'll meet the owners and receive personalized attention on every journey.
-              <strong className="text-pink-600"> Your safety and comfort are our reputation—</strong>we take that seriously.
+              Book with confidence using our encrypted payment system powered by Stripe.
+              <strong className="text-pink-600"> Your financial data is protected with bank-level security—</strong>the same technology trusted by Amazon and Google.
             </p>
           </div>
 

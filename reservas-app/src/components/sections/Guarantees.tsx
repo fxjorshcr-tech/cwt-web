@@ -81,13 +81,6 @@ export default function Guarantees() {
 
         </div>
 
-        {/* Bottom CTA */}
-        <div className="mt-12 text-center">
-          <p className="text-white text-base sm:text-lg max-w-2xl mx-auto">
-            These aren't just words—they're written into our booking policy. Your peace of mind is our priority.
-          </p>
-        </div>
-
       </div>
     </section>
   );
