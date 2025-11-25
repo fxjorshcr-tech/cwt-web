@@ -459,12 +459,23 @@ export default function TourDetailPage({ params }: PageProps) {
 
           <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
 
-            {/* Left Column - Main Content */}
+            {/* Left Column - Tour Information */}
             <div className="lg:col-span-2 space-y-6 md:space-y-8">
+
+              {/* Section Header - Tour Information */}
+              <div className="flex items-center gap-3 pb-2 border-b-2 border-blue-200">
+                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                  <MapPin className="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">Tour Information</h2>
+                  <p className="text-sm text-gray-500">Everything you need to know about this experience</p>
+                </div>
+              </div>
 
               {/* Overview - Short Description */}
               <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-200">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Tour Overview</h2>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Tour Overview</h3>
                 <p className="text-gray-700 leading-relaxed text-lg">
                   {tour.short_description}
                 </p>
@@ -473,14 +484,14 @@ export default function TourDetailPage({ params }: PageProps) {
               {/* Photo Gallery */}
               {tour.gallery && tour.gallery.length > 0 && (
                 <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-200">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Tour Photos</h2>
+                  <h3 className="text-xl font-bold text-gray-900 mb-6">Tour Photos</h3>
                   <TourGallery images={tour.gallery} tourName={tour.name} />
                 </div>
               )}
 
               {/* Highlights */}
               <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-200">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Tour Highlights</h2>
+                <h3 className="text-xl font-bold text-gray-900 mb-6">Tour Highlights</h3>
                 <div className="grid md:grid-cols-2 gap-4">
                   {tour.highlights.map((highlight, index) => (
                     <div key={index} className="flex items-start gap-3">
@@ -622,12 +633,40 @@ export default function TourDetailPage({ params }: PageProps) {
               </div>
             </div>
 
+            {/* Mobile Separator - Visible only on mobile/tablet before booking section */}
+            <div className="lg:hidden col-span-full">
+              <div className="relative py-8">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t-2 border-dashed border-blue-300"></div>
+                </div>
+                <div className="relative flex justify-center">
+                  <div className="bg-gray-50 px-6 py-3 rounded-full border-2 border-blue-300 shadow-sm">
+                    <span className="text-blue-600 font-bold text-lg flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5" />
+                      Ready to Book?
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Right Column - Booking Form (Sticky) */}
             <div className="lg:col-span-1">
               <div className="sticky top-4 space-y-6">
-                {/* Booking Section Header */}
+                {/* Section Header - Booking (visible on desktop) */}
+                <div className="hidden lg:flex items-center gap-3 pb-2 border-b-2 border-green-200">
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <CheckCircle className="h-5 w-5 text-green-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900">Book Your Tour</h2>
+                    <p className="text-sm text-gray-500">Reserve your spot now</p>
+                  </div>
+                </div>
+
+                {/* Booking Section Header - Card style */}
                 <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg">
-                  <h2 className="text-2xl font-bold mb-2">Book This Adventure</h2>
+                  <h3 className="text-2xl font-bold mb-2">Book This Adventure</h3>
                   <p className="text-blue-100 text-sm">
                     Fill in the details below to reserve your spot on this amazing tour
                   </p>
