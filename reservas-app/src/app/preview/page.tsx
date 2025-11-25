@@ -56,6 +56,9 @@ function PreviewPageContent() {
   const [showAddTrip, setShowAddTrip] = useState(false);
 
   // Edit form state
+  const [error, setError] = useState<string | null>(null);
+
+  // Edit form state
   const [editOrigin, setEditOrigin] = useState('');
   const [editDestination, setEditDestination] = useState('');
   const [editDate, setEditDate] = useState<Date | null>(null);
@@ -66,14 +69,22 @@ function PreviewPageContent() {
   useEffect(() => {
     async function load() {
       if (!bookingId) {
-        router.push('/transfers');
+        setError('No booking ID provided');
+        setLoading(false);
         return;
       }
 
       try {
         // Load routes
         const supabase = createClient();
-        const { routes: loadedRoutes } = await loadRoutesFromSupabase(supabase);
+        const { routes: loadedRoutes, error: routesError } = await loadRoutesFromSupabase(supabase);
+
+        if (routesError) {
+          setError('Failed to load routes. Please try again.');
+          setLoading(false);
+          return;
+        }
+
         if (loadedRoutes) {
           setRoutes(loadedRoutes);
         }
@@ -81,7 +92,8 @@ function PreviewPageContent() {
         // Load booking from localStorage
         const localData = loadBookingFromLocalStorage(bookingId);
         if (!localData) {
-          router.push('/transfers');
+          setError('Booking not found. It may have expired.');
+          setLoading(false);
           return;
         }
 
@@ -98,9 +110,10 @@ function PreviewPageContent() {
 
         setTrips(loadedTrips);
         setLoading(false);
-      } catch (error) {
-        console.error('Error loading preview:', error);
-        router.push('/transfers');
+      } catch (err) {
+        console.error('Error loading preview:', err);
+        setError('Something went wrong loading your booking. Please try again.');
+        setLoading(false);
       }
     }
     load();
@@ -347,17 +360,25 @@ function PreviewPageContent() {
     );
   }
 
-  if (!bookingId || trips.length === 0) {
+  if (error || (!bookingId && !loading) || (trips.length === 0 && !loading)) {
     return (
       <>
         <BookingNavbar />
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="text-center">
+          <div className="text-center px-4">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">No booking found</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              {error || 'No booking found'}
+            </h2>
+            <p className="text-gray-600 mb-6 max-w-md">
+              {error
+                ? 'Please start a new search to continue.'
+                : 'Your booking may have expired. Please start a new search.'
+              }
+            </p>
             <button
               onClick={() => router.push('/transfers')}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
             >
               Start New Search
             </button>

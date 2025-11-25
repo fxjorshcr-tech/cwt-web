@@ -119,7 +119,13 @@ export function QuickSearchForm({ className = '' }: QuickSearchFormProps) {
       // Save to localStorage
       localStorage.setItem(`booking_${bookingId}`, JSON.stringify(bookingData));
 
-      // Navigate to preview
+      // Verify the data was saved correctly before navigating
+      const savedData = localStorage.getItem(`booking_${bookingId}`);
+      if (!savedData) {
+        throw new Error('Failed to save booking data');
+      }
+
+      // Navigate to preview - keep isSubmitting true to prevent double clicks
       router.push(`/preview?booking_id=${bookingId}`);
     } catch (err) {
       console.error('Search error:', err);
@@ -128,12 +134,45 @@ export function QuickSearchForm({ className = '' }: QuickSearchFormProps) {
     }
   }
 
+  // Retry loading routes
+  const retryLoadRoutes = async () => {
+    setError(null);
+    setIsLoadingRoutes(true);
+    const supabase = createClient();
+    const { routes: loadedRoutes, error: loadError } = await loadRoutesFromSupabase(supabase);
+
+    if (loadError) {
+      setError(loadError);
+    } else if (loadedRoutes) {
+      setRoutes(loadedRoutes);
+    }
+    setIsLoadingRoutes(false);
+  };
+
   if (isLoadingRoutes) {
     return (
       <div className={`bg-white rounded-2xl shadow-xl p-6 ${className}`}>
         <div className="flex items-center justify-center gap-3 py-8">
           <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
           <span className="text-gray-600">Loading routes...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if routes failed to load
+  if (routes.length === 0 && error) {
+    return (
+      <div className={`bg-white rounded-2xl shadow-xl p-6 ${className}`}>
+        <div className="flex flex-col items-center justify-center gap-4 py-8">
+          <AlertCircle className="h-10 w-10 text-red-500" />
+          <p className="text-gray-600 text-center">{error}</p>
+          <button
+            onClick={retryLoadRoutes}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Try Again
+          </button>
         </div>
       </div>
     );
