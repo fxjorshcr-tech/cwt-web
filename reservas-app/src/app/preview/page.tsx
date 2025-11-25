@@ -448,57 +448,50 @@ function PreviewPageContent() {
                     renderEditForm(false)
                   ) : (
                     // View Mode
-                    <div className="p-5">
-                      {/* Route Display */}
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 text-gray-600 text-xs mb-1">
-                            <MapPin className="h-3 w-3 text-blue-600 flex-shrink-0" />
-                            From
+                    <div className="p-4 sm:p-5">
+                      {/* Route Display - Vertical on mobile */}
+                      <div className="space-y-2 mb-4">
+                        <div className="flex items-center gap-2">
+                          <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                            <MapPin className="h-3 w-3 text-blue-600" />
                           </div>
-                          <p className="font-semibold text-gray-900 truncate">{trip.from_location}</p>
-                        </div>
-                        <ArrowRight className="h-5 w-5 text-gray-400 flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 text-gray-600 text-xs mb-1">
-                            <MapPin className="h-3 w-3 text-orange-500 flex-shrink-0" />
-                            To
-                          </div>
-                          <p className="font-semibold text-gray-900 truncate">{trip.to_location}</p>
-                        </div>
-                      </div>
-
-                      {/* Trip Details */}
-                      <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-4 border-t border-gray-100">
-                        <div className="text-center sm:text-left sm:flex sm:items-center sm:gap-2">
-                          <Calendar className="h-4 w-4 text-gray-400 mx-auto sm:mx-0 mb-1 sm:mb-0 flex-shrink-0" />
-                          <div className="min-w-0">
-                            <p className="text-[10px] sm:text-xs text-gray-500">Date</p>
-                            <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">{formatDisplayDate(trip.date)}</p>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[10px] text-gray-500 uppercase">From</p>
+                            <p className="text-sm font-semibold text-gray-900 leading-tight">{trip.from_location}</p>
                           </div>
                         </div>
-                        <div className="text-center sm:text-left sm:flex sm:items-center sm:gap-2">
-                          <Users className="h-4 w-4 text-gray-400 mx-auto sm:mx-0 mb-1 sm:mb-0 flex-shrink-0" />
-                          <div>
-                            <p className="text-[10px] sm:text-xs text-gray-500">Passengers</p>
-                            <p className="text-xs sm:text-sm font-medium text-gray-900">
-                              {trip.adults + trip.children} pax
-                            </p>
+                        <div className="flex items-center gap-2">
+                          <div className="h-6 w-6 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
+                            <MapPin className="h-3 w-3 text-orange-500" />
                           </div>
-                        </div>
-                        <div className="text-center sm:text-left sm:flex sm:items-center sm:gap-2">
-                          <Clock className="h-4 w-4 text-gray-400 mx-auto sm:mx-0 mb-1 sm:mb-0 flex-shrink-0" />
-                          <div>
-                            <p className="text-[10px] sm:text-xs text-gray-500">Duration</p>
-                            <p className="text-xs sm:text-sm font-medium text-gray-900">{trip.duration}</p>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[10px] text-gray-500 uppercase">To</p>
+                            <p className="text-sm font-semibold text-gray-900 leading-tight">{trip.to_location}</p>
                           </div>
                         </div>
                       </div>
 
-                      {/* Price */}
-                      <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-                        <span className="text-gray-600">Trip Price</span>
-                        <span className="text-xl font-bold text-blue-600">${trip.price}</span>
+                      {/* Trip Details - 2x2 grid on mobile */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-gray-100">
+                        <div className="bg-gray-50 rounded-lg p-2 text-center">
+                          <Calendar className="h-4 w-4 text-blue-500 mx-auto mb-1" />
+                          <p className="text-[10px] text-gray-500 uppercase">Date</p>
+                          <p className="text-xs font-semibold text-gray-900">{formatDisplayDate(trip.date)}</p>
+                        </div>
+                        <div className="bg-gray-50 rounded-lg p-2 text-center">
+                          <Users className="h-4 w-4 text-blue-500 mx-auto mb-1" />
+                          <p className="text-[10px] text-gray-500 uppercase">Guests</p>
+                          <p className="text-xs font-semibold text-gray-900">{trip.adults + trip.children} pax</p>
+                        </div>
+                        <div className="bg-gray-50 rounded-lg p-2 text-center">
+                          <Clock className="h-4 w-4 text-blue-500 mx-auto mb-1" />
+                          <p className="text-[10px] text-gray-500 uppercase">Duration</p>
+                          <p className="text-xs font-semibold text-gray-900">{trip.duration || 'N/A'}</p>
+                        </div>
+                        <div className="bg-blue-50 rounded-lg p-2 text-center">
+                          <p className="text-[10px] text-blue-600 uppercase font-medium">Price</p>
+                          <p className="text-lg font-bold text-blue-600">${trip.price}</p>
+                        </div>
                       </div>
                     </div>
                   )}
