@@ -1,7 +1,7 @@
 // src/app/private-tours/[tourId]/page.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -46,7 +46,8 @@ interface PageProps {
 
 export default function TourDetailPage({ params }: PageProps) {
   const router = useRouter();
-  const supabase = createClient();
+  // Create supabase client once with useMemo to avoid recreation on every render
+  const supabase = useMemo(() => createClient(), []);
   const { addItem } = useCart();
 
   const [tour, setTour] = useState<Tour | null>(null);
@@ -76,31 +77,32 @@ export default function TourDetailPage({ params }: PageProps) {
     setAccordions(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
+  // Memoize loadTour function
+  const loadTour = useCallback(async () => {
+    try {
+      setLoading(true);
+      const tourData = await getTourBySlug(params.tourId);
+
+      if (!tourData) {
+        setNotFoundError(true);
+        setLoading(false);
+        return;
+      }
+
+      setTour(tourData);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error loading tour:', error);
+      setNotFoundError(true);
+      setLoading(false);
+    }
+  }, [params.tourId]);
+
   useEffect(() => {
     // Scroll to top on mount
     window.scrollTo({ top: 0, behavior: 'instant' });
-
-    async function loadTour() {
-      try {
-        const tourData = await getTourBySlug(params.tourId);
-
-        if (!tourData) {
-          setNotFoundError(true);
-          setLoading(false);
-          return;
-        }
-
-        setTour(tourData);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error loading tour:', error);
-        setNotFoundError(true);
-        setLoading(false);
-      }
-    }
-
     loadTour();
-  }, [params.tourId]);
+  }, [loadTour]);
 
   if (loading) {
     return (
