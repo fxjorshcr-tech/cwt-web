@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import WhatsAppButton from '@/components/WhatsAppButton';
-import { TrendingUp, Clock, DollarSign, MapPin, Flame, ArrowRight, Star, Shield, CheckCircle2 } from 'lucide-react';
+import { TrendingUp, Clock, DollarSign, MapPin, Flame, ArrowRight, Shield, CheckCircle2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
@@ -162,12 +162,6 @@ export default async function MostBookedPage() {
                     <CheckCircle2 className="h-4 w-4" />
                   </div>
                   <span className="text-sm font-semibold">100% Private</span>
-                </div>
-                <div className="flex items-center gap-2">
-                   <div className="bg-white/20 p-1.5 rounded-full">
-                    <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                  </div>
-                  <span className="text-sm font-semibold">30+ Years of Combined Experience</span>
                 </div>
               </div>
             </div>

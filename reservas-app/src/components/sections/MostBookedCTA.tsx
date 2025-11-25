@@ -102,22 +102,14 @@ export default function MostBookedCTA({ routes }: MostBookedCTAProps) {
           </div>
 
           {/* CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+          <div className="flex justify-center mb-8">
             <Link
               href="/shuttle"
               className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-lg rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
             >
-              View All Destinations
+              View Top Destinations
               <ArrowRight className="h-6 w-6" />
             </Link>
-
-            <button
-              onClick={scrollToBooking}
-              className="inline-flex items-center gap-3 px-8 py-4 bg-white border-2 border-gray-300 text-gray-700 font-bold text-lg rounded-xl hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-all shadow-md hover:shadow-lg transform hover:scale-105"
-            >
-              <Search className="h-6 w-6" />
-              Search Your Route
-            </button>
           </div>
 
           {/* Footer text */}

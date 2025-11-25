@@ -1,6 +1,7 @@
 // src/components/home/WhyChooseUs.tsx
 'use client';
 
+import Link from 'next/link';
 import {
   Users,
   Car,
@@ -43,23 +44,15 @@ export default function WhyChooseUs() {
               With <strong className="text-blue-600">over 400+ routes</strong> connecting all major destinations, we make getting around Costa Rica simple and stress-free.
             </p>
             <div className="text-center">
-              <a
-                href="#main-content"
-                onClick={(e) => {
-                  e.preventDefault();
-                  const bookingSection = document.querySelector('#main-content');
-                  if (bookingSection) {
-                    const offset = bookingSection.getBoundingClientRect().top + window.scrollY + 800;
-                    window.scrollTo({ top: offset, behavior: 'smooth' });
-                  }
-                }}
+              <Link
+                href="/transfers"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition-all hover:shadow-xl hover:scale-105"
               >
                 Check Your Route & Get a Quote
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
-              </a>
+              </Link>
             </div>
           </div>
         </div>

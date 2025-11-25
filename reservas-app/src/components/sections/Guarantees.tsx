@@ -36,7 +36,7 @@ export default function Guarantees() {
               Free Cancellation
             </h3>
             <p className="text-sm text-gray-700 leading-relaxed">
-              Cancel up to <strong className="text-green-600">48 hours</strong> before your transfer for a full refund. Plans change—we understand.
+              Cancel up to <strong className="text-green-600">48 hours</strong> before your transfer for a full refund with flexible booking policies.
             </p>
           </div>
 
@@ -49,7 +49,7 @@ export default function Guarantees() {
               Flight Delay Protection
             </h3>
             <p className="text-sm text-gray-700 leading-relaxed">
-              We track your flight automatically. <strong className="text-blue-600">Optional travel insurance available</strong> for added protection against delays and cancellations. Ask us about coverage options!
+              We monitor your flight status automatically. <strong className="text-blue-600">Optional insurance available</strong> for comprehensive coverage against delays and cancellations.
             </p>
           </div>
 
@@ -62,7 +62,7 @@ export default function Guarantees() {
               On-Time Pickup Guarantee
             </h3>
             <p className="text-sm text-gray-700 leading-relaxed">
-              We take responsibility seriously. <strong className="text-purple-600">We'll be there on time</strong> and keep you informed with constant communication every step of the way.
+              <strong className="text-purple-600">Punctual service guaranteed.</strong> We'll be there on time with constant communication throughout your booking process.
             </p>
           </div>
 
@@ -75,7 +75,7 @@ export default function Guarantees() {
               Price You See = Price You Pay
             </h3>
             <p className="text-sm text-gray-700 leading-relaxed">
-              <strong className="text-orange-600">Transparent pricing, every time.</strong> The price on your booking is the final price. All-inclusive.
+              <strong className="text-orange-600">All-inclusive pricing.</strong> The price you see at booking is your final cost with no hidden charges or surprise fees.
             </p>
           </div>
 

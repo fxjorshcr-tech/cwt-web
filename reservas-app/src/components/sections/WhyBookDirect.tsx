@@ -16,8 +16,8 @@ export default function WhyBookDirect() {
               Direct Service
             </span>
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Why Book Direct With Us?
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+            Why Book a Private Shuttle With Us?
           </h2>
           <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
             When you book with Can't Wait Travel CR, you're working directly with the people who will drive you.
@@ -37,8 +37,8 @@ export default function WhyBookDirect() {
               Operated Directly by Us
             </h3>
             <p className="text-gray-700 leading-relaxed">
-              Every vehicle is ours, every driver is trained, vetted, and employed directly by our team.
-              <strong className="text-blue-600"> You're booking the people who will actually drive you.</strong>
+              We own every vehicle and employ every driver directly. When you book through our website, you're securing your ride with our professional team.
+              <strong className="text-blue-600"> Direct booking means direct service.</strong>
             </p>
           </div>
 
@@ -52,7 +52,7 @@ export default function WhyBookDirect() {
             </h3>
             <p className="text-gray-700 leading-relaxed">
               Based in La Fortuna with vehicles strategically located in SJO, Manuel Antonio, Guanacaste, and Monteverde.
-              <strong className="text-green-600"> We know every route personally—which roads flood, where construction is, and shortcuts only locals use.</strong>
+              <strong className="text-green-600"> Complete coverage across Costa Rica's main destinations.</strong>
             </p>
           </div>
 
@@ -79,8 +79,8 @@ export default function WhyBookDirect() {
               30+ Years Combined Experience
             </h3>
             <p className="text-gray-700 leading-relaxed">
-              After three decades working in Costa Rican tourism for big companies, we started Can't Wait Travel CR to offer the service
-              <strong className="text-orange-600"> WE would want as travelers—</strong>reliable, responsible, and authentic.
+              We started Can't Wait Travel CR to offer the service
+              <strong className="text-orange-600"> WE would want as travelers—</strong>reliable, responsible, and authentic with local expertise.
             </p>
           </div>
 
@@ -94,7 +94,7 @@ export default function WhyBookDirect() {
             </h3>
             <p className="text-gray-700 leading-relaxed">
               Message us on WhatsApp and connect instantly with our bilingual team members who know every detail of your booking.
-              <strong className="text-cyan-600"> Real people, real answers, whenever you need us.</strong>
+              <strong className="text-cyan-600"> Fast response times from our dedicated support team.</strong>
             </p>
           </div>
 
