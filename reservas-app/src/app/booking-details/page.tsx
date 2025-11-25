@@ -656,17 +656,17 @@ function BookingDetailsContent() {
           <div className="max-w-4xl mx-auto px-4 py-3">
             {/* Price Summary */}
             <div className="flex items-center justify-between mb-3">
-              <div className="text-sm">
-                <span className="text-gray-600">Trip {currentTripIndex + 1} Total:</span>
-                {priceCalculation.nightSurcharge > 0 || priceCalculation.addOnsPrice > 0 ? (
-                  <span className="text-xs text-gray-500 ml-2">
-                    (${priceCalculation.basePrice} base
-                    {priceCalculation.nightSurcharge > 0 && ` + $${priceCalculation.nightSurcharge} night`}
-                    {priceCalculation.addOnsPrice > 0 && ` + $${priceCalculation.addOnsPrice} add-ons`})
+              <div className="text-xs sm:text-sm">
+                <span className="text-gray-600">Transfer {currentTripIndex + 1}:</span>
+                {(priceCalculation.nightSurcharge > 0 || priceCalculation.addOnsPrice > 0) && (
+                  <span className="text-[10px] sm:text-xs text-gray-500 ml-1 sm:ml-2 block sm:inline">
+                    ${priceCalculation.basePrice}
+                    {priceCalculation.nightSurcharge > 0 && ` +$${priceCalculation.nightSurcharge}`}
+                    {priceCalculation.addOnsPrice > 0 && ` +$${priceCalculation.addOnsPrice}`}
                   </span>
-                ) : null}
+                )}
               </div>
-              <span className="text-2xl font-bold text-blue-600">${priceCalculation.subtotal}</span>
+              <span className="text-xl sm:text-2xl font-bold text-blue-600">${priceCalculation.subtotal}</span>
             </div>
 
             {/* Navigation Buttons */}
