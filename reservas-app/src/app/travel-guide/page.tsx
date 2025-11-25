@@ -71,7 +71,7 @@ export default async function TravelGuidePage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="/#booking"
+                href="/transfers#booking-form"
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white hover:bg-gray-100 text-blue-600 font-bold rounded-xl transition-colors shadow-xl"
               >
                 <span>Book Transportation</span>

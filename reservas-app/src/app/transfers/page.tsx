@@ -2,23 +2,27 @@
 // ✅ UPDATED - Lightweight QuickSearchForm
 'use client';
 
-import { useState, useEffect } from "react";
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { QuickSearchForm } from '@/components/forms/QuickSearchForm';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import BookingSteps from '@/components/booking/BookingSteps';
 import PaymentMethods from '@/components/sections/PaymentMethods';
-import { CheckCircle2, Shield, MapPin, Users } from 'lucide-react'; 
+import { CheckCircle2, Shield, MapPin, Users } from 'lucide-react';
 
 export default function TransfersPage() {
-  const [isPageReady, setIsPageReady] = useState(false);
+  const bookingFormRef = useRef<HTMLDivElement>(null);
 
+  // Handle hash navigation on mount
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsPageReady(true);
-    }, 150);
-
-    return () => clearTimeout(timer);
+    // Check if there's a hash in the URL
+    if (typeof window !== 'undefined' && window.location.hash === '#booking-form') {
+      // Small delay to ensure the form is rendered
+      const timer = setTimeout(() => {
+        bookingFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+      return () => clearTimeout(timer);
+    }
   }, []);
 
   return (
@@ -75,12 +79,12 @@ export default function TransfersPage() {
         </section>
 
         {/* Booking Form */}
-        <section id="booking-form" className="relative -mt-16 z-20 px-4 sm:px-6 pb-16">
-          <div
-            className={`max-w-4xl mx-auto transition-opacity duration-500 ${
-              isPageReady ? 'opacity-100' : 'opacity-0'
-            }`}
-          >
+        <section
+          id="booking-form"
+          ref={bookingFormRef}
+          className="relative -mt-16 z-20 px-4 sm:px-6 pb-16"
+        >
+          <div className="max-w-4xl mx-auto">
             <QuickSearchForm />
           </div>
         </section>

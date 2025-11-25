@@ -4,24 +4,36 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Clock, Users, MapPin, DollarSign } from 'lucide-react';
+import { ArrowRight, Clock, Users, MapPin, AlertCircle, RefreshCw } from 'lucide-react';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import { getAllTours } from '@/lib/supabase-tours';
 
 export default function PrivateToursPage() {
   const [tours, setTours] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadTours = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await getAllTours();
+      if (!data || data.length === 0) {
+        setError('No tours available at the moment.');
+      } else {
+        setTours(data);
+      }
+    } catch (err) {
+      console.error('Error loading tours:', err);
+      setError('Failed to load tours. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     // Scroll to top on mount
     window.scrollTo({ top: 0, behavior: 'instant' });
-
-    // Load tours
-    async function loadTours() {
-      const data = await getAllTours();
-      setTours(data);
-      setLoading(false);
-    }
     loadTours();
   }, []);
 
@@ -41,6 +53,28 @@ export default function PrivateToursPage() {
         <BookingNavbar />
         <div className="min-h-screen flex items-center justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <>
+        <BookingNavbar />
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="text-center px-4">
+            <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Oops! Something went wrong</h2>
+            <p className="text-gray-600 mb-6">{error}</p>
+            <button
+              onClick={loadTours}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Try Again
+            </button>
+          </div>
         </div>
       </>
     );

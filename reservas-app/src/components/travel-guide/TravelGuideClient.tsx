@@ -1,9 +1,10 @@
 // src/components/travel-guide/TravelGuideClient.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ChevronDown, MapPin, ArrowRight } from 'lucide-react';
 import type { Destination } from '@/lib/supabase-destinations';
 
@@ -19,6 +20,7 @@ interface TravelGuideClientProps {
 }
 
 export default function TravelGuideClient({ destinations, zones }: TravelGuideClientProps) {
+  const router = useRouter();
   const [activeZone, setActiveZone] = useState('all');
   const [openDestinations, setOpenDestinations] = useState<Set<string>>(new Set());
 
@@ -31,6 +33,15 @@ export default function TravelGuideClient({ destinations, zones }: TravelGuideCl
       }, 100);
     }
   }, []);
+
+  // Handle navigation to booking form with proper scroll
+  const handleBookShuttle = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    // Prefetch the page first
+    router.prefetch('/transfers');
+    // Navigate and then scroll
+    router.push('/transfers#booking-form');
+  }, [router]);
 
   const filteredDestinations = activeZone === 'all' 
     ? destinations 
@@ -246,6 +257,7 @@ export default function TravelGuideClient({ destinations, zones }: TravelGuideCl
                         <div className="pt-4 border-t border-gray-200 flex flex-col sm:flex-row gap-3">
                           <Link
                             href="/transfers#booking-form"
+                            onClick={handleBookShuttle}
                             className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white text-center rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
                           >
                             <span>Book Shuttle</span>
