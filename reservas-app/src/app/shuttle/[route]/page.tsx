@@ -116,7 +116,7 @@ export default async function ShuttleRoutePage({ params }: { params: { route: st
             <div className="absolute inset-0 bg-black/60" />
           </div>
 
-          <div className="relative z-10 h-full flex flex-col items-center justify-center px-6">
+          <div className="relative z-10 h-full flex flex-col items-center justify-center px-6 pt-20 sm:pt-0">
             <div className="text-center max-w-3xl">
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-2xl">
                 100% Private. Operated by Us.

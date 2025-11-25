@@ -60,7 +60,7 @@ function TransfersContent() {
             <div className="absolute inset-0 bg-gradient-to-t from-blue-900/40 via-transparent to-transparent" />
           </div>
 
-          <div className="relative z-10 h-full flex flex-col items-center justify-center px-6">
+          <div className="relative z-10 h-full flex flex-col items-center justify-center px-6 pt-20 sm:pt-0">
             <div className="text-center max-w-4xl">
               <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold text-white mb-3 sm:mb-4 drop-shadow-xl leading-tight">
                 Private Transportation in Costa Rica
