@@ -387,7 +387,7 @@ function BookingDetailsContent() {
     }
   };
 
-  // ✅ HANDLE BACK - Mejorado con modal de confirmación
+  // ✅ HANDLE BACK - Go to previous trip or preview page
   const handleBack = () => {
     if (currentTripIndex > 0) {
       // Retroceder al trip anterior - guardar progreso primero
@@ -395,20 +395,16 @@ function BookingDetailsContent() {
       setCurrentTripIndex(currentTripIndex - 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
-      // Está en Trip 1 - mostrar modal de confirmación
-      setShowBackConfirmDialog(true);
+      // On first trip - go back to Preview page
+      saveToLocalStorage();
+      router.push(`/preview?booking_id=${bookingId}`);
     }
   };
 
-  // ✅ Confirmar salida - SIEMPRE va al home
+  // ✅ Confirmar salida - va a preview en vez de home
   const confirmLeaveBooking = () => {
-    if (bookingId) {
-      // Clean up localStorage using helper
-      removeBookingFromLocalStorage(bookingId);
-    }
-
-    // SIEMPRE ir al home
-    router.push('/');
+    // Go to preview page (keeps booking data)
+    router.push(`/preview?booking_id=${bookingId}`);
   };
 
   // LOADING STATE
@@ -489,7 +485,7 @@ function BookingDetailsContent() {
       {/* Stepper */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-6 md:py-8">
-          <BookingStepper currentStep={1} />
+          <BookingStepper currentStep={2} />
         </div>
       </div>
 
