@@ -1,26 +1,28 @@
 // src/components/sections/MostBookedCTA.tsx
 'use client';
 
-import { ArrowRight, Search, Sparkles } from 'lucide-react';
+import { ArrowRight, Search, Sparkles, DollarSign } from 'lucide-react';
 import Link from 'next/link';
 
-export default function MostBookedCTA() {
+interface Route {
+  displayFrom: string;
+  displayTo: string;
+  slug: string;
+  price: number | null;
+  duration: string | null;
+}
+
+interface MostBookedCTAProps {
+  routes: Route[];
+}
+
+export default function MostBookedCTA({ routes }: MostBookedCTAProps) {
   const scrollToBooking = () => {
     const bookingForm = document.getElementById('booking-form');
     if (bookingForm) {
       bookingForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   };
-
-  // Rutas más populares que existen en tu sistema
-  const popularRoutes = [
-    { from: 'SJO Airport', to: 'La Fortuna', slug: 'sjo-to-la-fortuna' },
-    { from: 'SJO Airport', to: 'Tamarindo', slug: 'sjo-to-tamarindo' },
-    { from: 'SJO Airport', to: 'Monteverde', slug: 'sjo-to-monteverde' },
-    { from: 'LIR Airport', to: 'Tamarindo', slug: 'lir-to-tamarindo' },
-    { from: 'LIR Airport', to: 'La Fortuna', slug: 'lir-to-la-fortuna' },
-    { from: 'La Fortuna', to: 'Monteverde', slug: 'la-fortuna-to-monteverde' },
-  ];
 
   return (
     <section className="py-16 sm:py-24 bg-gradient-to-b from-gray-50 to-white">
@@ -56,17 +58,26 @@ export default function MostBookedCTA() {
             </h3>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
-              {popularRoutes.map((route, idx) => (
+              {routes.map((route, idx) => (
                 <Link
                   key={idx}
                   href={`/shuttle/${route.slug}`}
-                  className="flex items-center justify-between p-4 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl hover:shadow-lg hover:scale-105 hover:border-blue-400 transition-all duration-200 group"
+                  className="flex flex-col p-4 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl hover:shadow-lg hover:scale-105 hover:border-blue-400 transition-all duration-200 group"
                 >
-                  <div className="flex items-center gap-3 flex-1">
-                    <span className="font-bold text-gray-900 text-sm group-hover:text-blue-700 transition-colors">{route.from}</span>
-                    <ArrowRight className="h-4 w-4 text-blue-600 flex-shrink-0 group-hover:translate-x-1 transition-transform" />
-                    <span className="font-bold text-gray-900 text-sm group-hover:text-blue-700 transition-colors">{route.to}</span>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2 flex-1">
+                      <span className="font-bold text-gray-900 text-sm group-hover:text-blue-700 transition-colors">{route.displayFrom}</span>
+                      <ArrowRight className="h-4 w-4 text-blue-600 flex-shrink-0 group-hover:translate-x-1 transition-transform" />
+                      <span className="font-bold text-gray-900 text-sm group-hover:text-blue-700 transition-colors">{route.displayTo}</span>
+                    </div>
                   </div>
+                  {route.price && (
+                    <div className="flex items-center gap-1 text-blue-700 font-bold text-lg">
+                      <span className="text-xs text-gray-600">From</span>
+                      <DollarSign className="h-4 w-4" />
+                      <span>{route.price}</span>
+                    </div>
+                  )}
                 </Link>
               ))}
             </div>

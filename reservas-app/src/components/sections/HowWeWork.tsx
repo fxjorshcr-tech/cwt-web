@@ -1,67 +1,100 @@
-// src/components/home/HowWeWork.tsx
+// src/components/sections/HowWeWork.tsx
 'use client';
 
-import { Heart, CheckCircle2 } from 'lucide-react';
+import { Calendar, CheckCircle, Car } from 'lucide-react';
 
 export default function HowWeWork() {
   return (
-    <section className="py-12 sm:py-16 bg-white overflow-x-hidden">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
-        <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 border-2 border-blue-100 shadow-xl">
-          <div className="text-center mb-6 sm:mb-8">
-            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white rounded-full mb-3 sm:mb-4 shadow-md">
-              <Heart className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
-              <span className="text-blue-700 font-bold text-xs sm:text-sm uppercase tracking-wide">
-                How We Work
-              </span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4 px-4">
-              Direct Service. No Middlemen. No Surprises.
-            </h2>
-          </div>
+    <section className="py-16 sm:py-20 bg-gradient-to-b from-gray-50 to-white">
+      <div className="container mx-auto px-4 sm:px-6 max-w-6xl">
 
-          <div className="prose prose-lg max-w-none">
-            <div className="grid md:grid-cols-2 gap-4 sm:gap-6 mt-6 sm:mt-8">
-              <div className="bg-white rounded-xl p-4 sm:p-6 shadow-md border border-blue-100">
-                <div className="flex items-start gap-3 mb-3">
-                  <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6 text-green-600 flex-shrink-0 mt-1" />
-                  <div>
-                    <h3 className="font-bold text-gray-900 mb-2 text-sm sm:text-base">What We Do</h3>
-                    <ul className="space-y-2 text-gray-700 text-sm sm:text-base">
-                     <li>✅ Maintain 100% control of our vehicles</li>
-                     <li>✅ Curate and guide our own experiences</li>
-                     <li>✅ Employ only vetted, professional drivers</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-xl p-4 sm:p-6 shadow-md border border-red-100">
-                <div className="flex items-start gap-3 mb-3">
-                  <div className="h-5 w-5 sm:h-6 sm:w-6 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-red-600 font-bold text-xs sm:text-sm">✕</span>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-gray-900 mb-2 text-sm sm:text-base">What We Don't Do</h3>
-                    <ul className="space-y-2 text-gray-700 text-sm sm:text-base">
-                     <li>❌ Gamble with unverified freelancers</li>
-                     <li>❌ Outsource to random third parties</li>
-                     <li>❌ Promote crowded, low-quality mass tours</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-6 sm:mt-8 p-4 sm:p-6 bg-white rounded-xl border-2 border-blue-200">
-              <p className="text-sm sm:text-base text-gray-700 leading-relaxed text-center">
-                  We take our commitment to you seriously. By <strong>strictly limiting reservations to match our own fleet’s capacity</strong>, 
-                  we ensure that every confirmed booking is backed by a specific vehicle and driver. <strong className="text-blue-600">If we don't
-                  have the space, we don't take the booking.</strong> It’s that simple.
-              </p>
-            </div>
-          </div>
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            How It Works
+          </h2>
+          <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
+            Simple, transparent, reliable—book your private transfer in 3 easy steps
+          </p>
         </div>
+
+        {/* 3 Steps */}
+        <div className="grid sm:grid-cols-3 gap-8 sm:gap-6">
+
+          {/* Step 1: Book */}
+          <div className="text-center">
+            <div className="relative mb-6">
+              {/* Circle with Number */}
+              <div className="h-20 w-20 sm:h-24 sm:w-24 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto shadow-xl">
+                <Calendar className="h-10 w-10 sm:h-12 sm:w-12 text-white" />
+              </div>
+              {/* Step Number Badge */}
+              <div className="absolute -top-2 -right-2 sm:-right-4 h-8 w-8 bg-blue-600 border-4 border-white rounded-full flex items-center justify-center mx-auto shadow-lg">
+                <span className="text-white font-bold text-sm">1</span>
+              </div>
+              {/* Connector Line - Hidden on mobile */}
+              <div className="hidden sm:block absolute top-10 left-[calc(50%+48px)] w-[calc(100%-48px)] h-1 bg-gradient-to-r from-blue-300 to-green-300"></div>
+            </div>
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">
+              Book Online
+            </h3>
+            <p className="text-gray-600 leading-relaxed">
+              Select your route, date, and passengers. Get instant pricing with no hidden fees.
+            </p>
+          </div>
+
+          {/* Step 2: We Confirm */}
+          <div className="text-center">
+            <div className="relative mb-6">
+              {/* Circle with Number */}
+              <div className="h-20 w-20 sm:h-24 sm:w-24 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto shadow-xl">
+                <CheckCircle className="h-10 w-10 sm:h-12 sm:w-12 text-white" />
+              </div>
+              {/* Step Number Badge */}
+              <div className="absolute -top-2 -right-2 sm:-right-4 h-8 w-8 bg-green-600 border-4 border-white rounded-full flex items-center justify-center mx-auto shadow-lg">
+                <span className="text-white font-bold text-sm">2</span>
+              </div>
+              {/* Connector Line - Hidden on mobile */}
+              <div className="hidden sm:block absolute top-10 left-[calc(50%+48px)] w-[calc(100%-48px)] h-1 bg-gradient-to-r from-green-300 to-purple-300"></div>
+            </div>
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">
+              Get Confirmed
+            </h3>
+            <p className="text-gray-600 leading-relaxed">
+              We confirm your booking and send all details: driver info, vehicle, pickup time.
+            </p>
+          </div>
+
+          {/* Step 3: Meet Your Driver */}
+          <div className="text-center">
+            <div className="relative mb-6">
+              {/* Circle with Number */}
+              <div className="h-20 w-20 sm:h-24 sm:w-24 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center mx-auto shadow-xl">
+                <Car className="h-10 w-10 sm:h-12 sm:w-12 text-white" />
+              </div>
+              {/* Step Number Badge */}
+              <div className="absolute -top-2 -right-2 sm:-right-4 h-8 w-8 bg-purple-600 border-4 border-white rounded-full flex items-center justify-center mx-auto shadow-lg">
+                <span className="text-white font-bold text-sm">3</span>
+              </div>
+            </div>
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">
+              Relax & Enjoy
+            </h3>
+            <p className="text-gray-600 leading-relaxed">
+              Your driver picks you up on time. Sit back, relax, and enjoy the journey to your destination.
+            </p>
+          </div>
+
+        </div>
+
+        {/* Bottom Note */}
+        <div className="mt-12 p-6 bg-blue-50 border-2 border-blue-200 rounded-2xl text-center">
+          <p className="text-gray-700 text-sm sm:text-base leading-relaxed max-w-3xl mx-auto">
+            <strong className="text-blue-600">Direct service with our own fleet.</strong> We only accept bookings we can personally handle.
+            If we don't have capacity, we'll be upfront with you—your confirmed booking is guaranteed.
+          </p>
+        </div>
+
       </div>
     </section>
   );

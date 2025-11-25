@@ -26,15 +26,42 @@ export default function WhyChooseUs() {
               Your Trusted Transportation Partner
             </span>
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 sm:mb-6 px-4">
-            Why Trust Can't Wait Travel CR for Your Private Transfers in Costa Rica?
+          <h2 className="text-3xl sm:text-4xl md:text-4xl font-bold text-gray-900 mb-4 sm:mb-6 px-4">
+            The Best Way to Travel Between Destinations in Costa Rica
           </h2>
-          <p className="text-base sm:text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed px-4">
-            We are a <strong>100% Costa Rican team</strong> based in the heart of <strong>La Fortuna, Arenal</strong>.
-            With over <strong>30 years of combined experience in private transfers</strong>, we know every curve of these roads. We combine
-            the warmth of <em className="text-blue-600">Pura Vida</em> hospitality with the strict professionalism
-            of a top-tier transport operator, connecting Costa Rica's most popular routes daily.
+          <p className="text-base sm:text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed px-4 mb-6">
+            When it comes to moving from point A to point B in Costa Rica, <strong>private transfers with a trusted company like Can't Wait Travel CR</strong> are the best option for travelers who value <em>peace of mind and security</em>.
+            Our team of local experts offers direct, private transportation with <strong>over 30 years of combined experience</strong> in Costa Rican tourism.
+            We know every curve of these roads and combine the warmth of <em className="text-blue-600">Pura Vida</em> hospitality with the strict professionalism
+            of a licensed transport operator, ensuring you arrive safely and comfortably every time.
           </p>
+
+          {/* Routes SEO Content */}
+          <div className="max-w-3xl mx-auto px-4">
+            <p className="text-base sm:text-lg text-gray-700 leading-relaxed mb-4">
+              Whether you're traveling from <strong>Tamarindo to La Fortuna</strong>, <strong>San José to Manuel Antonio</strong>, or <strong>Guanacaste to anywhere in Costa Rica</strong>, we've got you covered.
+              With <strong className="text-blue-600">over 400+ routes</strong> connecting all major destinations, we make getting around Costa Rica simple and stress-free.
+            </p>
+            <div className="text-center">
+              <a
+                href="#main-content"
+                onClick={(e) => {
+                  e.preventDefault();
+                  const bookingSection = document.querySelector('#main-content');
+                  if (bookingSection) {
+                    const offset = bookingSection.getBoundingClientRect().top + window.scrollY + 800;
+                    window.scrollTo({ top: offset, behavior: 'smooth' });
+                  }
+                }}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition-all hover:shadow-xl hover:scale-105"
+              >
+                Check Your Route & Get a Quote
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
+            </div>
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-start mb-12 md:mb-16">
@@ -158,7 +185,7 @@ export default function WhyChooseUs() {
                 <Heart className="h-8 w-8 text-green-600" />
                 <div>
                   <p className="font-bold text-gray-900 text-base">100% Costa Rican</p>
-                  <p className="text-sm text-gray-700">Based in La Fortuna (Arenal Volcano) </p>
+                  <p className="text-sm text-gray-700">Nationwide coverage across Costa Rica</p>
                 </div>
               </div>
             </div>

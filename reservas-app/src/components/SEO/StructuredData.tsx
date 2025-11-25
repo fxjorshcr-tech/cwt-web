@@ -6,11 +6,11 @@
 export default function StructuredData() {
   const localBusinessSchema = {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
+    "@type": ["LocalBusiness", "TravelAgency"],
     "@id": "https://cantwaittravelcr.com/#business",
-    "name": "Can't Wait Travel",
+    "name": "Can't Wait Travel CR",
     "image": "https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/logo-cant-wait-travel.webp",
-    "description": "Professional private shuttle service in Costa Rica with over 30 years of combined experience. Bilingual drivers, modern vehicles, ICT licensed 4121-2025.",
+    "description": "Professional private shuttle and airport transfer service in Costa Rica. Over 30 years of combined experience, bilingual drivers, modern vehicles. ICT licensed #4121-2025.",
     "address": {
       "@type": "PostalAddress",
       "addressLocality": "La Fortuna",
@@ -38,11 +38,6 @@ export default function StructuredData() {
       ],
       "opens": "00:00",
       "closes": "23:59"
-    },
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.9",
-      "reviewCount": "150"
     }
   };
 
@@ -50,9 +45,9 @@ export default function StructuredData() {
     "@context": "https://schema.org",
     "@type": "Service",
     "@id": "https://cantwaittravelcr.com/#service",
-    "serviceType": "Private Shuttle Transportation",
-    "name": "Private Shuttle Service Costa Rica",
-    "description": "Door-to-door private shuttle service from SJO and LIR airports to all major Costa Rica destinations including La Fortuna, Manuel Antonio, Tamarindo, and Monteverde.",
+    "serviceType": "Private Shuttle & Airport Transfer",
+    "name": "Private Shuttle & Airport Transfers Costa Rica",
+    "description": "Door-to-door private shuttle and airport transfer service from SJO and LIR airports to all major Costa Rica destinations including La Fortuna, Manuel Antonio, Tamarindo, and Monteverde. Over 400+ routes available.",
     "provider": {
       "@id": "https://cantwaittravelcr.com/#business"
     },

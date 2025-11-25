@@ -48,27 +48,27 @@ export default function TransfersPage() {
 
           <div className="relative z-10 h-full flex flex-col items-center justify-center px-6">
             <div className="text-center max-w-4xl">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-xl leading-tight">
+              <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold text-white mb-3 sm:mb-4 drop-shadow-xl leading-tight">
                 Private Transportation in Costa Rica
               </h1>
 
-              <p className="text-base sm:text-lg md:text-xl text-white/95 mb-8 drop-shadow-md max-w-3xl mx-auto font-medium">
+              <p className="text-sm sm:text-base md:text-xl text-white/95 mb-6 sm:mb-8 drop-shadow-md max-w-3xl mx-auto font-medium">
                 Direct Operator | Stress-Free Travel
               </p>
 
-              <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8">
+              <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 md:gap-8">
                 {/* Tags unificados visualmente */}
-                <div className="flex items-center gap-2 text-white bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
-                  <Shield className="h-4 w-4 text-green-400" />
-                  <span className="text-sm font-semibold">ICT Certified</span>
+                <div className="flex items-center gap-2 text-white bg-white/10 backdrop-blur-md px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-white/20">
+                  <Shield className="h-3.5 sm:h-4 w-3.5 sm:w-4 text-green-400" />
+                  <span className="text-xs sm:text-sm font-semibold">ICT Certified</span>
                 </div>
-                <div className="flex items-center gap-2 text-white bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
-                  <Users className="h-4 w-4 text-orange-400" />
-                  <span className="text-sm font-semibold">Local Experts</span>
+                <div className="flex items-center gap-2 text-white bg-white/10 backdrop-blur-md px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-white/20">
+                  <Users className="h-3.5 sm:h-4 w-3.5 sm:w-4 text-orange-400" />
+                  <span className="text-xs sm:text-sm font-semibold">Local Experts</span>
                 </div>
-                <div className="flex items-center gap-2 text-white bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
-                  <CheckCircle2 className="h-4 w-4 text-blue-400" />
-                  <span className="text-sm font-semibold">100% Private</span>
+                <div className="flex items-center gap-2 text-white bg-white/10 backdrop-blur-md px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-white/20">
+                  <CheckCircle2 className="h-3.5 sm:h-4 w-3.5 sm:w-4 text-blue-400" />
+                  <span className="text-xs sm:text-sm font-semibold">100% Private</span>
                 </div>
               </div>
             </div>
