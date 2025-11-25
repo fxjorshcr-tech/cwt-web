@@ -134,17 +134,50 @@ export default function PrivateToursPage() {
       </section>
 
       {/* Tours Grid */}
-      <section className="py-10 sm:py-16 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-12 sm:py-20 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-4 max-w-7xl">
 
-          {/* Category Title */}
-          <div className="mb-8">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
-              Available Tours
+          {/* La Fortuna Introduction */}
+          <div className="mb-12 text-center max-w-4xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 rounded-full mb-6">
+              <span className="text-green-700 font-semibold text-sm">Costa Rica&apos;s Adventure Capital</span>
+            </div>
+
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+              Memorable Experiences in <span className="text-green-600">La Fortuna</span>
             </h2>
-            <p className="text-gray-600">
-              Experience La Fortuna's best attractions with local guides who know every trail and secret spot.
+
+            <p className="text-lg text-gray-600 leading-relaxed mb-8">
+              Nestled at the foot of the majestic Arenal Volcano, La Fortuna is where adventure meets tropical paradise.
+              With its warm, welcoming locals and year-round mild climate averaging 25°C, this rainforest gem
+              offers the perfect blend of thrilling activities and natural beauty.
             </p>
+
+            {/* La Fortuna Features */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+              <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                <div className="text-3xl mb-2">🌿</div>
+                <h3 className="font-bold text-gray-900 mb-1">Tropical Climate</h3>
+                <p className="text-sm text-gray-600">Year-round warmth with refreshing rainforest breezes</p>
+              </div>
+              <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                <div className="text-3xl mb-2">🤝</div>
+                <h3 className="font-bold text-gray-900 mb-1">Pura Vida Spirit</h3>
+                <p className="text-sm text-gray-600">Friendly locals who share their love for nature</p>
+              </div>
+              <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                <div className="text-3xl mb-2">🌋</div>
+                <h3 className="font-bold text-gray-900 mb-1">Endless Adventures</h3>
+                <p className="text-sm text-gray-600">Waterfalls, hot springs, wildlife & volcano views</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Section Divider */}
+          <div className="flex items-center gap-4 mb-10">
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+            <span className="text-gray-500 font-medium text-sm uppercase tracking-wide">Our Tours</span>
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
           </div>
 
           {/* Tours Grid */}
