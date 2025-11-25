@@ -438,9 +438,10 @@ function BookingDetailsContent() {
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-4 py-6 pb-40 bg-gray-50 min-h-screen">
 
-        {/* Trip Header - Compact */}
+        {/* Trip Header - Mobile Responsive */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-t-xl px-4 py-3">
-          <div className="flex items-center justify-between mb-2">
+          {/* Header Row */}
+          <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <div className="h-7 w-7 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-sm">
                 {currentTripIndex + 1}
@@ -449,13 +450,25 @@ function BookingDetailsContent() {
             </div>
             <p className="text-white font-bold text-lg">${currentTrip.price}</p>
           </div>
-          <div className="flex items-center gap-2 text-white text-sm font-semibold">
-            <MapPin className="h-3.5 w-3.5 text-blue-200 flex-shrink-0" />
-            <span className="truncate">{currentTrip.from_location}</span>
-            <ArrowRight className="h-3.5 w-3.5 text-blue-200 flex-shrink-0" />
-            <span className="truncate">{currentTrip.to_location}</span>
+
+          {/* Route - Vertical stack on mobile */}
+          <div className="space-y-1.5 mb-3">
+            <div className="flex items-center gap-2">
+              <div className="h-5 w-5 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                <MapPin className="h-2.5 w-2.5 text-white" />
+              </div>
+              <span className="text-white text-sm font-medium leading-tight">{currentTrip.from_location}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-5 w-5 rounded-full bg-orange-400/30 flex items-center justify-center flex-shrink-0">
+                <MapPin className="h-2.5 w-2.5 text-orange-200" />
+              </div>
+              <span className="text-white text-sm font-medium leading-tight">{currentTrip.to_location}</span>
+            </div>
           </div>
-          <div className="flex items-center gap-4 mt-2 text-blue-100 text-xs">
+
+          {/* Trip Details - Flexible wrap */}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-blue-100 text-xs">
             <span className="flex items-center gap-1">
               <Calendar className="h-3 w-3" />
               {formatDate(currentTrip.date)}
@@ -656,17 +669,17 @@ function BookingDetailsContent() {
           <div className="max-w-4xl mx-auto px-4 py-3">
             {/* Price Summary */}
             <div className="flex items-center justify-between mb-3">
-              <div className="text-sm">
-                <span className="text-gray-600">Trip {currentTripIndex + 1} Total:</span>
-                {priceCalculation.nightSurcharge > 0 || priceCalculation.addOnsPrice > 0 ? (
-                  <span className="text-xs text-gray-500 ml-2">
-                    (${priceCalculation.basePrice} base
-                    {priceCalculation.nightSurcharge > 0 && ` + $${priceCalculation.nightSurcharge} night`}
-                    {priceCalculation.addOnsPrice > 0 && ` + $${priceCalculation.addOnsPrice} add-ons`})
+              <div className="text-xs sm:text-sm">
+                <span className="text-gray-600">Transfer {currentTripIndex + 1}:</span>
+                {(priceCalculation.nightSurcharge > 0 || priceCalculation.addOnsPrice > 0) && (
+                  <span className="text-[10px] sm:text-xs text-gray-500 ml-1 sm:ml-2 block sm:inline">
+                    ${priceCalculation.basePrice}
+                    {priceCalculation.nightSurcharge > 0 && ` +$${priceCalculation.nightSurcharge}`}
+                    {priceCalculation.addOnsPrice > 0 && ` +$${priceCalculation.addOnsPrice}`}
                   </span>
-                ) : null}
+                )}
               </div>
-              <span className="text-2xl font-bold text-blue-600">${priceCalculation.subtotal}</span>
+              <span className="text-xl sm:text-2xl font-bold text-blue-600">${priceCalculation.subtotal}</span>
             </div>
 
             {/* Navigation Buttons */}

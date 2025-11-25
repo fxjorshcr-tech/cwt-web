@@ -19,7 +19,7 @@ import {
   AlertCircle,
   Shield,
   Car,
-  Globe,
+  BadgeCheck,
   Headphones,
 } from 'lucide-react';
 import BookingNavbar from '@/components/booking/BookingNavbar';
@@ -448,62 +448,50 @@ function PreviewPageContent() {
                     renderEditForm(false)
                   ) : (
                     // View Mode
-                    <div className="p-5">
-                      {/* Route Display */}
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 text-gray-600 text-xs mb-1">
-                            <MapPin className="h-3 w-3 text-blue-600 flex-shrink-0" />
-                            From
-                          </div>
-                          <p className="font-semibold text-gray-900 truncate">{trip.from_location}</p>
-                        </div>
-                        <ArrowRight className="h-5 w-5 text-gray-400 flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 text-gray-600 text-xs mb-1">
-                            <MapPin className="h-3 w-3 text-orange-500 flex-shrink-0" />
-                            To
-                          </div>
-                          <p className="font-semibold text-gray-900 truncate">{trip.to_location}</p>
-                        </div>
-                      </div>
-
-                      {/* Trip Details */}
-                      <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+                    <div className="p-4 sm:p-5">
+                      {/* Route Display - Vertical on mobile */}
+                      <div className="space-y-2 mb-4">
                         <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                          <div className="min-w-0">
-                            <p className="text-xs text-gray-500">Date</p>
-                            <p className="text-sm font-medium text-gray-900 truncate">{formatDisplayDate(trip.date)}</p>
+                          <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                            <MapPin className="h-3 w-3 text-blue-600" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[10px] text-gray-500 uppercase">From</p>
+                            <p className="text-sm font-semibold text-gray-900 leading-tight">{trip.from_location}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Users className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                          <div>
-                            <p className="text-xs text-gray-500">Passengers</p>
-                            <p className="text-sm font-medium text-gray-900">
-                              {trip.adults + trip.children}
-                              {trip.children > 0 && (
-                                <span className="text-gray-500 text-xs ml-1">
-                                  ({trip.adults}A, {trip.children}C)
-                                </span>
-                              )}
-                            </p>
+                          <div className="h-6 w-6 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
+                            <MapPin className="h-3 w-3 text-orange-500" />
                           </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                          <div>
-                            <p className="text-xs text-gray-500">Duration</p>
-                            <p className="text-sm font-medium text-gray-900">{trip.duration}</p>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[10px] text-gray-500 uppercase">To</p>
+                            <p className="text-sm font-semibold text-gray-900 leading-tight">{trip.to_location}</p>
                           </div>
                         </div>
                       </div>
 
-                      {/* Price */}
-                      <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-                        <span className="text-gray-600">Trip Price</span>
-                        <span className="text-xl font-bold text-blue-600">${trip.price}</span>
+                      {/* Trip Details - 2x2 grid on mobile */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-gray-100">
+                        <div className="bg-gray-50 rounded-lg p-2 text-center">
+                          <Calendar className="h-4 w-4 text-blue-500 mx-auto mb-1" />
+                          <p className="text-[10px] text-gray-500 uppercase">Date</p>
+                          <p className="text-xs font-semibold text-gray-900">{formatDisplayDate(trip.date)}</p>
+                        </div>
+                        <div className="bg-gray-50 rounded-lg p-2 text-center">
+                          <Users className="h-4 w-4 text-blue-500 mx-auto mb-1" />
+                          <p className="text-[10px] text-gray-500 uppercase">Guests</p>
+                          <p className="text-xs font-semibold text-gray-900">{trip.adults + trip.children} pax</p>
+                        </div>
+                        <div className="bg-gray-50 rounded-lg p-2 text-center">
+                          <Clock className="h-4 w-4 text-blue-500 mx-auto mb-1" />
+                          <p className="text-[10px] text-gray-500 uppercase">Duration</p>
+                          <p className="text-xs font-semibold text-gray-900">{trip.duration || 'N/A'}</p>
+                        </div>
+                        <div className="bg-blue-50 rounded-lg p-2 text-center">
+                          <p className="text-[10px] text-blue-600 uppercase font-medium">Price</p>
+                          <p className="text-lg font-bold text-blue-600">${trip.price}</p>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -582,35 +570,35 @@ function PreviewPageContent() {
         </div>
 
         {/* Trust Badges */}
-        <div className="mt-12 border-t border-gray-200 pt-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-200">
-              <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
-                <Car className="h-6 w-6 text-blue-600" />
+        <div className="max-w-5xl mx-auto px-4 mt-12 border-t border-gray-200 pt-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+            <div className="bg-white rounded-xl p-3 sm:p-4 text-center shadow-sm border border-gray-200">
+              <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-2 sm:mb-3">
+                <Car className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
               </div>
-              <h3 className="font-bold text-gray-900 text-sm">100% Private</h3>
-              <p className="text-xs text-gray-500 mt-1">No shared shuttles, just you and your group</p>
+              <h3 className="font-bold text-gray-900 text-xs sm:text-sm">100% Private</h3>
+              <p className="text-[10px] sm:text-xs text-gray-500 mt-1 hidden sm:block">No shared shuttles</p>
             </div>
-            <div className="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-200">
-              <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-3">
-                <Shield className="h-6 w-6 text-green-600" />
+            <div className="bg-white rounded-xl p-3 sm:p-4 text-center shadow-sm border border-gray-200">
+              <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-2 sm:mb-3">
+                <Shield className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
               </div>
-              <h3 className="font-bold text-gray-900 text-sm">Fully Insured</h3>
-              <p className="text-xs text-gray-500 mt-1">Complete coverage for your peace of mind</p>
+              <h3 className="font-bold text-gray-900 text-xs sm:text-sm">Fully Insured</h3>
+              <p className="text-[10px] sm:text-xs text-gray-500 mt-1 hidden sm:block">Complete coverage</p>
             </div>
-            <div className="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-200">
-              <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-3">
-                <Globe className="h-6 w-6 text-purple-600" />
+            <div className="bg-white rounded-xl p-3 sm:p-4 text-center shadow-sm border border-gray-200">
+              <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-2 sm:mb-3">
+                <BadgeCheck className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
               </div>
-              <h3 className="font-bold text-gray-900 text-sm">Bilingual Drivers</h3>
-              <p className="text-xs text-gray-500 mt-1">English & Spanish speaking professionals</p>
+              <h3 className="font-bold text-gray-900 text-xs sm:text-sm">Licensed & Vetted</h3>
+              <p className="text-[10px] sm:text-xs text-gray-500 mt-1 hidden sm:block">Certified drivers</p>
             </div>
-            <div className="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-200">
-              <div className="h-12 w-12 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-3">
-                <Headphones className="h-6 w-6 text-orange-600" />
+            <div className="bg-white rounded-xl p-3 sm:p-4 text-center shadow-sm border border-gray-200">
+              <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-2 sm:mb-3">
+                <Headphones className="h-5 w-5 sm:h-6 sm:w-6 text-orange-600" />
               </div>
-              <h3 className="font-bold text-gray-900 text-sm">24/7 Support</h3>
-              <p className="text-xs text-gray-500 mt-1">WhatsApp & phone support anytime</p>
+              <h3 className="font-bold text-gray-900 text-xs sm:text-sm">24/7 Support</h3>
+              <p className="text-[10px] sm:text-xs text-gray-500 mt-1 hidden sm:block">Always available</p>
             </div>
           </div>
         </div>

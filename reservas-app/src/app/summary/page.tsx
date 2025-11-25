@@ -371,7 +371,7 @@ function SummaryPageContent() {
       <BookingNavbar />
       <FAQModal isOpen={showFAQModal} onClose={() => setShowFAQModal(false)} />
 
-      <section className="relative h-64 md:h-80 w-full overflow-hidden">
+      <section className="relative h-40 sm:h-56 md:h-72 w-full overflow-hidden">
         <Image
           src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/puerto-viejo-costa-rica-beach.webp"
           alt="Costa Rica Beach"
@@ -384,11 +384,11 @@ function SummaryPageContent() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center text-white px-4">
-            <h1 className="text-3xl md:text-5xl font-bold mb-2 drop-shadow-lg">
+            <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-2 drop-shadow-lg">
               Booking Summary
             </h1>
-            <p className="text-lg md:text-xl drop-shadow-md">
-              Review your reservation details before confirming
+            <p className="text-sm sm:text-lg md:text-xl drop-shadow-md">
+              Review your details before confirming
             </p>
           </div>
         </div>
@@ -396,15 +396,15 @@ function SummaryPageContent() {
 
       <main className="min-h-screen bg-gray-50">
         <div className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
-          <div className="max-w-5xl mx-auto px-4 py-8">
+          <div className="max-w-5xl mx-auto px-4 py-4 sm:py-6">
             <BookingStepper currentStep={3} />
           </div>
         </div>
 
-        <div className="py-12">
+        <div className="py-6 sm:py-10">
           <div className="max-w-5xl mx-auto px-4">
-            <div className="grid lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2 space-y-6">
+            <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+              <div className="lg:col-span-2 space-y-4 sm:space-y-6">
                 {trips.map((trip, index) => (
                   <TripSummaryCard
                     key={trip.id}

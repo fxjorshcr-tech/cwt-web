@@ -1,5 +1,5 @@
 // src/components/summary/TripSummaryCard.tsx
-import { MapPin, ShoppingCart, Plane, MessageSquare, Calendar, Clock, Users, ArrowRight } from 'lucide-react';
+import { MapPin, ShoppingCart, Plane, MessageSquare, Calendar, Clock, Users } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { formatDate, formatTime, formatCurrency } from '@/lib/formatters';
 
@@ -31,7 +31,7 @@ interface TripSummaryCardProps {
 export function TripSummaryCard({ trip, tripNumber, totalTrips, addOnNames }: TripSummaryCardProps) {
   return (
     <Card className="overflow-hidden">
-      {/* Header with route */}
+      {/* Header with route - Mobile responsive */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-3">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
@@ -42,10 +42,20 @@ export function TripSummaryCard({ trip, tripNumber, totalTrips, addOnNames }: Tr
           </div>
           <span className="text-white font-bold">{formatCurrency(trip.final_price || trip.price)}</span>
         </div>
-        <div className="flex items-center gap-2 text-white text-sm">
-          <span className="truncate max-w-[40%]">{trip.from_location}</span>
-          <ArrowRight className="h-4 w-4 text-blue-200 flex-shrink-0" />
-          <span className="truncate max-w-[40%]">{trip.to_location}</span>
+        {/* Route - Vertical stack */}
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-4 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+              <MapPin className="h-2 w-2 text-white" />
+            </div>
+            <span className="text-white text-sm font-medium leading-tight">{trip.from_location}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-4 rounded-full bg-orange-400/30 flex items-center justify-center flex-shrink-0">
+              <MapPin className="h-2 w-2 text-orange-200" />
+            </div>
+            <span className="text-white text-sm font-medium leading-tight">{trip.to_location}</span>
+          </div>
         </div>
       </div>
 
