@@ -59,7 +59,7 @@ export default function ComparisonTable() {
                 <td className="p-4 sm:p-6 font-semibold text-gray-900 text-sm sm:text-base">Direct Route</td>
                 <td className="p-4 sm:p-6 bg-blue-50/30 border-l border-r-2 border-blue-200 text-center">
                   <CheckCircle2 className="h-6 w-6 sm:h-7 sm:w-7 text-green-600 mx-auto" />
-                  <span className="text-xs sm:text-sm text-gray-700 mt-1 block font-bold">No stops</span>
+                  <span className="text-xs sm:text-sm text-gray-700 mt-1 block font-bold">Direct + strategic stops</span>
                 </td>
                 <td className="p-4 sm:p-6 text-center">
                   <XCircle className="h-6 w-6 sm:h-7 sm:w-7 text-red-500 mx-auto" />

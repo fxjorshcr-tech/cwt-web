@@ -90,8 +90,8 @@ export default function HowWeWork() {
         {/* Bottom Note */}
         <div className="mt-12 p-6 bg-blue-50 border-2 border-blue-200 rounded-2xl text-center">
           <p className="text-gray-700 text-sm sm:text-base leading-relaxed max-w-3xl mx-auto">
-            <strong className="text-blue-600">Direct service, no middlemen.</strong> We only accept bookings we can handle with our own fleet.
-            If we don't have capacity, we won't take your reservation—your confirmed booking is guaranteed.
+            <strong className="text-blue-600">Direct service with our own fleet.</strong> We only accept bookings we can personally handle.
+            If we don't have capacity, we'll be upfront with you—your confirmed booking is guaranteed.
           </p>
         </div>
 

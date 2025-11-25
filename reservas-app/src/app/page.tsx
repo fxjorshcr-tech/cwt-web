@@ -22,6 +22,10 @@ const WhyChooseUs = dynamic(() => import("@/components/sections/WhyChooseUs"), {
   loading: () => <ComponentSkeleton />,
 });
 
+const HomeAddons = dynamic(() => import("@/components/sections/HomeAddons"), {
+  loading: () => <ComponentSkeleton />,
+});
+
 const HowWeWork = dynamic(() => import("@/components/sections/HowWeWork"), {
   loading: () => <ComponentSkeleton />,
 });
@@ -191,6 +195,7 @@ export default async function Home() {
         {/* New Optimized Structure - Transfers First */}
         <WhyBookDirect />
         <WhyChooseUs />
+        <HomeAddons />
         <HowWeWork />
         <MostBookedCTA />
         <ComparisonTable />

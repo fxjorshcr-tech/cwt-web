@@ -75,7 +75,7 @@ export default function Guarantees() {
               Price You See = Price You Pay
             </h3>
             <p className="text-sm text-gray-700 leading-relaxed">
-              <strong className="text-orange-600">No hidden fees, no surprises.</strong> The price on your booking is the final price. All-inclusive.
+              <strong className="text-orange-600">Transparent pricing, every time.</strong> The price on your booking is the final price. All-inclusive.
             </p>
           </div>
 

@@ -21,7 +21,7 @@ export default function WhyBookDirect() {
           </h2>
           <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
             When you book with Can't Wait Travel CR, you're working directly with the people who will drive you.
-            No middlemen, no outsourcing, no surprises.
+            Direct communication, transparent pricing, and personalized service from start to finish.
           </p>
         </div>
 
@@ -37,7 +37,7 @@ export default function WhyBookDirect() {
               Operated Directly by Us
             </h3>
             <p className="text-gray-700 leading-relaxed">
-              We don't outsource to random drivers or third parties. Every vehicle is ours, every driver is vetted and employed by us.
+              Every vehicle is ours, every driver is trained, vetted, and employed directly by our team.
               <strong className="text-blue-600"> You're booking the people who will actually drive you.</strong>
             </p>
           </div>
@@ -65,8 +65,8 @@ export default function WhyBookDirect() {
               Licensed & Insured
             </h3>
             <p className="text-gray-700 leading-relaxed">
-              Full ICT tourism operator license #4121. Comprehensive insurance coverage.
-              <strong className="text-purple-600"> Professional, legal, and safe—</strong>not a random ride-share driver or unlicensed freelancer.
+              Full ICT tourism operator license #4121 with comprehensive insurance coverage.
+              <strong className="text-purple-600"> Professional, legal, and certified</strong> by Costa Rica's official tourism board.
             </p>
           </div>
 
@@ -93,8 +93,8 @@ export default function WhyBookDirect() {
               Fast WhatsApp Support
             </h3>
             <p className="text-gray-700 leading-relaxed">
-              No call centers, no automated responses. Message us on WhatsApp and get real answers as soon as possible from our team.
-              <strong className="text-cyan-600"> We're here to help whenever you need us.</strong>
+              Message us on WhatsApp and connect instantly with our bilingual team members who know every detail of your booking.
+              <strong className="text-cyan-600"> Real people, real answers, whenever you need us.</strong>
             </p>
           </div>
 
@@ -107,7 +107,7 @@ export default function WhyBookDirect() {
               Small Team, Big Attention to Detail
             </h3>
             <p className="text-gray-700 leading-relaxed">
-              Many big companies are impersonal. We're a family-run business where you'll meet the owners.
+              We're a family-run business where you'll meet the owners and receive personalized attention on every journey.
               <strong className="text-pink-600"> Your safety and comfort are our reputation—</strong>we take that seriously.
             </p>
           </div>
