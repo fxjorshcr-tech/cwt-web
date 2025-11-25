@@ -1,20 +1,36 @@
 // src/lib/supabase/client.ts
+// ✅ CORREGIDO: No lanzar errores a nivel de módulo para evitar crashes críticos
 
 import { createBrowserClient } from '@supabase/ssr';
 import { Database } from '@/lib/database.types';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-// Validate environment variables at module load time
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error(
-    'Missing Supabase environment variables. Please ensure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are set.'
-  );
-}
+/**
+ * Creates a Supabase browser client
+ * @throws Error if environment variables are not configured (deferred to runtime)
+ */
+export const createClient = () => {
+  // ✅ Validate at runtime instead of module load time
+  // This allows Error Boundaries to catch the error
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.error('[Supabase] Missing environment variables');
+    throw new Error(
+      'Configuration error. Please refresh the page or try again later.'
+    );
+  }
 
-export const createClient = () =>
-  createBrowserClient<Database>(
+  return createBrowserClient<Database>(
     supabaseUrl,
     supabaseAnonKey
   );
+};
+
+/**
+ * Check if Supabase is properly configured
+ * Use this for graceful degradation
+ */
+export const isSupabaseConfigured = (): boolean => {
+  return !!(supabaseUrl && supabaseAnonKey);
+};

@@ -1,4 +1,5 @@
 // src/contexts/CartContext.tsx
+// ✅ CORREGIDO: Manejo robusto de localStorage para evitar errores críticos
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
@@ -45,6 +46,69 @@ interface CartContextType {
   removeItem: (id: string) => void;
   clearCart: () => void;
   isInCart: (id: string) => boolean;
+  isStorageAvailable: boolean;
+}
+
+// ============================================
+// STORAGE HELPERS
+// ============================================
+
+/**
+ * ✅ Check if localStorage is available and working
+ * Safari private mode and some corporate browsers disable localStorage
+ */
+function checkStorageAvailable(): boolean {
+  if (typeof window === 'undefined') return false;
+
+  try {
+    const testKey = '__storage_test__';
+    window.localStorage.setItem(testKey, testKey);
+    window.localStorage.removeItem(testKey);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * ✅ Safe localStorage get with error handling
+ */
+function safeGetItem(key: string): string | null {
+  try {
+    if (!checkStorageAvailable()) return null;
+    return localStorage.getItem(key);
+  } catch (error) {
+    console.warn('[Cart] localStorage.getItem failed:', error);
+    return null;
+  }
+}
+
+/**
+ * ✅ Safe localStorage set with error handling
+ */
+function safeSetItem(key: string, value: string): boolean {
+  try {
+    if (!checkStorageAvailable()) return false;
+    localStorage.setItem(key, value);
+    return true;
+  } catch (error) {
+    // QuotaExceededError or SecurityError
+    console.warn('[Cart] localStorage.setItem failed:', error);
+    return false;
+  }
+}
+
+/**
+ * ✅ Safe localStorage remove with error handling
+ */
+function safeRemoveItem(key: string): void {
+  try {
+    if (checkStorageAvailable()) {
+      localStorage.removeItem(key);
+    }
+  } catch (error) {
+    console.warn('[Cart] localStorage.removeItem failed:', error);
+  }
 }
 
 // ============================================
@@ -60,35 +124,48 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isHydrated, setIsHydrated] = useState(false);
+  const [isStorageAvailable, setIsStorageAvailable] = useState(true);
 
-  // ✅ Load from localStorage on mount with validation
+  // ✅ Load from localStorage on mount with robust error handling
   useEffect(() => {
-    const savedCart = localStorage.getItem('cart');
+    const storageOk = checkStorageAvailable();
+    setIsStorageAvailable(storageOk);
+
+    if (!storageOk) {
+      console.warn('[Cart] localStorage not available - cart will not persist');
+      setIsHydrated(true);
+      return;
+    }
+
+    const savedCart = safeGetItem('cart');
     if (savedCart) {
       try {
         const parsed = JSON.parse(savedCart);
         // ✅ Validate parsed data before setting
         if (Array.isArray(parsed)) {
-          setItems(parsed);
+          // ✅ Additional validation: ensure each item has required fields
+          const validItems = parsed.filter(item =>
+            item && typeof item === 'object' && item.id && item.type
+          );
+          setItems(validItems);
         } else {
-          console.error('Invalid cart data in localStorage');
-          localStorage.removeItem('cart');
+          console.warn('[Cart] Invalid cart data format, clearing');
+          safeRemoveItem('cart');
         }
       } catch (error) {
-        console.error('Error loading cart:', error);
-        // ✅ Clear corrupted localStorage
-        localStorage.removeItem('cart');
+        console.warn('[Cart] Error parsing cart data:', error);
+        safeRemoveItem('cart');
       }
     }
     setIsHydrated(true);
   }, []);
 
-  // Save to localStorage whenever items change
+  // ✅ Save to localStorage whenever items change (with error handling)
   useEffect(() => {
-    if (isHydrated) {
-      localStorage.setItem('cart', JSON.stringify(items));
+    if (isHydrated && isStorageAvailable) {
+      safeSetItem('cart', JSON.stringify(items));
     }
-  }, [items, isHydrated]);
+  }, [items, isHydrated, isStorageAvailable]);
 
   const addItem = (item: CartItem) => {
     setItems((prev) => {
@@ -107,7 +184,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clearCart = () => {
     setItems([]);
-    localStorage.removeItem('cart');
+    safeRemoveItem('cart');
   };
 
   const isInCart = (id: string): boolean => {
@@ -118,9 +195,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const totalAmount = items.reduce((sum, item) => {
     if (item.type === 'shuttle') {
-      return sum + item.finalPrice;
+      return sum + (item.finalPrice || 0);
     } else {
-      return sum + item.price;
+      return sum + (item.price || 0);
     }
   }, 0);
 
@@ -132,6 +209,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     removeItem,
     clearCart,
     isInCart,
+    isStorageAvailable,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
