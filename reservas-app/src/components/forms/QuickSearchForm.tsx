@@ -144,6 +144,11 @@ export function QuickSearchForm({ className = '' }: QuickSearchFormProps) {
       onSubmit={handleSubmit}
       className={`bg-white rounded-2xl shadow-xl overflow-visible ${className}`}
     >
+      {/* Title */}
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-5 py-4 rounded-t-2xl">
+        <h2 className="text-white font-bold text-lg text-center">Get an Instant Quote</h2>
+      </div>
+
       {error && (
         <div className="px-5 pt-5">
           <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 flex items-center justify-between">

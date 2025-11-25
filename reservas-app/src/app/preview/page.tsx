@@ -310,7 +310,7 @@ function PreviewPageContent() {
             {isNewTrip ? (
               <>
                 <Plus className="h-4 w-4" />
-                Add Trip
+                Add Transfer
               </>
             ) : (
               <>
@@ -395,7 +395,7 @@ function PreviewPageContent() {
               {trips.map((trip, index) => (
                 <div
                   key={index}
-                  className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
+                  className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-visible"
                 >
                   {/* Trip Header */}
                   <div className="bg-gradient-to-r from-blue-50 to-blue-100 px-5 py-3 border-b border-blue-200 flex items-center justify-between">
@@ -404,7 +404,7 @@ function PreviewPageContent() {
                         {index + 1}
                       </div>
                       <span className="font-semibold text-gray-900">
-                        {trips.length > 1 ? `Trip ${index + 1}` : 'Your Transfer'}
+                        {trips.length > 1 ? `Transfer ${index + 1}` : 'Your Transfer'}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -498,24 +498,24 @@ function PreviewPageContent() {
                 </div>
               ))}
 
-              {/* Add Trip Form */}
+              {/* Add Transfer Form */}
               {showAddTrip && (
-                <div className="bg-white rounded-xl shadow-sm border border-dashed border-blue-300 overflow-hidden">
+                <div className="bg-white rounded-xl shadow-sm border border-dashed border-blue-300 overflow-visible">
                   <div className="bg-blue-50 px-5 py-3 border-b border-blue-200">
-                    <span className="font-semibold text-gray-900">Add Another Trip</span>
+                    <span className="font-semibold text-gray-900">Add Another Transfer</span>
                   </div>
                   {renderEditForm(true)}
                 </div>
               )}
 
-              {/* Add Trip Button */}
+              {/* Add Transfer Button */}
               {!showAddTrip && editingIndex === null && (
                 <button
                   onClick={startAddTrip}
                   className="w-full py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 font-medium hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
                 >
                   <Plus className="h-5 w-5" />
-                  Add Another Trip
+                  Add Another Transfer
                 </button>
               )}
             </div>
@@ -528,25 +528,13 @@ function PreviewPageContent() {
                   <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-5 py-4">
                     <h2 className="text-white font-bold text-lg">Order Summary</h2>
                   </div>
-                  <div className="p-5 space-y-4">
+                  <div className="p-5 space-y-3">
                     {trips.map((trip, index) => (
-                      <div key={index} className="pb-3 border-b border-gray-100 last:border-0 last:pb-0">
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900">
-                              {trips.length > 1 ? `Transfer ${index + 1}` : 'Transfer'}
-                            </p>
-                            <p className="text-xs text-gray-500 truncate">
-                              {trip.from_location} → {trip.to_location}
-                            </p>
-                          </div>
-                          <span className="font-bold text-gray-900 ml-2">${trip.price}</span>
-                        </div>
-                        <div className="flex items-center gap-3 text-xs text-gray-500">
-                          <span>{formatDisplayDate(trip.date)}</span>
-                          <span>•</span>
-                          <span>{trip.adults + trip.children} pax</span>
-                        </div>
+                      <div key={index} className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-700">
+                          {trips.length > 1 ? `Transfer ${index + 1}` : 'Transfer'}
+                        </span>
+                        <span className="font-bold text-gray-900">${trip.price}</span>
                       </div>
                     ))}
 
