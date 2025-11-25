@@ -16,16 +16,18 @@ import {
   X,
   Edit2,
   Check,
-  ChevronDown,
-  DollarSign,
   AlertCircle,
 } from 'lucide-react';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import BookingStepper from '@/components/booking/BookingStepper';
 import { IncludedFeatures, ImportantInfo } from '@/components/summary';
+import { LocationAutocomplete } from '@/components/forms/LocationAutocomplete';
+import { ModernDatePicker } from '@/components/forms/ModernDatePicker';
+import { PassengerSelector } from '@/components/forms/PassengerSelector';
 import { createClient } from '@/lib/supabase/client';
 import { loadRoutesFromSupabase, type Route, calculateTripPrice } from '@/utils/bookingFormHelpers';
 import { loadBookingFromLocalStorage } from '@/utils/localStorageHelpers';
+import { formatDateToString, parseDateFromString } from '@/utils/timeHelpers';
 
 interface TripPreview {
   from_location: string;
@@ -52,10 +54,9 @@ function PreviewPageContent() {
   // Edit form state
   const [editOrigin, setEditOrigin] = useState('');
   const [editDestination, setEditDestination] = useState('');
-  const [editDate, setEditDate] = useState('');
-  const [editPassengers, setEditPassengers] = useState(2);
-  const [editOriginOpen, setEditOriginOpen] = useState(false);
-  const [editDestinationOpen, setEditDestinationOpen] = useState(false);
+  const [editDate, setEditDate] = useState<Date | null>(null);
+  const [editAdults, setEditAdults] = useState(2);
+  const [editChildren, setEditChildren] = useState(0);
 
   // Load booking data and routes
   useEffect(() => {
@@ -101,27 +102,6 @@ function PreviewPageContent() {
     load();
   }, [bookingId, router]);
 
-  // Get unique origins
-  const origins = useMemo(() => {
-    const originSet = new Set<string>();
-    routes.forEach((r) => originSet.add(r.origen));
-    return Array.from(originSet).sort();
-  }, [routes]);
-
-  // Get destinations for edit form
-  const editDestinations = useMemo(() => {
-    if (!editOrigin) return [];
-    const destSet = new Set<string>();
-    routes.filter((r) => r.origen === editOrigin).forEach((r) => destSet.add(r.destino));
-    return Array.from(destSet).sort();
-  }, [routes, editOrigin]);
-
-  // Minimum date
-  const minDate = useMemo(() => {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
-  }, []);
-
   // Total price
   const totalPrice = useMemo(() => {
     return trips.reduce((sum, trip) => sum + trip.price, 0);
@@ -143,27 +123,36 @@ function PreviewPageContent() {
     const trip = trips[index];
     setEditOrigin(trip.from_location);
     setEditDestination(trip.to_location);
-    setEditDate(trip.date);
-    setEditPassengers(trip.adults + trip.children);
+    setEditDate(parseDateFromString(trip.date));
+    setEditAdults(trip.adults);
+    setEditChildren(trip.children);
     setEditingIndex(index);
+    setShowAddTrip(false);
   }
+
+  // Handle passengers change in edit mode
+  const handleEditPassengersChange = (adults: number, children: number) => {
+    setEditAdults(adults);
+    setEditChildren(children);
+  };
 
   // Save edit
   function saveEdit() {
-    if (editingIndex === null) return;
+    if (editingIndex === null || !editDate) return;
 
     const route = routes.find((r) => r.origen === editOrigin && r.destino === editDestination);
     if (!route) return;
 
-    const price = calculateTripPrice(route, editPassengers);
+    const totalPassengers = editAdults + editChildren;
+    const price = calculateTripPrice(route, totalPassengers);
 
     const newTrips = [...trips];
     newTrips[editingIndex] = {
       from_location: editOrigin,
       to_location: editDestination,
-      date: editDate,
-      adults: editPassengers,
-      children: 0,
+      date: formatDateToString(editDate),
+      adults: editAdults,
+      children: editChildren,
       price,
       duration: route.duracion,
       routeId: route.id,
@@ -185,25 +174,29 @@ function PreviewPageContent() {
     const lastTrip = trips[trips.length - 1];
     setEditOrigin(lastTrip.to_location);
     setEditDestination('');
-    setEditDate(lastTrip.date);
-    setEditPassengers(lastTrip.adults + lastTrip.children);
+    setEditDate(parseDateFromString(lastTrip.date));
+    setEditAdults(lastTrip.adults);
+    setEditChildren(lastTrip.children);
     setShowAddTrip(true);
     setEditingIndex(null);
   }
 
   // Save new trip
   function saveNewTrip() {
+    if (!editDate) return;
+
     const route = routes.find((r) => r.origen === editOrigin && r.destino === editDestination);
     if (!route) return;
 
-    const price = calculateTripPrice(route, editPassengers);
+    const totalPassengers = editAdults + editChildren;
+    const price = calculateTripPrice(route, totalPassengers);
 
     const newTrip: TripPreview = {
       from_location: editOrigin,
       to_location: editDestination,
-      date: editDate,
-      adults: editPassengers,
-      children: 0,
+      date: formatDateToString(editDate),
+      adults: editAdults,
+      children: editChildren,
       price,
       duration: route.duracion,
       routeId: route.id,
@@ -247,6 +240,88 @@ function PreviewPageContent() {
   function handleContinue() {
     saveToLocalStorage(trips);
     router.push(`/booking-details?booking_id=${bookingId}&trip=0`);
+  }
+
+  // Render edit/add form
+  function renderEditForm(isNewTrip: boolean) {
+    return (
+      <div className="p-5 space-y-4">
+        <div className="grid sm:grid-cols-2 gap-4">
+          {/* Origin */}
+          <LocationAutocomplete
+            label="Pick-up Location"
+            placeholder="Where from?"
+            value={editOrigin}
+            onChange={(val) => {
+              setEditOrigin(val);
+              // Reset destination if origin changes
+              if (val !== editOrigin) {
+                setEditDestination('');
+              }
+            }}
+            routes={routes}
+            filterByDestination={editDestination}
+            type="origin"
+          />
+
+          {/* Destination */}
+          <LocationAutocomplete
+            label="Drop-off Location"
+            placeholder={editOrigin ? "Where to?" : "Select origin first"}
+            value={editDestination}
+            onChange={setEditDestination}
+            routes={routes}
+            filterByOrigin={editOrigin}
+            disabled={!editOrigin}
+            type="destination"
+          />
+        </div>
+
+        <div className="grid sm:grid-cols-2 gap-4">
+          {/* Date */}
+          <ModernDatePicker
+            label="Travel Date"
+            value={editDate}
+            onChange={setEditDate}
+          />
+
+          {/* Passengers */}
+          <PassengerSelector
+            label="Passengers"
+            adults={editAdults}
+            children={editChildren}
+            onPassengersChange={handleEditPassengersChange}
+          />
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-2 pt-2">
+          <button
+            onClick={cancelEdit}
+            className="flex-1 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={isNewTrip ? saveNewTrip : saveEdit}
+            disabled={!editOrigin || !editDestination || !editDate}
+            className="flex-1 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 flex items-center justify-center gap-2"
+          >
+            {isNewTrip ? (
+              <>
+                <Plus className="h-4 w-4" />
+                Add Trip
+              </>
+            ) : (
+              <>
+                <Check className="h-4 w-4" />
+                Save
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    );
   }
 
   if (loading) {
@@ -358,168 +433,54 @@ function PreviewPageContent() {
 
                   {/* Trip Content */}
                   {editingIndex === index ? (
-                    // Edit Mode
-                    <div className="p-5 space-y-4">
-                      <div className="grid sm:grid-cols-2 gap-4">
-                        {/* Origin */}
-                        <div className="relative">
-                          <label className="block text-xs font-medium text-gray-600 mb-1.5">From</label>
-                          <button
-                            type="button"
-                            onClick={() => setEditOriginOpen(!editOriginOpen)}
-                            className="w-full h-11 px-4 bg-gray-50 border border-gray-200 rounded-lg flex items-center gap-2 hover:border-blue-400 text-left text-sm"
-                          >
-                            <MapPin className="h-4 w-4 text-blue-600" />
-                            <span className="flex-1 truncate">{editOrigin || 'Select'}</span>
-                            <ChevronDown className="h-4 w-4 text-gray-400" />
-                          </button>
-                          {editOriginOpen && (
-                            <div className="absolute z-50 left-0 right-0 mt-1 bg-white border rounded-lg shadow-xl max-h-48 overflow-y-auto">
-                              {origins.map((loc) => (
-                                <button
-                                  key={loc}
-                                  type="button"
-                                  onClick={() => {
-                                    setEditOrigin(loc);
-                                    setEditDestination('');
-                                    setEditOriginOpen(false);
-                                  }}
-                                  className="w-full px-4 py-2 text-left text-sm hover:bg-blue-50"
-                                >
-                                  {loc}
-                                </button>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Destination */}
-                        <div className="relative">
-                          <label className="block text-xs font-medium text-gray-600 mb-1.5">To</label>
-                          <button
-                            type="button"
-                            onClick={() => editOrigin && setEditDestinationOpen(!editDestinationOpen)}
-                            disabled={!editOrigin}
-                            className="w-full h-11 px-4 bg-gray-50 border border-gray-200 rounded-lg flex items-center gap-2 hover:border-blue-400 text-left text-sm disabled:opacity-50"
-                          >
-                            <MapPin className="h-4 w-4 text-orange-500" />
-                            <span className="flex-1 truncate">{editDestination || 'Select'}</span>
-                            <ChevronDown className="h-4 w-4 text-gray-400" />
-                          </button>
-                          {editDestinationOpen && (
-                            <div className="absolute z-50 left-0 right-0 mt-1 bg-white border rounded-lg shadow-xl max-h-48 overflow-y-auto">
-                              {editDestinations.map((loc) => (
-                                <button
-                                  key={loc}
-                                  type="button"
-                                  onClick={() => {
-                                    setEditDestination(loc);
-                                    setEditDestinationOpen(false);
-                                  }}
-                                  className="w-full px-4 py-2 text-left text-sm hover:bg-blue-50"
-                                >
-                                  {loc}
-                                </button>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="grid sm:grid-cols-2 gap-4">
-                        {/* Date */}
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-1.5">Date</label>
-                          <input
-                            type="date"
-                            value={editDate}
-                            onChange={(e) => setEditDate(e.target.value)}
-                            min={minDate}
-                            className="w-full h-11 px-4 bg-gray-50 border border-gray-200 rounded-lg text-sm"
-                          />
-                        </div>
-
-                        {/* Passengers */}
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-1.5">Passengers</label>
-                          <div className="flex items-center h-11 border border-gray-200 rounded-lg bg-gray-50">
-                            <button
-                              type="button"
-                              onClick={() => setEditPassengers(Math.max(1, editPassengers - 1))}
-                              className="px-4 h-full hover:bg-gray-100 rounded-l-lg"
-                            >
-                              -
-                            </button>
-                            <span className="flex-1 text-center text-sm font-medium">{editPassengers}</span>
-                            <button
-                              type="button"
-                              onClick={() => setEditPassengers(Math.min(12, editPassengers + 1))}
-                              className="px-4 h-full hover:bg-gray-100 rounded-r-lg"
-                            >
-                              +
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Edit Actions */}
-                      <div className="flex gap-2 pt-2">
-                        <button
-                          onClick={cancelEdit}
-                          className="flex-1 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          onClick={saveEdit}
-                          disabled={!editOrigin || !editDestination || !editDate}
-                          className="flex-1 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 flex items-center justify-center gap-2"
-                        >
-                          <Check className="h-4 w-4" />
-                          Save
-                        </button>
-                      </div>
-                    </div>
+                    renderEditForm(false)
                   ) : (
                     // View Mode
                     <div className="p-5">
                       {/* Route Display */}
                       <div className="flex items-center gap-3 mb-4">
-                        <div className="flex-1">
+                        <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 text-gray-600 text-xs mb-1">
-                            <MapPin className="h-3 w-3 text-blue-600" />
+                            <MapPin className="h-3 w-3 text-blue-600 flex-shrink-0" />
                             From
                           </div>
-                          <p className="font-semibold text-gray-900">{trip.from_location}</p>
+                          <p className="font-semibold text-gray-900 truncate">{trip.from_location}</p>
                         </div>
                         <ArrowRight className="h-5 w-5 text-gray-400 flex-shrink-0" />
-                        <div className="flex-1">
+                        <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 text-gray-600 text-xs mb-1">
-                            <MapPin className="h-3 w-3 text-orange-500" />
+                            <MapPin className="h-3 w-3 text-orange-500 flex-shrink-0" />
                             To
                           </div>
-                          <p className="font-semibold text-gray-900">{trip.to_location}</p>
+                          <p className="font-semibold text-gray-900 truncate">{trip.to_location}</p>
                         </div>
                       </div>
 
                       {/* Trip Details */}
                       <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-100">
                         <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-gray-400" />
-                          <div>
+                          <Calendar className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                          <div className="min-w-0">
                             <p className="text-xs text-gray-500">Date</p>
-                            <p className="text-sm font-medium text-gray-900">{formatDisplayDate(trip.date)}</p>
+                            <p className="text-sm font-medium text-gray-900 truncate">{formatDisplayDate(trip.date)}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Users className="h-4 w-4 text-gray-400" />
+                          <Users className="h-4 w-4 text-gray-400 flex-shrink-0" />
                           <div>
                             <p className="text-xs text-gray-500">Passengers</p>
-                            <p className="text-sm font-medium text-gray-900">{trip.adults + trip.children}</p>
+                            <p className="text-sm font-medium text-gray-900">
+                              {trip.adults + trip.children}
+                              {trip.children > 0 && (
+                                <span className="text-gray-500 text-xs ml-1">
+                                  ({trip.adults}A, {trip.children}C)
+                                </span>
+                              )}
+                            </p>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-gray-400" />
+                          <Clock className="h-4 w-4 text-gray-400 flex-shrink-0" />
                           <div>
                             <p className="text-xs text-gray-500">Duration</p>
                             <p className="text-sm font-medium text-gray-900">{trip.duration}</p>
@@ -543,127 +504,7 @@ function PreviewPageContent() {
                   <div className="bg-blue-50 px-5 py-3 border-b border-blue-200">
                     <span className="font-semibold text-gray-900">Add Another Trip</span>
                   </div>
-                  <div className="p-5 space-y-4">
-                    <div className="grid sm:grid-cols-2 gap-4">
-                      {/* Origin */}
-                      <div className="relative">
-                        <label className="block text-xs font-medium text-gray-600 mb-1.5">From</label>
-                        <button
-                          type="button"
-                          onClick={() => setEditOriginOpen(!editOriginOpen)}
-                          className="w-full h-11 px-4 bg-gray-50 border border-gray-200 rounded-lg flex items-center gap-2 hover:border-blue-400 text-left text-sm"
-                        >
-                          <MapPin className="h-4 w-4 text-blue-600" />
-                          <span className="flex-1 truncate">{editOrigin || 'Select'}</span>
-                          <ChevronDown className="h-4 w-4 text-gray-400" />
-                        </button>
-                        {editOriginOpen && (
-                          <div className="absolute z-50 left-0 right-0 mt-1 bg-white border rounded-lg shadow-xl max-h-48 overflow-y-auto">
-                            {origins.map((loc) => (
-                              <button
-                                key={loc}
-                                type="button"
-                                onClick={() => {
-                                  setEditOrigin(loc);
-                                  setEditDestination('');
-                                  setEditOriginOpen(false);
-                                }}
-                                className="w-full px-4 py-2 text-left text-sm hover:bg-blue-50"
-                              >
-                                {loc}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Destination */}
-                      <div className="relative">
-                        <label className="block text-xs font-medium text-gray-600 mb-1.5">To</label>
-                        <button
-                          type="button"
-                          onClick={() => editOrigin && setEditDestinationOpen(!editDestinationOpen)}
-                          disabled={!editOrigin}
-                          className="w-full h-11 px-4 bg-gray-50 border border-gray-200 rounded-lg flex items-center gap-2 hover:border-blue-400 text-left text-sm disabled:opacity-50"
-                        >
-                          <MapPin className="h-4 w-4 text-orange-500" />
-                          <span className="flex-1 truncate">{editDestination || 'Select'}</span>
-                          <ChevronDown className="h-4 w-4 text-gray-400" />
-                        </button>
-                        {editDestinationOpen && (
-                          <div className="absolute z-50 left-0 right-0 mt-1 bg-white border rounded-lg shadow-xl max-h-48 overflow-y-auto">
-                            {editDestinations.map((loc) => (
-                              <button
-                                key={loc}
-                                type="button"
-                                onClick={() => {
-                                  setEditDestination(loc);
-                                  setEditDestinationOpen(false);
-                                }}
-                                className="w-full px-4 py-2 text-left text-sm hover:bg-blue-50"
-                              >
-                                {loc}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="grid sm:grid-cols-2 gap-4">
-                      {/* Date */}
-                      <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1.5">Date</label>
-                        <input
-                          type="date"
-                          value={editDate}
-                          onChange={(e) => setEditDate(e.target.value)}
-                          min={minDate}
-                          className="w-full h-11 px-4 bg-gray-50 border border-gray-200 rounded-lg text-sm"
-                        />
-                      </div>
-
-                      {/* Passengers */}
-                      <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1.5">Passengers</label>
-                        <div className="flex items-center h-11 border border-gray-200 rounded-lg bg-gray-50">
-                          <button
-                            type="button"
-                            onClick={() => setEditPassengers(Math.max(1, editPassengers - 1))}
-                            className="px-4 h-full hover:bg-gray-100 rounded-l-lg"
-                          >
-                            -
-                          </button>
-                          <span className="flex-1 text-center text-sm font-medium">{editPassengers}</span>
-                          <button
-                            type="button"
-                            onClick={() => setEditPassengers(Math.min(12, editPassengers + 1))}
-                            className="px-4 h-full hover:bg-gray-100 rounded-r-lg"
-                          >
-                            +
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Add Trip Actions */}
-                    <div className="flex gap-2 pt-2">
-                      <button
-                        onClick={cancelEdit}
-                        className="flex-1 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        onClick={saveNewTrip}
-                        disabled={!editOrigin || !editDestination || !editDate}
-                        className="flex-1 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 flex items-center justify-center gap-2"
-                      >
-                        <Plus className="h-4 w-4" />
-                        Add Trip
-                      </button>
-                    </div>
-                  </div>
+                  {renderEditForm(true)}
                 </div>
               )}
 
@@ -687,18 +528,32 @@ function PreviewPageContent() {
                   <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-5 py-4">
                     <h2 className="text-white font-bold text-lg">Order Summary</h2>
                   </div>
-                  <div className="p-5 space-y-3">
+                  <div className="p-5 space-y-4">
                     {trips.map((trip, index) => (
-                      <div key={index} className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600">
-                          {trips.length > 1 ? `Trip ${index + 1}` : 'Transfer'}
-                        </span>
-                        <span className="font-medium text-gray-900">${trip.price}</span>
+                      <div key={index} className="pb-3 border-b border-gray-100 last:border-0 last:pb-0">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900">
+                              {trips.length > 1 ? `Transfer ${index + 1}` : 'Transfer'}
+                            </p>
+                            <p className="text-xs text-gray-500 truncate">
+                              {trip.from_location} → {trip.to_location}
+                            </p>
+                          </div>
+                          <span className="font-bold text-gray-900 ml-2">${trip.price}</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-xs text-gray-500">
+                          <span>{formatDisplayDate(trip.date)}</span>
+                          <span>•</span>
+                          <span>{trip.adults + trip.children} pax</span>
+                        </div>
                       </div>
                     ))}
-                    <div className="border-t border-gray-200 pt-3 mt-3">
+
+                    {/* Total */}
+                    <div className="pt-3 border-t-2 border-gray-200">
                       <div className="flex items-center justify-between">
-                        <span className="font-semibold text-gray-900">Total</span>
+                        <span className="font-bold text-gray-900 text-lg">Total</span>
                         <span className="text-2xl font-bold text-blue-600">${totalPrice}</span>
                       </div>
                       <p className="text-xs text-gray-500 mt-1">Taxes and fees included</p>
