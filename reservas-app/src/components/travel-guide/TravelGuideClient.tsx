@@ -28,9 +28,14 @@ export default function TravelGuideClient({ destinations, zones }: TravelGuideCl
     if (typeof window !== 'undefined' && window.location.hash) {
       const destinationId = window.location.hash.slice(1);
       setOpenDestinations(new Set([destinationId]));
-      setTimeout(() => {
+
+      // ✅ CORREGIDO: Guardar referencia del timeout para cleanup
+      const scrollTimeout = setTimeout(() => {
         document.getElementById(destinationId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 100);
+
+      // ✅ Cleanup: limpiar timeout si el componente se desmonta
+      return () => clearTimeout(scrollTimeout);
     }
   }, []);
 

@@ -96,9 +96,7 @@ function ConfirmationPageContent() {
     );
   }
 
-  const grandTotal = trips.reduce((sum, trip) => sum + (trip.final_price || trip.price), 0);
-  const customerInfo = trips[0];
-
+  // ✅ CORREGIDO: Mostrar loading ANTES de acceder a trips
   if (loading) {
     return (
       <>
@@ -109,6 +107,32 @@ function ConfirmationPageContent() {
       </>
     );
   }
+
+  // ✅ CORREGIDO: Validar que trips tenga elementos antes de acceder
+  if (trips.length === 0) {
+    return (
+      <>
+        <BookingNavbar />
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <Card className="max-w-md mx-4">
+            <CardHeader>
+              <CardTitle className="text-red-600">Booking Not Found</CardTitle>
+              <CardDescription>We couldn&apos;t find your booking details</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
+                Return Home
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </>
+    );
+  }
+
+  // ✅ Ahora es seguro acceder a trips porque ya verificamos que no está vacío
+  const grandTotal = trips.reduce((sum, trip) => sum + (trip.final_price || trip.price), 0);
+  const customerInfo = trips[0];
 
   return (
     <>

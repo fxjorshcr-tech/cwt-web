@@ -1,6 +1,5 @@
 // src/components/forms/QuickSearchForm.tsx
-// Lightweight search form for Home/Transfers pages
-// Uses existing LocationAutocomplete, ModernDatePicker, PassengerSelector
+// ✅ CORREGIDO: Manejo robusto de localStorage y errores
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -12,6 +11,7 @@ import { ModernDatePicker } from './ModernDatePicker';
 import { PassengerSelector } from './PassengerSelector';
 import { loadRoutesFromSupabase, calculateTripPrice, type Route } from '@/utils/bookingFormHelpers';
 import { formatDateToString } from '@/utils/timeHelpers';
+import { isLocalStorageAvailable, saveBookingToLocalStorage } from '@/utils/localStorageHelpers';
 
 interface QuickSearchFormProps {
   className?: string;
@@ -44,18 +44,27 @@ export function QuickSearchForm({
     if (initialDestination) setDestination(initialDestination);
   }, [initialOrigin, initialDestination]);
 
-  // Load routes
+  // Load routes with error handling
   useEffect(() => {
     async function loadRoutes() {
       setIsLoadingRoutes(true);
-      const supabase = createClient();
-      const { routes: loadedRoutes, error: loadError } = await loadRoutesFromSupabase(supabase);
+      setError(null);
 
-      if (loadError) {
-        setError(loadError);
-      } else if (loadedRoutes) {
-        setRoutes(loadedRoutes);
+      try {
+        const supabase = createClient();
+        const { routes: loadedRoutes, error: loadError } = await loadRoutesFromSupabase(supabase);
+
+        if (loadError) {
+          setError(loadError);
+        } else if (loadedRoutes) {
+          setRoutes(loadedRoutes);
+        }
+      } catch (err) {
+        // ✅ Catch any unexpected errors during Supabase client creation or query
+        console.error('Error loading routes:', err);
+        setError('Unable to connect to our servers. Please check your internet connection and try again.');
       }
+
       setIsLoadingRoutes(false);
     }
     loadRoutes();
@@ -99,6 +108,12 @@ export function QuickSearchForm({
       return;
     }
 
+    // ✅ Check localStorage availability before proceeding
+    if (!isLocalStorageAvailable()) {
+      setError('Your browser settings are blocking this feature. Please enable cookies/localStorage or try a different browser.');
+      return;
+    }
+
     setIsSubmitting(true);
     setError(null);
 
@@ -119,7 +134,6 @@ export function QuickSearchForm({
 
       // Create booking data
       const bookingData = {
-        bookingId,
         trips: [{
           from_location: origin,
           to_location: destination,
@@ -134,20 +148,19 @@ export function QuickSearchForm({
         createdAt: new Date().toISOString(),
       };
 
-      // Save to localStorage
-      localStorage.setItem(`booking_${bookingId}`, JSON.stringify(bookingData));
+      // ✅ Save to localStorage using safe function
+      const saved = saveBookingToLocalStorage(bookingId, bookingData);
 
-      // Verify the data was saved correctly before navigating
-      const savedData = localStorage.getItem(`booking_${bookingId}`);
-      if (!savedData) {
-        throw new Error('Failed to save booking data');
+      if (!saved) {
+        throw new Error('Failed to save booking data. Please check your browser settings.');
       }
 
       // Navigate to preview - keep isSubmitting true to prevent double clicks
       router.push(`/preview?booking_id=${bookingId}`);
     } catch (err) {
       console.error('Search error:', err);
-      setError('Something went wrong. Please try again.');
+      const errorMessage = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
+      setError(errorMessage);
       setIsSubmitting(false);
     }
   }

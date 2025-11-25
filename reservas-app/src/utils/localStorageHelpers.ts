@@ -1,5 +1,5 @@
 // src/utils/localStorageHelpers.ts
-// ✅ Pure functions for localStorage operations
+// ✅ CORREGIDO: Manejo robusto de localStorage para evitar errores críticos
 // NO state management - just data transformation and storage
 
 export interface LocalStorageTrip {
@@ -35,12 +35,39 @@ export interface LocalStorageBooking {
   tripDetails?: LocalStorageTripDetails[];
 }
 
+// ============================================
+// STORAGE AVAILABILITY CHECK
+// ============================================
+
+/**
+ * ✅ Check if localStorage is available and working
+ * Safari private mode and some corporate browsers disable localStorage
+ */
+export function isLocalStorageAvailable(): boolean {
+  if (typeof window === 'undefined') return false;
+
+  try {
+    const testKey = '__booking_storage_test__';
+    window.localStorage.setItem(testKey, testKey);
+    window.localStorage.removeItem(testKey);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Load a booking from localStorage
  * @param bookingId - The booking ID (without 'booking_' prefix)
  * @returns The booking data or null if not found
  */
 export function loadBookingFromLocalStorage(bookingId: string): LocalStorageBooking | null {
+  // ✅ Check if localStorage is available
+  if (!isLocalStorageAvailable()) {
+    console.warn('[Booking] localStorage not available');
+    return null;
+  }
+
   try {
     const localDataStr = localStorage.getItem(`booking_${bookingId}`);
 
@@ -48,10 +75,22 @@ export function loadBookingFromLocalStorage(bookingId: string): LocalStorageBook
       return null;
     }
 
-    const localData: LocalStorageBooking = JSON.parse(localDataStr);
-    return localData;
+    const localData = JSON.parse(localDataStr);
+
+    // ✅ Validate the structure of the data
+    if (!localData || typeof localData !== 'object') {
+      console.warn('[Booking] Invalid booking data structure');
+      return null;
+    }
+
+    if (!localData.bookingId || !Array.isArray(localData.trips)) {
+      console.warn('[Booking] Missing required fields in booking data');
+      return null;
+    }
+
+    return localData as LocalStorageBooking;
   } catch (error) {
-    console.error('Error loading booking from localStorage:', error);
+    console.error('[Booking] Error loading from localStorage:', error);
     return null;
   }
 }
@@ -68,11 +107,17 @@ export function saveBookingDetailsToLocalStorage(
   tripIndex: number,
   tripDetails: LocalStorageTripDetails
 ): boolean {
+  // ✅ Check if localStorage is available
+  if (!isLocalStorageAvailable()) {
+    console.warn('[Booking] localStorage not available for saving');
+    return false;
+  }
+
   try {
     const localDataStr = localStorage.getItem(`booking_${bookingId}`);
 
     if (!localDataStr) {
-      console.error('Booking not found in localStorage');
+      console.warn('[Booking] Booking not found in localStorage');
       return false;
     }
 
@@ -91,7 +136,38 @@ export function saveBookingDetailsToLocalStorage(
 
     return true;
   } catch (error) {
-    console.error('Error saving to localStorage:', error);
+    console.error('[Booking] Error saving to localStorage:', error);
+    return false;
+  }
+}
+
+/**
+ * ✅ Save a new booking to localStorage
+ * @param bookingId - The booking ID (without 'booking_' prefix)
+ * @param bookingData - The booking data to save
+ * @returns true if successful, false otherwise
+ */
+export function saveBookingToLocalStorage(
+  bookingId: string,
+  bookingData: Omit<LocalStorageBooking, 'bookingId'>
+): boolean {
+  // ✅ Check if localStorage is available
+  if (!isLocalStorageAvailable()) {
+    console.warn('[Booking] localStorage not available for saving');
+    return false;
+  }
+
+  try {
+    const dataToSave: LocalStorageBooking = {
+      bookingId,
+      ...bookingData,
+    };
+
+    localStorage.setItem(`booking_${bookingId}`, JSON.stringify(dataToSave));
+    return true;
+  } catch (error) {
+    // Handle QuotaExceededError
+    console.error('[Booking] Error saving to localStorage:', error);
     return false;
   }
 }
@@ -101,10 +177,12 @@ export function saveBookingDetailsToLocalStorage(
  * @param bookingId - The booking ID (without 'booking_' prefix)
  */
 export function removeBookingFromLocalStorage(bookingId: string): void {
+  if (!isLocalStorageAvailable()) return;
+
   try {
     localStorage.removeItem(`booking_${bookingId}`);
   } catch (error) {
-    console.error('Error removing booking from localStorage:', error);
+    console.error('[Booking] Error removing from localStorage:', error);
   }
 }
 
@@ -114,10 +192,12 @@ export function removeBookingFromLocalStorage(bookingId: string): void {
  * @returns true if the booking exists, false otherwise
  */
 export function bookingExistsInLocalStorage(bookingId: string): boolean {
+  if (!isLocalStorageAvailable()) return false;
+
   try {
     return localStorage.getItem(`booking_${bookingId}`) !== null;
   } catch (error) {
-    console.error('Error checking booking existence:', error);
+    console.error('[Booking] Error checking booking existence:', error);
     return false;
   }
 }
