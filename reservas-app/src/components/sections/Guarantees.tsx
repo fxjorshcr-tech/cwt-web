@@ -62,7 +62,7 @@ export default function Guarantees() {
               On-Time Pickup Guarantee
             </h3>
             <p className="text-sm text-gray-700 leading-relaxed">
-              We'll be there at the agreed time. If we're late without notice, <strong className="text-purple-600">you get a refund.</strong>
+              We take responsibility seriously. <strong className="text-purple-600">We'll be there on time</strong> and keep you informed with constant communication every step of the way.
             </p>
           </div>
 
