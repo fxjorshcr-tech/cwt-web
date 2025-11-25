@@ -165,18 +165,21 @@ export default async function Home() {
 
           <div className="relative z-10 h-full flex flex-col items-center justify-center px-4 sm:px-6">
             <div className="text-center max-w-5xl">
-              <h1 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6 drop-shadow-2xl leading-tight">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-4xl font-bold text-white mb-4 sm:mb-6 drop-shadow-2xl leading-tight">
                 Private Shuttle & Airport Transfers Across Costa Rica
               </h1>
-              <p className="text-base sm:text-lg md:text-xl text-white/95 mb-6 sm:mb-8 drop-shadow-lg max-w-2xl mx-auto font-medium px-4">
-                100% private, professional drivers, direct service from main destinations in CR
+              <p className="text-sm sm:text-base md:text-lg text-white/95 mb-6 sm:mb-8 drop-shadow-lg max-w-2xl mx-auto font-medium px-4">
+                Professional drivers, direct service, local expertise
               </p>
-              <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 md:gap-6">
+              <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 md:gap-4">
                 <div className="flex items-center gap-2 text-white bg-white/10 backdrop-blur-md px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-white/20">
                   <span className="text-xs sm:text-sm font-semibold">ICT Licensed #4121-2025</span>
                 </div>
                 <div className="flex items-center gap-2 text-white bg-white/10 backdrop-blur-md px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-white/20">
-                  <span className="text-xs sm:text-sm font-semibold">30+ Years Experience</span>
+                  <span className="text-xs sm:text-sm font-semibold">100% Private</span>
+                </div>
+                <div className="flex items-center gap-2 text-white bg-white/10 backdrop-blur-md px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-white/20">
+                  <span className="text-xs sm:text-sm font-semibold">Local Expertise</span>
                 </div>
               </div>
             </div>

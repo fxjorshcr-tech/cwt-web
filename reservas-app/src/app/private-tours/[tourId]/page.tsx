@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { notFound, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
@@ -51,6 +51,7 @@ export default function TourDetailPage({ params }: PageProps) {
 
   const [tour, setTour] = useState<Tour | null>(null);
   const [loading, setLoading] = useState(true);
+  const [notFoundError, setNotFoundError] = useState(false);
   const [formData, setFormData] = useState<BookingFormData>({
     date: undefined,
     adults: 2,
@@ -76,26 +77,63 @@ export default function TourDetailPage({ params }: PageProps) {
   };
 
   useEffect(() => {
+    // Scroll to top on mount
+    window.scrollTo({ top: 0, behavior: 'instant' });
+
     async function loadTour() {
-      const tourData = await getTourBySlug(params.tourId);
+      try {
+        const tourData = await getTourBySlug(params.tourId);
 
-      if (!tourData) {
-        notFound();
+        if (!tourData) {
+          setNotFoundError(true);
+          setLoading(false);
+          return;
+        }
+
+        setTour(tourData);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error loading tour:', error);
+        setNotFoundError(true);
+        setLoading(false);
       }
-
-      setTour(tourData);
-      setLoading(false);
     }
 
     loadTour();
   }, [params.tourId]);
 
-  if (loading || !tour) {
+  if (loading) {
     return (
       <>
         <BookingNavbar />
         <div className="min-h-screen flex items-center justify-center">
           <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
+        </div>
+      </>
+    );
+  }
+
+  if (notFoundError || !tour) {
+    return (
+      <>
+        <BookingNavbar />
+        <div className="min-h-screen flex items-center justify-center px-4">
+          <div className="text-center max-w-md">
+            <div className="mb-6">
+              <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">Tour Not Found</h1>
+              <p className="text-gray-600 mb-6">
+                Sorry, we couldn't find the tour you're looking for. It may have been removed or the link might be incorrect.
+              </p>
+            </div>
+            <Link
+              href="/private-tours"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
+            >
+              <ArrowLeft className="h-5 w-5" />
+              Back to All Tours
+            </Link>
+          </div>
         </div>
       </>
     );
