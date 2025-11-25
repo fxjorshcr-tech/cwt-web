@@ -178,7 +178,7 @@ export default async function Home() {
                   <span className="text-xs sm:text-sm font-semibold">100% Private</span>
                 </div>
                 <div className="flex items-center gap-2 text-white bg-white/10 backdrop-blur-md px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-white/20">
-                  <span className="text-xs sm:text-sm font-semibold">Local Expertise</span>
+                  <span className="text-xs sm:text-sm font-semibold">Bilingual Drivers</span>
                 </div>
               </div>
             </div>

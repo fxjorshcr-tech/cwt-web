@@ -140,7 +140,7 @@ export function LocationAutocomplete({
           onFocus={() => setIsOpen(true)}
           disabled={disabled}
           placeholder={placeholder}
-          className="w-full pl-9 pr-9 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+          className="w-full pl-9 pr-9 py-2.5 text-base sm:text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
           autoComplete="off"
         />
         {inputValue && !disabled && (
