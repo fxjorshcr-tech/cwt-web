@@ -632,14 +632,6 @@ export default function TourDetailPage({ params }: PageProps) {
                   </div>
                 </div>
 
-                {/* Booking Section Header - Card style */}
-                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg">
-                  <h3 className="text-2xl font-bold mb-2">Book This Adventure</h3>
-                  <p className="text-blue-100 text-sm">
-                    Fill in the details below to reserve your spot on this amazing tour
-                  </p>
-                </div>
-
                 {/* Booking Form */}
                 <form className="space-y-6">
                   <TourDatePassengerForm

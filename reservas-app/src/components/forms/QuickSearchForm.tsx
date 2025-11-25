@@ -61,15 +61,21 @@ export function QuickSearchForm({
     loadRoutes();
   }, []);
 
-  // Reset destination when origin changes
+  // Reset destination when origin changes (but NOT when values come from URL params)
   useEffect(() => {
+    // Skip validation if origin/destination came from URL params (initialOrigin/initialDestination)
+    // This prevents resetting the destination when routes are loaded
+    if (initialOrigin && initialDestination) {
+      return; // Don't reset - values came from indexed route page
+    }
+
     if (origin && destination) {
       const validRoute = routes.find(r => r.origen === origin && r.destino === destination);
       if (!validRoute) {
         setDestination('');
       }
     }
-  }, [origin, destination, routes]);
+  }, [origin, destination, routes, initialOrigin, initialDestination]);
 
   // Handle passengers change
   const handlePassengersChange = (newAdults: number, newChildren: number) => {
