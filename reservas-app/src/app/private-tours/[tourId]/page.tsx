@@ -22,6 +22,8 @@ import { FAQsWidget } from '@/components/booking/FAQsWidget';
 import { createClient } from '@/lib/supabase/client';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from 'sonner';
+// ✅ CORREGIDO: Usar la función de timeHelpers en lugar de duplicar
+import { formatDateToString } from '@/utils/timeHelpers';
 
 interface BookingFormData {
   date?: Date;
@@ -29,13 +31,6 @@ interface BookingFormData {
   children: number;
   hotel: string;
   specialRequests: string;
-}
-
-function formatDateToString(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
 }
 
 interface PageProps {
