@@ -168,19 +168,8 @@ export default async function Home() {
                 Private Shuttle & Airport Transfers Across Costa Rica
               </h1>
               <p className="text-sm sm:text-base md:text-lg text-white/95 mb-6 sm:mb-8 drop-shadow-lg max-w-2xl mx-auto font-medium px-4">
-                Professional drivers, direct service, local expertise
+                Professional drivers • 100% private service • Local expertise
               </p>
-              <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 md:gap-4">
-                <div className="flex items-center gap-2 text-white bg-white/10 backdrop-blur-md px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-white/20">
-                  <span className="text-xs sm:text-sm font-semibold">ICT Licensed #4121-2025</span>
-                </div>
-                <div className="flex items-center gap-2 text-white bg-white/10 backdrop-blur-md px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-white/20">
-                  <span className="text-xs sm:text-sm font-semibold">100% Private</span>
-                </div>
-                <div className="flex items-center gap-2 text-white bg-white/10 backdrop-blur-md px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-white/20">
-                  <span className="text-xs sm:text-sm font-semibold">Bilingual Drivers</span>
-                </div>
-              </div>
 
               {/* Social Media Buttons - Inside Hero */}
               <div className="flex items-center justify-center gap-3 mt-6 sm:mt-8">
