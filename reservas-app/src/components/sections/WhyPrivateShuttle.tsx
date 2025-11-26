@@ -96,8 +96,8 @@ export default function WhyPrivateShuttle() {
                 your transfer should be the most relaxing part of your day, not a source of worry.
               </p>
               <p className="text-sm sm:text-base text-gray-700 leading-relaxed mb-4">
-                With over <strong>30 years of combined experience</strong>, we don't just offer a vehicle; 
-                we offer the certainty that you and your family are in the safest hands possible. We navigate 
+                As <strong>experienced professionals</strong>, we don't just offer a vehicle;
+                we offer the certainty that you and your family are in the safest hands possible. We navigate
                 the challenges so you don't have to.
               </p>
               

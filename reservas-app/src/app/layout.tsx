@@ -8,6 +8,7 @@ import { CartProvider } from "@/contexts/CartContext";
 import { Toaster } from "sonner";
 import LocalStorageCleanup from "@/components/LocalStorageCleanup";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -84,6 +85,7 @@ export default function RootLayout({
           <WhatsAppButton />
           <Toaster position="top-right" richColors closeButton duration={1000} />
         </CartProvider>
+        <SpeedInsights />
       </body>
     </html>
   );

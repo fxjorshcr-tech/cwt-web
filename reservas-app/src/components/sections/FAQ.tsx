@@ -48,7 +48,7 @@ export default function FAQ() {
     },
     {
       question: 'How do I pay for the Costa Rica private transportation?',
-      answer: 'We accept all major credit cards (Visa, Mastercard, Amex), bank transfers, ACH, SEPA Direct Debit, and other secure payment methods through our Stripe-powered platform - the same technology trusted by Netflix and HBO.'
+      answer: 'We accept all major credit cards (Visa, Mastercard, Amex), bank transfers, ACH, SEPA Direct Debit, and other secure payment methods through our secure online payment platform.'
     }
   ];
 

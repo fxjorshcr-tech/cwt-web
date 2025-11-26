@@ -20,7 +20,7 @@ import {
 // ✅ SEO Metadata works perfectly now (Server Component)
 export const metadata: Metadata = {
   title: 'About Us | Local Experts in La Fortuna',
-  description: 'Meet the team behind Can\'t Wait Travel CR. 100% Costa Rican owned and operated. Over 30 years of experience providing private transport in La Fortuna.',
+  description: 'Meet the team behind Can\'t Wait Travel CR. 100% Costa Rican owned and operated. Experienced professionals providing private transport in La Fortuna.',
 };
 
 export default function AboutPage() {
@@ -54,7 +54,7 @@ export default function AboutPage() {
             </div>
 
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 drop-shadow-2xl">
-              More Than Drivers. <br className="hidden md:block" /> Your Local Hosts.
+              Your Local Hosts
             </h1>
 
             <p className="text-base sm:text-lg md:text-xl text-white/95 max-w-2xl drop-shadow-lg font-medium">
@@ -99,13 +99,13 @@ export default function AboutPage() {
                 
                 <div className="prose prose-lg text-gray-600 space-y-6">
                   <p>
-                    We are <strong>Ticos</strong>. La Fortuna isn't just our base of operations; it's our home. We grew up swimming in these rivers and watching the Arenal Volcano light up the night sky.
+                    While <strong>Can't Wait Travel</strong> was officially born in 2025, our story begins much earlier. We are two brothers who have lived and worked in La Fortuna's tourism sector since 2006.
                   </p>
                   <p>
-                    With over <strong>30 years of combined experience</strong> in tourism, we noticed something missing. Too many companies were treating travelers like cargo—moving them from Point A to Point B without a word.
+                    After almost two decades of learning the roads and the industry, we united to create a private transfer service that covers every corner of Costa Rica. We built this company to offer what others didn't: a ride where you are treated like family, not just a passenger.
                   </p>
                   <p>
-                    We started <strong>Can't Wait Travel</strong> to change that. We wanted to build a service where the drive is part of the adventure, not just a commute. When you ride with us, you're riding with a local friend.
+                    From the airport to the beach, and everywhere in between, experience Costa Rica with the confidence of drivers who have been here from the start.
                   </p>
                 </div>
 
