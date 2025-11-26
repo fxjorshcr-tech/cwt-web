@@ -61,7 +61,7 @@ export default function HowWeWork() {
               Get Confirmed
             </h3>
             <p className="text-gray-600 leading-relaxed">
-              We confirm your booking and send all details: driver info, vehicle, pickup time.
+              We confirm your booking and send all details: vehicle, pickup time.
             </p>
           </div>
 
@@ -81,7 +81,7 @@ export default function HowWeWork() {
               Relax & Enjoy
             </h3>
             <p className="text-gray-600 leading-relaxed">
-              Your driver picks you up on time. Sit back, relax, and enjoy the journey to your destination.
+              Sit back, relax, and enjoy the journey to your destination.
             </p>
           </div>
 
