@@ -54,7 +54,7 @@ export default function AboutPage() {
             </div>
 
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 drop-shadow-2xl">
-              More Than Drivers. <br className="hidden md:block" /> Your Local Hosts.
+              Your Local Hosts
             </h1>
 
             <p className="text-base sm:text-lg md:text-xl text-white/95 max-w-2xl drop-shadow-lg font-medium">
@@ -99,13 +99,16 @@ export default function AboutPage() {
                 
                 <div className="prose prose-lg text-gray-600 space-y-6">
                   <p>
-                    We are <strong>Ticos</strong>. La Fortuna isn't just our base of operations; it's our home. We grew up swimming in these rivers and watching the Arenal Volcano light up the night sky.
+                    While <strong>Can't Wait Travel</strong> was officially born in 2025, we are building on a lifetime of experience. We are two brothers who grew up here in La Fortuna, at the foot of the Arenal Volcano, surrounded by rivers, rainforests, and the rhythm of Costa Rica.
                   </p>
                   <p>
-                    With over <strong>30 years of combined experience</strong> in tourism, we noticed something missing. Too many companies were treating travelers like cargo—moving them from Point A to Point B without a word.
+                    Our family spent years driving for one of the biggest tour operators in the country. We learned the routes, the shortcuts, the hidden waterfalls, the best stops for real Costa Rican cuisine, and the stories behind every mountain and town. But we always dreamed of creating something more personal, more authentic.
                   </p>
                   <p>
-                    We started <strong>Can't Wait Travel</strong> to change that. We wanted to build a service where the drive is part of the adventure, not just a commute. When you ride with us, you're riding with a local friend.
+                    That dream became <strong>Can't Wait Travel</strong>: a small, family-owned business where every ride is a chance to share the Costa Rica we love with travelers who want something more than just a shuttle.
+                  </p>
+                  <p>
+                    When you ride with us, you're not just getting transportation—you're getting local friends who actually know the place, who want you to feel the same pride in this country that we do.
                   </p>
                 </div>
 
