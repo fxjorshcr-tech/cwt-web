@@ -10,7 +10,7 @@ export default function StructuredData() {
     "@id": "https://cantwaittravelcr.com/#business",
     "name": "Can't Wait Travel CR",
     "image": "https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/logo-cant-wait-travel.webp",
-    "description": "Professional private shuttle and airport transfer service in Costa Rica. Over 30 years of combined experience, bilingual drivers, modern vehicles. ICT licensed #4121-2025.",
+    "description": "Professional private shuttle and airport transfer service in Costa Rica. Experienced professionals, bilingual drivers, modern vehicles. ICT licensed #4121-2025.",
     "address": {
       "@type": "PostalAddress",
       "addressLocality": "La Fortuna",

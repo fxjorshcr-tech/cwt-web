@@ -107,7 +107,7 @@ export default function WhyBookDirect() {
               Secure Online Payments
             </h3>
             <p className="text-gray-700 leading-relaxed">
-              Book with confidence using our encrypted payment system powered by Stripe.
+              Book with confidence using our secure online payment system.
               <strong className="text-pink-600"> Your financial data is protected with bank-level security—</strong>the same technology trusted by Amazon and Google.
             </p>
           </div>

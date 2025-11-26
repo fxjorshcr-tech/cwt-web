@@ -148,7 +148,7 @@ function TransfersContent() {
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Local Expert Drivers</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Our drivers are locals from La Fortuna with over 30 years of experience. We know every curve of the road.
+                  Our drivers are experienced professionals from La Fortuna. We know every curve of the road.
                 </p>
               </div>
             </div>

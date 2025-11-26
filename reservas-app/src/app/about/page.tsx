@@ -20,7 +20,7 @@ import {
 // ✅ SEO Metadata works perfectly now (Server Component)
 export const metadata: Metadata = {
   title: 'About Us | Local Experts in La Fortuna',
-  description: 'Meet the team behind Can\'t Wait Travel CR. 100% Costa Rican owned and operated. Over 30 years of experience providing private transport in La Fortuna.',
+  description: 'Meet the team behind Can\'t Wait Travel CR. 100% Costa Rican owned and operated. Experienced professionals providing private transport in La Fortuna.',
 };
 
 export default function AboutPage() {
@@ -99,16 +99,13 @@ export default function AboutPage() {
                 
                 <div className="prose prose-lg text-gray-600 space-y-6">
                   <p>
-                    While <strong>Can't Wait Travel</strong> was officially born in 2025, we are building on a lifetime of experience. We are two brothers who grew up here in La Fortuna, at the foot of the Arenal Volcano, surrounded by rivers, rainforests, and the rhythm of Costa Rica.
+                    While <strong>Can't Wait Travel</strong> was officially born in 2025, our story begins much earlier. We are two brothers who have lived and worked in La Fortuna's tourism sector since 2006.
                   </p>
                   <p>
-                    Our family spent years driving for one of the biggest tour operators in the country. We learned the routes, the shortcuts, the hidden waterfalls, the best stops for real Costa Rican cuisine, and the stories behind every mountain and town. But we always dreamed of creating something more personal, more authentic.
+                    After almost two decades of learning the roads and the industry, we united to create a private transfer service that covers every corner of Costa Rica. We built this company to offer what others didn't: a ride where you are treated like family, not just a passenger.
                   </p>
                   <p>
-                    That dream became <strong>Can't Wait Travel</strong>: a small, family-owned business where every ride is a chance to share the Costa Rica we love with travelers who want something more than just a shuttle.
-                  </p>
-                  <p>
-                    When you ride with us, you're not just getting transportation—you're getting local friends who actually know the place, who want you to feel the same pride in this country that we do.
+                    From the airport to the beach, and everywhere in between, experience Costa Rica with the confidence of drivers who have been here from the start.
                   </p>
                 </div>
 

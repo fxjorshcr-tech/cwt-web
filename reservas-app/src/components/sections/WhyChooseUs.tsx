@@ -32,7 +32,7 @@ export default function WhyChooseUs() {
           </h2>
           <p className="text-base sm:text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed px-4 mb-6">
             When it comes to moving from point A to point B in Costa Rica, <strong>private transfers with a trusted company like Can't Wait Travel CR</strong> are the best option for travelers who value <em>peace of mind and security</em>.
-            Our team of local experts offers direct, private transportation with <strong>over 30 years of combined experience</strong> in Costa Rican tourism.
+            Our team of local experts offers direct, private transportation as <strong>experienced professionals</strong> in Costa Rican tourism.
             We know every curve of these roads and combine the warmth of <em className="text-blue-600">Pura Vida</em> hospitality with the strict professionalism
             of a licensed transport operator, ensuring you arrive safely and comfortably every time.
           </p>
@@ -124,8 +124,8 @@ export default function WhyChooseUs() {
               <div>
                 <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-1 sm:mb-2">Bank-Level Security</h3>
                 <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-                  Book with confidence. We process payments via <strong>Stripe</strong>, guaranteeing that your 
-                  data is protected by the same security standards used by Amazon and Google.
+                  Book with confidence. We use <strong>secure online payment</strong>, guaranteeing that your
+                  data is protected by bank-level security standards.
                 </p>
               </div>
             </div>

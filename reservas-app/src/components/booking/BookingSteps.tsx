@@ -47,7 +47,7 @@ export default function BookingSteps() {
       icon: CreditCard, 
       number: '04',
       title: 'Payment', 
-      description: 'Complete secure checkout via Stripe',
+      description: 'Complete secure online checkout',
       color: 'text-green-600',
       bg: 'bg-green-50',
       border: 'border-green-200',
