@@ -65,7 +65,7 @@ export default function WhyBookDirect() {
               Licensed & Insured
             </h3>
             <p className="text-gray-700 leading-relaxed">
-              Full ICT tourism operator license #4121 with comprehensive insurance coverage.
+              Full ICT tourism operator license #4121-2025 with comprehensive insurance coverage.
               <strong className="text-purple-600"> Professional, legal, and certified</strong> by Costa Rica's official tourism board.
             </p>
           </div>
@@ -108,7 +108,7 @@ export default function WhyBookDirect() {
             </h3>
             <p className="text-gray-700 leading-relaxed">
               Book with confidence using our secure online payment system.
-              <strong className="text-pink-600"> Your financial data is protected with bank-level security—</strong>the same technology trusted by Amazon and Google.
+              <strong className="text-pink-600"> Your financial data is protected with bank-level security.</strong>
             </p>
           </div>
 
