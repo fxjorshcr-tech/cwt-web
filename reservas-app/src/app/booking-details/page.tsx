@@ -412,7 +412,7 @@ function BookingDetailsContent() {
           sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center justify-center pt-16">
           <h1 className="text-xl md:text-3xl font-bold text-white drop-shadow-lg">
             Complete Your Booking
           </h1>
