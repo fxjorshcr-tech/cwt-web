@@ -86,18 +86,22 @@ function BookingDetailsContent() {
     children_ages: [],
   });
 
+  // ✅ FIXED: Only set trip index AFTER trips are loaded to avoid race condition
   useEffect(() => {
     const tripParam = searchParams.get('trip');
-    if (tripParam) {
+    if (tripParam && trips.length > 0) {
       const tripIndex = parseInt(tripParam, 10);
-      if (!isNaN(tripIndex) && tripIndex >= 0) {
+      if (!isNaN(tripIndex) && tripIndex >= 0 && tripIndex < trips.length) {
         setCurrentTripIndex(tripIndex);
       }
     }
-  }, [searchParams]);
+  }, [searchParams, trips.length]);
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // ✅ FIXED: Safe window access
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }, [currentTripIndex]);
 
   if (!bookingId) {

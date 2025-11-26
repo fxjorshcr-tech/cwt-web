@@ -28,12 +28,17 @@ export interface TripData {
 
 /**
  * Calculate price based on route and passenger count
+ * ✅ FIXED: Handle null route and undefined prices
  */
-export function calculateTripPrice(route: Route, passengers: number): number {
+export function calculateTripPrice(route: Route | null | undefined, passengers: number): number {
+  // ✅ FIXED: Handle null/undefined route
+  if (!route) return 0;
   if (passengers > 12 || passengers < 1) return 0;
-  if (passengers <= 6) return route.precio1a6;
-  if (passengers <= 9) return route.precio7a9;
-  if (passengers <= 12) return route.precio10a12;
+
+  // ✅ FIXED: Use nullish coalescing to handle undefined prices
+  if (passengers <= 6) return route.precio1a6 ?? 0;
+  if (passengers <= 9) return route.precio7a9 ?? 0;
+  if (passengers <= 12) return route.precio10a12 ?? 0;
   return 0;
 }
 
