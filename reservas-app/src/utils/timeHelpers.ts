@@ -13,36 +13,79 @@
 /**
  * ✅ CRÍTICO: Convertir Date a string YYYY-MM-DD sin conversión UTC
  * Evita bug de timezone que causaba pérdida de 1 día
- * 
+ * ✅ IMPROVED: Better error handling for mobile compatibility (React Error 310)
+ *
  * @param date - Fecha a convertir
- * @returns String en formato YYYY-MM-DD en timezone local
- * 
+ * @returns String en formato YYYY-MM-DD en timezone local, or empty string if invalid
+ *
  * @example
  * formatDateToString(new Date(2025, 10, 27)) → "2025-11-27"
  */
-export function formatDateToString(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+export function formatDateToString(date: Date | null | undefined): string {
+  // ✅ FIXED: Handle null, undefined, and invalid Date input
+  if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
+    console.warn('[formatDateToString] Invalid date provided:', date);
+    return '';
+  }
+
+  try {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  } catch {
+    // ✅ FIXED: Catch any formatting errors
+    console.warn('[formatDateToString] Failed to format date:', date);
+    return '';
+  }
 }
 
 /**
  * ✅ CRÍTICO: Parsear string YYYY-MM-DD a Date en timezone LOCAL
  * Evita bug de timezone al cargar fechas desde la base de datos
- * 
+ * ✅ IMPROVED: Better error handling for mobile compatibility (React Error 310)
+ *
  * NUNCA usar: new Date("2025-11-27") ❌ (interpreta como UTC)
  * SIEMPRE usar: parseDateFromString("2025-11-27") ✅ (interpreta como local)
- * 
+ *
  * @param dateString - String en formato YYYY-MM-DD
- * @returns Date en timezone local (medianoche)
- * 
+ * @returns Date en timezone local (medianoche) o Invalid Date if parsing fails
+ *
  * @example
  * parseDateFromString("2025-11-27") → Date(2025, 10, 27, 0, 0, 0, 0) en timezone local
  */
-export function parseDateFromString(dateString: string): Date {
-  const [year, month, day] = dateString.split('-').map(Number);
-  return new Date(year, month - 1, day, 0, 0, 0, 0); // Local timezone
+export function parseDateFromString(dateString: string | null | undefined): Date {
+  // ✅ FIXED: Handle null, undefined, and non-string input
+  if (!dateString || typeof dateString !== 'string' || dateString.trim() === '') {
+    return new Date(NaN); // Returns Invalid Date
+  }
+
+  try {
+    const parts = dateString.split('-');
+    if (parts.length !== 3) {
+      return new Date(NaN);
+    }
+
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10);
+    const day = parseInt(parts[2], 10);
+
+    // Validate parsed values
+    if (isNaN(year) || isNaN(month) || isNaN(day)) {
+      return new Date(NaN);
+    }
+
+    // Validate reasonable date ranges
+    if (year < 1900 || year > 2100 || month < 1 || month > 12 || day < 1 || day > 31) {
+      return new Date(NaN);
+    }
+
+    return new Date(year, month - 1, day, 0, 0, 0, 0); // Local timezone
+  } catch {
+    // ✅ FIXED: Catch any parsing errors
+    console.warn('[parseDateFromString] Failed to parse date:', dateString);
+    return new Date(NaN);
+  }
 }
 
 /**

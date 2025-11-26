@@ -31,93 +31,128 @@ export function formatBookingId(id: string | null): string {
 
 /**
  * Formatear hora de 24h a 12h con AM/PM
+ * ✅ IMPROVED: Better error handling for mobile compatibility
  * @param time24 - Hora en formato HH:mm (24 horas)
- * @returns Hora formateada en 12h con AM/PM
+ * @returns Hora formateada en 12h con AM/PM (siempre string)
  * @example
  * formatTime("14:30") → "2:30 PM"
  * formatTime("09:15") → "9:15 AM"
  */
-export function formatTime(time24: string | null): string {
-  if (!time24) return 'N/A';
-  
-  const [h, m] = time24.split(':').map(Number);
-  
-  if (isNaN(h) || isNaN(m)) {
-    return time24; // Retornar original si el formato es inválido
+export function formatTime(time24: string | null | undefined): string {
+  // ✅ FIXED: Handle null, undefined, and non-string input
+  if (!time24 || typeof time24 !== 'string' || time24.trim() === '') {
+    return 'N/A';
   }
-  
-  const period = h >= 12 ? 'PM' : 'AM';
-  const hour12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
-  
-  return `${hour12}:${m.toString().padStart(2, '0')} ${period}`;
+
+  try {
+    const parts = time24.split(':');
+    if (parts.length < 2) return time24;
+
+    const h = parseInt(parts[0], 10);
+    const m = parseInt(parts[1], 10);
+
+    if (isNaN(h) || isNaN(m) || h < 0 || h > 23 || m < 0 || m > 59) {
+      return time24; // Retornar original si el formato es inválido
+    }
+
+    const period = h >= 12 ? 'PM' : 'AM';
+    const hour12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+
+    return `${hour12}:${m.toString().padStart(2, '0')} ${period}`;
+  } catch {
+    // ✅ FIXED: Catch any parsing errors
+    console.warn('[formatTime] Failed to parse time:', time24);
+    return 'N/A';
+  }
 }
 
 /**
  * Formatear moneda (USD)
+ * ✅ IMPROVED: Better error handling for mobile compatibility
  * @param amount - Cantidad
  * @param showCents - Si debe mostrar centavos (default: true)
- * @returns Cantidad formateada
+ * @returns Cantidad formateada (siempre string)
  * @example
  * formatCurrency(150) → "$150.00"
  * formatCurrency(150.5, false) → "$151"
  */
-export function formatCurrency(amount: number, showCents: boolean = true): string {
-  if (isNaN(amount)) return '$0.00';
-  
-  if (showCents) {
-    return `$${amount.toFixed(2)}`;
-  } else {
-    return `$${Math.round(amount)}`;
+export function formatCurrency(amount: number | null | undefined, showCents: boolean = true): string {
+  // ✅ FIXED: Handle null, undefined, and non-number input
+  if (amount === null || amount === undefined || typeof amount !== 'number' || isNaN(amount)) {
+    return '$0.00';
+  }
+
+  try {
+    if (showCents) {
+      return `$${amount.toFixed(2)}`;
+    } else {
+      return `$${Math.round(amount)}`;
+    }
+  } catch {
+    // ✅ FIXED: Catch any formatting errors
+    console.warn('[formatCurrency] Failed to format amount:', amount);
+    return '$0.00';
   }
 }
 
 /**
  * ✅ FIXED: Formatear fecha para visualización
  * Usa parseDateFromString para evitar bug de timezone
- * 
+ * ✅ IMPROVED: Better error handling for mobile compatibility
+ *
  * @param dateString - Fecha en formato ISO (YYYY-MM-DD)
  * @param format - Formato deseado: 'short' | 'medium' | 'long'
- * @returns Fecha formateada
+ * @returns Fecha formateada (siempre string, nunca objeto)
  * @example
  * formatDate("2024-12-25", "short") → "Dec 25"
  * formatDate("2024-12-25", "medium") → "Thu, Dec 25"
  * formatDate("2024-12-25", "long") → "Thursday, December 25, 2024"
  */
 export function formatDate(
-  dateString: string,
+  dateString: string | null | undefined,
   format: 'short' | 'medium' | 'long' = 'long'
 ): string {
-  if (!dateString) return 'N/A';
-  
-  // ✅ FIXED: Usar parseDateFromString en lugar de new Date()
-  const date = parseDateFromString(dateString);
-  
-  if (isNaN(date.getTime())) {
-    return 'Invalid Date';
+  // ✅ FIXED: Handle null, undefined, empty, and non-string input
+  if (!dateString || typeof dateString !== 'string' || dateString.trim() === '') {
+    return 'N/A';
   }
-  
-  switch (format) {
-    case 'short':
-      return date.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-      });
-    
-    case 'medium':
-      return date.toLocaleDateString('en-US', {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric',
-      });
-    
-    case 'long':
-    default:
-      return date.toLocaleDateString('en-US', {
-        weekday: 'long',
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric',
-      });
+
+  try {
+    // ✅ FIXED: Usar parseDateFromString en lugar de new Date()
+    const date = parseDateFromString(dateString);
+
+    // ✅ FIXED: Better invalid date detection
+    if (!date || isNaN(date.getTime())) {
+      return 'N/A';
+    }
+
+    switch (format) {
+      case 'short':
+        return date.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+        });
+
+      case 'medium':
+        return date.toLocaleDateString('en-US', {
+          weekday: 'short',
+          month: 'short',
+          day: 'numeric',
+        });
+
+      case 'long':
+      default:
+        return date.toLocaleDateString('en-US', {
+          weekday: 'long',
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric',
+        });
+    }
+  } catch {
+    // ✅ FIXED: Catch any parsing errors (especially on mobile)
+    console.warn('[formatDate] Failed to parse date:', dateString);
+    return 'N/A';
   }
 }
 
