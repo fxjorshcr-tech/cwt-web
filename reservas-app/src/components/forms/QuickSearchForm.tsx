@@ -304,6 +304,19 @@ export function QuickSearchForm({
             )}
           </button>
         </div>
+
+        {/* Info Pills */}
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+          <span className="text-xs text-gray-500 bg-gray-50 px-3 py-1 rounded-full border border-gray-200">
+            Max 12 per van with luggage
+          </span>
+          <span className="text-xs text-gray-500 bg-gray-50 px-3 py-1 rounded-full border border-gray-200">
+            Custom routes available
+          </span>
+          <span className="text-xs text-gray-500 bg-gray-50 px-3 py-1 rounded-full border border-gray-200">
+            Multidestination booking
+          </span>
+        </div>
       </div>
     </form>
   );
