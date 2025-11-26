@@ -258,45 +258,22 @@ function TransfersContent() {
 
                 <div className="space-y-4 text-gray-600 leading-relaxed">
                   <p>
-                    Every route in Costa Rica passes by something worth stopping for. A waterfall hidden
-                    just off the main road. A mirador with views of the Pacific. A family-run coffee farm
-                    where you can taste beans roasted that morning. Traditional <em>sodas</em> serving
-                    casado the way your grandmother would have made it.
+                    Every route in Costa Rica passes by something worth stopping for. Waterfalls hidden
+                    just off the main road. Miradores with views of volcanoes and coastlines. Family-run
+                    coffee farms, artisan villages, wildlife sanctuaries, and traditional <em>sodas</em> serving
+                    casado the way abuela used to make it.
                   </p>
                   <p>
                     Our standard transfers include one complimentary stop for photos or a quick stretch.
                     But if you want to transform your transfer into a half-day exploration, our{' '}
                     <strong className="text-purple-700">Explorer Upgrade</strong> adds 3 extra hours to
-                    your journey. Stop at La Fortuna waterfall on your way from the airport. Visit a
-                    sloth sanctuary between Arenal and Monteverde. Pull over at that perfect beach you
-                    spotted from the road.
+                    your journey. Visit a waterfall on your way from the airport, stop at a sloth sanctuary,
+                    or pull over at that perfect beach you spotted from the road.
                   </p>
                   <p>
                     The Explorer Upgrade also includes a cooler stocked with local beers, San Pellegrino,
-                    sodas, and snacks, so you can toast to the view at every stop.
+                    sodas, and snacks for the road.
                   </p>
-                </div>
-
-                {/* Suggested Stops */}
-                <div className="mt-8 p-6 bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl border border-purple-100">
-                  <h4 className="font-bold text-gray-900 mb-4">Popular Stops Our Guests Love</h4>
-                  <div className="grid sm:grid-cols-2 gap-3">
-                    {[
-                      'La Fortuna Waterfall',
-                      'Arenal Volcano Viewpoint',
-                      'Sarchí Artisan Village',
-                      'Tárcoles Crocodile Bridge',
-                      'Grecia Church (Red Metal)',
-                      'Coffee Farm Tours',
-                      'Nauyaca Waterfalls',
-                      'Rio Celeste Entrance'
-                    ].map((stop) => (
-                      <div key={stop} className="flex items-center gap-2 text-sm text-gray-700">
-                        <CheckCircle2 className="h-4 w-4 text-purple-500 flex-shrink-0" />
-                        <span>{stop}</span>
-                      </div>
-                    ))}
-                  </div>
                 </div>
               </div>
 
@@ -383,9 +360,10 @@ function TransfersContent() {
                 </h2>
 
                 <p className="text-white/80 text-lg leading-relaxed mb-8">
-                  Our headquarters is in La Fortuna, at the base of Arenal Volcano. From there, we operate
-                  daily transfers to and from both international airports (SJO and Liberia), beach towns,
-                  cloud forest reserves, and everywhere in between. One company, one fleet, one standard of service.
+                  Our headquarters is in La Fortuna, at the base of Arenal Volcano, but we keep vehicles
+                  strategically positioned in San José, Monteverde, Manuel Antonio, and Guanacaste. This
+                  allows us to cover inter-destination transfers efficiently across the country. One company,
+                  one fleet, one standard of service.
                 </p>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -431,20 +409,16 @@ function TransfersContent() {
                     <Phone className="h-7 w-7 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold">Real People, Real Support</h3>
-                    <p className="text-white/70">Available when you need us</p>
+                    <h3 className="text-xl font-bold">With You From Booking to Drop-off</h3>
+                    <p className="text-white/70">WhatsApp & Email Support</p>
                   </div>
                 </div>
 
                 <div className="space-y-4 text-white/80">
                   <p>
-                    When you book with us, you get a direct WhatsApp line to our team. Questions about
-                    your pickup? Need to change a detail? Wondering what to pack? Just message us.
-                  </p>
-                  <p>
-                    We monitor your flight in real-time. If your plane is delayed, we adjust. If you
-                    land early, we are there. Our drivers carry phones and stay in contact with our
-                    office throughout every transfer.
+                    From the moment you book until we drop you off at your destination, our team stays
+                    connected with you via WhatsApp or email. We monitor your flight, coordinate with
+                    your driver, and handle any changes along the way.
                   </p>
                 </div>
 
