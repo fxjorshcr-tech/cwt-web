@@ -125,24 +125,38 @@ function PreviewPageContent() {
   }, [trips]);
 
   // Format date for display
-  function formatDisplayDate(dateStr: string): string {
-    const date = new Date(dateStr + 'T00:00:00');
-    return date.toLocaleDateString('en-US', {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
+  // ✅ FIXED: Handle null/undefined dates safely
+  function formatDisplayDate(dateStr: string | null | undefined): string {
+    if (!dateStr || typeof dateStr !== 'string') return 'N/A';
+
+    try {
+      const date = parseDateFromString(dateStr);
+      if (!date || isNaN(date.getTime())) return 'N/A';
+
+      return date.toLocaleDateString('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      });
+    } catch {
+      return 'N/A';
+    }
   }
 
   // Start editing a trip
+  // ✅ FIXED: Check bounds before accessing array
   function startEdit(index: number) {
+    if (!trips || index < 0 || index >= trips.length) return;
+
     const trip = trips[index];
-    setEditOrigin(trip.from_location);
-    setEditDestination(trip.to_location);
-    setEditDate(parseDateFromString(trip.date));
-    setEditAdults(trip.adults);
-    setEditChildren(trip.children);
+    if (!trip) return;
+
+    setEditOrigin(trip.from_location || '');
+    setEditDestination(trip.to_location || '');
+    setEditDate(trip.date ? parseDateFromString(trip.date) : null);
+    setEditAdults(trip.adults || 1);
+    setEditChildren(trip.children || 0);
     setEditingIndex(index);
     setShowAddTrip(false);
   }
@@ -154,24 +168,30 @@ function PreviewPageContent() {
   };
 
   // Save edit
+  // ✅ FIXED: Handle null date and bounds check
   function saveEdit() {
     if (editingIndex === null || !editDate) return;
+    if (editingIndex < 0 || editingIndex >= trips.length) return;
 
     const route = routes.find((r) => r.origen === editOrigin && r.destino === editDestination);
     if (!route) return;
 
     const totalPassengers = editAdults + editChildren;
     const price = calculateTripPrice(route, totalPassengers);
+    const dateStr = formatDateToString(editDate);
+
+    // ✅ Don't save if date formatting failed
+    if (!dateStr) return;
 
     const newTrips = [...trips];
     newTrips[editingIndex] = {
       from_location: editOrigin,
       to_location: editDestination,
-      date: formatDateToString(editDate),
+      date: dateStr,
       adults: editAdults,
       children: editChildren,
       price,
-      duration: route.duracion,
+      duration: route.duracion || '',
       routeId: route.id,
     };
 
@@ -187,18 +207,32 @@ function PreviewPageContent() {
   }
 
   // Add new trip
+  // ✅ FIXED: Check if trips array has elements before accessing
   function startAddTrip() {
+    if (!trips || trips.length === 0) {
+      // Default values if no trips exist
+      setEditOrigin('');
+      setEditDestination('');
+      setEditDate(null);
+      setEditAdults(2);
+      setEditChildren(0);
+      setShowAddTrip(true);
+      setEditingIndex(null);
+      return;
+    }
+
     const lastTrip = trips[trips.length - 1];
-    setEditOrigin(lastTrip.to_location);
+    setEditOrigin(lastTrip?.to_location || '');
     setEditDestination('');
-    setEditDate(parseDateFromString(lastTrip.date));
-    setEditAdults(lastTrip.adults);
-    setEditChildren(lastTrip.children);
+    setEditDate(lastTrip?.date ? parseDateFromString(lastTrip.date) : null);
+    setEditAdults(lastTrip?.adults || 2);
+    setEditChildren(lastTrip?.children || 0);
     setShowAddTrip(true);
     setEditingIndex(null);
   }
 
   // Save new trip
+  // ✅ FIXED: Handle null date gracefully
   function saveNewTrip() {
     if (!editDate) return;
 
@@ -207,15 +241,19 @@ function PreviewPageContent() {
 
     const totalPassengers = editAdults + editChildren;
     const price = calculateTripPrice(route, totalPassengers);
+    const dateStr = formatDateToString(editDate);
+
+    // ✅ Don't save if date formatting failed
+    if (!dateStr) return;
 
     const newTrip: TripPreview = {
       from_location: editOrigin,
       to_location: editDestination,
-      date: formatDateToString(editDate),
+      date: dateStr,
       adults: editAdults,
       children: editChildren,
       price,
-      duration: route.duracion,
+      duration: route.duracion || '',
       routeId: route.id,
     };
 

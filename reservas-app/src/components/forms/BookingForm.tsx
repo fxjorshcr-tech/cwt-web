@@ -1,11 +1,13 @@
 ﻿// src/components/forms/BookingForm.tsx
 // ✅ CORREGIDO: Usa localStorage en vez de Supabase para guardar bookings temporales
 // ✅ Solo se guarda en Supabase cuando usuario confirma en Summary (Pay Now / Add to Cart)
+// ✅ IMPROVED: Safe localStorage, sonner toast, mobile compatibility
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Search, Loader2, AlertCircle, Plus, X } from 'lucide-react';
+import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
 import {
   TripCard,
@@ -23,6 +25,7 @@ import {
   generateBookingId,
   createBookingData,
 } from '@/utils/bookingFormHelpers';
+import { saveBookingToLocalStorage, isLocalStorageAvailable } from '@/utils/localStorageHelpers';
 
 export function BookingForm() {
   const router = useRouter();
@@ -67,7 +70,10 @@ export function BookingForm() {
           return newTrips;
         });
 
-        window.history.replaceState({}, '', window.location.pathname);
+        // ✅ FIXED: Safe window access
+        if (typeof window !== 'undefined' && window.history && window.location) {
+          window.history.replaceState({}, '', window.location.pathname);
+        }
       }
     }
   }, [routes, searchParams]);
@@ -100,16 +106,30 @@ export function BookingForm() {
   }
 
   function addTrip() {
+    // ✅ FIXED: Check if trips array has elements before accessing
+    if (!trips || trips.length === 0) {
+      setTrips([{
+        from_location: '',
+        to_location: '',
+        date: '',
+        adults: 1,
+        children: 0,
+        calculatedPrice: 0,
+        selectedRoute: null,
+      }]);
+      return;
+    }
+
     const lastTrip = trips[trips.length - 1];
 
     setTrips([
       ...trips,
       {
-        from_location: lastTrip.to_location,
+        from_location: lastTrip?.to_location || '',
         to_location: '',
-        date: lastTrip.date,
-        adults: lastTrip.adults,
-        children: lastTrip.children,
+        date: lastTrip?.date || '',
+        adults: lastTrip?.adults || 1,
+        children: lastTrip?.children || 0,
         calculatedPrice: 0,
         selectedRoute: null,
       },
@@ -128,18 +148,12 @@ export function BookingForm() {
 
   // Ref to track if component is mounted (for safe async operations)
   const isMountedRef = useRef(true);
-  const toastRef = useRef<HTMLDivElement | null>(null);
 
   // Cleanup on unmount
   useEffect(() => {
     isMountedRef.current = true;
     return () => {
       isMountedRef.current = false;
-      // Clean up toast if it exists
-      if (toastRef.current && document.body.contains(toastRef.current)) {
-        document.body.removeChild(toastRef.current);
-        toastRef.current = null;
-      }
     };
   }, []);
 
@@ -149,7 +163,15 @@ export function BookingForm() {
     const validationError = validate();
     if (validationError) {
       setError(validationError);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      return;
+    }
+
+    // ✅ FIXED: Check localStorage availability before proceeding
+    if (!isLocalStorageAvailable()) {
+      setError('Your browser settings are blocking this feature. Please enable cookies/localStorage or try a different browser.');
       return;
     }
 
@@ -160,77 +182,54 @@ export function BookingForm() {
       const bookingId = generateBookingId();
       const bookingData = createBookingData(trips, bookingId);
 
-      // Save to localStorage
-      localStorage.setItem(`booking_${bookingId}`, JSON.stringify(bookingData));
+      // ✅ FIXED: Use safe localStorage helper
+      const saved = saveBookingToLocalStorage(bookingId, bookingData);
+      if (!saved) {
+        throw new Error('Unable to save booking. Please check your browser settings.');
+      }
 
-      // Create toast element and store in ref for safe cleanup
-      const checkingToast = document.createElement('div');
-      checkingToast.className = 'fixed top-4 right-4 z-50 bg-white rounded-xl shadow-2xl p-6 border-2 border-blue-500 animate-in fade-in slide-in-from-top-5 duration-500';
-      checkingToast.innerHTML = `
-        <div class="flex items-center gap-4">
-          <div class="relative">
-            <div class="h-12 w-12 rounded-full border-4 border-blue-100 border-t-blue-600 animate-spin"></div>
-          </div>
-          <div>
-            <p class="text-lg font-bold text-gray-900">Checking Availability...</p>
-            <p class="text-sm text-gray-600">Please wait a moment</p>
-          </div>
-        </div>
-      `;
-      toastRef.current = checkingToast;
-      document.body.appendChild(checkingToast);
+      // ✅ FIXED: Use sonner toast instead of DOM manipulation
+      const toastId = toast.loading('Checking Availability...', {
+        description: 'Please wait a moment',
+      });
 
       await new Promise(resolve => setTimeout(resolve, 1400));
 
       // Check if still mounted before continuing
-      if (!isMountedRef.current) return;
-
-      // Update toast content
-      if (toastRef.current && document.body.contains(toastRef.current)) {
-        toastRef.current.innerHTML = `
-          <div class="flex items-center gap-4">
-            <div class="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
-              <svg class="h-7 w-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-              </svg>
-            </div>
-            <div>
-              <p class="text-lg font-bold text-gray-900">Availability Approved</p>
-              <p class="text-sm text-gray-600">Redirecting to booking details...</p>
-            </div>
-          </div>
-        `;
+      if (!isMountedRef.current) {
+        toast.dismiss(toastId);
+        return;
       }
 
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Update toast to success
+      toast.success('Availability Approved!', {
+        id: toastId,
+        description: 'Redirecting to booking details...',
+      });
+
+      await new Promise(resolve => setTimeout(resolve, 800));
 
       // Check if still mounted before continuing
       if (!isMountedRef.current) return;
-
-      // Clean up toast safely
-      if (toastRef.current && document.body.contains(toastRef.current)) {
-        document.body.removeChild(toastRef.current);
-        toastRef.current = null;
-      }
 
       // Redirect to booking-details
       router.push(`/booking-details?booking_id=${bookingId}&trip=0`);
 
     } catch (error) {
-      console.error('Full error:', error);
-
-      // Clean up toast on error
-      if (toastRef.current && document.body.contains(toastRef.current)) {
-        document.body.removeChild(toastRef.current);
-        toastRef.current = null;
-      }
+      console.error('Booking error:', error);
 
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error processing booking';
 
+      toast.error('Failed to process booking', {
+        description: errorMessage,
+      });
+
       if (isMountedRef.current) {
         setError(errorMessage);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (typeof window !== 'undefined') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
         setIsSubmitting(false);
       }
     }
