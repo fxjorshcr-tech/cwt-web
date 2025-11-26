@@ -183,78 +183,51 @@ export default async function MostBookedPage() {
                   </div>
                 </div>
                 
-                <div className="space-y-4">
+                <div className="bg-white rounded-xl border border-gray-200 overflow-hidden divide-y divide-gray-100">
                   {category.routes
                     .filter(route => route.price !== null)
                     .map((route) => (
                     <Link
                       key={route.slug}
                       href={`/shuttle/${route.slug}`}
-                      className="group relative bg-white rounded-xl overflow-hidden border border-gray-200 hover:border-blue-500 hover:shadow-lg transition-all duration-200 block"
+                      className="group flex items-center justify-between p-4 hover:bg-blue-50 transition-all duration-200"
                     >
-                      <div className="p-5">
-                        {/* Top: Badge and Price */}
-                        <div className="flex items-start justify-between mb-4">
-                          <div>
+                      {/* Left: Destination info */}
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div className="bg-green-100 p-2 rounded-lg flex-shrink-0">
+                          <MapPin className="h-4 w-4 text-green-600" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="text-sm font-bold text-gray-900 truncate">
+                              {route.to}
+                            </p>
                             {route.isHot && (
-                              <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold">
+                              <span className="bg-blue-600 text-white px-2 py-0.5 rounded-full text-[10px] font-bold flex-shrink-0">
                                 POPULAR
                               </span>
                             )}
                           </div>
-                          {route.price && (
-                            <div className="text-right">
-                              <p className="text-xs text-gray-500">From</p>
-                              <p className="text-2xl font-black text-gray-900">${route.price}</p>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Route Display - Vertical on mobile, horizontal on larger screens */}
-                        <div className="space-y-3">
-                          {/* From Location */}
-                          <div className="flex items-start gap-3">
-                            <div className="bg-blue-100 p-2 rounded-lg flex-shrink-0 mt-1">
-                              <MapPin className="h-4 w-4 text-blue-600" />
-                            </div>
-                            <div>
-                              <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">From</p>
-                              <p className="text-sm font-bold text-gray-900 leading-snug">
-                                {route.from}
-                              </p>
-                            </div>
-                          </div>
-
-                          {/* Arrow Separator */}
-                          <div className="flex items-center justify-center">
-                            <div className="bg-gray-100 p-2 rounded-full">
-                              <ArrowRight className="h-5 w-5 text-gray-600" />
-                            </div>
-                          </div>
-
-                          {/* To Location */}
-                          <div className="flex items-start gap-3">
-                            <div className="bg-green-100 p-2 rounded-lg flex-shrink-0 mt-1">
-                              <MapPin className="h-4 w-4 text-green-600" />
-                            </div>
-                            <div>
-                              <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">To</p>
-                              <p className="text-sm font-bold text-gray-900 leading-snug">
-                                {route.to}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Duration */}
-                        {route.duration && (
-                          <div className="mt-4 pt-4 border-t border-gray-100">
-                            <p className="text-xs text-gray-500 flex items-center gap-2">
-                              <Clock className="h-4 w-4" />
+                          {route.duration && (
+                            <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                              <Clock className="h-3 w-3" />
                               <span>{route.duration}</span>
                             </p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Right: Price and arrow */}
+                      <div className="flex items-center gap-3 flex-shrink-0 ml-4">
+                        {route.price && (
+                          <div className="text-right">
+                            <p className="text-xs text-gray-400">From</p>
+                            <p className="text-lg font-black text-gray-900">${route.price}</p>
                           </div>
                         )}
+                        <div className="bg-gray-100 group-hover:bg-blue-600 p-2 rounded-full transition-colors">
+                          <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-white transition-colors" />
+                        </div>
                       </div>
                     </Link>
                   ))}
