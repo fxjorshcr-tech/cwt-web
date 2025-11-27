@@ -206,23 +206,13 @@ export function OrderSummaryCard({
         <div className="space-y-2.5">
           <TermsCheckbox checked={termsAccepted} onChange={onTermsChange} error={false} />
 
-          {/* ✅ ACTUALIZADO: Mostrar loading state */}
+          {/* ✅ DESACTIVADO: Pagos online próximamente */}
           <Button
-            onClick={onPayNow}
-            disabled={!termsAccepted || isSaving}
-            className="w-full h-11 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold shadow-md hover:shadow-lg transition-all"
+            disabled={true}
+            className="w-full h-11 bg-gray-400 cursor-not-allowed text-white text-sm font-semibold"
           >
-            {isSaving ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <CreditCard className="h-4 w-4 mr-2" />
-                Pay Now
-              </>
-            )}
+            <CreditCard className="h-4 w-4 mr-2" />
+            Online Payments Coming Soon
           </Button>
 
           <Button
