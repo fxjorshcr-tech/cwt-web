@@ -4,44 +4,80 @@
 'use client';
 
 import { useState } from 'react';
-import { Phone, Mail, MessageSquare, Clock, Send, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
+import { Phone, Mail, MessageSquare, Clock, Send, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+
+// Common country codes for phone
+const COUNTRY_CODES = [
+  { code: '+1', country: 'US/Canada', flag: '🇺🇸' },
+  { code: '+44', country: 'UK', flag: '🇬🇧' },
+  { code: '+49', country: 'Germany', flag: '🇩🇪' },
+  { code: '+33', country: 'France', flag: '🇫🇷' },
+  { code: '+34', country: 'Spain', flag: '🇪🇸' },
+  { code: '+39', country: 'Italy', flag: '🇮🇹' },
+  { code: '+31', country: 'Netherlands', flag: '🇳🇱' },
+  { code: '+41', country: 'Switzerland', flag: '🇨🇭' },
+  { code: '+43', country: 'Austria', flag: '🇦🇹' },
+  { code: '+61', country: 'Australia', flag: '🇦🇺' },
+  { code: '+64', country: 'New Zealand', flag: '🇳🇿' },
+  { code: '+52', country: 'Mexico', flag: '🇲🇽' },
+  { code: '+55', country: 'Brazil', flag: '🇧🇷' },
+  { code: '+54', country: 'Argentina', flag: '🇦🇷' },
+  { code: '+56', country: 'Chile', flag: '🇨🇱' },
+  { code: '+57', country: 'Colombia', flag: '🇨🇴' },
+  { code: '+506', country: 'Costa Rica', flag: '🇨🇷' },
+  { code: '+507', country: 'Panama', flag: '🇵🇦' },
+  { code: '+81', country: 'Japan', flag: '🇯🇵' },
+  { code: '+82', country: 'South Korea', flag: '🇰🇷' },
+  { code: '+65', country: 'Singapore', flag: '🇸🇬' },
+];
 
 export default function FinalCTA() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    countryCode: '+1',
     phone: '',
+    subject: 'question',
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.name || !formData.email || !formData.message) {
-      toast.error('Please fill in all required fields');
-      return;
-    }
-
     setIsSubmitting(true);
+    setSubmitStatus('idle');
 
     try {
-      // TODO: Integrate with your email service (SendGrid, Resend, etc.)
-      // For now, we'll just simulate success
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast.success('Message sent! We\'ll get back to you soon.');
-      
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+
+      setSubmitStatus('success');
+
       // Reset form
       setFormData({
         name: '',
         email: '',
+        countryCode: '+1',
         phone: '',
+        subject: 'question',
         message: ''
       });
+
+      // Reset success message after 8 seconds
+      setTimeout(() => setSubmitStatus('idle'), 8000);
     } catch (error) {
-      toast.error('Failed to send message. Please try WhatsApp instead.');
+      console.error('Contact form error:', error);
+      setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
     }
@@ -56,7 +92,7 @@ export default function FinalCTA() {
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 max-w-6xl relative z-10">
-        
+
         {/* Header */}
         <div className="text-center text-white mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -68,7 +104,7 @@ export default function FinalCTA() {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
-          
+
           {/* Left Column - Quick Contact Options */}
           <div className="space-y-6">
             <div className="text-white mb-6">
@@ -91,7 +127,7 @@ export default function FinalCTA() {
                   <p className="font-bold text-gray-900 mb-1 text-lg">WhatsApp</p>
                   <p className="text-sm text-gray-600 mb-2">+506-8596-2438</p>
                   <p className="text-sm text-green-600 font-semibold">
-                    ⚡ Fastest response - Usually under 5 minutes
+                    Fastest response - Usually under 5 minutes
                   </p>
                 </div>
               </div>
@@ -151,15 +187,38 @@ export default function FinalCTA() {
             <h3 className="text-2xl font-bold text-gray-900 mb-2">Send Us a Message</h3>
             <p className="text-gray-600 mb-6">Fill out the form and we'll get back to you soon</p>
 
+            {/* Success Message */}
+            {submitStatus === 'success' && (
+              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start gap-3">
+                <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-semibold text-green-900">Message sent successfully!</p>
+                  <p className="text-xs text-green-700 mt-1">We'll get back to you within 2 hours. Check your email for confirmation.</p>
+                </div>
+              </div>
+            )}
+
+            {/* Error Message */}
+            {submitStatus === 'error' && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-semibold text-red-900">Failed to send message</p>
+                  <p className="text-xs text-red-700 mt-1">Please try again or contact us via WhatsApp.</p>
+                </div>
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Name */}
               <div>
-                <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="home-name" className="block text-sm font-semibold text-gray-700 mb-2">
                   Your Name *
                 </label>
                 <input
                   type="text"
-                  id="name"
+                  id="home-name"
+                  name="name"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -170,12 +229,13 @@ export default function FinalCTA() {
 
               {/* Email */}
               <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="home-email" className="block text-sm font-semibold text-gray-700 mb-2">
                   Email Address *
                 </label>
                 <input
                   type="email"
-                  id="email"
+                  id="home-email"
+                  name="email"
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -184,30 +244,47 @@ export default function FinalCTA() {
                 />
               </div>
 
-              {/* Phone (Optional) */}
+              {/* Phone with Country Code */}
               <div>
-                <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Phone Number <span className="text-gray-400">(optional)</span>
+                <label htmlFor="home-phone" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Phone Number <span className="text-gray-400 font-normal">(optional)</span>
                 </label>
-                <input
-                  type="tel"
-                  id="phone"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  placeholder="+1 234 567 8900"
-                />
+                <div className="flex gap-2">
+                  <select
+                    id="home-countryCode"
+                    name="countryCode"
+                    value={formData.countryCode}
+                    onChange={(e) => setFormData({ ...formData, countryCode: e.target.value })}
+                    className="w-28 px-2 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
+                  >
+                    {COUNTRY_CODES.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.flag} {c.code}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    type="tel"
+                    id="home-phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    placeholder="234 567 8900"
+                  />
+                </div>
               </div>
 
               {/* Message */}
               <div>
-                <label htmlFor="message" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="home-message" className="block text-sm font-semibold text-gray-700 mb-2">
                   Your Message *
                 </label>
                 <textarea
-                  id="message"
+                  id="home-message"
+                  name="message"
                   required
-                  rows={5}
+                  rows={4}
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
