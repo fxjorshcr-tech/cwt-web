@@ -401,7 +401,7 @@ function BookingDetailsContent() {
       <BookingNavbar />
 
       {/* Compact Hero */}
-      <section className="relative h-32 md:h-40 w-full overflow-hidden">
+      <section className="relative h-36 sm:h-40 md:h-48 w-full overflow-hidden">
         <Image
           src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/puerto-viejo-costa-rica-beach.webp"
           alt="Costa Rica Beach"
@@ -412,8 +412,8 @@ function BookingDetailsContent() {
           sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
-        <div className="absolute inset-0 flex items-end md:items-center justify-center pb-3 md:pb-0">
-          <h1 className="text-xl md:text-3xl font-bold text-white drop-shadow-lg">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white drop-shadow-lg text-center px-4">
             Complete Your Booking
           </h1>
         </div>
