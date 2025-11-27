@@ -4,7 +4,6 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import BookingNavbar from '@/components/booking/BookingNavbar';
@@ -22,7 +21,6 @@ interface PaymentResult {
 function PaymentCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const supabase = createClient();
 
   const [processing, setProcessing] = useState(true);
   const [result, setResult] = useState<PaymentResult | null>(null);
@@ -63,16 +61,32 @@ function PaymentCallbackContent() {
         // Check if payment was successful
         const isApproved = code === '1';
 
-        // Log payment info cuando el pago es aprobado
-        if (bookingId && isApproved) {
-          console.log('Payment approved for booking:', bookingId, {
-            transactionId,
-            orderId,
-            authCode,
-          });
+        // Save payment status to database
+        if (bookingId) {
+          try {
+            const response = await fetch('/api/payment/update-status', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                bookingId,
+                paymentStatus: isApproved ? 'approved' : 'rejected',
+                transactionId,
+                authCode,
+                paymentCode: code,
+                paymentDescription: description,
+              }),
+            });
 
-          // TODO: Agregar campos payment_status, payment_id, etc. a la tabla trips en Supabase
-          // Por ahora solo logueamos - los campos se agregarán después
+            const data = await response.json();
+            console.log('Payment status update:', data);
+
+            if (data.needsMigration) {
+              console.log('Note: Payment columns need to be added to Supabase trips table');
+            }
+          } catch (err) {
+            console.error('Failed to update payment status:', err);
+            // Don't block the user flow if status update fails
+          }
         }
 
         setResult({
@@ -101,7 +115,7 @@ function PaymentCallbackContent() {
     }
 
     processPaymentCallback();
-  }, [searchParams, router, supabase]);
+  }, [searchParams, router]);
 
   if (processing) {
     return (
