@@ -85,8 +85,26 @@ export default function TransfersPage() {
         <Suspense
           fallback={
             <section className="relative -mt-16 z-20 px-4 sm:px-6 pb-16">
-              <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-8 flex items-center justify-center min-h-[200px]">
-                <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+              <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-visible">
+                <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-5 py-4 rounded-t-2xl">
+                  <h2 className="text-white font-bold text-lg text-center">Get an Instant Quote</h2>
+                </div>
+                <div className="p-5 md:p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="h-[72px] bg-gray-100 rounded-lg animate-pulse" />
+                    <div className="h-[72px] bg-gray-100 rounded-lg animate-pulse" />
+                    <div className="h-[72px] bg-gray-100 rounded-lg animate-pulse" />
+                    <div className="h-[72px] bg-gray-100 rounded-lg animate-pulse" />
+                  </div>
+                  <div className="mt-6 flex justify-center">
+                    <div className="w-full sm:w-auto min-w-[220px] h-[52px] bg-gray-200 rounded-xl animate-pulse" />
+                  </div>
+                  <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+                    <div className="h-6 w-32 bg-gray-100 rounded-full animate-pulse" />
+                    <div className="h-6 w-36 bg-gray-100 rounded-full animate-pulse" />
+                    <div className="h-6 w-40 bg-gray-100 rounded-full animate-pulse" />
+                  </div>
+                </div>
               </div>
             </section>
           }
