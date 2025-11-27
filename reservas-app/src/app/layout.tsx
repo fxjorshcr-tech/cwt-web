@@ -10,6 +10,7 @@ import LocalStorageCleanup from "@/components/LocalStorageCleanup";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import RollbarProvider from "@/components/RollbarProvider";
 
 const inter = Inter({
@@ -91,6 +92,9 @@ export default function RootLayout({
         </RollbarProvider>
         <SpeedInsights />
         <Analytics />
+        {process.env.NEXT_PUBLIC_GA_ID && (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+        )}
       </body>
     </html>
   );
