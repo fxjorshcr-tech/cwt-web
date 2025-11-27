@@ -14,6 +14,7 @@ import BookingStepper from '@/components/booking/BookingStepper';
 import FAQModal from '@/components/booking/FAQModal';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from 'sonner';
+import CustomerInfoModal, { CustomerInfo } from '@/components/payment/CustomerInfoModal';
 
 // ✅ Imports de componentes divididos
 import {
@@ -110,6 +111,8 @@ function SummaryPageContent() {
   const [showFAQModal, setShowFAQModal] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [isSavingToSupabase, setIsSavingToSupabase] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   if (!bookingId) {
     return (
@@ -325,7 +328,7 @@ function SummaryPageContent() {
     router.push('/transfers');
   };
 
-  // ✅ HANDLE PAY NOW - Redirigir directamente a Tilopay
+  // ✅ HANDLE PAY NOW - Mostrar modal para capturar datos del cliente
   const handlePayNow = async () => {
     if (!termsAccepted) {
       toast.error('Please accept the terms and conditions');
@@ -339,11 +342,37 @@ function SummaryPageContent() {
       return; // Si falla, no continuar
     }
 
-    // Procesar pago con Tilopay
-    setIsSavingToSupabase(true);
+    // Mostrar el modal para capturar datos del cliente
+    setShowPaymentModal(true);
+  };
+
+  // ✅ HANDLE TILOPAY PAYMENT - Procesar pago con datos del cliente
+  const handleTilopayPayment = async (customerInfo: CustomerInfo) => {
+    setIsProcessingPayment(true);
 
     try {
-      // Llamar a la API de Tilopay
+      // Guardar datos del cliente en Supabase
+      const tripIds = trips.map((t) => t.id);
+
+      // Actualizar cada trip con los datos del cliente
+      for (const tripId of tripIds) {
+        const { error } = await supabase
+          .from('trips')
+          .update({
+            customer_first_name: customerInfo.firstName,
+            customer_last_name: customerInfo.lastName,
+            customer_email: customerInfo.email,
+            customer_phone: customerInfo.phone,
+            customer_country: customerInfo.country,
+          })
+          .eq('id', tripId);
+
+        if (error) {
+          console.error('Error updating trip with customer info:', error);
+        }
+      }
+
+      // Llamar a la API de Tilopay con los datos del cliente
       const response = await fetch('/api/tilopay/create-payment', {
         method: 'POST',
         headers: {
@@ -353,7 +382,8 @@ function SummaryPageContent() {
           bookingId,
           amount: grandTotal,
           currency: 'USD',
-          tripIds: trips.map((t) => t.id),
+          tripIds,
+          customerInfo,
         }),
       });
 
@@ -364,7 +394,6 @@ function SummaryPageContent() {
       }
 
       // Redirigir al formulario de pago de Tilopay
-      // Tilopay capturará los datos del cliente en su formulario
       if (data.paymentUrl) {
         toast.success('Redirecting to payment...');
         window.location.href = data.paymentUrl;
@@ -374,7 +403,8 @@ function SummaryPageContent() {
     } catch (error) {
       console.error('Payment error:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to process payment');
-      setIsSavingToSupabase(false);
+      setIsProcessingPayment(false);
+      setShowPaymentModal(false);
     }
   };
 
@@ -413,6 +443,17 @@ function SummaryPageContent() {
     <>
       <BookingNavbar />
       <FAQModal isOpen={showFAQModal} onClose={() => setShowFAQModal(false)} />
+      <CustomerInfoModal
+        isOpen={showPaymentModal}
+        onClose={() => {
+          if (!isProcessingPayment) {
+            setShowPaymentModal(false);
+          }
+        }}
+        onSubmit={handleTilopayPayment}
+        totalAmount={grandTotal}
+        isProcessing={isProcessingPayment}
+      />
 
       <section className="relative h-40 sm:h-56 md:h-72 w-full overflow-hidden">
         <Image

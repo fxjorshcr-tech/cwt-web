@@ -7,11 +7,20 @@ import {
   TILOPAY_CONFIG,
 } from '@/lib/tilopay';
 
+interface CustomerInfo {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  country: string;
+}
+
 interface PaymentRequestBody {
   bookingId: string;
   amount: number;
   currency?: string;
   tripIds?: string[];
+  customerInfo?: CustomerInfo;
 }
 
 export async function POST(request: NextRequest) {
@@ -26,7 +35,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { bookingId, amount, currency = 'USD', tripIds } = body;
+    const { bookingId, amount, currency = 'USD', tripIds, customerInfo } = body;
 
     // Get Tilopay access token
     const token = await getTilopayToken();
@@ -42,9 +51,26 @@ export async function POST(request: NextRequest) {
       timestamp: Date.now(),
     });
 
-    // Create payment request
-    // Nota: Tilopay captura los datos del cliente en su formulario de pago
-    // Enviamos valores placeholder que serán reemplazados por el usuario
+    // Use customer info if provided, otherwise use defaults
+    const firstName = customerInfo?.firstName || 'Customer';
+    const lastName = customerInfo?.lastName || 'CWT';
+    const email = customerInfo?.email || 'customer@cantwaittravelcr.com';
+    const phone = customerInfo?.phone || '00000000';
+    const country = customerInfo?.country || 'CR';
+
+    // Map country code to state for Tilopay
+    const stateMap: Record<string, string> = {
+      CR: 'CR-SJ',
+      US: 'US-FL',
+      CA: 'CA-ON',
+      MX: 'MX-DIF',
+      GT: 'GT-GU',
+      PA: 'PA-8',
+      CO: 'CO-DC',
+      OTHER: 'CR-SJ',
+    };
+
+    // Create payment request with customer billing info
     const paymentResponse = await createTilopayPayment(token, {
       redirect: redirectUrl,
       key: TILOPAY_CONFIG.API_KEY,
@@ -54,16 +80,16 @@ export async function POST(request: NextRequest) {
       capture: '1', // Capture immediately
       subscription: '0', // Don't save card
       platform: 'CWT-Web',
-      billToFirstName: 'Customer',
-      billToLastName: 'CWT',
-      billToEmail: 'customer@cantwaittravelcr.com',
-      billToTelephone: '00000000',
+      billToFirstName: firstName,
+      billToLastName: lastName,
+      billToEmail: email,
+      billToTelephone: phone,
       billToAddress: 'San Jose',
       billToAddress2: 'Costa Rica',
       billToCity: 'San Jose',
-      billToState: 'CR-SJ',
+      billToState: stateMap[country] || 'CR-SJ',
       billToZipPostCode: '10101',
-      billToCountry: 'CR',
+      billToCountry: country,
       returnData: returnData,
       hashVersion: 'V2',
     });
