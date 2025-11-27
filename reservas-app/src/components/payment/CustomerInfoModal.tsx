@@ -7,6 +7,26 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
+// Country codes with phone prefixes
+const COUNTRIES = [
+  { code: 'CR', name: 'Costa Rica', phonePrefix: '+506' },
+  { code: 'US', name: 'United States', phonePrefix: '+1' },
+  { code: 'CA', name: 'Canada', phonePrefix: '+1' },
+  { code: 'MX', name: 'Mexico', phonePrefix: '+52' },
+  { code: 'GT', name: 'Guatemala', phonePrefix: '+502' },
+  { code: 'PA', name: 'Panama', phonePrefix: '+507' },
+  { code: 'CO', name: 'Colombia', phonePrefix: '+57' },
+  { code: 'ES', name: 'Spain', phonePrefix: '+34' },
+  { code: 'UK', name: 'United Kingdom', phonePrefix: '+44' },
+  { code: 'DE', name: 'Germany', phonePrefix: '+49' },
+  { code: 'FR', name: 'France', phonePrefix: '+33' },
+  { code: 'BR', name: 'Brazil', phonePrefix: '+55' },
+  { code: 'AR', name: 'Argentina', phonePrefix: '+54' },
+  { code: 'CL', name: 'Chile', phonePrefix: '+56' },
+  { code: 'PE', name: 'Peru', phonePrefix: '+51' },
+  { code: 'OTHER', name: 'Other', phonePrefix: '+' },
+];
+
 export interface CustomerInfo {
   firstName: string;
   lastName: string;
@@ -37,7 +57,11 @@ export default function CustomerInfoModal({
     phone: '',
     country: 'CR',
   });
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [errors, setErrors] = useState<Partial<CustomerInfo>>({});
+
+  // Get current country's phone prefix
+  const currentCountry = COUNTRIES.find(c => c.code === formData.country) || COUNTRIES[0];
 
   if (!isOpen) return null;
 
@@ -55,8 +79,10 @@ export default function CustomerInfoModal({
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email';
     }
-    if (!formData.phone.trim()) {
+    if (!phoneNumber.trim()) {
       newErrors.phone = 'Phone is required';
+    } else if (phoneNumber.length < 6) {
+      newErrors.phone = 'Please enter a valid phone number';
     }
 
     setErrors(newErrors);
@@ -66,7 +92,9 @@ export default function CustomerInfoModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
-    await onSubmit(formData);
+    // Combine phone prefix with number
+    const fullPhone = `${currentCountry.phonePrefix} ${phoneNumber}`;
+    await onSubmit({ ...formData, phone: fullPhone });
   };
 
   const handleChange = (field: keyof CustomerInfo, value: string) => {
@@ -74,6 +102,19 @@ export default function CustomerInfoModal({
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
+  };
+
+  const handlePhoneChange = (value: string) => {
+    // Only allow digits
+    const cleaned = value.replace(/\D/g, '');
+    setPhoneNumber(cleaned);
+    if (errors.phone) {
+      setErrors((prev) => ({ ...prev, phone: undefined }));
+    }
+  };
+
+  const handleCountryChange = (countryCode: string) => {
+    setFormData((prev) => ({ ...prev, country: countryCode }));
   };
 
   return (
@@ -158,42 +199,44 @@ export default function CustomerInfoModal({
             )}
           </div>
 
-          {/* Phone */}
-          <div>
-            <Label htmlFor="phone">Phone Number *</Label>
-            <Input
-              id="phone"
-              type="tel"
-              value={formData.phone}
-              onChange={(e) => handleChange('phone', e.target.value)}
-              placeholder="+506 8888-8888"
-              disabled={isProcessing}
-              className={errors.phone ? 'border-red-500' : ''}
-            />
-            {errors.phone && (
-              <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
-            )}
-          </div>
-
           {/* Country */}
           <div>
-            <Label htmlFor="country">Country</Label>
+            <Label htmlFor="country">Country *</Label>
             <select
               id="country"
               value={formData.country}
-              onChange={(e) => handleChange('country', e.target.value)}
+              onChange={(e) => handleCountryChange(e.target.value)}
               disabled={isProcessing}
               className="w-full h-10 px-3 rounded-md border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="CR">Costa Rica</option>
-              <option value="US">United States</option>
-              <option value="CA">Canada</option>
-              <option value="MX">Mexico</option>
-              <option value="GT">Guatemala</option>
-              <option value="PA">Panama</option>
-              <option value="CO">Colombia</option>
-              <option value="OTHER">Other</option>
+              {COUNTRIES.map((country) => (
+                <option key={country.code} value={country.code}>
+                  {country.name} ({country.phonePrefix})
+                </option>
+              ))}
             </select>
+          </div>
+
+          {/* Phone with country code */}
+          <div>
+            <Label htmlFor="phone">Phone Number *</Label>
+            <div className="flex gap-2">
+              <div className="flex items-center justify-center px-3 h-10 bg-gray-100 border border-gray-300 rounded-md text-sm font-medium min-w-[70px]">
+                {currentCountry.phonePrefix}
+              </div>
+              <Input
+                id="phone"
+                type="tel"
+                value={phoneNumber}
+                onChange={(e) => handlePhoneChange(e.target.value)}
+                placeholder="8888 8888"
+                disabled={isProcessing}
+                className={`flex-1 ${errors.phone ? 'border-red-500' : ''}`}
+              />
+            </div>
+            {errors.phone && (
+              <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
+            )}
           </div>
 
           {/* Security badge */}
