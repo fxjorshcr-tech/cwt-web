@@ -72,8 +72,15 @@ let cachedToken: { token: string; expiresAt: number } | null = null;
 export async function getTilopayToken(): Promise<string> {
   // Check if we have a valid cached token (with 5 min buffer)
   if (cachedToken && cachedToken.expiresAt > Date.now() + 5 * 60 * 1000) {
+    console.log('[Tilopay] Using cached token');
     return cachedToken.token;
   }
+
+  console.log('[Tilopay] Getting new token...', {
+    url: `${TILOPAY_CONFIG.API_URL}/login`,
+    user: TILOPAY_CONFIG.API_USER ? '***set***' : '***NOT SET***',
+    password: TILOPAY_CONFIG.API_PASSWORD ? '***set***' : '***NOT SET***',
+  });
 
   const response = await fetch(`${TILOPAY_CONFIG.API_URL}/login`, {
     method: 'POST',
@@ -86,11 +93,14 @@ export async function getTilopayToken(): Promise<string> {
     }),
   });
 
+  const responseText = await response.text();
+  console.log('[Tilopay] Login response:', response.status, responseText);
+
   if (!response.ok) {
-    throw new Error(`Tilopay authentication failed: ${response.statusText}`);
+    throw new Error(`Tilopay authentication failed: ${response.status} - ${responseText}`);
   }
 
-  const data: TilopayTokenResponse = await response.json();
+  const data: TilopayTokenResponse = JSON.parse(responseText);
 
   // Cache the token
   cachedToken = {
@@ -98,6 +108,7 @@ export async function getTilopayToken(): Promise<string> {
     expiresAt: Date.now() + data.expires_in * 1000,
   };
 
+  console.log('[Tilopay] Token obtained successfully');
   return data.access_token;
 }
 
@@ -105,6 +116,13 @@ export async function createTilopayPayment(
   token: string,
   paymentData: TilopayPaymentRequest
 ): Promise<TilopayPaymentResponse> {
+  console.log('[Tilopay] Creating payment...', {
+    url: `${TILOPAY_CONFIG.API_URL}/processPayment`,
+    amount: paymentData.amount,
+    orderNumber: paymentData.orderNumber,
+    key: paymentData.key ? '***set***' : '***NOT SET***',
+  });
+
   const response = await fetch(`${TILOPAY_CONFIG.API_URL}/processPayment`, {
     method: 'POST',
     headers: {
@@ -115,16 +133,28 @@ export async function createTilopayPayment(
     body: JSON.stringify(paymentData),
   });
 
+  const responseText = await response.text();
+  console.log('[Tilopay] Payment response:', response.status, responseText);
+
   if (!response.ok) {
-    const errorText = await response.text();
-    console.error('Tilopay payment error:', errorText);
     return {
       success: false,
-      message: `Payment request failed: ${response.statusText}`,
+      message: `Payment request failed: ${response.status} - ${responseText}`,
     };
   }
 
-  const data = await response.json();
+  let data;
+  try {
+    data = JSON.parse(responseText);
+  } catch (e) {
+    console.error('[Tilopay] Failed to parse response:', e);
+    return {
+      success: false,
+      message: 'Invalid response from Tilopay',
+    };
+  }
+
+  console.log('[Tilopay] Parsed response:', data);
 
   // Tilopay returns the payment form URL
   if (data.url) {
@@ -136,7 +166,7 @@ export async function createTilopayPayment(
 
   return {
     success: false,
-    message: data.message || 'Unknown error',
+    message: data.message || data.error || 'Unknown error',
     code: data.code,
   };
 }
