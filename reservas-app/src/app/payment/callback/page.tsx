@@ -87,6 +87,27 @@ function PaymentCallbackContent() {
             console.error('Failed to update payment status:', err);
             // Don't block the user flow if status update fails
           }
+
+          // Send confirmation email if payment was approved
+          if (isApproved) {
+            try {
+              const emailResponse = await fetch('/api/email/send-confirmation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  bookingId,
+                  transactionId,
+                  authCode,
+                }),
+              });
+
+              const emailData = await emailResponse.json();
+              console.log('Confirmation email:', emailData);
+            } catch (err) {
+              console.error('Failed to send confirmation email:', err);
+              // Don't block the user flow if email fails
+            }
+          }
         }
 
         setResult({
