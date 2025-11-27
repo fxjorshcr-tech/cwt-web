@@ -103,9 +103,38 @@ export default function TourDetailPage({ params }: PageProps) {
     return (
       <>
         <BookingNavbar />
-        <div className="min-h-screen flex items-center justify-center">
-          <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
-        </div>
+        {/* Skeleton Hero - same dimensions as real hero */}
+        <section className="relative h-[60vh] sm:h-[70vh] min-h-[450px] sm:min-h-[500px] flex items-end">
+          <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-700 to-gray-600 animate-pulse" />
+          <div className="relative z-10 w-full pb-8 sm:pb-12 px-4 sm:px-6 pt-20 sm:pt-0">
+            <div className="container mx-auto max-w-6xl">
+              <div className="h-8 w-24 bg-white/20 rounded-lg mb-6 animate-pulse" />
+              <div className="h-12 sm:h-16 w-3/4 bg-white/30 rounded-lg mb-4 animate-pulse" />
+              <div className="h-6 w-2/3 bg-white/20 rounded-lg mb-6 animate-pulse" />
+              <div className="flex flex-wrap gap-2">
+                <div className="h-10 w-24 bg-white/40 rounded-lg animate-pulse" />
+                <div className="h-10 w-28 bg-white/40 rounded-lg animate-pulse" />
+                <div className="h-10 w-24 bg-white/40 rounded-lg animate-pulse" />
+                <div className="h-10 w-32 bg-white/40 rounded-lg animate-pulse" />
+              </div>
+            </div>
+          </div>
+        </section>
+        {/* Skeleton Content */}
+        <section className="py-8 md:py-16 bg-gray-50">
+          <div className="container mx-auto px-4 max-w-6xl">
+            <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
+              <div className="lg:col-span-2 space-y-6">
+                <div className="h-40 bg-white rounded-2xl animate-pulse" />
+                <div className="h-64 bg-white rounded-2xl animate-pulse" />
+                <div className="h-48 bg-white rounded-2xl animate-pulse" />
+              </div>
+              <div className="lg:col-span-1">
+                <div className="h-96 bg-white rounded-2xl animate-pulse" />
+              </div>
+            </div>
+          </div>
+        </section>
       </>
     );
   }

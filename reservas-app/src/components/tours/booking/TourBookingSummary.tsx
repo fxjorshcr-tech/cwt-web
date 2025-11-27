@@ -117,23 +117,14 @@ export function TourBookingSummary({
           </div>
 
           <div className="pt-4 border-t border-gray-200 flex flex-col gap-3">
+            {/* ✅ DESACTIVADO: Pagos online próximamente */}
             <button
               type="button"
-              onClick={onPayNow}
-              disabled={isSubmitting || !isValidPassengerCount || !termsAccepted}
-              className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base shadow-lg"
+              disabled={true}
+              className="w-full h-14 bg-gray-400 cursor-not-allowed text-white font-bold rounded-xl flex items-center justify-center gap-2 text-base"
             >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  Processing...
-                </>
-              ) : (
-                <>
-                  <CreditCard className="h-5 w-5" />
-                  Pay Now
-                </>
-              )}
+              <CreditCard className="h-5 w-5" />
+              Online Payments Coming Soon
             </button>
 
             <button

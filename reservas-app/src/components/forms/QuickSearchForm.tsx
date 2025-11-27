@@ -182,10 +182,28 @@ export function QuickSearchForm({
 
   if (isLoadingRoutes) {
     return (
-      <div className={`bg-white rounded-2xl shadow-xl p-6 ${className}`}>
-        <div className="flex items-center justify-center gap-3 py-8">
-          <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
-          <span className="text-gray-600">Loading routes...</span>
+      <div className={`bg-white rounded-2xl shadow-xl overflow-visible ${className}`}>
+        {/* Same header as the form */}
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-5 py-4 rounded-t-2xl">
+          <h2 className="text-white font-bold text-lg text-center">Get an Instant Quote</h2>
+        </div>
+        {/* Same height as the form content */}
+        <div className="p-5 md:p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Skeleton placeholders matching form fields */}
+            <div className="h-[72px] bg-gray-100 rounded-lg animate-pulse" />
+            <div className="h-[72px] bg-gray-100 rounded-lg animate-pulse" />
+            <div className="h-[72px] bg-gray-100 rounded-lg animate-pulse" />
+            <div className="h-[72px] bg-gray-100 rounded-lg animate-pulse" />
+          </div>
+          <div className="mt-6 flex justify-center">
+            <div className="w-full sm:w-auto min-w-[220px] h-[52px] bg-gray-200 rounded-xl animate-pulse" />
+          </div>
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+            <div className="h-6 w-32 bg-gray-100 rounded-full animate-pulse" />
+            <div className="h-6 w-36 bg-gray-100 rounded-full animate-pulse" />
+            <div className="h-6 w-40 bg-gray-100 rounded-full animate-pulse" />
+          </div>
         </div>
       </div>
     );
