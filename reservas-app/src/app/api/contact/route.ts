@@ -7,7 +7,10 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, phone, subject, message } = body;
+    const { name, email, countryCode, phone, subject, message } = body;
+
+    // Combine country code and phone number
+    const fullPhone = phone ? `${countryCode || ''} ${phone}`.trim() : '';
 
     // Validate required fields
     if (!name || !email || !subject || !message) {
@@ -52,11 +55,11 @@ export async function POST(request: NextRequest) {
                   <a href="mailto:${email}" style="color: #2563eb;">${email}</a>
                 </td>
               </tr>
-              ${phone ? `
+              ${fullPhone ? `
               <tr>
                 <td style="padding: 10px 0; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #64748b;">Phone:</td>
                 <td style="padding: 10px 0; border-bottom: 1px solid #e2e8f0;">
-                  <a href="tel:${phone}" style="color: #2563eb;">${phone}</a>
+                  <a href="tel:${fullPhone.replace(/\s/g, '')}" style="color: #2563eb;">${fullPhone}</a>
                 </td>
               </tr>
               ` : ''}

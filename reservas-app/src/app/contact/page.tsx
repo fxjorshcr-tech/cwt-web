@@ -16,10 +16,36 @@ import {
   AlertCircle
 } from 'lucide-react';
 
+// Common country codes for phone
+const COUNTRY_CODES = [
+  { code: '+1', country: 'US/Canada', flag: '🇺🇸' },
+  { code: '+44', country: 'UK', flag: '🇬🇧' },
+  { code: '+49', country: 'Germany', flag: '🇩🇪' },
+  { code: '+33', country: 'France', flag: '🇫🇷' },
+  { code: '+34', country: 'Spain', flag: '🇪🇸' },
+  { code: '+39', country: 'Italy', flag: '🇮🇹' },
+  { code: '+31', country: 'Netherlands', flag: '🇳🇱' },
+  { code: '+41', country: 'Switzerland', flag: '🇨🇭' },
+  { code: '+43', country: 'Austria', flag: '🇦🇹' },
+  { code: '+61', country: 'Australia', flag: '🇦🇺' },
+  { code: '+64', country: 'New Zealand', flag: '🇳🇿' },
+  { code: '+52', country: 'Mexico', flag: '🇲🇽' },
+  { code: '+55', country: 'Brazil', flag: '🇧🇷' },
+  { code: '+54', country: 'Argentina', flag: '🇦🇷' },
+  { code: '+56', country: 'Chile', flag: '🇨🇱' },
+  { code: '+57', country: 'Colombia', flag: '🇨🇴' },
+  { code: '+506', country: 'Costa Rica', flag: '🇨🇷' },
+  { code: '+507', country: 'Panama', flag: '🇵🇦' },
+  { code: '+81', country: 'Japan', flag: '🇯🇵' },
+  { code: '+82', country: 'South Korea', flag: '🇰🇷' },
+  { code: '+65', country: 'Singapore', flag: '🇸🇬' },
+];
+
 export default function ContactPage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    countryCode: '+1',
     phone: '',
     subject: '',
     message: ''
@@ -51,6 +77,7 @@ export default function ContactPage() {
       setFormData({
         name: '',
         email: '',
+        countryCode: '+1',
         phone: '',
         subject: '',
         message: ''
@@ -238,20 +265,35 @@ export default function ContactPage() {
                     />
                   </div>
 
-                  {/* Phone */}
+                  {/* Phone with Country Code */}
                   <div>
                     <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1.5">
                       Phone Number (Optional)
                     </label>
-                    <input
-                      type="tel"
-                      id="phone"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                      placeholder="+1 234 567 8900"
-                    />
+                    <div className="flex gap-2">
+                      <select
+                        id="countryCode"
+                        name="countryCode"
+                        value={formData.countryCode}
+                        onChange={handleChange}
+                        className="w-28 px-2 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
+                      >
+                        {COUNTRY_CODES.map((c) => (
+                          <option key={c.code} value={c.code}>
+                            {c.flag} {c.code}
+                          </option>
+                        ))}
+                      </select>
+                      <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        placeholder="234 567 8900"
+                      />
+                    </div>
                   </div>
 
                   {/* Subject */}
