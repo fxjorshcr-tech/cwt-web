@@ -134,7 +134,7 @@ export const COUNTRIES = [
 
 export const CONTACT_INFO = {
   WHATSAPP: '+506-8596-2438',
-  EMAIL: 'info@cantwaittravelcr.com',
+  EMAIL: 'contact@cantwaittravelcr.com',
   WEBSITE: 'https://cantwaittravelcr.com',
   ICT_LICENSE: '4121-2025',
 } as const;

@@ -16,10 +16,36 @@ import {
   AlertCircle
 } from 'lucide-react';
 
+// Common country codes for phone
+const COUNTRY_CODES = [
+  { code: '+1', country: 'US/Canada', flag: '🇺🇸' },
+  { code: '+44', country: 'UK', flag: '🇬🇧' },
+  { code: '+49', country: 'Germany', flag: '🇩🇪' },
+  { code: '+33', country: 'France', flag: '🇫🇷' },
+  { code: '+34', country: 'Spain', flag: '🇪🇸' },
+  { code: '+39', country: 'Italy', flag: '🇮🇹' },
+  { code: '+31', country: 'Netherlands', flag: '🇳🇱' },
+  { code: '+41', country: 'Switzerland', flag: '🇨🇭' },
+  { code: '+43', country: 'Austria', flag: '🇦🇹' },
+  { code: '+61', country: 'Australia', flag: '🇦🇺' },
+  { code: '+64', country: 'New Zealand', flag: '🇳🇿' },
+  { code: '+52', country: 'Mexico', flag: '🇲🇽' },
+  { code: '+55', country: 'Brazil', flag: '🇧🇷' },
+  { code: '+54', country: 'Argentina', flag: '🇦🇷' },
+  { code: '+56', country: 'Chile', flag: '🇨🇱' },
+  { code: '+57', country: 'Colombia', flag: '🇨🇴' },
+  { code: '+506', country: 'Costa Rica', flag: '🇨🇷' },
+  { code: '+507', country: 'Panama', flag: '🇵🇦' },
+  { code: '+81', country: 'Japan', flag: '🇯🇵' },
+  { code: '+82', country: 'South Korea', flag: '🇰🇷' },
+  { code: '+65', country: 'Singapore', flag: '🇸🇬' },
+];
+
 export default function ContactPage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    countryCode: '+1',
     phone: '',
     subject: '',
     message: ''
@@ -30,24 +56,41 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    // Simulación de envío (reemplazar con API real)
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    setIsSubmitting(false);
-    setSubmitStatus('success');
-    
-    // Reset form
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      subject: '',
-      message: ''
-    });
+    setSubmitStatus('idle');
 
-    // Reset success message after 5 seconds
-    setTimeout(() => setSubmitStatus('idle'), 5000);
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+
+      setSubmitStatus('success');
+
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        countryCode: '+1',
+        phone: '',
+        subject: '',
+        message: ''
+      });
+
+      // Reset success message after 5 seconds
+      setTimeout(() => setSubmitStatus('idle'), 5000);
+    } catch (error) {
+      console.error('Contact form error:', error);
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -171,7 +214,17 @@ export default function ContactPage() {
                     <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="text-sm font-semibold text-green-900">Message sent successfully!</p>
-                      <p className="text-xs text-green-700 mt-1">We'll get back to you within 2 hours.</p>
+                      <p className="text-xs text-green-700 mt-1">We'll get back to you within 2 hours. Check your email for confirmation.</p>
+                    </div>
+                  </div>
+                )}
+
+                {submitStatus === 'error' && (
+                  <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+                    <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-semibold text-red-900">Failed to send message</p>
+                      <p className="text-xs text-red-700 mt-1">Please try again or contact us via WhatsApp.</p>
                     </div>
                   </div>
                 )}
@@ -212,20 +265,35 @@ export default function ContactPage() {
                     />
                   </div>
 
-                  {/* Phone */}
+                  {/* Phone with Country Code */}
                   <div>
                     <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1.5">
                       Phone Number (Optional)
                     </label>
-                    <input
-                      type="tel"
-                      id="phone"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                      placeholder="+1 234 567 8900"
-                    />
+                    <div className="flex gap-2">
+                      <select
+                        id="countryCode"
+                        name="countryCode"
+                        value={formData.countryCode}
+                        onChange={handleChange}
+                        className="w-28 px-2 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
+                      >
+                        {COUNTRY_CODES.map((c) => (
+                          <option key={c.code} value={c.code}>
+                            {c.flag} {c.code}
+                          </option>
+                        ))}
+                      </select>
+                      <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        placeholder="234 567 8900"
+                      />
+                    </div>
                   </div>
 
                   {/* Subject */}

@@ -30,6 +30,7 @@
     "react": "18.3.1",
     "react-day-picker": "^9.11.1",
     "react-dom": "18.3.1",
+    "resend": "^6.5.2",
     "rollbar": "^2.26.5",
     "sharp": "^0.34.5",
     "sonner": "^2.0.7",
