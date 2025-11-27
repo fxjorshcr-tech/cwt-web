@@ -380,7 +380,7 @@ function SummaryPageContent() {
       <BookingNavbar />
       <FAQModal isOpen={showFAQModal} onClose={() => setShowFAQModal(false)} />
 
-      <section className="relative h-40 sm:h-56 md:h-72 w-full overflow-hidden">
+      <section className="relative h-40 sm:h-48 md:h-56 w-full overflow-hidden">
         <Image
           src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/puerto-viejo-costa-rica-beach.webp"
           alt="Costa Rica Beach"
@@ -391,12 +391,12 @@ function SummaryPageContent() {
           sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
-        <div className="absolute inset-0 flex items-end md:items-center justify-center pb-3 md:pb-0">
+        <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center text-white px-4">
-            <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-2 drop-shadow-lg">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 sm:mb-2 drop-shadow-lg">
               Booking Summary
             </h1>
-            <p className="text-sm sm:text-lg md:text-xl drop-shadow-md">
+            <p className="text-sm sm:text-base md:text-lg drop-shadow-md">
               Review your details before confirming
             </p>
           </div>
