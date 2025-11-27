@@ -54,6 +54,12 @@ function PaymentCallbackContent() {
           }
         }
 
+        // Fallback: extract bookingId from orderId if not in returnData
+        if (!bookingId && orderId) {
+          // orderId format: booking_XXXXX or just the bookingId itself
+          bookingId = orderId.startsWith('booking_') ? orderId : `booking_${orderId}`;
+        }
+
         // Check if payment was successful
         const isApproved = code === '1';
 
