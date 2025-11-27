@@ -22,11 +22,11 @@ export default function LaunchBanner() {
   if (!isVisible) return null;
 
   return (
-    <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2 px-4 relative">
+    <div className="bg-amber-500 text-white py-2 px-4 relative">
       <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 text-center text-sm sm:text-base">
-        <span className="inline-block animate-pulse">🚀</span>
+        <span className="inline-block">⚠️</span>
         <p>
-          <strong>Coming Soon!</strong> We&apos;re in final testing. Book now and be among our first customers!
+          <strong>Website Testing in Progress</strong> — Online payments coming soon!
         </p>
         <button
           onClick={handleDismiss}
