@@ -1,8 +1,10 @@
 // src/app/global-error.tsx
-// ✅ MEJORADO: Error boundary con mejor UX y más información
+// Global error handler with Rollbar integration
 'use client';
 
 import { useEffect, useState } from 'react';
+import Rollbar from 'rollbar';
+import { clientConfig } from '@/lib/rollbar';
 
 interface GlobalErrorProps {
   error: Error & { digest?: string };
@@ -16,7 +18,13 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
     // Log error for debugging
     console.error('Critical application error:', error);
 
-    // ✅ Try to send error to analytics/monitoring if available
+    // Report to Rollbar (create instance directly since Provider is not available here)
+    if (clientConfig.accessToken) {
+      const rollbar = new Rollbar(clientConfig);
+      rollbar.critical(error);
+    }
+
+    // Also try to send error to Google Analytics if available
     if (typeof window !== 'undefined' && window.gtag) {
       try {
         window.gtag('event', 'exception', {

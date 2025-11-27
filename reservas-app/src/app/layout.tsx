@@ -9,6 +9,9 @@ import { Toaster } from "sonner";
 import LocalStorageCleanup from "@/components/LocalStorageCleanup";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
+import { GoogleAnalytics } from "@next/third-parties/google";
+import RollbarProvider from "@/components/RollbarProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -74,6 +77,7 @@ export default function RootLayout({
         <link rel="prefetch" href="/confirmation" />
       </head>
       <body className={`${inter.className} overflow-x-hidden`}>
+        <RollbarProvider>
         <CartProvider>
           <LocalStorageCleanup />
           <div className="min-h-screen flex flex-col overflow-x-hidden">
@@ -85,7 +89,12 @@ export default function RootLayout({
           <WhatsAppButton />
           <Toaster position="top-right" richColors closeButton duration={1000} />
         </CartProvider>
+        </RollbarProvider>
         <SpeedInsights />
+        <Analytics />
+        {process.env.NEXT_PUBLIC_GA_ID && (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+        )}
       </body>
     </html>
   );

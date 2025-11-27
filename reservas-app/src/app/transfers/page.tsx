@@ -1,14 +1,12 @@
 // src/app/transfers/page.tsx
-// ✅ UPDATED - Lightweight QuickSearchForm with URL prefill support
-'use client';
-
-import { useEffect, useRef, Suspense } from "react";
-import { useSearchParams } from 'next/navigation';
+// ✅ OPTIMIZADO: Server Component con formulario client-side aislado
+import { Suspense } from "react";
 import Image from "next/image";
-import { QuickSearchForm } from '@/components/forms/QuickSearchForm';
+import type { Metadata } from "next";
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import BookingSteps from '@/components/booking/BookingSteps';
 import PaymentMethods from '@/components/sections/PaymentMethods';
+import TransfersBookingSection from '@/components/transfers/TransfersBookingSection';
 import {
   CheckCircle2,
   Shield,
@@ -26,35 +24,17 @@ import {
   Plane
 } from 'lucide-react';
 
-function TransfersContent() {
-  const searchParams = useSearchParams();
-  const bookingFormRef = useRef<HTMLDivElement>(null);
+export const metadata: Metadata = {
+  title: "Private Transportation Services",
+  description: "Professional private shuttle and transportation services across Costa Rica. Airport transfers from SJO and LIR to La Fortuna, Monteverde, Manuel Antonio, and all major destinations.",
+  keywords: ["Costa Rica transportation", "private shuttle", "airport transfer", "SJO transfer", "LIR transfer"],
+};
 
-  // Get initial values from URL params (for indexed routes)
-  const initialOrigin = searchParams.get('from') || '';
-  const initialDestination = searchParams.get('to') || '';
-
-  // Handle hash navigation and auto-scroll when coming from indexed routes
-  useEffect(() => {
-    // Check if there's a hash or URL params (meaning user came from an indexed route)
-    if (typeof window !== 'undefined') {
-      const hasHash = window.location.hash === '#booking-form';
-      const hasParams = initialOrigin && initialDestination;
-
-      if (hasHash || hasParams) {
-        // Scroll to booking form
-        const timer = setTimeout(() => {
-          bookingFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
-        return () => clearTimeout(timer);
-      }
-    }
-  }, [initialOrigin, initialDestination]);
-
+export default function TransfersPage() {
   return (
     <>
       <BookingNavbar />
-      
+
       <main className="min-h-screen bg-white">
 
         {/* Hero Section */}
@@ -69,9 +49,7 @@ function TransfersContent() {
               priority
               quality={70}
             />
-            {/* Capa oscura para mejor lectura */}
             <div className="absolute inset-0 bg-black/50" />
-            {/* Gradiente sutil azulado en la base para conectar con la marca */}
             <div className="absolute inset-0 bg-gradient-to-t from-blue-900/40 via-transparent to-transparent" />
           </div>
 
@@ -86,7 +64,6 @@ function TransfersContent() {
               </p>
 
               <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 md:gap-8">
-                {/* Tags unificados visualmente */}
                 <div className="flex items-center gap-2 text-white bg-white/10 backdrop-blur-md px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-white/20">
                   <Shield className="h-3.5 sm:h-4 w-3.5 sm:w-4 text-green-400" />
                   <span className="text-xs sm:text-sm font-semibold">ICT Certified</span>
@@ -104,19 +81,18 @@ function TransfersContent() {
           </div>
         </section>
 
-        {/* Booking Form */}
-        <section
-          id="booking-form"
-          ref={bookingFormRef}
-          className="relative -mt-16 z-20 px-4 sm:px-6 pb-16"
+        {/* Booking Form - Client Component */}
+        <Suspense
+          fallback={
+            <section className="relative -mt-16 z-20 px-4 sm:px-6 pb-16">
+              <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-8 flex items-center justify-center min-h-[200px]">
+                <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+              </div>
+            </section>
+          }
         >
-          <div className="max-w-4xl mx-auto">
-            <QuickSearchForm
-              initialOrigin={initialOrigin}
-              initialDestination={initialDestination}
-            />
-          </div>
-        </section>
+          <TransfersBookingSection />
+        </Suspense>
 
         {/* The Journey Section */}
         <section className="py-16 sm:py-20 bg-white">
@@ -435,7 +411,7 @@ function TransfersContent() {
 
         {/* Why Choose Us - Consistent Colors */}
         <section className="relative py-20 bg-gray-50 overflow-hidden">
-          
+
           <div className="container relative mx-auto px-6 max-w-6xl">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -454,7 +430,7 @@ function TransfersContent() {
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Guaranteed Availability</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  We never overbook. We match our bookings strictly to our fleet capacity. 
+                  We never overbook. We match our bookings strictly to our fleet capacity.
                   <br />
                   <strong className="text-blue-700 block mt-2">If we confirm it, we drive it.</strong>
                 </p>
@@ -492,20 +468,5 @@ function TransfersContent() {
         <PaymentMethods />
       </main>
     </>
-  );
-}
-
-// Wrapper with Suspense for useSearchParams
-export default function TransfersPage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen flex items-center justify-center">
-          <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
-        </div>
-      }
-    >
-      <TransfersContent />
-    </Suspense>
   );
 }
