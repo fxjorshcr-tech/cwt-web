@@ -40,12 +40,26 @@ export async function POST(request: NextRequest) {
     // Get Tilopay access token
     const token = await getTilopayToken();
 
-    // Build the redirect URL - detect from request headers
+    // Build the redirect URL - detect from request headers or use Vercel URL
     const host = request.headers.get('host') || 'localhost:3000';
     const protocol = host.includes('localhost') ? 'http' : 'https';
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
+
+    // Priority: env var > detected host
+    let appUrl: string;
+    if (process.env.NEXT_PUBLIC_APP_URL) {
+      appUrl = process.env.NEXT_PUBLIC_APP_URL;
+    } else if (host.includes('vercel.app')) {
+      appUrl = `https://${host}`;
+    } else if (host.includes('localhost')) {
+      appUrl = `http://${host}`;
+    } else {
+      // Fallback to the Vercel preview URL
+      appUrl = `https://${host}`;
+    }
+
     const redirectUrl = `${appUrl}/payment/callback`;
 
+    console.log('[Tilopay] Host:', host);
     console.log('[Tilopay] Redirect URL:', redirectUrl);
 
     // Encode booking data to return after payment
