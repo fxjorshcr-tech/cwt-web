@@ -40,9 +40,13 @@ export async function POST(request: NextRequest) {
     // Get Tilopay access token
     const token = await getTilopayToken();
 
-    // Build the redirect URL
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    // Build the redirect URL - detect from request headers
+    const host = request.headers.get('host') || 'localhost:3000';
+    const protocol = host.includes('localhost') ? 'http' : 'https';
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
     const redirectUrl = `${appUrl}/payment/callback`;
+
+    console.log('[Tilopay] Redirect URL:', redirectUrl);
 
     // Encode booking data to return after payment
     const returnData = encodeReturnData({
