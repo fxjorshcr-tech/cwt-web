@@ -57,25 +57,16 @@ function PaymentCallbackContent() {
         // Check if payment was successful
         const isApproved = code === '1';
 
-        // Log payment info (campos de pago se agregarán después en Supabase)
+        // Log payment info cuando el pago es aprobado
         if (bookingId && isApproved) {
           console.log('Payment approved for booking:', bookingId, {
             transactionId,
             orderId,
             authCode,
           });
-          // TODO: Agregar campos payment_status, payment_id, etc. a la tabla trips en Supabase
-          // Por ahora guardamos en special_requests como respaldo
-          const { error: updateError } = await supabase
-            .from('trips')
-            .update({
-              special_requests: supabase.rpc ? undefined : `PAID - Transaction: ${transactionId}, Auth: ${authCode}`,
-            })
-            .eq('booking_id', bookingId);
 
-          if (updateError) {
-            console.error('Failed to log payment:', updateError);
-          }
+          // TODO: Agregar campos payment_status, payment_id, etc. a la tabla trips en Supabase
+          // Por ahora solo logueamos - los campos se agregarán después
         }
 
         setResult({

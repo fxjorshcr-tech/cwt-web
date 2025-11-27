@@ -11,17 +11,6 @@ interface PaymentRequestBody {
   bookingId: string;
   amount: number;
   currency?: string;
-  customerInfo: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-    address?: string;
-    city?: string;
-    state?: string;
-    zipCode?: string;
-    country?: string;
-  };
   tripIds?: string[];
 }
 
@@ -30,14 +19,14 @@ export async function POST(request: NextRequest) {
     const body: PaymentRequestBody = await request.json();
 
     // Validate required fields
-    if (!body.bookingId || !body.amount || !body.customerInfo) {
+    if (!body.bookingId || !body.amount) {
       return NextResponse.json(
-        { error: 'Missing required fields: bookingId, amount, customerInfo' },
+        { error: 'Missing required fields: bookingId, amount' },
         { status: 400 }
       );
     }
 
-    const { bookingId, amount, currency = 'USD', customerInfo, tripIds } = body;
+    const { bookingId, amount, currency = 'USD', tripIds } = body;
 
     // Get Tilopay access token
     const token = await getTilopayToken();
@@ -54,6 +43,8 @@ export async function POST(request: NextRequest) {
     });
 
     // Create payment request
+    // Nota: Tilopay captura los datos del cliente en su formulario de pago
+    // Enviamos valores placeholder que serán reemplazados por el usuario
     const paymentResponse = await createTilopayPayment(token, {
       redirect: redirectUrl,
       key: TILOPAY_CONFIG.API_KEY,
@@ -63,16 +54,16 @@ export async function POST(request: NextRequest) {
       capture: '1', // Capture immediately
       subscription: '0', // Don't save card
       platform: 'CWT-Web',
-      billToFirstName: customerInfo.firstName,
-      billToLastName: customerInfo.lastName,
-      billToEmail: customerInfo.email,
-      billToTelephone: customerInfo.phone,
-      billToAddress: customerInfo.address || 'N/A',
-      billToAddress2: 'N/A',
-      billToCity: customerInfo.city || 'San Jose',
-      billToState: customerInfo.state || 'CR-SJ',
-      billToZipPostCode: customerInfo.zipCode || '10101',
-      billToCountry: customerInfo.country || 'CR',
+      billToFirstName: 'Customer',
+      billToLastName: 'CWT',
+      billToEmail: 'customer@cantwaittravelcr.com',
+      billToTelephone: '00000000',
+      billToAddress: 'San Jose',
+      billToAddress2: 'Costa Rica',
+      billToCity: 'San Jose',
+      billToState: 'CR-SJ',
+      billToZipPostCode: '10101',
+      billToCountry: 'CR',
       returnData: returnData,
       hashVersion: 'V2',
     });
