@@ -1,33 +1,21 @@
 'use client';
 
-import { useEffect } from 'react';
-import rollbar from '@/lib/rollbar';
+import { Provider } from '@rollbar/react';
+import { clientConfig } from '@/lib/rollbar';
 
-export default function RollbarProvider({ children }: { children: React.ReactNode }) {
-  useEffect(() => {
-    if (!rollbar) {
-      console.warn('Rollbar not initialized - missing NEXT_PUBLIC_ROLLBAR_CLIENT_TOKEN');
-      return;
-    }
+interface RollbarProviderProps {
+  children: React.ReactNode;
+}
 
-    // Global error handler
-    const handleError = (event: ErrorEvent) => {
-      rollbar?.error(event.error || event.message);
-    };
+export default function RollbarProvider({ children }: RollbarProviderProps) {
+  // Only render Provider if token is available
+  if (!clientConfig.accessToken) {
+    return <>{children}</>;
+  }
 
-    // Unhandled promise rejection handler
-    const handleRejection = (event: PromiseRejectionEvent) => {
-      rollbar?.error('Unhandled Promise Rejection', event.reason);
-    };
-
-    window.addEventListener('error', handleError);
-    window.addEventListener('unhandledrejection', handleRejection);
-
-    return () => {
-      window.removeEventListener('error', handleError);
-      window.removeEventListener('unhandledrejection', handleRejection);
-    };
-  }, []);
-
-  return <>{children}</>;
+  return (
+    <Provider config={clientConfig}>
+      {children}
+    </Provider>
+  );
 }

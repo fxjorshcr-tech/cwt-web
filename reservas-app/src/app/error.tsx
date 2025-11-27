@@ -1,9 +1,10 @@
 // src/app/error.tsx
-// Global Error Boundary for Next.js App Router
+// Global Error Boundary for Next.js App Router with Rollbar
 'use client';
 
 import { useEffect } from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import { useRollbar } from '@rollbar/react';
 
 interface ErrorProps {
   error: Error & { digest?: string };
@@ -11,10 +12,14 @@ interface ErrorProps {
 }
 
 export default function Error({ error, reset }: ErrorProps) {
+  const rollbar = useRollbar();
+
   useEffect(() => {
     // Log error to console for debugging
     console.error('Application error:', error);
-  }, [error]);
+    // Report error to Rollbar
+    rollbar.error(error);
+  }, [error, rollbar]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white px-4">

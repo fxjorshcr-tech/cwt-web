@@ -1,11 +1,11 @@
 // src/lib/rollbar.ts
+// Official Rollbar configuration for Next.js
 import Rollbar from 'rollbar';
 
-const rollbarConfig: Rollbar.Configuration = {
-  accessToken: process.env.NEXT_PUBLIC_ROLLBAR_CLIENT_TOKEN,
-  environment: process.env.NODE_ENV,
+const baseConfig = {
   captureUncaught: true,
   captureUnhandledRejections: true,
+  environment: process.env.NODE_ENV || 'development',
   payload: {
     client: {
       javascript: {
@@ -16,9 +16,18 @@ const rollbarConfig: Rollbar.Configuration = {
   },
 };
 
-// Only initialize Rollbar if token is available
-const rollbar = rollbarConfig.accessToken
-  ? new Rollbar(rollbarConfig)
+// Client-side config (used by RollbarProvider)
+export const clientConfig: Rollbar.Configuration = {
+  accessToken: process.env.NEXT_PUBLIC_ROLLBAR_CLIENT_TOKEN,
+  ...baseConfig,
+};
+
+// Server-side instance (for API routes, server components)
+export const serverInstance = process.env.ROLLBAR_SERVER_TOKEN
+  ? new Rollbar({
+      accessToken: process.env.ROLLBAR_SERVER_TOKEN,
+      ...baseConfig,
+    })
   : null;
 
-export default rollbar;
+export default clientConfig;
