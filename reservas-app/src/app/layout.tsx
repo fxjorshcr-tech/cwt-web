@@ -12,6 +12,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import RollbarProvider from "@/components/RollbarProvider";
+import LaunchBanner from "@/components/LaunchBanner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -79,6 +80,7 @@ export default function RootLayout({
       <body className={`${inter.className} overflow-x-hidden`}>
         <RollbarProvider>
         <CartProvider>
+          <LaunchBanner />
           <LocalStorageCleanup />
           <div className="min-h-screen flex flex-col overflow-x-hidden">
             <main className="flex-1 w-full overflow-x-hidden">
