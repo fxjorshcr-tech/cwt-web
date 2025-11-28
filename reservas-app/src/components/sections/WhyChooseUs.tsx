@@ -104,8 +104,8 @@ export default function WhyChooseUs() {
 
             {/* 4. Real Human Support */}
             <div className="flex items-start gap-3 sm:gap-4 group">
-              <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 bg-purple-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <HeadphonesIcon className="h-6 w-6 sm:h-7 sm:w-7 text-purple-600" />
+              <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 bg-orange-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <HeadphonesIcon className="h-6 w-6 sm:h-7 sm:w-7 text-orange-600" />
               </div>
               <div>
                 <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-1 sm:mb-2">Real Human Support</h3>
@@ -132,8 +132,8 @@ export default function WhyChooseUs() {
 
             {/* 6. Fully Licensed & Insured */}
             <div className="flex items-start gap-3 sm:gap-4 group">
-              <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 bg-indigo-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Shield className="h-6 w-6 sm:h-7 sm:w-7 text-indigo-600" />
+              <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 bg-blue-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Shield className="h-6 w-6 sm:h-7 sm:w-7 text-blue-600" />
               </div>
               <div>
                 <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-1 sm:mb-2">Fully Licensed & Insured</h3>

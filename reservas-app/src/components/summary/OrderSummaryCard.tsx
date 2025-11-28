@@ -1,5 +1,5 @@
 ﻿// src/components/summary/OrderSummaryCard.tsx
-// ✅ ACTUALIZADO: Agregado isSaving prop para mostrar loading state
+// ✅ ACTUALIZADO: Pay Now habilitado para pagos online
 import { ArrowLeft, ShoppingCart, Moon, Sparkles, CreditCard, Info, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,7 +20,7 @@ interface OrderSummaryCardProps {
   grandTotal: number;
   termsAccepted: boolean;
   feesPercentage: number;
-  isSaving?: boolean; // ✅ NUEVO
+  isSaving?: boolean;
   onTermsChange: (checked: boolean) => void;
   onPayNow: () => void;
   onAddToCart: () => void;
@@ -43,7 +43,7 @@ export function OrderSummaryCard({
   grandTotal,
   termsAccepted,
   feesPercentage,
-  isSaving = false, // ✅ NUEVO
+  isSaving = false,
   onTermsChange,
   onPayNow,
   onAddToCart,
@@ -193,7 +193,7 @@ export function OrderSummaryCard({
         <div className="border-t border-gray-200" />
 
         {/* Total Amount */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-3">
+        <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-3">
           <div className="flex justify-between items-center">
             <span className="text-sm font-bold text-gray-900">Total Amount</span>
             <span className="text-2xl font-bold text-blue-600">
@@ -206,13 +206,22 @@ export function OrderSummaryCard({
         <div className="space-y-2.5">
           <TermsCheckbox checked={termsAccepted} onChange={onTermsChange} error={false} />
 
-          {/* ✅ DESACTIVADO: Pagos online próximamente */}
           <Button
-            disabled={true}
-            className="w-full h-11 bg-gray-400 cursor-not-allowed text-white text-sm font-semibold"
+            onClick={onPayNow}
+            disabled={!termsAccepted || isSaving}
+            className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <CreditCard className="h-4 w-4 mr-2" />
-            Online Payments Coming Soon
+            {isSaving ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Processing...
+              </>
+            ) : (
+              <>
+                <CreditCard className="h-4 w-4 mr-2" />
+                Pay Now
+              </>
+            )}
           </Button>
 
           <Button

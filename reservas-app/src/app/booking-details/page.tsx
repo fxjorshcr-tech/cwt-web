@@ -684,7 +684,7 @@ function BookingDetailsContent() {
               <>
                 <div className="border-t border-gray-200" />
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-purple-600">
+                  <div className="flex items-center gap-2 text-orange-600">
                     <Users className="h-4 w-4" />
                     <span className="font-semibold text-sm">Children&apos;s Ages <span className="text-red-500">*</span></span>
                   </div>

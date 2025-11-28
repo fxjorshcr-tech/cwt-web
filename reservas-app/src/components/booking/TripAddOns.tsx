@@ -126,9 +126,9 @@ export function TripAddOns({ selectedAddOns, onAddOnsChange }: TripAddOnsProps) 
               {addon.badge && (
                 <div className={`
                   absolute -top-2 right-2 text-white text-[10px] md:text-xs font-bold px-2 md:px-3 py-0.5 md:py-1 rounded-full shadow-lg z-10
-                  ${addon.badge === 'POPULAR' 
-                    ? 'bg-gradient-to-r from-orange-500 to-orange-600' 
-                    : 'bg-gradient-to-r from-purple-500 to-purple-600'
+                  ${addon.badge === 'POPULAR'
+                    ? 'bg-gradient-to-r from-orange-500 to-orange-600'
+                    : 'bg-gradient-to-r from-green-500 to-green-600'
                   }
                 `}>
                   {addon.badge}

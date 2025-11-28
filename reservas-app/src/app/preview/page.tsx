@@ -715,8 +715,8 @@ function PreviewPageContent() {
               <p className="text-[10px] sm:text-xs text-gray-500 mt-1 hidden sm:block">Complete coverage</p>
             </div>
             <div className="bg-white rounded-xl p-3 sm:p-4 text-center shadow-sm border border-gray-200">
-              <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-2 sm:mb-3">
-                <BadgeCheck className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
+              <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-2 sm:mb-3">
+                <BadgeCheck className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
               </div>
               <h3 className="font-bold text-gray-900 text-xs sm:text-sm">Licensed & Vetted</h3>
               <p className="text-[10px] sm:text-xs text-gray-500 mt-1 hidden sm:block">Certified drivers</p>

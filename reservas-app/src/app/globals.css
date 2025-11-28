@@ -67,3 +67,11 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Performance optimizations */
+@layer utilities {
+  .lazy-section {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 500px;
+  }
+}

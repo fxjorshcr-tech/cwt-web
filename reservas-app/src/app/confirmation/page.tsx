@@ -324,7 +324,7 @@ function ConfirmationPageContent() {
 
                 <div className="flex gap-4">
                   <div className="flex-shrink-0">
-                    <div className="h-8 w-8 rounded-full bg-purple-500 flex items-center justify-center">
+                    <div className="h-8 w-8 rounded-full bg-orange-500 flex items-center justify-center">
                       <MapPin className="h-5 w-5 text-white" />
                     </div>
                   </div>

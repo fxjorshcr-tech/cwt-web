@@ -74,9 +74,9 @@ export function FAQsWidget() {
   }
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border-2 border-blue-200 shadow-lg overflow-hidden">
+    <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl border-2 border-blue-200 shadow-lg overflow-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-4">
         <div className="flex items-center gap-2 text-white">
           <HelpCircle className="h-6 w-6" />
           <h3 className="font-bold text-lg">Quick FAQs</h3>

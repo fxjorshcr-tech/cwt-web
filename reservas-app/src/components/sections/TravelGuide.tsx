@@ -72,7 +72,7 @@ export default function TravelGuide() {
         <div className="bg-white rounded-3xl shadow-2xl border-2 border-gray-200 overflow-hidden">
           
           {/* Featured Destinations - 4 Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 p-6 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 border-b-2 border-gray-200">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 p-6 bg-gradient-to-br from-blue-50 via-blue-100 to-orange-50 border-b-2 border-gray-200">
             {featuredDestinations.map((dest, idx) => (
               <div key={idx} className="group text-center">
                 <div className={`mx-auto mb-3 h-16 w-16 bg-gradient-to-br ${dest.color} rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}>
@@ -127,8 +127,8 @@ export default function TravelGuide() {
                   <p className="text-3xl font-bold text-blue-600">7</p>
                   <p className="text-sm text-gray-700 font-medium">Destinations</p>
                 </div>
-                <div className="p-4 bg-indigo-50 rounded-xl border border-indigo-200">
-                  <p className="text-3xl font-bold text-indigo-600">100+</p>
+                <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
+                  <p className="text-3xl font-bold text-blue-600">100+</p>
                   <p className="text-sm text-gray-700 font-medium">Local Tips</p>
                 </div>
                 <div className="p-4 bg-orange-50 rounded-xl border border-orange-200">
@@ -152,7 +152,7 @@ export default function TravelGuide() {
 
               {/* CTA Button */}
               <Link href="/travel-guide">
-                <button className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
+                <button className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
                   <MapPin className="h-5 w-5" />
                   <span>Explore Complete Travel Guides</span>
                   <ArrowRight className="h-5 w-5" />

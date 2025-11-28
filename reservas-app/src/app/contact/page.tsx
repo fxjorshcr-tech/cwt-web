@@ -375,7 +375,7 @@ export default function ContactPage() {
                 </div>
 
                 {/* FAQ Link */}
-                <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl shadow-lg p-8 text-white">
+                <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl shadow-lg p-8 text-white">
                   <h3 className="text-xl font-bold mb-3">Have a Quick Question?</h3>
                   <p className="text-blue-100 mb-6 leading-relaxed">
                     Check our FAQ section for instant answers to common questions about bookings, 

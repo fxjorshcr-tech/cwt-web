@@ -241,7 +241,7 @@ export default async function MostBookedPage() {
         {/* CTA Section - Search All Routes */}
         <section className="py-20 bg-white">
           <div className="container mx-auto px-6 max-w-4xl">
-            <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-12 text-center text-white shadow-2xl">
+            <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl p-12 text-center text-white shadow-2xl">
               <h2 className="text-2xl md:text-3xl font-bold mb-4">
                 Don't See Your Route?
               </h2>

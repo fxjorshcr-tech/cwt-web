@@ -57,8 +57,8 @@ export default function WhyBookDirect() {
           </div>
 
           {/* Card 3: Licensed & Insured */}
-          <div className="group bg-gradient-to-br from-purple-50 to-white border-2 border-purple-200 rounded-2xl p-6 sm:p-8 hover:shadow-xl transition-all hover:-translate-y-1">
-            <div className="h-14 w-14 bg-purple-600 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+          <div className="group bg-gradient-to-br from-orange-50 to-white border-2 border-orange-200 rounded-2xl p-6 sm:p-8 hover:shadow-xl transition-all hover:-translate-y-1">
+            <div className="h-14 w-14 bg-orange-600 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
               <Shield className="h-7 w-7 text-white" />
             </div>
             <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">
@@ -66,7 +66,7 @@ export default function WhyBookDirect() {
             </h3>
             <p className="text-gray-700 leading-relaxed">
               Full ICT tourism operator license #4121-2025 with comprehensive insurance coverage.
-              <strong className="text-purple-600"> Professional, legal, and certified</strong> by Costa Rica's official tourism board.
+              <strong className="text-orange-600"> Professional, legal, and certified</strong> by Costa Rica's official tourism board.
             </p>
           </div>
 

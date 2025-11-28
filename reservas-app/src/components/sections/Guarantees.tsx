@@ -55,14 +55,14 @@ export default function Guarantees() {
 
           {/* On-Time Guarantee */}
           <div className="bg-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1">
-            <div className="h-12 w-12 bg-purple-100 rounded-xl flex items-center justify-center mb-4">
-              <Clock className="h-6 w-6 text-purple-600" />
+            <div className="h-12 w-12 bg-orange-100 rounded-xl flex items-center justify-center mb-4">
+              <Clock className="h-6 w-6 text-orange-600" />
             </div>
             <h3 className="text-lg font-bold text-gray-900 mb-2">
               On-Time Pickup Guarantee
             </h3>
             <p className="text-sm text-gray-700 leading-relaxed">
-              <strong className="text-purple-600">Punctual service guaranteed.</strong> We'll be there on time with constant communication throughout your booking process.
+              <strong className="text-orange-600">Punctual service guaranteed.</strong> We'll be there on time with constant communication throughout your booking process.
             </p>
           </div>
 
