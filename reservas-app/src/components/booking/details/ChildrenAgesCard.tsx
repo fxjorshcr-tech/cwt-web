@@ -19,7 +19,7 @@ export function ChildrenAgesCard({
   if (childrenCount === 0) return null;
 
   return (
-    <Card>
+    <Card className="notranslate" translate="no">
       <CardHeader className="pb-4">
         <CardTitle className="text-base md:text-lg">Children&apos;s Ages</CardTitle>
         <CardDescription className="text-xs md:text-sm">

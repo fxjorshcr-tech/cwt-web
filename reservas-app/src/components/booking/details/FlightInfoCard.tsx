@@ -23,7 +23,7 @@ export function FlightInfoCard({
   onFlightNumberChange,
 }: FlightInfoCardProps) {
   return (
-    <Card>
+    <Card className="notranslate" translate="no">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-base md:text-lg">
           <Plane className="h-5 w-5 text-blue-600" />

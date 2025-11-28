@@ -39,7 +39,7 @@ export function TourDatePassengerForm({
   const totalPassengers = adults + children;
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-200">
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 notranslate" translate="no">
       <div className="p-6 md:p-8 border-b border-gray-100">
         <h2 className="text-xl font-bold text-gray-900">Tour Date & Passengers</h2>
       </div>
