@@ -5,12 +5,12 @@ import { useState } from 'react';
 import Image from 'next/image';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import WhatsAppButton from '@/components/WhatsAppButton';
+import SuccessModal from '@/components/modals/SuccessModal';
 import {
   Mail,
   Phone,
   MapPin,
   Send,
-  CheckCircle2,
   MessageSquare,
   Loader2,
   AlertCircle
@@ -208,16 +208,6 @@ export default function ContactPage() {
               {/* Contact Form */}
               <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-200">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Send Us a Message</h2>
-
-                {submitStatus === 'success' && (
-                  <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-semibold text-green-900">Message sent successfully!</p>
-                      <p className="text-xs text-green-700 mt-1">We'll get back to you within 2 hours. Check your email for confirmation.</p>
-                    </div>
-                  </div>
-                )}
 
                 {submitStatus === 'error' && (
                   <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
@@ -428,6 +418,12 @@ export default function ContactPage() {
       </main>
 
       <WhatsAppButton />
+
+      {/* Success Modal */}
+      <SuccessModal
+        isOpen={submitStatus === 'success'}
+        onClose={() => setSubmitStatus('idle')}
+      />
     </>
   );
 }
