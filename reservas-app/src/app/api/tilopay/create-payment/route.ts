@@ -88,8 +88,15 @@ export async function POST(request: NextRequest) {
       OTHER: 'CR-SJ',
     };
 
+    // Get IP and User Agent for logging
+    const ipAddress =
+      request.headers.get('x-forwarded-for')?.split(',')[0] ||
+      request.headers.get('x-real-ip') ||
+      'unknown';
+    const userAgent = request.headers.get('user-agent') || 'unknown';
+
     // Create payment request with customer billing info
-    const paymentResponse = await createTilopayPayment(token, {
+    const paymentRequest = {
       redirect: redirectUrl,
       key: TILOPAY_CONFIG.API_KEY,
       amount: amount.toFixed(2),
@@ -110,14 +117,72 @@ export async function POST(request: NextRequest) {
       billToCountry: country,
       returnData: returnData,
       hashVersion: 'V2',
-    });
+    };
+
+    const paymentResponse = await createTilopayPayment(token, paymentRequest);
 
     if (!paymentResponse.success) {
       console.error('Tilopay payment creation failed:', paymentResponse);
+
+      // Log failed payment creation
+      try {
+        await fetch(`${appUrl}/api/payment/log`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            bookingId,
+            status: 'error',
+            amount,
+            currency,
+            tripIds,
+            customerEmail: email,
+            customerFirstName: firstName,
+            customerLastName: lastName,
+            customerPhone: phone,
+            customerCountry: country,
+            ipAddress,
+            userAgent,
+            errorMessage: paymentResponse.message || 'Failed to create payment',
+            errorCode: 'TILOPAY_CREATE_FAILED',
+            rawRequest: { ...paymentRequest, key: '[REDACTED]' },
+            rawResponse: paymentResponse,
+          }),
+        });
+      } catch (logErr) {
+        console.error('Failed to log payment error:', logErr);
+      }
+
       return NextResponse.json(
         { error: paymentResponse.message || 'Failed to create payment' },
         { status: 500 }
       );
+    }
+
+    // Log successful payment initiation
+    try {
+      await fetch(`${appUrl}/api/payment/log`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bookingId,
+          status: 'initiated',
+          amount,
+          currency,
+          tripIds,
+          customerEmail: email,
+          customerFirstName: firstName,
+          customerLastName: lastName,
+          customerPhone: phone,
+          customerCountry: country,
+          ipAddress,
+          userAgent,
+          paymentUrl: paymentResponse.url,
+          rawRequest: { ...paymentRequest, key: '[REDACTED]' },
+          rawResponse: { success: true, url: paymentResponse.url },
+        }),
+      });
+    } catch (logErr) {
+      console.error('Failed to log payment initiation:', logErr);
     }
 
     // Return the payment URL to redirect the user
