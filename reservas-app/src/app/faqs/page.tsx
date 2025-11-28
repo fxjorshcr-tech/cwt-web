@@ -179,11 +179,28 @@ export default function FAQsPage() {
             </div>
           </div>
 
-          {/* Loading */}
+          {/* Loading Skeleton */}
           {loading && (
-            <div className="text-center py-12">
-              <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
-              <p className="mt-4 text-gray-600">Loading FAQs...</p>
+            <div className="space-y-8">
+              {/* Category Skeleton */}
+              {[1, 2, 3].map((category) => (
+                <div key={category}>
+                  <div className="h-8 w-48 bg-gray-200 rounded-lg mb-4 animate-pulse" />
+                  <div className="space-y-3">
+                    {[1, 2, 3, 4].map((item) => (
+                      <div
+                        key={item}
+                        className="bg-white rounded-xl border border-gray-200 overflow-hidden"
+                      >
+                        <div className="px-6 py-4 flex items-center justify-between">
+                          <div className="h-5 bg-gray-200 rounded animate-pulse" style={{ width: `${60 + Math.random() * 30}%` }} />
+                          <div className="h-5 w-5 bg-gray-200 rounded animate-pulse" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 
