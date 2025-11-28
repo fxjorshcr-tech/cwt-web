@@ -88,7 +88,7 @@ export function TripSummaryCard({ trip, tripNumber, totalTrips, addOnNames }: Tr
 
           {/* Pickup */}
           <div className="relative flex items-start gap-3 mb-4">
-            <div className="bg-blue-600 rounded-full p-1.5 z-10 flex-shrink-0">
+            <div className="bg-blue-600 rounded-full p-1.5 relative flex-shrink-0">
               <MapPin className="h-3 w-3 text-white" />
             </div>
             <div className="flex-1 min-w-0">
@@ -99,7 +99,7 @@ export function TripSummaryCard({ trip, tripNumber, totalTrips, addOnNames }: Tr
 
           {/* Dropoff */}
           <div className="relative flex items-start gap-3">
-            <div className="bg-orange-600 rounded-full p-1.5 z-10 flex-shrink-0">
+            <div className="bg-orange-600 rounded-full p-1.5 relative flex-shrink-0">
               <MapPin className="h-3 w-3 text-white" />
             </div>
             <div className="flex-1 min-w-0">

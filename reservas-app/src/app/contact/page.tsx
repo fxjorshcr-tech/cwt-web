@@ -140,7 +140,7 @@ export default function ContactPage() {
         </section>
 
         {/* Contact Info Cards */}
-        <section className="relative -mt-16 z-20 px-6 pb-12">
+        <section className="relative -mt-16 z-20 px-4 sm:px-6 pb-12">
           <div className="container mx-auto max-w-6xl">
             <div className="grid md:grid-cols-3 gap-6">
               
@@ -202,11 +202,11 @@ export default function ContactPage() {
 
         {/* Main Content: Form + Info */}
         <section className="py-10 sm:py-16 bg-gradient-to-b from-white to-gray-50">
-          <div className="container mx-auto px-6 max-w-6xl">
+          <div className="container mx-auto px-4 sm:px-6 max-w-6xl">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
               
               {/* Contact Form */}
-              <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-200">
+              <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-gray-200 overflow-hidden">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Send Us a Message</h2>
 
                 {submitStatus === 'error' && (
@@ -260,13 +260,13 @@ export default function ContactPage() {
                     <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1.5">
                       Phone Number (Optional)
                     </label>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 min-w-0">
                       <select
                         id="countryCode"
                         name="countryCode"
                         value={formData.countryCode}
                         onChange={handleChange}
-                        className="w-28 px-2 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
+                        className="w-[90px] flex-shrink-0 px-2 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
                       >
                         {COUNTRY_CODES.map((c) => (
                           <option key={c.code} value={c.code}>
@@ -280,7 +280,7 @@ export default function ContactPage() {
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
-                        className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        className="flex-1 min-w-0 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                         placeholder="234 567 8900"
                       />
                     </div>
@@ -396,7 +396,7 @@ export default function ContactPage() {
 
         {/* Emergency Contact Notice */}
         <section className="py-12 bg-orange-50 border-t border-orange-200">
-          <div className="container mx-auto px-6 max-w-4xl text-center">
+          <div className="container mx-auto px-4 sm:px-6 max-w-4xl text-center">
             <AlertCircle className="h-12 w-12 text-orange-600 mx-auto mb-4" />
             <h3 className="text-xl font-bold text-gray-900 mb-3">Need Immediate Assistance?</h3>
             <p className="text-gray-700 mb-6 leading-relaxed">

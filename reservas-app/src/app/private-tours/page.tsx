@@ -51,9 +51,63 @@ export default function PrivateToursPage() {
     return (
       <>
         <BookingNavbar />
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        </div>
+
+        {/* Hero Skeleton */}
+        <section className="relative h-[70vh] min-h-[500px] max-h-[750px] flex items-center justify-center">
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-700 via-gray-600 to-gray-800 animate-pulse" />
+          <div className="relative z-10 text-center px-6 max-w-5xl mx-auto pt-20 sm:pt-0">
+            <div className="h-8 w-48 bg-white/20 rounded-full mx-auto mb-6 animate-pulse" />
+            <div className="h-14 sm:h-20 w-3/4 bg-white/30 rounded-lg mx-auto mb-4 animate-pulse" />
+            <div className="h-6 w-2/3 bg-white/20 rounded-lg mx-auto mb-8 animate-pulse" />
+            <div className="flex flex-wrap justify-center gap-6">
+              <div className="h-6 w-32 bg-white/20 rounded animate-pulse" />
+              <div className="h-6 w-36 bg-white/20 rounded animate-pulse" />
+              <div className="h-6 w-32 bg-white/20 rounded animate-pulse" />
+            </div>
+          </div>
+        </section>
+
+        {/* Tours Grid Skeleton */}
+        <section className="py-12 sm:py-20 bg-gradient-to-b from-gray-50 to-white">
+          <div className="container mx-auto px-4 max-w-7xl">
+            {/* Intro Skeleton */}
+            <div className="mb-12 text-center max-w-4xl mx-auto">
+              <div className="h-8 w-48 bg-green-100 rounded-full mx-auto mb-6 animate-pulse" />
+              <div className="h-12 w-3/4 bg-gray-200 rounded-lg mx-auto mb-6 animate-pulse" />
+              <div className="h-20 w-full bg-gray-100 rounded-lg mx-auto mb-8 animate-pulse" />
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="bg-white p-5 rounded-xl border border-gray-100 animate-pulse">
+                    <div className="h-8 w-8 bg-gray-200 rounded mb-2" />
+                    <div className="h-5 w-24 bg-gray-200 rounded mb-1" />
+                    <div className="h-4 w-full bg-gray-100 rounded" />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Tour Cards Skeleton */}
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 animate-pulse">
+                  <div className="h-56 bg-gray-200" />
+                  <div className="p-5">
+                    <div className="h-6 w-3/4 bg-gray-200 rounded mb-2" />
+                    <div className="h-4 w-full bg-gray-100 rounded mb-4" />
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="h-4 w-20 bg-gray-100 rounded" />
+                      <div className="h-4 w-16 bg-gray-100 rounded" />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="h-8 w-16 bg-blue-100 rounded" />
+                      <div className="h-6 w-24 bg-blue-100 rounded" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
       </>
     );
   }

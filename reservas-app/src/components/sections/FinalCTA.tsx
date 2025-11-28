@@ -182,7 +182,7 @@ export default function FinalCTA() {
             </div>
 
             {/* Right Column - Contact Form */}
-            <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-2xl">
+            <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-2xl overflow-hidden">
               <h3 className="text-2xl font-bold text-gray-900 mb-2">Send Us a Message</h3>
               <p className="text-gray-600 mb-6">Fill out the form and we'll get back to you soon</p>
 
@@ -237,13 +237,13 @@ export default function FinalCTA() {
                   <label htmlFor="home-phone" className="block text-sm font-semibold text-gray-700 mb-2">
                     Phone Number <span className="text-gray-400 font-normal">(optional)</span>
                   </label>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 min-w-0">
                     <select
                       id="home-countryCode"
                       name="countryCode"
                       value={formData.countryCode}
                       onChange={(e) => setFormData({ ...formData, countryCode: e.target.value })}
-                      className="w-28 px-2 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
+                      className="w-[90px] flex-shrink-0 px-2 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
                     >
                       {COUNTRY_CODES.map((c) => (
                         <option key={c.code} value={c.code}>
@@ -257,7 +257,7 @@ export default function FinalCTA() {
                       name="phone"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className="flex-1 min-w-0 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                       placeholder="234 567 8900"
                     />
                   </div>

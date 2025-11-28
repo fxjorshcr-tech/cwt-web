@@ -391,9 +391,78 @@ function PreviewPageContent() {
     return (
       <>
         <BookingNavbar />
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
+
+        {/* Hero Skeleton */}
+        <section className="relative h-48 md:h-56 w-full overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-600 via-gray-500 to-gray-700 animate-pulse" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-center px-4">
+              <div className="h-8 w-48 bg-white/30 rounded-lg mx-auto mb-2 animate-pulse" />
+              <div className="h-5 w-64 bg-white/20 rounded mx-auto animate-pulse" />
+            </div>
+          </div>
+        </section>
+
+        {/* Stepper Skeleton */}
+        <div className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+          <div className="max-w-5xl mx-auto px-4 py-6">
+            <div className="flex items-center justify-between">
+              {[1, 2, 3].map((step) => (
+                <div key={step} className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-full bg-gray-200 animate-pulse" />
+                  <div className="hidden sm:block h-4 w-20 bg-gray-200 rounded animate-pulse" />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
+
+        {/* Content Skeleton */}
+        <main className="bg-gray-50 py-8 pb-24">
+          <div className="max-w-5xl mx-auto px-4">
+            <div className="grid lg:grid-cols-3 gap-6">
+              {/* Left Column - Trip Cards Skeleton */}
+              <div className="lg:col-span-2 space-y-4">
+                {[1, 2].map((i) => (
+                  <div key={i} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden animate-pulse">
+                    <div className="bg-blue-100 px-5 py-3 border-b border-blue-200">
+                      <div className="flex items-center gap-2">
+                        <div className="h-7 w-7 rounded-full bg-blue-300" />
+                        <div className="h-5 w-24 bg-blue-200 rounded" />
+                      </div>
+                    </div>
+                    <div className="p-5 space-y-3">
+                      <div className="h-6 w-3/4 bg-gray-200 rounded" />
+                      <div className="h-6 w-2/3 bg-gray-200 rounded" />
+                      <div className="grid grid-cols-4 gap-3 pt-4">
+                        {[1, 2, 3, 4].map((j) => (
+                          <div key={j} className="h-16 bg-gray-100 rounded-lg" />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Right Column - Summary Skeleton */}
+              <div className="lg:col-span-1">
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden animate-pulse">
+                  <div className="bg-blue-600 px-5 py-4">
+                    <div className="h-6 w-32 bg-white/30 rounded" />
+                  </div>
+                  <div className="p-5 space-y-3">
+                    <div className="h-5 w-full bg-gray-200 rounded" />
+                    <div className="h-5 w-full bg-gray-200 rounded" />
+                    <div className="pt-3 border-t border-gray-200">
+                      <div className="h-8 w-24 bg-blue-100 rounded ml-auto" />
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-4 h-14 bg-blue-200 rounded-xl animate-pulse" />
+              </div>
+            </div>
+          </div>
+        </main>
       </>
     );
   }
@@ -672,9 +741,34 @@ export default function PreviewPage() {
       fallback={
         <>
           <BookingNavbar />
-          <div className="min-h-screen flex items-center justify-center bg-gray-50">
-            <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
+          {/* Hero Skeleton */}
+          <section className="relative h-48 md:h-56 w-full overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-b from-gray-600 via-gray-500 to-gray-700 animate-pulse" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="h-8 w-48 bg-white/30 rounded-lg animate-pulse" />
+            </div>
+          </section>
+          {/* Stepper Skeleton */}
+          <div className="bg-white border-b border-gray-200">
+            <div className="max-w-5xl mx-auto px-4 py-6">
+              <div className="flex items-center justify-between">
+                {[1, 2, 3].map((step) => (
+                  <div key={step} className="h-8 w-8 rounded-full bg-gray-200 animate-pulse" />
+                ))}
+              </div>
+            </div>
           </div>
+          {/* Content Skeleton */}
+          <main className="bg-gray-50 py-8 min-h-screen">
+            <div className="max-w-5xl mx-auto px-4">
+              <div className="grid lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 space-y-4">
+                  <div className="bg-white rounded-xl h-48 animate-pulse" />
+                </div>
+                <div className="bg-white rounded-xl h-64 animate-pulse" />
+              </div>
+            </div>
+          </main>
         </>
       }
     >

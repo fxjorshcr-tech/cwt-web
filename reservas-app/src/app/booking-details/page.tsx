@@ -365,10 +365,82 @@ function BookingDetailsContent() {
     return (
       <>
         <BookingNavbar />
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="text-center">
-            <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
-            <p className="text-gray-600">Loading your booking...</p>
+
+        {/* Hero Skeleton */}
+        <section className="relative h-36 sm:h-40 md:h-48 w-full overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-600 via-gray-500 to-gray-700 animate-pulse" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="h-10 w-64 bg-white/30 rounded-lg animate-pulse" />
+          </div>
+        </section>
+
+        {/* Stepper Skeleton */}
+        <div className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+          <div className="max-w-4xl mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              {[1, 2, 3].map((step) => (
+                <div key={step} className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-full bg-gray-200 animate-pulse" />
+                  <div className="hidden sm:block h-4 w-20 bg-gray-200 rounded animate-pulse" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Content Skeleton */}
+        <div className="max-w-4xl mx-auto px-4 py-6 pb-40 bg-gray-50 min-h-screen">
+          {/* Trip Header Skeleton */}
+          <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-t-xl px-4 py-3 animate-pulse">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <div className="h-7 w-7 rounded-full bg-white/30" />
+                <div className="h-4 w-20 bg-white/30 rounded" />
+              </div>
+              <div className="h-6 w-16 bg-white/30 rounded" />
+            </div>
+            <div className="space-y-1.5 mb-3">
+              <div className="h-5 w-48 bg-white/20 rounded" />
+              <div className="h-5 w-40 bg-white/20 rounded" />
+            </div>
+            <div className="flex gap-4">
+              <div className="h-4 w-24 bg-white/20 rounded" />
+              <div className="h-4 w-16 bg-white/20 rounded" />
+            </div>
+          </div>
+
+          {/* Form Skeleton */}
+          <div className="bg-white rounded-b-xl border border-t-0 p-4 md:p-6 space-y-5">
+            {[1, 2, 3].map((section) => (
+              <div key={section} className="space-y-3">
+                <div className="h-4 w-32 bg-gray-200 rounded animate-pulse" />
+                <div className="h-12 w-full bg-gray-100 rounded-lg animate-pulse" />
+              </div>
+            ))}
+          </div>
+
+          {/* Add-ons Skeleton */}
+          <div className="mt-4 bg-white rounded-xl border p-4">
+            <div className="h-6 w-40 bg-gray-200 rounded mb-4 animate-pulse" />
+            <div className="grid grid-cols-2 gap-3">
+              {[1, 2].map((addon) => (
+                <div key={addon} className="h-24 bg-gray-100 rounded-lg animate-pulse" />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Bar Skeleton */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+          <div className="max-w-4xl mx-auto px-4 py-3">
+            <div className="flex items-center justify-between mb-3">
+              <div className="h-4 w-24 bg-gray-200 rounded animate-pulse" />
+              <div className="h-8 w-20 bg-blue-100 rounded animate-pulse" />
+            </div>
+            <div className="flex gap-3">
+              <div className="flex-1 h-12 bg-gray-200 rounded-lg animate-pulse" />
+              <div className="flex-1 h-12 bg-blue-200 rounded-lg animate-pulse" />
+            </div>
           </div>
         </div>
       </>
@@ -728,10 +800,36 @@ export default function BookingDetailsPage() {
       fallback={
         <>
           <BookingNavbar />
-          <div className="min-h-screen flex items-center justify-center bg-gray-50">
-            <div className="text-center">
-              <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
-              <p className="text-gray-600">Loading...</p>
+          {/* Hero Skeleton */}
+          <section className="relative h-36 sm:h-40 md:h-48 w-full overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-b from-gray-600 via-gray-500 to-gray-700 animate-pulse" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="h-10 w-64 bg-white/30 rounded-lg animate-pulse" />
+            </div>
+          </section>
+          {/* Stepper Skeleton */}
+          <div className="bg-white border-b border-gray-200">
+            <div className="max-w-4xl mx-auto px-4 py-4">
+              <div className="flex items-center justify-between">
+                {[1, 2, 3].map((step) => (
+                  <div key={step} className="flex items-center gap-2">
+                    <div className="h-8 w-8 rounded-full bg-gray-200 animate-pulse" />
+                    <div className="hidden sm:block h-4 w-20 bg-gray-200 rounded animate-pulse" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          {/* Content Skeleton */}
+          <div className="max-w-4xl mx-auto px-4 py-6 bg-gray-50 min-h-screen">
+            <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-t-xl px-4 py-4 animate-pulse">
+              <div className="h-6 w-32 bg-white/30 rounded mb-2" />
+              <div className="h-5 w-48 bg-white/20 rounded" />
+            </div>
+            <div className="bg-white rounded-b-xl border border-t-0 p-6 space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-12 bg-gray-100 rounded-lg animate-pulse" />
+              ))}
             </div>
           </div>
         </>
