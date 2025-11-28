@@ -66,7 +66,7 @@ export default function LegalPage() {
     return (
       <>
         <BookingNavbar />
-        <section className="relative h-64 bg-gradient-to-r from-blue-600 to-indigo-700">
+        <section className="relative h-64 bg-gradient-to-r from-blue-600 to-blue-700">
           <div className="absolute inset-0 flex items-center justify-center">
             <Loader2 className="h-12 w-12 animate-spin text-white" />
           </div>

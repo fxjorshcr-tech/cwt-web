@@ -43,7 +43,7 @@ export default function MostBookedCTA({ routes }: MostBookedCTAProps) {
           <div className="text-center mb-12">
             <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 mb-6 leading-tight">
               Traveler Favorites<br className="hidden sm:block" /> 
-              <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Top Private Connections</span>
+              <span className="bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">Top Private Connections</span>
             </h2>
             
             <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
@@ -62,7 +62,7 @@ export default function MostBookedCTA({ routes }: MostBookedCTAProps) {
                 <Link
                   key={idx}
                   href={`/shuttle/${route.slug}`}
-                  className="flex flex-col p-4 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl hover:shadow-lg hover:scale-105 hover:border-blue-400 transition-all duration-200 group"
+                  className="flex flex-col p-4 bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl hover:shadow-lg hover:scale-105 hover:border-blue-400 transition-all duration-200 group"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2 flex-1">
@@ -96,7 +96,7 @@ export default function MostBookedCTA({ routes }: MostBookedCTAProps) {
             </span>
             <span className="text-gray-300">•</span>
             <span className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 bg-purple-500 rounded-full"></span>
+              <span className="w-1.5 h-1.5 bg-orange-500 rounded-full"></span>
               ICT Certified #4121-2025
             </span>
           </div>
@@ -105,7 +105,7 @@ export default function MostBookedCTA({ routes }: MostBookedCTAProps) {
           <div className="flex justify-center mb-8">
             <Link
               href="/shuttle"
-              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-lg rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold text-lg rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
             >
               View Top Destinations
               <ArrowRight className="h-6 w-6" />

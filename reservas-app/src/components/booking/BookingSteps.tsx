@@ -23,15 +23,15 @@ export default function BookingSteps() {
       border: 'border-blue-200',
       iconBg: 'bg-gradient-to-br from-blue-500 to-blue-600'
     },
-    { 
-      icon: ClipboardList, 
+    {
+      icon: ClipboardList,
       number: '02',
-      title: 'Details', 
+      title: 'Details',
       description: 'Add pickup time, passengers, and special requests',
-      color: 'text-purple-600',
-      bg: 'bg-purple-50',
-      border: 'border-purple-200',
-      iconBg: 'bg-gradient-to-br from-purple-500 to-purple-600'
+      color: 'text-orange-600',
+      bg: 'bg-orange-50',
+      border: 'border-orange-200',
+      iconBg: 'bg-gradient-to-br from-orange-500 to-orange-600'
     },
     { 
       icon: CheckSquare, 
@@ -59,7 +59,7 @@ export default function BookingSteps() {
     <section className="relative py-20 bg-gradient-to-b from-white via-gray-50 to-blue-50 overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200/20 rounded-full blur-3xl" />
-      <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-200/20 rounded-full blur-3xl" />
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-orange-200/20 rounded-full blur-3xl" />
       
       <div className="container relative mx-auto px-6 max-w-7xl">
         

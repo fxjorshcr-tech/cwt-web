@@ -163,8 +163,8 @@ export default function TransfersPage() {
                   <h4 className="font-bold text-gray-900 mb-1">Local Stops</h4>
                   <p className="text-sm text-gray-600">Coffee breaks, fruit stands, bathroom stops when you need them</p>
                 </div>
-                <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-5 border border-purple-200">
-                  <Camera className="h-8 w-8 text-purple-600 mb-3" />
+                <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-5 border border-green-200">
+                  <Camera className="h-8 w-8 text-green-600 mb-3" />
                   <h4 className="font-bold text-gray-900 mb-1">Photo Opps</h4>
                   <p className="text-sm text-gray-600">Volcano views, river crossings, wildlife sightings, all camera-ready</p>
                 </div>
@@ -221,8 +221,8 @@ export default function TransfersPage() {
               </div>
 
               <div className="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow">
-                <div className="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                  <Sparkles className="h-6 w-6 text-purple-600" />
+                <div className="h-12 w-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
+                  <Sparkles className="h-6 w-6 text-orange-600" />
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">Rainy Season Ready</h3>
                 <p className="text-sm text-gray-600">
@@ -241,9 +241,9 @@ export default function TransfersPage() {
 
               {/* Left: Main Content */}
               <div className="lg:col-span-3">
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-50 border border-purple-200 rounded-full mb-6">
-                  <Sparkles className="h-4 w-4 text-purple-600" />
-                  <span className="text-purple-700 font-semibold text-sm">Turn Your Transfer Into an Adventure</span>
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 rounded-full mb-6">
+                  <Sparkles className="h-4 w-4 text-green-600" />
+                  <span className="text-green-700 font-semibold text-sm">Turn Your Transfer Into an Adventure</span>
                 </div>
 
                 <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6 leading-tight">
@@ -260,7 +260,7 @@ export default function TransfersPage() {
                   <p>
                     Our standard transfers include one complimentary stop for photos or a quick stretch.
                     But if you want to transform your transfer into a half-day exploration, our{' '}
-                    <strong className="text-purple-700">Explorer Upgrade</strong> adds 3 extra hours to
+                    <strong className="text-green-700">Explorer Upgrade</strong> adds 3 extra hours to
                     your journey. Visit a waterfall on your way from the airport, stop at a sloth sanctuary,
                     or pull over at that perfect beach you spotted from the road.
                   </p>
@@ -300,30 +300,30 @@ export default function TransfersPage() {
                 </div>
 
                 {/* Explorer Upgrade Card */}
-                <div className="bg-gradient-to-br from-purple-50 to-white rounded-2xl p-6 border-2 border-purple-200 relative">
-                  <div className="absolute -top-3 right-4 bg-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                <div className="bg-gradient-to-br from-green-50 to-white rounded-2xl p-6 border-2 border-green-200 relative">
+                  <div className="absolute -top-3 right-4 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">
                     DELUXE
                   </div>
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="h-12 w-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                      <Sparkles className="h-6 w-6 text-purple-600" />
+                    <div className="h-12 w-12 bg-green-100 rounded-xl flex items-center justify-center">
+                      <Sparkles className="h-6 w-6 text-green-600" />
                     </div>
                     <div>
                       <h4 className="font-bold text-gray-900">Explorer Upgrade</h4>
-                      <p className="text-2xl font-bold text-purple-600">$195 <span className="text-sm font-normal text-gray-500">/ transfer</span></p>
+                      <p className="text-2xl font-bold text-green-600">$195 <span className="text-sm font-normal text-gray-500">/ transfer</span></p>
                     </div>
                   </div>
                   <ul className="space-y-2 text-sm text-gray-600">
                     <li className="flex items-start gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-purple-500 mt-0.5 flex-shrink-0" />
+                      <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
                       <span>All Flex Protection benefits included</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-purple-500 mt-0.5 flex-shrink-0" />
+                      <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
                       <span>+3 hours for scenic stops, waterfalls, viewpoints</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-purple-500 mt-0.5 flex-shrink-0" />
+                      <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
                       <span>Cooler with beers, San Pellegrino, sodas & snacks</span>
                     </li>
                   </ul>

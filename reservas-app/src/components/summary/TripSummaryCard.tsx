@@ -133,11 +133,11 @@ export function TripSummaryCard({ trip, tripNumber, totalTrips, addOnNames }: Tr
         {/* Add-ons */}
         {trip.add_ons && trip.add_ons.length > 0 && (
           <div className="flex items-center gap-2 flex-wrap">
-            <ShoppingCart className="h-4 w-4 text-purple-600 flex-shrink-0" />
+            <ShoppingCart className="h-4 w-4 text-green-600 flex-shrink-0" />
             {trip.add_ons.map((addon) => (
               <span
                 key={addon}
-                className="inline-flex items-center px-2.5 py-1 bg-purple-100 border border-purple-200 rounded-full text-xs font-semibold text-purple-800"
+                className="inline-flex items-center px-2.5 py-1 bg-green-100 border border-green-200 rounded-full text-xs font-semibold text-green-800"
               >
                 {addOnNames[addon] || addon}
               </span>

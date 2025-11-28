@@ -20,7 +20,7 @@ export default function PaymentMethods() {
     { name: 'American Express', icon: CreditCard, color: 'text-blue-700', bg: 'bg-blue-50', border: 'border-blue-200' },
     { name: 'Discover', icon: CreditCard, color: 'text-orange-500', bg: 'bg-orange-50', border: 'border-orange-200' },
     { name: 'Google Pay', icon: Smartphone, color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-200' },
-    { name: 'Link', icon: Link2, color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-200' },
+    { name: 'Link', icon: Link2, color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-200' },
     { name: 'ACH Direct Debit', icon: Building2, color: 'text-gray-600', bg: 'bg-gray-50', border: 'border-gray-200' },
   ];
 
@@ -41,13 +41,13 @@ export default function PaymentMethods() {
       bg: 'bg-green-50',
       border: 'border-green-200'
     },
-    { 
-      icon: CheckCircle2, 
+    {
+      icon: CheckCircle2,
       label: '3D Secure',
       description: 'Additional fraud protection layer',
-      color: 'text-purple-600',
-      bg: 'bg-purple-50',
-      border: 'border-purple-200'
+      color: 'text-orange-600',
+      bg: 'bg-orange-50',
+      border: 'border-orange-200'
     },
   ];
 
@@ -55,7 +55,7 @@ export default function PaymentMethods() {
     <section className="relative py-20 bg-gradient-to-b from-blue-50 via-gray-50 to-white overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-blue-200/20 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-200/20 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-orange-200/20 rounded-full blur-3xl" />
       
       <div className="container relative mx-auto px-6 max-w-7xl">
         
@@ -82,7 +82,7 @@ export default function PaymentMethods() {
           <div className="space-y-6">
             
             {/* Secure Payment Info Card */}
-            <div className="bg-gradient-to-br from-indigo-600 to-blue-600 rounded-2xl p-8 shadow-lg text-white">
+            <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-8 shadow-lg text-white">
               <div className="flex items-start gap-4">
                 <div className="h-12 w-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30">
                   <Lock className="h-6 w-6 text-white" />
@@ -119,7 +119,7 @@ export default function PaymentMethods() {
                 ))}
               </div>
 
-              <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border-2 border-blue-200">
+              <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border-2 border-blue-200">
                 <p className="text-sm text-gray-700 flex items-start gap-2">
                   <CheckCircle2 className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <span>
@@ -187,8 +187,8 @@ export default function PaymentMethods() {
               <p className="text-2xl font-bold text-green-600 mb-1">Level 1</p>
               <p className="text-sm text-gray-600">PCI DSS Certified</p>
             </div>
-            <div className="p-6 text-center bg-gradient-to-br from-purple-50 to-white">
-              <p className="text-2xl font-bold text-purple-600 mb-1">3D Secure</p>
+            <div className="p-6 text-center bg-gradient-to-br from-orange-50 to-white">
+              <p className="text-2xl font-bold text-orange-600 mb-1">3D Secure</p>
               <p className="text-sm text-gray-600">Protected</p>
             </div>
             <div className="p-6 text-center bg-gradient-to-br from-orange-50 to-white">

@@ -81,9 +81,9 @@ export default function WhyPrivateShuttle() {
             </div>
 
             {/* About Can't Wait Travel - Updated */}
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 sm:p-8 border-2 border-blue-100">
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 sm:p-8 border-2 border-blue-100">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
                   <Award className="h-6 w-6 sm:h-7 sm:w-7 text-white" />
                 </div>
                 <div>
@@ -128,9 +128,9 @@ export default function WhyPrivateShuttle() {
           <div className="order-1 lg:order-2 relative">
             <div className="relative h-[400px] sm:h-[500px] lg:h-[700px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl border-4 border-white">
               {/* Placeholder */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-100 via-blue-50 to-orange-50">
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 sm:p-8">
-                  <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mb-4 sm:mb-6 shadow-2xl">
+                  <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mb-4 sm:mb-6 shadow-2xl">
                     <Mountain className="h-12 w-12 sm:h-16 sm:w-16 text-white" />
                   </div>
                   <p className="text-gray-600 text-base sm:text-lg font-semibold mb-2">Team Photo Goes Here</p>

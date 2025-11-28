@@ -132,7 +132,7 @@ export default function HomeFAQs() {
         </div>
 
         {/* Contact CTA */}
-        <div className="mt-12 p-6 bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-2xl text-center">
+        <div className="mt-12 p-6 bg-gradient-to-r from-blue-50 to-orange-50 border-2 border-blue-200 rounded-2xl text-center">
           <p className="text-gray-700 text-base sm:text-lg mb-3">
             Still have questions?
           </p>
