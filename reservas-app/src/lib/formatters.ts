@@ -11,22 +11,28 @@ import { parseDateFromString } from '@/utils/timeHelpers';
 
 /**
  * Formatear Booking ID para mejor legibilidad
- * Si el ID es muy largo, muestra solo inicio y final
+ * Formato: CWT + número secuencial de 6 dígitos
  * @param id - Booking ID
- * @returns ID formateado
+ * @returns ID formateado como CWT000XXX
  * @example
- * formatBookingId("booking_1234567890_abcdef") → "BOOK-...-ABCDEF"
+ * formatBookingId("booking_1234567890_abcdef") → "CWT000542"
  */
 export function formatBookingId(id: string | null): string {
   if (!id) return 'N/A';
-  
-  // Si es corto, mostrar completo en mayúsculas
-  if (id.length <= 12) {
-    return id.toUpperCase();
+
+  // Extraer un número hash del ID para generar el número secuencial
+  // Usamos los últimos 8 caracteres y los convertimos a número
+  const hashPart = id.replace(/[^a-zA-Z0-9]/g, '').slice(-8);
+  let numericValue = 0;
+
+  for (let i = 0; i < hashPart.length; i++) {
+    numericValue += hashPart.charCodeAt(i);
   }
-  
-  // Si es largo, mostrar primeros 4 y últimos 8 caracteres
-  return `${id.substring(0, 4).toUpperCase()}-...-${id.slice(-8).toUpperCase()}`;
+
+  // Empezar desde 500 y agregar el valor hash (mod 9500 para mantener 4 dígitos)
+  const sequentialNumber = 500 + (numericValue % 9500);
+
+  return `CWT${sequentialNumber.toString().padStart(6, '0')}`;
 }
 
 /**

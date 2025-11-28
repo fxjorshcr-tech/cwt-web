@@ -124,9 +124,20 @@ function PaymentCallbackContent() {
 
         // If successful, redirect to confirmation after a delay
         if (isApproved && bookingId) {
+          const confirmationUrl = `/confirmation?booking_id=${bookingId}&payment=success`;
+
           setTimeout(() => {
-            router.push(`/confirmation?booking_id=${bookingId}&payment=success`);
-          }, 3000);
+            // Check if we're running in a popup
+            if (window.opener && !window.opener.closed) {
+              // Redirect the parent window to confirmation
+              window.opener.location.href = confirmationUrl;
+              // Close the popup
+              window.close();
+            } else {
+              // Normal redirect if not in popup
+              router.push(confirmationUrl);
+            }
+          }, 2000);
         }
       } catch (err) {
         console.error('Error processing payment callback:', err);
@@ -211,7 +222,16 @@ function PaymentCallbackContent() {
               </p>
 
               <Button
-                onClick={() => router.push(`/confirmation?booking_id=${result.bookingId}&payment=success`)}
+                onClick={() => {
+                  const confirmationUrl = `/confirmation?booking_id=${result.bookingId}&payment=success`;
+                  // Check if we're running in a popup
+                  if (window.opener && !window.opener.closed) {
+                    window.opener.location.href = confirmationUrl;
+                    window.close();
+                  } else {
+                    router.push(confirmationUrl);
+                  }
+                }}
                 className="w-full min-h-[48px]"
               >
                 View Confirmation
@@ -246,17 +266,30 @@ function PaymentCallbackContent() {
             <div className="flex gap-3">
               <Button
                 variant="outline"
-                onClick={() => router.push('/')}
+                onClick={() => {
+                  // Check if we're running in a popup
+                  if (window.opener && !window.opener.closed) {
+                    window.opener.location.href = '/';
+                    window.close();
+                  } else {
+                    router.push('/');
+                  }
+                }}
                 className="flex-1 min-h-[48px]"
               >
                 Cancel
               </Button>
               <Button
                 onClick={() => {
-                  if (result?.bookingId) {
-                    router.push(`/summary?booking_id=${result.bookingId}`);
+                  const summaryUrl = result?.bookingId
+                    ? `/summary?booking_id=${result.bookingId}`
+                    : '/';
+                  // Check if we're running in a popup
+                  if (window.opener && !window.opener.closed) {
+                    window.opener.location.href = summaryUrl;
+                    window.close();
                   } else {
-                    router.push('/');
+                    router.push(summaryUrl);
                   }
                 }}
                 className="flex-1 min-h-[48px]"
