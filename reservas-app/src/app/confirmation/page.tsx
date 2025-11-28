@@ -311,13 +311,13 @@ function ConfirmationPageContent() {
                 <div className="flex gap-4">
                   <div className="flex-shrink-0">
                     <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center">
-                      <Phone className="h-5 w-5 text-white" />
+                      <Mail className="h-5 w-5 text-white" />
                     </div>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-green-900 mb-1">Driver Assignment</h4>
+                    <h4 className="font-semibold text-green-900 mb-1">Need Assistance?</h4>
                     <p className="text-sm text-green-700">
-                      Your driver will contact you 24 hours before pickup with final details.
+                      Contact us anytime at <a href="mailto:mybooking@cantwaittravelcr.com" className="font-semibold underline">mybooking@cantwaittravelcr.com</a> or via <a href="https://wa.me/50685962438" className="font-semibold underline" target="_blank" rel="noopener noreferrer">WhatsApp</a>.
                     </p>
                   </div>
                 </div>

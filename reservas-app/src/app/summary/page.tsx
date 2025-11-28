@@ -391,9 +391,41 @@ function SummaryPageContent() {
         throw new Error(data.error || 'Failed to create payment');
       }
 
-      // Redirigir a Tilopay
+      // Abrir Tilopay en popup centrado
       if (data.paymentUrl) {
-        window.location.href = data.paymentUrl;
+        // Calcular posición centrada del popup
+        const width = 500;
+        const height = 700;
+        const left = window.screenX + (window.outerWidth - width) / 2;
+        const top = window.screenY + (window.outerHeight - height) / 2;
+
+        const popup = window.open(
+          data.paymentUrl,
+          'TilopayPayment',
+          `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
+        );
+
+        // Si el popup fue bloqueado, redirigir normalmente
+        if (!popup || popup.closed) {
+          toast.info('Popup blocked. Redirecting to payment page...');
+          window.location.href = data.paymentUrl;
+          return;
+        }
+
+        // Monitorear el popup para cerrar el modal cuando termine
+        const checkPopup = setInterval(() => {
+          if (popup.closed) {
+            clearInterval(checkPopup);
+            setIsProcessingPayment(false);
+            setShowPaymentModal(false);
+            // Recargar la página para verificar si el pago fue exitoso
+            window.location.reload();
+          }
+        }, 500);
+
+        // Cerrar el modal de info del cliente
+        setShowPaymentModal(false);
+        toast.success('Payment window opened. Complete your payment there.');
       } else {
         throw new Error('No payment URL received');
       }
