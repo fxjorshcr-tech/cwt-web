@@ -93,7 +93,7 @@ export function TripAddOns({ selectedAddOns, onAddOnsChange }: TripAddOnsProps) 
   };
 
   return (
-    <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">
+    <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200 notranslate" translate="no">
       <CardHeader className="pb-3">
         <CardTitle className="text-base md:text-lg flex items-center gap-2 text-blue-900">
           <Sparkles className="h-5 w-5" />

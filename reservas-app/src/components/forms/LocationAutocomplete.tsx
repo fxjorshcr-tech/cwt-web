@@ -124,7 +124,7 @@ export function LocationAutocomplete({
   };
 
   return (
-    <div className="space-y-1.5 relative">
+    <div className="space-y-1.5 relative notranslate" translate="no">
       <label className="flex items-center gap-1.5 text-xs font-medium text-gray-700">
         <MapPin className={`h-3.5 w-3.5 ${type === 'origin' ? 'text-blue-600' : 'text-orange-600'}`} />
         {label}

@@ -206,7 +206,7 @@ export default function ContactPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
               
               {/* Contact Form */}
-              <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-gray-200 overflow-hidden">
+              <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-gray-200 overflow-hidden notranslate" translate="no">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Send Us a Message</h2>
 
                 {submitStatus === 'error' && (

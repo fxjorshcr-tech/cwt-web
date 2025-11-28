@@ -182,7 +182,7 @@ export function ModernDatePicker({
   const canGoNext = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1) <= maxDate;
 
   return (
-    <div ref={containerRef} className={`relative ${className}`}>
+    <div ref={containerRef} className={`relative notranslate ${className}`} translate="no">
       {label && (
         <label className="block text-sm font-medium text-gray-700 mb-2">
           {label}
