@@ -60,12 +60,12 @@ export async function POST(request: NextRequest) {
 
     // Format trips for email
     const formattedTrips = trips.map(trip => ({
-      origin: trip.origin_location || trip.origin || 'Unknown',
-      destination: trip.destination_location || trip.destination || 'Unknown',
-      date: trip.travel_date || trip.date || 'TBD',
+      origin: trip.from_location || trip.origin_location || 'Unknown',
+      destination: trip.to_location || trip.destination_location || 'Unknown',
+      date: trip.date || trip.travel_date || 'TBD',
       time: trip.pickup_time || trip.time || 'TBD',
-      passengers: trip.passenger_count || trip.passengers || 1,
-      price: trip.price || 0,
+      passengers: (trip.adults || 0) + (trip.children || 0) || trip.passenger_count || 1,
+      price: trip.final_price || trip.price || 0,
     }));
 
     // Calculate total
