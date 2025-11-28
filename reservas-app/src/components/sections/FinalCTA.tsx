@@ -182,7 +182,7 @@ export default function FinalCTA() {
             </div>
 
             {/* Right Column - Contact Form */}
-            <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-2xl overflow-hidden">
+            <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-2xl overflow-hidden notranslate" translate="no">
               <h3 className="text-2xl font-bold text-gray-900 mb-2">Send Us a Message</h3>
               <p className="text-gray-600 mb-6">Fill out the form and we'll get back to you soon</p>
 

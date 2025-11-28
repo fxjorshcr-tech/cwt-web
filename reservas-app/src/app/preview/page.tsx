@@ -300,7 +300,7 @@ function PreviewPageContent() {
   // Render edit/add form
   function renderEditForm(isNewTrip: boolean) {
     return (
-      <div className="p-5 space-y-4 relative" style={{ minHeight: '320px' }}>
+      <div className="p-5 space-y-4 relative notranslate" style={{ minHeight: '320px' }} translate="no">
         <div className="grid sm:grid-cols-2 gap-4 relative z-30">
           {/* Origin */}
           <div className="relative z-40">
