@@ -110,8 +110,8 @@ export default function WhyChooseUs() {
               <div>
                 <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-1 sm:mb-2">Real Human Support</h3>
                 <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-                  Our bilingual team is available <strong>24/7 via WhatsApp, phone, 
-                  or email</strong> to assist you instantly with any changes or questions.
+                  Our bilingual team is ready to help <strong>via WhatsApp, phone,
+                  or email</strong> to assist you with any changes or questions.
                 </p>
               </div>
             </div>

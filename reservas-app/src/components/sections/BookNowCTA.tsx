@@ -31,7 +31,7 @@ export default function BookNowCTA() {
             <ArrowDown className="h-5 w-5 animate-bounce" />
           </button>
           <p className="text-sm text-orange-100 mt-6">
-            ✓ Instant confirmation  •  ✓ 24/7 support  •  ✓ Free cancellation up to 48hrs
+            ✓ Instant confirmation  •  ✓ Dedicated support  •  ✓ Free cancellation up to 48hrs
           </p>
         </div>
       </div>

@@ -148,8 +148,8 @@ export default function VisualProof() {
               <p className="text-gray-300">Vehicles with A/C</p>
             </div>
             <div>
-              <p className="text-4xl font-bold text-blue-400 mb-2">24/7</p>
-              <p className="text-gray-300">Service Available</p>
+              <p className="text-4xl font-bold text-blue-400 mb-2">5★</p>
+              <p className="text-gray-300">Rated Service</p>
             </div>
           </div>
         </div>
