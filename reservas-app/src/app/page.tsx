@@ -215,11 +215,10 @@ export default async function Home() {
         <section className="bg-white py-8 sm:py-10">
           <div className="container mx-auto px-4 sm:px-6 text-center max-w-3xl">
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
-              Welcome to Can't Wait Travel CR
+              Can't Wait to Explore Costa Rica?
             </h2>
             <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
-              Discover over <span className="font-semibold text-blue-600">400+ routes</span> connecting Costa Rica's most popular destinations.
-              Book your private shuttle in seconds with instant confirmation.
+              Seamlessly book your private transfer connecting over <span className="font-semibold text-blue-600">400+ routes</span>.
             </p>
           </div>
         </section>
