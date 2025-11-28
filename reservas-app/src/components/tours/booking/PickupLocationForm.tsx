@@ -19,7 +19,7 @@ export function PickupLocationForm({
   onSpecialRequestsChange,
 }: PickupLocationFormProps) {
   return (
-    <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-200">
+    <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-200 notranslate" translate="no">
       <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
         <MapPin className="h-5 w-5 text-blue-600" />
         Pickup Location

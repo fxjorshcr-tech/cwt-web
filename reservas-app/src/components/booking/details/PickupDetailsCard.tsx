@@ -38,7 +38,7 @@ export function PickupDetailsCard({
   onPickupTimeChange,
 }: PickupDetailsCardProps) {
   return (
-    <Card>
+    <Card className="notranslate" translate="no">
       <CardHeader className="pb-4">
         <CardTitle className="text-base md:text-lg">Pickup Details</CardTitle>
         <CardDescription className="text-xs md:text-sm flex items-center gap-2 flex-wrap">
