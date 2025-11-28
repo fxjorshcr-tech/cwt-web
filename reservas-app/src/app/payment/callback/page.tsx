@@ -61,7 +61,55 @@ function PaymentCallbackContent() {
         // Check if payment was successful
         const isApproved = code === '1';
 
-        // Save payment status to database
+        // Determine payment status for logging
+        let paymentStatus: 'approved' | 'rejected' | 'error' | 'cancelled' = 'rejected';
+        if (isApproved) {
+          paymentStatus = 'approved';
+        } else if (code === '0' || code === '') {
+          paymentStatus = 'cancelled';
+        } else if (code === '-1' || code === '99') {
+          paymentStatus = 'error';
+        }
+
+        // Log payment result to payment_logs table
+        if (bookingId) {
+          try {
+            const logResponse = await fetch('/api/payment/log', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                bookingId,
+                status: paymentStatus,
+                amount: 0, // Amount is stored in the initiated log
+                tripIds,
+                tilopayTransactionId: transactionId,
+                tilopayAuthCode: authCode,
+                tilopayCode: code,
+                tilopayDescription: description,
+                tilopayOrderId: orderId,
+                tilopayOrderHash: orderHash,
+                rawResponse: {
+                  code,
+                  description,
+                  auth: authCode,
+                  order: orderId,
+                  transactionId,
+                  orderHash,
+                  returnData: returnDataEncoded,
+                  allParams: Object.fromEntries(searchParams.entries()),
+                },
+              }),
+            });
+
+            const logData = await logResponse.json();
+            console.log('Payment logged:', logData);
+          } catch (err) {
+            console.error('Failed to log payment:', err);
+            // Don't block the user flow if logging fails
+          }
+        }
+
+        // Save payment status to trips table
         if (bookingId) {
           try {
             const response = await fetch('/api/payment/update-status', {
