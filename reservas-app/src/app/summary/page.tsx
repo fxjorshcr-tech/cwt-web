@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import BookingStepper from '@/components/booking/BookingStepper';
 import FAQModal from '@/components/booking/FAQModal';
+import CustomerInfoModal, { CustomerInfo } from '@/components/payment/CustomerInfoModal';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from 'sonner';
 
@@ -108,6 +109,8 @@ function SummaryPageContent() {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
   const [showFAQModal, setShowFAQModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [isSavingToSupabase, setIsSavingToSupabase] = useState(false);
 
@@ -325,23 +328,80 @@ function SummaryPageContent() {
     router.push('/transfers');
   };
 
-  // ✅ HANDLE PAY NOW - Guardar en Supabase primero
+  // ✅ HANDLE PAY NOW - Mostrar modal de información del cliente
   const handlePayNow = async () => {
     if (!termsAccepted) {
       toast.error('Please accept the terms and conditions');
       return;
     }
 
-    // Guardar en Supabase
+    // Guardar en Supabase primero
     const saved = await saveBookingToSupabase();
 
     if (!saved) {
       return; // Si falla, no continuar
     }
 
-    // ✅ TODO: Integrar con WeTravel
-    toast.info('WeTravel payment integration - Coming soon!');
-    // Aquí irá la integración con WeTravel usando los IDs reales de Supabase
+    // Mostrar modal para capturar información del cliente
+    setShowPaymentModal(true);
+  };
+
+  // ✅ HANDLE TILOPAY PAYMENT - Procesar pago con Tilopay
+  const handleTilopayPayment = async (customerInfo: CustomerInfo) => {
+    setIsProcessingPayment(true);
+
+    try {
+      // Guardar información del cliente en Supabase
+      const { error: updateError } = await supabase
+        .from('trips')
+        .update({
+          customer_first_name: customerInfo.firstName,
+          customer_last_name: customerInfo.lastName,
+          customer_email: customerInfo.email,
+          customer_phone: customerInfo.phone,
+          customer_country: customerInfo.country,
+        })
+        .eq('booking_id', bookingId);
+
+      if (updateError) {
+        console.error('Error updating customer info:', updateError);
+      }
+
+      // Calcular el total con fees
+      const subtotal = trips.reduce((sum, trip) => sum + (trip.final_price || trip.price), 0);
+      const fees = subtotal * PRICING_CONFIG.FEES_PERCENTAGE;
+      const totalWithFees = subtotal + fees;
+
+      // Llamar a la API de Tilopay
+      const response = await fetch('/api/tilopay/create-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bookingId,
+          amount: totalWithFees,
+          currency: 'USD',
+          tripIds: trips.map(t => t.id),
+          customerInfo,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to create payment');
+      }
+
+      // Redirigir a Tilopay
+      if (data.paymentUrl) {
+        window.location.href = data.paymentUrl;
+      } else {
+        throw new Error('No payment URL received');
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      toast.error('Failed to process payment. Please try again.');
+      setIsProcessingPayment(false);
+    }
   };
 
   if (loading) {
@@ -445,6 +505,17 @@ function SummaryPageContent() {
     <>
       <BookingNavbar />
       <FAQModal isOpen={showFAQModal} onClose={() => setShowFAQModal(false)} />
+      <CustomerInfoModal
+        isOpen={showPaymentModal}
+        onClose={() => {
+          if (!isProcessingPayment) {
+            setShowPaymentModal(false);
+          }
+        }}
+        onSubmit={handleTilopayPayment}
+        totalAmount={grandTotal}
+        isProcessing={isProcessingPayment}
+      />
 
       <section className="relative h-40 sm:h-48 md:h-56 w-full overflow-hidden">
         <Image
