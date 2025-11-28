@@ -76,7 +76,7 @@ export function PassengerSelector({
   };
 
   return (
-    <div ref={containerRef} className={`relative ${className}`}>
+    <div ref={containerRef} className={`relative notranslate ${className}`} translate="no">
       {label && (
         <label className="block text-sm font-medium text-gray-700 mb-2">
           {label}

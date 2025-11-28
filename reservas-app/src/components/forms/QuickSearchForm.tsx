@@ -182,7 +182,7 @@ export function QuickSearchForm({
 
   if (isLoadingRoutes) {
     return (
-      <div className={`bg-white rounded-2xl shadow-xl overflow-visible ${className}`}>
+      <div className={`bg-white rounded-2xl shadow-xl overflow-visible notranslate ${className}`} translate="no">
         {/* Same header as the form */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-5 py-4 rounded-t-2xl">
           <h2 className="text-white font-bold text-lg text-center">Get an Instant Quote</h2>
@@ -212,7 +212,7 @@ export function QuickSearchForm({
   // Show error state if routes failed to load
   if (routes.length === 0 && error) {
     return (
-      <div className={`bg-white rounded-2xl shadow-xl p-6 ${className}`}>
+      <div className={`bg-white rounded-2xl shadow-xl p-6 notranslate ${className}`} translate="no">
         <div className="flex flex-col items-center justify-center gap-4 py-8">
           <AlertCircle className="h-10 w-10 text-red-500" />
           <p className="text-gray-600 text-center">{error}</p>
@@ -230,7 +230,8 @@ export function QuickSearchForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className={`bg-white rounded-2xl shadow-xl overflow-visible ${className}`}
+      className={`bg-white rounded-2xl shadow-xl overflow-visible notranslate ${className}`}
+      translate="no"
     >
       {/* Title */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-5 py-4 rounded-t-2xl">
