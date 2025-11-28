@@ -178,7 +178,7 @@ export function OrderSummaryCard({
               <div className="relative group">
                 <Info className="h-3.5 w-3.5 text-gray-400 cursor-help" />
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block w-56 p-2.5 bg-gray-900 text-white text-xs rounded-lg shadow-lg z-50">
-                  <p>Includes payment processing, booking management, and 24/7 customer support.</p>
+                  <p>Includes payment processing, booking management, and dedicated customer support.</p>
                   <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900"></div>
                 </div>
               </div>

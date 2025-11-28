@@ -134,7 +134,7 @@ export default function ContactPage() {
             </h1>
 
             <p className="text-base sm:text-lg md:text-xl text-white/95 max-w-2xl drop-shadow-lg">
-              Questions about your transfer? Need help planning your trip? We're available 24/7
+              Questions about your transfer? Need help planning your trip? We're here to help!
             </p>
           </div>
         </section>

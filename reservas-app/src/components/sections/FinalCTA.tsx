@@ -146,7 +146,7 @@ export default function FinalCTA() {
                   <p className="font-bold text-gray-900 mb-1 text-lg">Phone</p>
                   <p className="text-sm text-gray-600 mb-2">+506-8596-2438</p>
                   <p className="text-sm text-blue-600 font-semibold">
-                    24/7 available
+                    Call us anytime
                   </p>
                 </div>
               </div>
@@ -176,7 +176,7 @@ export default function FinalCTA() {
               <div className="flex items-center gap-3 text-white">
                 <Clock className="h-5 w-5 flex-shrink-0" />
                 <p className="text-sm font-medium">
-                  We operate 24/7, every day of the year
+                  Fast response time - We're here to help!
                 </p>
               </div>
             </div>
@@ -312,7 +312,7 @@ export default function FinalCTA() {
               </button>
 
               <p className="text-xs text-gray-500 text-center">
-                We typically respond within 2 hours during business hours
+                We typically respond within 2 hours
               </p>
             </form>
           </div>

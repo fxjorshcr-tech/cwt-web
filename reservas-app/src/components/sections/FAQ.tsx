@@ -111,7 +111,7 @@ export default function FAQ() {
             Still Have Questions?
           </h3>
           <p className="text-gray-700 mb-4">
-            Our team is available 24/7 to help with your Costa Rica travel plans
+            Our team is ready to help with your Costa Rica travel plans
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <a

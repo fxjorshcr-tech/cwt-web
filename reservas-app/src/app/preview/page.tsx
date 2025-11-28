@@ -656,8 +656,8 @@ function PreviewPageContent() {
               <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-2 sm:mb-3">
                 <Headphones className="h-5 w-5 sm:h-6 sm:w-6 text-orange-600" />
               </div>
-              <h3 className="font-bold text-gray-900 text-xs sm:text-sm">24/7 Support</h3>
-              <p className="text-[10px] sm:text-xs text-gray-500 mt-1 hidden sm:block">Always available</p>
+              <h3 className="font-bold text-gray-900 text-xs sm:text-sm">Dedicated Support</h3>
+              <p className="text-[10px] sm:text-xs text-gray-500 mt-1 hidden sm:block">Here to help</p>
             </div>
           </div>
         </div>
