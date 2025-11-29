@@ -17,6 +17,7 @@ export interface BookingEmailData {
     price: number;
     pickupAddress?: string | null;
     dropoffAddress?: string | null;
+    voucherNumber?: string | null;
   }>;
   totalAmount: number;
   transactionId?: string;
@@ -26,28 +27,34 @@ export interface BookingEmailData {
 export async function sendBookingConfirmationEmail(data: BookingEmailData): Promise<boolean> {
   const { customerEmail, customerName, bookingId, trips, totalAmount, transactionId, authCode } = data;
 
-  // Generate trip details HTML with pickup/dropoff addresses
+  // Generate trip details HTML with pickup/dropoff addresses and voucher
   const tripDetailsHtml = trips.map((trip, index) => `
-    <div style="background: #f8f9fa; border-radius: 8px; padding: 16px; margin-bottom: 12px;">
-      <h3 style="margin: 0 0 12px 0; color: #1a365d; font-size: 16px;">
-        ${trips.length > 1 ? `Trip ${index + 1}: ` : ''}${trip.origin} → ${trip.destination}
-      </h3>
+    <div style="background: #f8f9fa; border-radius: 8px; padding: 16px; margin-bottom: 12px; border-left: 4px solid #3b82f6;">
+      <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+        <h3 style="margin: 0; color: #1a365d; font-size: 16px;">
+          ${trips.length > 1 ? `Trip ${index + 1}: ` : ''}${trip.origin} → ${trip.destination}
+        </h3>
+        <span style="font-weight: 600; color: #3b82f6;">$${trip.price.toFixed(2)}</span>
+      </div>
+      ${trip.voucherNumber ? `
+      <div style="margin-bottom: 12px;">
+        <span style="font-size: 11px; color: #6b7280; font-family: monospace; background: #e5e7eb; padding: 4px 8px; border-radius: 4px;">
+          Voucher: ${trip.voucherNumber}
+        </span>
+      </div>
+      ` : ''}
       <table style="width: 100%; font-size: 14px;">
         <tr>
-          <td style="color: #666; padding: 4px 0;">Date:</td>
+          <td style="color: #666; padding: 4px 0;">📅 Date:</td>
           <td style="text-align: right; font-weight: 500;">${trip.date}</td>
         </tr>
         <tr>
-          <td style="color: #666; padding: 4px 0;">Pickup Time:</td>
+          <td style="color: #666; padding: 4px 0;">⏰ Pickup Time:</td>
           <td style="text-align: right; font-weight: 500;">${trip.time}</td>
         </tr>
         <tr>
-          <td style="color: #666; padding: 4px 0;">Passengers:</td>
+          <td style="color: #666; padding: 4px 0;">👥 Passengers:</td>
           <td style="text-align: right; font-weight: 500;">${trip.passengers}</td>
-        </tr>
-        <tr>
-          <td style="color: #666; padding: 4px 0;">Price:</td>
-          <td style="text-align: right; font-weight: 500;">$${trip.price.toFixed(2)}</td>
         </tr>
       </table>
       ${trip.pickupAddress || trip.dropoffAddress ? `

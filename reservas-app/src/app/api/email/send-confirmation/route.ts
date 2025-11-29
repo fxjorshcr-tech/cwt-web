@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Format trips for email
+    // Format trips for email - include voucher numbers
     const formattedTrips = trips.map(trip => ({
       origin: trip.from_location || trip.origin_location || 'Unknown',
       destination: trip.to_location || trip.destination_location || 'Unknown',
@@ -69,10 +69,11 @@ export async function POST(request: NextRequest) {
       price: trip.final_price || trip.price || 0,
       pickupAddress: trip.pickup_address || null,
       dropoffAddress: trip.dropoff_address || null,
+      voucherNumber: trip.voucher_number || null,
     }));
 
-    // Format booking ID for display (e.g., "BOOK-...-YQ9MQ5VI" -> "CWT000XXX")
-    const formattedBookingId = formatBookingId(bookingId);
+    // Use booking_number from database if available, otherwise format the old booking ID
+    const formattedBookingId = firstTrip.booking_number || formatBookingId(bookingId);
 
     // Calculate total
     const totalAmount = formattedTrips.reduce((sum, trip) => sum + trip.price, 0);

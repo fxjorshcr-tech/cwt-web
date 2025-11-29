@@ -1,6 +1,11 @@
 // src/app/api/payment/update-status/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import {
+  generateBookingNumber,
+  generateShuttleVoucher,
+  generateTourVoucher,
+} from '@/lib/booking-numbers';
 
 // Create Supabase client for server-side operations
 const supabase = createClient(
@@ -40,6 +45,16 @@ export async function POST(request: NextRequest) {
     });
 
     if (bookingType === 'tour') {
+      // Generate booking number and voucher for approved payments
+      let bookingNumber: string | null = null;
+      let voucherNumber: string | null = null;
+
+      if (paymentStatus === 'approved') {
+        bookingNumber = await generateBookingNumber();
+        voucherNumber = generateTourVoucher(bookingNumber, 1);
+        console.log('[Payment] Generated tour booking number:', bookingNumber, 'voucher:', voucherNumber);
+      }
+
       // Update tour_bookings table for tour bookings
       const { data, error } = await supabase
         .from('tour_bookings')
@@ -51,6 +66,8 @@ export async function POST(request: NextRequest) {
           payment_code: paymentCode || null,
           payment_description: paymentDescription || null,
           payment_date: paymentStatus === 'approved' ? new Date().toISOString() : null,
+          ...(bookingNumber && { booking_number: bookingNumber }),
+          ...(voucherNumber && { voucher_number: voucherNumber }),
         })
         .eq('booking_id', bookingId)
         .select();
@@ -80,8 +97,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         updatedTours: data?.length || 0,
+        bookingNumber,
+        voucherNumber,
       });
     }
+
+    // Generate booking number for approved shuttle payments
+    let bookingNumber: string | null = null;
+
+    if (paymentStatus === 'approved') {
+      bookingNumber = await generateBookingNumber();
+      console.log('[Payment] Generated shuttle booking number:', bookingNumber);
+    }
+
+    // First, get all trips to assign individual vouchers
+    const { data: existingTrips } = await supabase
+      .from('trips')
+      .select('id')
+      .eq('booking_id', bookingId)
+      .order('created_at', { ascending: true });
 
     // Update all trips for this booking with payment info (shuttles)
     const { data, error } = await supabase
@@ -93,6 +127,7 @@ export async function POST(request: NextRequest) {
         payment_code: paymentCode || null,
         payment_description: paymentDescription || null,
         payment_date: paymentStatus === 'approved' ? new Date().toISOString() : null,
+        ...(bookingNumber && { booking_number: bookingNumber }),
       })
       .eq('booking_id', bookingId)
       .select();
@@ -117,11 +152,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Assign individual vouchers to each trip
+    const voucherNumbers: string[] = [];
+    if (bookingNumber && existingTrips && existingTrips.length > 0) {
+      for (let i = 0; i < existingTrips.length; i++) {
+        const voucherNumber = generateShuttleVoucher(bookingNumber, i + 1);
+        voucherNumbers.push(voucherNumber);
+
+        await supabase
+          .from('trips')
+          .update({ voucher_number: voucherNumber })
+          .eq('id', existingTrips[i].id);
+      }
+      console.log('[Payment] Assigned vouchers:', voucherNumbers);
+    }
+
     console.log('[Payment] Successfully updated', data?.length || 0, 'trips');
 
     return NextResponse.json({
       success: true,
       updatedTrips: data?.length || 0,
+      bookingNumber,
+      voucherNumbers,
     });
   } catch (error) {
     console.error('[Payment] Error in update-status:', error);
