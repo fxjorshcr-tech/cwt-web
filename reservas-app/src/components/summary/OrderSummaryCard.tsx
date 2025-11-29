@@ -1,9 +1,9 @@
 // src/components/summary/OrderSummaryCard.tsx
 // Botón "Proceed to Checkout" para ir a la página de pago
+// Sin checkbox de términos - eso está en la página de checkout
 import { ArrowLeft, ShoppingCart, Moon, Sparkles, ArrowRight, Info, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import TermsCheckbox from '@/components/booking/TermsCheckbox';
 import { formatCurrency } from '@/lib/formatters';
 
 interface Trip {
@@ -18,10 +18,8 @@ interface OrderSummaryCardProps {
   trips: Trip[];
   totalPassengers: number;
   grandTotal: number;
-  termsAccepted: boolean;
   feesPercentage: number;
   isSaving?: boolean;
-  onTermsChange: (checked: boolean) => void;
   onProceedToCheckout: () => void;
   onAddToCart: () => void;
   onBackToDetails: () => void;
@@ -41,10 +39,8 @@ export function OrderSummaryCard({
   trips,
   totalPassengers,
   grandTotal,
-  termsAccepted,
   feesPercentage,
   isSaving = false,
-  onTermsChange,
   onProceedToCheckout,
   onAddToCart,
   onBackToDetails,
@@ -202,13 +198,11 @@ export function OrderSummaryCard({
           </div>
         </div>
 
-        {/* Terms & Actions */}
+        {/* Actions - Sin checkbox de términos */}
         <div className="space-y-2.5">
-          <TermsCheckbox checked={termsAccepted} onChange={onTermsChange} error={false} />
-
           <Button
             onClick={onProceedToCheckout}
-            disabled={!termsAccepted || isSaving}
+            disabled={isSaving}
             className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSaving ? (

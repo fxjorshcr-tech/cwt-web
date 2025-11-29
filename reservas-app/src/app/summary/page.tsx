@@ -106,7 +106,6 @@ function SummaryPageContent() {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
   const [showFAQModal, setShowFAQModal] = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(false);
   const [isSavingToSupabase, setIsSavingToSupabase] = useState(false);
 
   if (!bookingId) {
@@ -325,11 +324,6 @@ function SummaryPageContent() {
 
   // HANDLE PROCEED TO CHECKOUT - Guardar en Supabase y navegar a checkout
   const handleProceedToCheckout = async () => {
-    if (!termsAccepted) {
-      toast.error('Please accept the terms and conditions');
-      return;
-    }
-
     // Guardar en Supabase
     const saved = await saveBookingToSupabase();
 
@@ -501,10 +495,8 @@ function SummaryPageContent() {
                     trips={trips}
                     totalPassengers={totalPassengers}
                     grandTotal={grandTotal}
-                    termsAccepted={termsAccepted}
                     feesPercentage={PRICING_CONFIG.FEES_PERCENTAGE}
                     isSaving={isSavingToSupabase}
-                    onTermsChange={setTermsAccepted}
                     onProceedToCheckout={handleProceedToCheckout}
                     onAddToCart={handleAddToCartAndContinue}
                     onBackToDetails={() => {

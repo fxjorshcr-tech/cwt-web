@@ -1,16 +1,17 @@
 // src/app/payment/callback/page.tsx
-// Callback de Tilopay - SOLO procesa, envía mensaje y CIERRA
-// NO muestra ninguna confirmación - solo "Cerrando..."
+// Callback de Tilopay - procesa el resultado y REDIRIGE a confirmación
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { Loader2, X } from 'lucide-react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { Loader2, XCircle, Home } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 function PaymentCallbackContent() {
   const searchParams = useSearchParams();
-  // Solo 2 estados: procesando o intentando cerrar
-  const [status, setStatus] = useState<'processing' | 'closing'>('processing');
+  const router = useRouter();
+  const [status, setStatus] = useState<'processing' | 'redirecting' | 'failed'>('processing');
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     async function processPaymentCallback() {
@@ -56,141 +57,154 @@ function PaymentCallbackContent() {
           paymentStatus = 'error';
         }
 
-        // SIEMPRE intentar enviar mensaje al padre, incluso si opener parece null
-        // Algunos browsers pierden la referencia pero el mensaje aún puede llegar
-        const messageData = {
-          type: 'PAYMENT_COMPLETE',
-          success: approved,
-          transactionId,
-          authCode,
-          bookingId,
-          code,
-          description,
-        };
+        console.log('[Callback] Payment result:', { code, approved, bookingId, transactionId });
 
-        console.log('[Callback] Attempting to send message to parent:', messageData);
-
-        // Intentar múltiples métodos para enviar el mensaje
-        try {
-          if (window.opener && !window.opener.closed) {
-            window.opener.postMessage(messageData, '*');
-            console.log('[Callback] Message sent via window.opener');
-          }
-        } catch (e) {
-          console.log('[Callback] window.opener failed:', e);
-        }
-
-        try {
-          if (window.parent && window.parent !== window) {
-            window.parent.postMessage(messageData, '*');
-            console.log('[Callback] Message sent via window.parent');
-          }
-        } catch (e) {
-          console.log('[Callback] window.parent failed:', e);
-        }
-
-        // También intentar broadcast
-        try {
-          const bc = new BroadcastChannel('payment_channel');
-          bc.postMessage(messageData);
-          bc.close();
-          console.log('[Callback] Message sent via BroadcastChannel');
-        } catch (e) {
-          console.log('[Callback] BroadcastChannel failed:', e);
-        }
-
-        // Procesar el backend (sin bloquear)
+        // Procesar el backend
         if (bookingId) {
           // Log payment result
-          fetch('/api/payment/log', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              bookingId,
-              status: paymentStatus,
-              amount: 0,
-              tripIds,
-              tilopayTransactionId: transactionId,
-              tilopayAuthCode: authCode,
-              tilopayCode: code,
-              tilopayDescription: description,
-              tilopayOrderId: orderId,
-              tilopayOrderHash: orderHash,
-            }),
-          }).catch(err => console.error('Failed to log payment:', err));
+          try {
+            await fetch('/api/payment/log', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                bookingId,
+                status: paymentStatus,
+                amount: 0,
+                tripIds,
+                tilopayTransactionId: transactionId,
+                tilopayAuthCode: authCode,
+                tilopayCode: code,
+                tilopayDescription: description,
+                tilopayOrderId: orderId,
+                tilopayOrderHash: orderHash,
+              }),
+            });
+          } catch (err) {
+            console.error('Failed to log payment:', err);
+          }
 
           // Update payment status
-          fetch('/api/payment/update-status', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              bookingId,
-              paymentStatus: approved ? 'approved' : 'rejected',
-              transactionId,
-              authCode,
-              paymentCode: code,
-              paymentDescription: description,
-            }),
-          }).catch(err => console.error('Failed to update payment status:', err));
+          try {
+            await fetch('/api/payment/update-status', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                bookingId,
+                paymentStatus: approved ? 'approved' : 'rejected',
+                transactionId,
+                authCode,
+                paymentCode: code,
+                paymentDescription: description,
+              }),
+            });
+          } catch (err) {
+            console.error('Failed to update payment status:', err);
+          }
+
+          // Enviar email de confirmación si el pago fue aprobado
+          if (approved) {
+            try {
+              console.log('[Callback] Sending confirmation email for:', bookingId);
+              await fetch('/api/email/send-confirmation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  bookingId,
+                  transactionId,
+                  authCode,
+                }),
+              });
+              console.log('[Callback] Email sent');
+            } catch (err) {
+              console.error('Failed to send confirmation email:', err);
+            }
+          }
         }
 
-        // Cambiar a estado "cerrando" inmediatamente
-        setStatus('closing');
-
-        // Intentar cerrar la ventana múltiples veces
-        const tryClose = () => {
-          try {
-            window.close();
-          } catch (e) {
-            console.log('[Callback] window.close failed:', e);
-          }
-        };
-
-        // Intentar cerrar inmediatamente
-        tryClose();
-        // Intentar de nuevo después de 100ms
-        setTimeout(tryClose, 100);
-        // Y otra vez después de 500ms
-        setTimeout(tryClose, 500);
-        // Y una última vez después de 1 segundo
-        setTimeout(tryClose, 1000);
+        // Si el pago fue exitoso, redirigir a confirmación
+        if (approved && bookingId) {
+          setStatus('redirecting');
+          // Pequeño delay para mostrar el mensaje
+          setTimeout(() => {
+            router.push(`/confirmation?booking_id=${bookingId}`);
+          }, 500);
+        } else {
+          // Pago fallido - mostrar error
+          setErrorMessage(description || 'Payment was not approved. Please try again.');
+          setStatus('failed');
+        }
 
       } catch (err) {
         console.error('Error processing payment callback:', err);
-        // Aún así intentar cerrar
-        setStatus('closing');
-        setTimeout(() => {
-          try { window.close(); } catch (e) { /* ignore */ }
-        }, 100);
+        setStatus('failed');
+        setErrorMessage('Error processing payment. Please contact support.');
       }
     }
 
     processPaymentCallback();
-  }, [searchParams]);
+  }, [searchParams, router]);
 
-  // Siempre mostrar UI mínima - solo "Cerrando..." o botón para cerrar manualmente
+  // Procesando
+  if (status === 'processing') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="text-center p-8">
+          <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
+          <p className="text-gray-600 font-medium">Processing your payment...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Redirigiendo a confirmación
+  if (status === 'redirecting') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="text-center p-8">
+          <Loader2 className="h-12 w-12 animate-spin text-green-600 mx-auto mb-4" />
+          <p className="text-green-600 font-bold text-lg">Payment Successful!</p>
+          <p className="text-gray-500 text-sm mt-2">Redirecting to confirmation...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Pago fallido
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white">
-      <div className="text-center p-8">
-        {status === 'processing' ? (
-          <>
-            <Loader2 className="h-8 w-8 animate-spin text-gray-400 mx-auto mb-3" />
-            <p className="text-gray-500 text-sm">Processing...</p>
-          </>
-        ) : (
-          <>
-            <Loader2 className="h-8 w-8 animate-spin text-gray-400 mx-auto mb-3" />
-            <p className="text-gray-500 text-sm mb-4">Closing...</p>
-            <button
-              onClick={() => {
-                try { window.close(); } catch(e) { /* ignore */ }
-              }}
-              className="text-blue-600 hover:text-blue-700 text-sm underline"
-            >
-              Click here if window doesn't close
-            </button>
-          </>
-        )}
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="text-center p-8 max-w-md mx-4">
+        <XCircle className="h-20 w-20 text-red-500 mx-auto mb-6" />
+        <h1 className="text-2xl font-bold text-red-600 mb-4">Payment Failed</h1>
+        <p className="text-gray-600 mb-8">
+          {errorMessage}
+        </p>
+        <div className="space-y-3">
+          <Button
+            onClick={() => router.back()}
+            className="w-full"
+          >
+            Try Again
+          </Button>
+          <Button
+            onClick={() => router.push('/')}
+            variant="outline"
+            className="w-full"
+          >
+            <Home className="h-4 w-4 mr-2" />
+            Return Home
+          </Button>
+        </div>
+        <p className="text-sm text-gray-500 mt-6">
+          Need help? Contact us on{' '}
+          <a
+            href="https://wa.me/50685962438"
+            className="text-green-600 font-semibold hover:underline"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            WhatsApp
+          </a>
+        </p>
       </div>
     </div>
   );
