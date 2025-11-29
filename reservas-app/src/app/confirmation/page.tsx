@@ -108,7 +108,7 @@ function ConfirmationPageContent() {
         const { data, error } = await supabase
           .from('trips')
           .select('*')
-          .eq('booking_id', bookingId)
+          .eq('booking_id', bookingId as string)
           .order('created_at', { ascending: true });
 
         if (error) throw error;
