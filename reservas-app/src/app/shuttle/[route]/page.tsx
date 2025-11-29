@@ -105,13 +105,13 @@ export default async function ShuttleRoutePage({ params }: { params: { route: st
         <section className="relative h-[50vh] min-h-[400px] max-h-[500px]">
           <div className="absolute inset-0 z-0">
             <Image
-              src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/aerial-view-conchal-beach.webp?width=1600&quality=70"
+              src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/aerial-view-conchal-beach.webp"
               alt={`Private Transfer from ${routeInfo.from} to ${routeInfo.to}`}
               fill
               sizes="100vw"
               className="object-cover"
               priority
-              quality={70}
+              
             />
             <div className="absolute inset-0 bg-black/60" />
           </div>

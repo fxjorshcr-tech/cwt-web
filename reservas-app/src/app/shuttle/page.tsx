@@ -122,13 +122,13 @@ export default async function MostBookedPage() {
         <section className="relative h-[50vh] min-h-[400px] max-h-[600px]">
           <div className="absolute inset-0 z-0">
             <Image
-              src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/aerial-view-conchal-beach.webp?width=1600&quality=70"
+              src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/aerial-view-conchal-beach.webp"
               alt="Costa Rica Private Transportation Routes"
               fill
               sizes="100vw"
               className="object-cover"
               priority
-              quality={70}
+              
             />
             {/* Darker overlay for better text contrast */}
             <div className="absolute inset-0 bg-black/60" />
