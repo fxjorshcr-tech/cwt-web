@@ -21,6 +21,7 @@ import {
   FAQSection,
   OrderSummaryCard,
 } from '@/components/summary';
+import { CartCheckoutModal } from '@/components/cart';
 
 import { formatDate, formatTime } from '@/lib/formatters';
 import { PRICING_CONFIG } from '@/lib/pricing-config';
@@ -99,7 +100,7 @@ function SummaryPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClient();
-  const { addItem } = useCart();
+  const { addItem, items: cartItems, itemCount: cartItemCount, totalAmount: cartTotal } = useCart();
 
   const bookingId = searchParams.get('booking_id');
 
@@ -107,6 +108,7 @@ function SummaryPageContent() {
   const [loading, setLoading] = useState(true);
   const [showFAQModal, setShowFAQModal] = useState(false);
   const [isSavingToSupabase, setIsSavingToSupabase] = useState(false);
+  const [showCartCheckoutModal, setShowCartCheckoutModal] = useState(false);
 
   if (!bookingId) {
     return (
@@ -324,15 +326,69 @@ function SummaryPageContent() {
 
   // HANDLE PROCEED TO CHECKOUT - Guardar en Supabase y navegar a checkout
   const handleProceedToCheckout = async () => {
+    // Check if there are items in cart - show modal to confirm
+    if (cartItemCount > 0) {
+      setShowCartCheckoutModal(true);
+      return;
+    }
+
+    // No cart items, proceed directly
+    await proceedToCheckoutOnly();
+  };
+
+  // Proceed to checkout with only current booking
+  const proceedToCheckoutOnly = async () => {
+    setShowCartCheckoutModal(false);
+
     // Guardar en Supabase
     const saved = await saveBookingToSupabase();
 
     if (!saved) {
-      return; // Si falla, no continuar
+      return;
     }
 
     // Navegar a la página de checkout
     router.push(`/checkout?booking_id=${bookingId}`);
+  };
+
+  // Add current booking to cart and proceed to checkout with all items
+  const proceedWithFullCart = async () => {
+    setShowCartCheckoutModal(false);
+
+    // Guardar en Supabase primero
+    const saved = await saveBookingToSupabase();
+
+    if (!saved) {
+      return;
+    }
+
+    // Agregar al carrito los trips actuales
+    trips.forEach((trip, index) => {
+      addItem({
+        type: 'shuttle',
+        id: trip.id,
+        bookingId: trip.booking_id,
+        fromLocation: trip.from_location,
+        toLocation: trip.to_location,
+        date: formatDate(trip.date),
+        pickupTime: formatTime(trip.pickup_time),
+        adults: trip.adults,
+        children: trip.children,
+        price: trip.price,
+        finalPrice: trip.final_price || trip.price,
+        tripNumber: trips.length > 1 ? index + 1 : undefined,
+        totalTrips: trips.length > 1 ? trips.length : undefined,
+      });
+    });
+
+    // Navegar a checkout (el checkout mostrará todo el carrito)
+    router.push('/checkout');
+  };
+
+  // Navigate to cart page
+  const handleViewCart = () => {
+    setShowCartCheckoutModal(false);
+    router.push('/cart');
   };
 
   if (loading) {
@@ -439,6 +495,17 @@ function SummaryPageContent() {
     <>
       <BookingNavbar />
       <FAQModal isOpen={showFAQModal} onClose={() => setShowFAQModal(false)} />
+      <CartCheckoutModal
+        isOpen={showCartCheckoutModal}
+        onClose={() => setShowCartCheckoutModal(false)}
+        cartItemCount={cartItemCount}
+        cartTotal={cartTotal}
+        currentBookingTotal={grandTotal * (1 + PRICING_CONFIG.FEES_PERCENTAGE)}
+        isLoading={isSavingToSupabase}
+        onPayAll={proceedWithFullCart}
+        onPayOnlyThis={proceedToCheckoutOnly}
+        onViewCart={handleViewCart}
+      />
 
       <section className="relative h-40 sm:h-48 md:h-56 w-full overflow-hidden">
         <Image
