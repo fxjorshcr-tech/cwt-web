@@ -48,10 +48,11 @@ export async function POST(request: NextRequest) {
             booking_number: bookingNumber,
             voucher_number: voucherNumber,
             payment_status: 'approved',
-            transaction_id: transactionId,
-            auth_code: authCode,
-            payment_code: paymentCode,
-            payment_description: paymentDescription,
+            payment_transaction_id: transactionId || null,
+            payment_auth_code: authCode || null,
+            payment_code: paymentCode || null,
+            payment_description: paymentDescription || null,
+            payment_date: new Date().toISOString(),
           })
           .eq('booking_id', shuttleBookingIds[i]);
 
@@ -73,10 +74,11 @@ export async function POST(request: NextRequest) {
           .update({
             booking_number: bookingNumber,
             voucher_number: voucherNumber,
-            status: 'approved',
+            status: 'confirmed',
             payment_status: 'approved',
-            transaction_id: transactionId,
-            auth_code: authCode,
+            payment_transaction_id: transactionId || null,
+            payment_auth_code: authCode || null,
+            payment_date: new Date().toISOString(),
           })
           .eq('id', tourIds[i]);
 

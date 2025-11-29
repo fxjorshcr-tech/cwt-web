@@ -149,85 +149,105 @@ function generateCartEmailHtml(data: EmailData): string {
 
   // Generate shuttles HTML
   const shuttlesHtml = shuttles.length > 0 ? `
-    <h3 style="color: #1a365d; font-size: 16px; margin: 24px 0 12px 0; display: flex; align-items: center; gap: 8px;">
-      🚐 Private Shuttles (${shuttles.length})
+    <h3 style="color: #1a365d; font-size: 16px; margin: 24px 0 12px 0;">
+      Private Shuttles (${shuttles.length})
     </h3>
     ${shuttles.map((shuttle, index) => `
-      <div style="background: #f8f9fa; border-radius: 8px; padding: 16px; margin-bottom: 12px; border-left: 4px solid #3b82f6;">
-        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
-          <div>
-            <p style="margin: 0; font-weight: 600; color: #1a365d; font-size: 15px;">
-              ${shuttle.from_location} → ${shuttle.to_location}
-            </p>
-            <p style="margin: 4px 0 0 0; font-size: 11px; color: #6b7280; font-family: monospace;">
-              Voucher: ${shuttle.voucher_number || `S${String(index + 1).padStart(2, '0')}`}
-            </p>
-          </div>
-          <span style="font-weight: 600; color: #3b82f6;">$${(shuttle.final_price || shuttle.price || 0).toFixed(2)}</span>
-        </div>
-        <table style="width: 100%; font-size: 13px; color: #4b5563;">
-          <tr>
-            <td style="padding: 2px 0;">📅 Date:</td>
-            <td style="text-align: right;">${shuttle.date}</td>
-          </tr>
-          <tr>
-            <td style="padding: 2px 0;">⏰ Pickup:</td>
-            <td style="text-align: right;">${shuttle.pickup_time || 'TBD'}</td>
-          </tr>
-          <tr>
-            <td style="padding: 2px 0;">👥 Passengers:</td>
-            <td style="text-align: right;">${(shuttle.adults || 0) + (shuttle.children || 0)}</td>
-          </tr>
-        </table>
-        ${shuttle.pickup_address ? `
-        <div style="margin-top: 8px; padding: 8px; background: #ecfdf5; border-radius: 6px;">
-          <p style="margin: 0; font-size: 11px; color: #059669; font-weight: 600;">PICKUP</p>
-          <p style="margin: 2px 0 0 0; font-size: 12px; color: #1f2937;">${shuttle.pickup_address}</p>
-        </div>
-        ` : ''}
-        ${shuttle.dropoff_address ? `
-        <div style="margin-top: 6px; padding: 8px; background: #eff6ff; border-radius: 6px;">
-          <p style="margin: 0; font-size: 11px; color: #2563eb; font-weight: 600;">DROPOFF</p>
-          <p style="margin: 2px 0 0 0; font-size: 12px; color: #1f2937;">${shuttle.dropoff_address}</p>
-        </div>
-        ` : ''}
-      </div>
+      <table style="width: 100%; background: #f8f9fa; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #3b82f6;" cellpadding="16" cellspacing="0">
+        <tr>
+          <td>
+            <table style="width: 100%;" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="font-weight: 600; color: #1a365d; font-size: 15px;">
+                  ${shuttle.from_location} &rarr; ${shuttle.to_location}
+                </td>
+                <td style="text-align: right; font-weight: 600; color: #3b82f6;">$${(shuttle.final_price || shuttle.price || 0).toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td colspan="2" style="padding-top: 4px; font-size: 11px; color: #6b7280; font-family: monospace;">
+                  Voucher: ${shuttle.voucher_number || `${bookingNumber}-S${String(index + 1).padStart(2, '0')}`}
+                </td>
+              </tr>
+            </table>
+            <table style="width: 100%; font-size: 13px; color: #4b5563; margin-top: 12px;" cellpadding="2" cellspacing="0">
+              <tr>
+                <td>Date:</td>
+                <td style="text-align: right;">${shuttle.date}</td>
+              </tr>
+              <tr>
+                <td>Pickup Time:</td>
+                <td style="text-align: right;">${shuttle.pickup_time || 'TBD'}</td>
+              </tr>
+              <tr>
+                <td>Passengers:</td>
+                <td style="text-align: right;">${(shuttle.adults || 0) + (shuttle.children || 0)}</td>
+              </tr>
+            </table>
+            ${shuttle.pickup_address ? `
+            <table style="width: 100%; margin-top: 8px; background: #ecfdf5; border-radius: 6px;" cellpadding="8" cellspacing="0">
+              <tr>
+                <td>
+                  <p style="margin: 0; font-size: 11px; color: #059669; font-weight: 600;">PICKUP ADDRESS</p>
+                  <p style="margin: 2px 0 0 0; font-size: 12px; color: #1f2937;">${shuttle.pickup_address}</p>
+                </td>
+              </tr>
+            </table>
+            ` : ''}
+            ${shuttle.dropoff_address ? `
+            <table style="width: 100%; margin-top: 6px; background: #eff6ff; border-radius: 6px;" cellpadding="8" cellspacing="0">
+              <tr>
+                <td>
+                  <p style="margin: 0; font-size: 11px; color: #2563eb; font-weight: 600;">DROPOFF ADDRESS</p>
+                  <p style="margin: 2px 0 0 0; font-size: 12px; color: #1f2937;">${shuttle.dropoff_address}</p>
+                </td>
+              </tr>
+            </table>
+            ` : ''}
+          </td>
+        </tr>
+      </table>
     `).join('')}
   ` : '';
 
   // Generate tours HTML
   const toursHtml = tours.length > 0 ? `
-    <h3 style="color: #1a365d; font-size: 16px; margin: 24px 0 12px 0; display: flex; align-items: center; gap: 8px;">
-      🎯 Private Tours (${tours.length})
+    <h3 style="color: #1a365d; font-size: 16px; margin: 24px 0 12px 0;">
+      Private Tours (${tours.length})
     </h3>
     ${tours.map((tour, index) => `
-      <div style="background: #f8f9fa; border-radius: 8px; padding: 16px; margin-bottom: 12px; border-left: 4px solid #22c55e;">
-        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
-          <div>
-            <p style="margin: 0; font-weight: 600; color: #1a365d; font-size: 15px;">
-              ${tour.tour_name}
-            </p>
-            <p style="margin: 4px 0 0 0; font-size: 11px; color: #6b7280; font-family: monospace;">
-              Voucher: ${tour.voucher_number || `T${String(index + 1).padStart(2, '0')}`}
-            </p>
-          </div>
-          <span style="font-weight: 600; color: #22c55e;">$${(tour.total_price || 0).toFixed(2)}</span>
-        </div>
-        <table style="width: 100%; font-size: 13px; color: #4b5563;">
-          <tr>
-            <td style="padding: 2px 0;">📅 Date:</td>
-            <td style="text-align: right;">${tour.date}</td>
-          </tr>
-          <tr>
-            <td style="padding: 2px 0;">👥 Passengers:</td>
-            <td style="text-align: right;">${(tour.adults || 0) + (tour.children || 0)}</td>
-          </tr>
-          <tr>
-            <td style="padding: 2px 0;">📍 Pickup:</td>
-            <td style="text-align: right;">${tour.hotel || 'TBD'}</td>
-          </tr>
-        </table>
-      </div>
+      <table style="width: 100%; background: #f8f9fa; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #22c55e;" cellpadding="16" cellspacing="0">
+        <tr>
+          <td>
+            <table style="width: 100%;" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="font-weight: 600; color: #1a365d; font-size: 15px;">
+                  ${tour.tour_name}
+                </td>
+                <td style="text-align: right; font-weight: 600; color: #22c55e;">$${(tour.total_price || 0).toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td colspan="2" style="padding-top: 4px; font-size: 11px; color: #6b7280; font-family: monospace;">
+                  Voucher: ${tour.voucher_number || `${bookingNumber}-T${String(index + 1).padStart(2, '0')}`}
+                </td>
+              </tr>
+            </table>
+            <table style="width: 100%; font-size: 13px; color: #4b5563; margin-top: 12px;" cellpadding="2" cellspacing="0">
+              <tr>
+                <td>Date:</td>
+                <td style="text-align: right;">${tour.date}</td>
+              </tr>
+              <tr>
+                <td>Passengers:</td>
+                <td style="text-align: right;">${(tour.adults || 0) + (tour.children || 0)}</td>
+              </tr>
+              <tr>
+                <td>Pickup Location:</td>
+                <td style="text-align: right;">${tour.hotel || 'TBD'}</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
     `).join('')}
   ` : '';
 
@@ -243,10 +263,14 @@ function generateCartEmailHtml(data: EmailData): string {
   <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
 
     <!-- Header -->
-    <div style="background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%); border-radius: 12px 12px 0 0; padding: 32px; text-align: center;">
-      <h1 style="color: white; margin: 0; font-size: 28px;">🎉 Booking Confirmed!</h1>
-      <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0;">Thank you for choosing Can't Wait Travel CR</p>
-    </div>
+    <table style="width: 100%; background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%); border-radius: 12px 12px 0 0;" cellpadding="32" cellspacing="0">
+      <tr>
+        <td style="text-align: center;">
+          <h1 style="color: white; margin: 0; font-size: 28px;">Booking Confirmed!</h1>
+          <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0;">Thank you for choosing Can't Wait Travel CR</p>
+        </td>
+      </tr>
+    </table>
 
     <!-- Main Content -->
     <div style="background: white; padding: 32px; border-radius: 0 0 12px 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
@@ -269,28 +293,28 @@ function generateCartEmailHtml(data: EmailData): string {
       ${toursHtml}
 
       <!-- Totals -->
-      <div style="margin-top: 24px; border-top: 2px solid #e5e7eb; padding-top: 16px;">
+      <table style="width: 100%; margin-top: 24px; border-top: 2px solid #e5e7eb; padding-top: 16px;" cellpadding="0" cellspacing="0">
         ${shuttles.length > 0 ? `
-        <div style="display: flex; justify-content: space-between; font-size: 14px; color: #4b5563; margin-bottom: 8px;">
-          <span>Shuttles Subtotal:</span>
-          <span>$${shuttleTotal.toFixed(2)}</span>
-        </div>
+        <tr>
+          <td style="font-size: 14px; color: #4b5563; padding-bottom: 8px;">Shuttles Subtotal:</td>
+          <td style="text-align: right; font-size: 14px; color: #4b5563; padding-bottom: 8px;">$${shuttleTotal.toFixed(2)}</td>
+        </tr>
         ` : ''}
         ${tours.length > 0 ? `
-        <div style="display: flex; justify-content: space-between; font-size: 14px; color: #4b5563; margin-bottom: 8px;">
-          <span>Tours Subtotal:</span>
-          <span>$${tourTotal.toFixed(2)}</span>
-        </div>
+        <tr>
+          <td style="font-size: 14px; color: #4b5563; padding-bottom: 8px;">Tours Subtotal:</td>
+          <td style="text-align: right; font-size: 14px; color: #4b5563; padding-bottom: 8px;">$${tourTotal.toFixed(2)}</td>
+        </tr>
         ` : ''}
-      </div>
+      </table>
 
       <!-- Grand Total -->
-      <div style="background: #1a365d; color: white; border-radius: 8px; padding: 16px; margin-top: 16px;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span style="font-size: 16px;">Total Paid:</span>
-          <span style="font-size: 28px; font-weight: bold;">$${grandTotal.toFixed(2)} USD</span>
-        </div>
-      </div>
+      <table style="width: 100%; background: #1a365d; border-radius: 8px; margin-top: 16px;" cellpadding="16" cellspacing="0">
+        <tr>
+          <td style="color: white; font-size: 16px;">Total Paid:</td>
+          <td style="text-align: right; color: white; font-size: 28px; font-weight: bold;">$${grandTotal.toFixed(2)} USD</td>
+        </tr>
+      </table>
 
       ${transactionId ? `
       <!-- Payment Details -->
@@ -315,41 +339,57 @@ function generateCartEmailHtml(data: EmailData): string {
 
       <!-- What's Next -->
       <h2 style="color: #1a365d; font-size: 18px;">What Happens Next?</h2>
-      <div style="margin-bottom: 16px;">
-        <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
-          <div style="width: 32px; height: 32px; background: #22c55e; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-            <span style="color: white; font-size: 16px;">✓</span>
-          </div>
-          <div>
+      <table style="width: 100%; margin-bottom: 16px;" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="width: 44px; vertical-align: top; padding-right: 12px; padding-bottom: 12px;">
+            <table style="width: 32px; height: 32px; background: #22c55e; border-radius: 16px;" cellpadding="0" cellspacing="0">
+              <tr><td style="text-align: center; color: white; font-weight: bold;">1</td></tr>
+            </table>
+          </td>
+          <td style="vertical-align: top; padding-bottom: 12px;">
             <p style="margin: 0; font-weight: 600; color: #166534;">Confirmation Email Sent</p>
             <p style="margin: 4px 0 0 0; font-size: 13px; color: #15803d;">Save this email with your booking reference and vouchers.</p>
-          </div>
-        </div>
-        <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
-          <div style="width: 32px; height: 32px; background: #f97316; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-            <span style="color: white; font-size: 14px;">📍</span>
-          </div>
-          <div>
+          </td>
+        </tr>
+        <tr>
+          <td style="width: 44px; vertical-align: top; padding-right: 12px;">
+            <table style="width: 32px; height: 32px; background: #f97316; border-radius: 16px;" cellpadding="0" cellspacing="0">
+              <tr><td style="text-align: center; color: white; font-weight: bold;">2</td></tr>
+            </table>
+          </td>
+          <td style="vertical-align: top;">
             <p style="margin: 0; font-weight: 600; color: #166534;">Day of Travel</p>
             <p style="margin: 4px 0 0 0; font-size: 13px; color: #15803d;">Be ready 10 minutes before your pickup time. Have a great trip!</p>
-          </div>
-        </div>
-      </div>
+          </td>
+        </tr>
+      </table>
 
       <!-- Contact -->
-      <div style="text-align: center; margin-top: 32px;">
-        <p style="color: #666; font-size: 14px;">Questions? Contact us:</p>
-        <a href="mailto:mybooking@cantwaittravelcr.com" style="color: #2563eb; text-decoration: none; font-weight: 500;">mybooking@cantwaittravelcr.com</a>
-        <span style="color: #999; margin: 0 8px;">|</span>
-        <a href="https://wa.me/50685962438" style="color: #22c55e; text-decoration: none; font-weight: 500;">WhatsApp</a>
-      </div>
+      <table style="width: 100%; margin-top: 32px;" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="text-align: center;">
+            <p style="color: #666; font-size: 14px; margin: 0 0 8px 0;">Questions? Contact us:</p>
+            <a href="mailto:mybooking@cantwaittravelcr.com" style="color: #2563eb; text-decoration: none; font-weight: 500;">mybooking@cantwaittravelcr.com</a>
+            <span style="color: #999; margin: 0 8px;">|</span>
+            <a href="https://wa.me/50685962438" style="color: #22c55e; text-decoration: none; font-weight: 500;">WhatsApp</a>
+          </td>
+        </tr>
+      </table>
 
       <!-- Animal Badge -->
-      <div style="text-align: center; margin-top: 24px; padding: 12px; background: linear-gradient(135deg, #fffbeb 0%, #fff7ed 100%); border-radius: 24px; border: 1px solid #fde68a;">
-        <span style="font-size: 16px;">🐕</span>
-        <span style="font-size: 12px; color: #92400e; font-weight: 500; margin: 0 4px;">🐾 We respect & love animals ❤️ 🐾</span>
-        <span style="font-size: 16px;">🐕</span>
-      </div>
+      <table style="width: 100%; margin-top: 24px;" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="text-align: center;">
+            <table style="background: linear-gradient(135deg, #fffbeb 0%, #fff7ed 100%); border-radius: 24px; border: 1px solid #fde68a; margin: 0 auto;" cellpadding="12" cellspacing="0">
+              <tr>
+                <td style="text-align: center; font-size: 12px; color: #92400e; font-weight: 500;">
+                  We respect &amp; love animals
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
     </div>
 
     <!-- Footer -->
