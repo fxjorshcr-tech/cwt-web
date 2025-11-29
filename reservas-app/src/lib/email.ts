@@ -15,6 +15,8 @@ export interface BookingEmailData {
     time: string;
     passengers: number;
     price: number;
+    pickupAddress?: string | null;
+    dropoffAddress?: string | null;
   }>;
   totalAmount: number;
   transactionId?: string;
@@ -24,7 +26,7 @@ export interface BookingEmailData {
 export async function sendBookingConfirmationEmail(data: BookingEmailData): Promise<boolean> {
   const { customerEmail, customerName, bookingId, trips, totalAmount, transactionId, authCode } = data;
 
-  // Generate trip details HTML
+  // Generate trip details HTML with pickup/dropoff addresses
   const tripDetailsHtml = trips.map((trip, index) => `
     <div style="background: #f8f9fa; border-radius: 8px; padding: 16px; margin-bottom: 12px;">
       <h3 style="margin: 0 0 12px 0; color: #1a365d; font-size: 16px;">
@@ -36,7 +38,7 @@ export async function sendBookingConfirmationEmail(data: BookingEmailData): Prom
           <td style="text-align: right; font-weight: 500;">${trip.date}</td>
         </tr>
         <tr>
-          <td style="color: #666; padding: 4px 0;">Time:</td>
+          <td style="color: #666; padding: 4px 0;">Pickup Time:</td>
           <td style="text-align: right; font-weight: 500;">${trip.time}</td>
         </tr>
         <tr>
@@ -48,6 +50,22 @@ export async function sendBookingConfirmationEmail(data: BookingEmailData): Prom
           <td style="text-align: right; font-weight: 500;">$${trip.price.toFixed(2)}</td>
         </tr>
       </table>
+      ${trip.pickupAddress || trip.dropoffAddress ? `
+      <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb;">
+        ${trip.pickupAddress ? `
+        <div style="background: #ecfdf5; border-radius: 6px; padding: 10px; margin-bottom: 8px;">
+          <p style="margin: 0; font-size: 11px; color: #059669; font-weight: 600; text-transform: uppercase;">Pickup Address</p>
+          <p style="margin: 4px 0 0 0; font-size: 13px; color: #1f2937;">${trip.pickupAddress}</p>
+        </div>
+        ` : ''}
+        ${trip.dropoffAddress ? `
+        <div style="background: #eff6ff; border-radius: 6px; padding: 10px;">
+          <p style="margin: 0; font-size: 11px; color: #2563eb; font-weight: 600; text-transform: uppercase;">Dropoff Address</p>
+          <p style="margin: 4px 0 0 0; font-size: 13px; color: #1f2937;">${trip.dropoffAddress}</p>
+        </div>
+        ` : ''}
+      </div>
+      ` : ''}
     </div>
   `).join('');
 
@@ -108,16 +126,52 @@ export async function sendBookingConfirmationEmail(data: BookingEmailData): Prom
 
       <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;">
 
-      <h2 style="color: #1a365d; font-size: 18px;">What's Next?</h2>
-      <ul style="color: #666; padding-left: 20px;">
-        <li>Our driver will contact you 24 hours before pickup</li>
-        <li>Please have your booking reference ready</li>
-        <li>Be ready 10 minutes before the scheduled time</li>
-      </ul>
+      <h2 style="color: #1a365d; font-size: 18px;">What Happens Next?</h2>
+
+      <div style="margin-bottom: 16px;">
+        <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+          <div style="width: 32px; height: 32px; background: #22c55e; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <span style="color: white; font-size: 16px;">✓</span>
+          </div>
+          <div>
+            <p style="margin: 0; font-weight: 600; color: #166534;">Confirmation Email Sent</p>
+            <p style="margin: 4px 0 0 0; font-size: 13px; color: #15803d;">Check your inbox for your booking details and receipt.</p>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+          <div style="width: 32px; height: 32px; background: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <span style="color: white; font-size: 14px;">✉</span>
+          </div>
+          <div>
+            <p style="margin: 0; font-weight: 600; color: #166534;">Need Assistance?</p>
+            <p style="margin: 4px 0 0 0; font-size: 13px; color: #15803d;">Contact us anytime at <a href="mailto:mybooking@cantwaittravelcr.com" style="color: #2563eb; font-weight: 600;">mybooking@cantwaittravelcr.com</a> or via <a href="https://wa.me/50685962438" style="color: #22c55e; font-weight: 600;">WhatsApp</a>.</p>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: flex-start; gap: 12px;">
+          <div style="width: 32px; height: 32px; background: #f97316; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <span style="color: white; font-size: 14px;">📍</span>
+          </div>
+          <div>
+            <p style="margin: 0; font-weight: 600; color: #166534;">Day of Travel</p>
+            <p style="margin: 4px 0 0 0; font-size: 13px; color: #15803d;">Be ready at your pickup location 10 minutes before scheduled time. Have a great trip!</p>
+          </div>
+        </div>
+      </div>
 
       <div style="text-align: center; margin-top: 32px;">
         <p style="color: #666; font-size: 14px;">Questions? Contact us at:</p>
         <a href="mailto:mybooking@cantwaittravelcr.com" style="color: #2563eb; text-decoration: none; font-weight: 500;">mybooking@cantwaittravelcr.com</a>
+        <span style="color: #999; margin: 0 8px;">|</span>
+        <a href="https://wa.me/50685962438" style="color: #22c55e; text-decoration: none; font-weight: 500;">WhatsApp</a>
+      </div>
+
+      <!-- Animal Love Badge -->
+      <div style="text-align: center; margin-top: 24px; padding: 12px; background: linear-gradient(135deg, #fffbeb 0%, #fff7ed 100%); border-radius: 24px; border: 1px solid #fde68a;">
+        <span style="font-size: 16px;">🐕</span>
+        <span style="font-size: 12px; color: #92400e; font-weight: 500; margin: 0 4px;">🐾 We respect & love animals ❤️ 🐾</span>
+        <span style="font-size: 16px;">🐕</span>
       </div>
     </div>
 

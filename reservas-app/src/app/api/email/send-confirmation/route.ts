@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendBookingConfirmationEmail, BookingEmailData } from '@/lib/email';
+import { formatBookingId } from '@/lib/formatters';
 
 // Create Supabase client for server-side operations
 const supabase = createClient(
@@ -66,7 +67,12 @@ export async function POST(request: NextRequest) {
       time: trip.pickup_time || trip.time || 'TBD',
       passengers: (trip.adults || 0) + (trip.children || 0) || trip.passenger_count || 1,
       price: trip.final_price || trip.price || 0,
+      pickupAddress: trip.pickup_address || null,
+      dropoffAddress: trip.dropoff_address || null,
     }));
+
+    // Format booking ID for display (e.g., "BOOK-...-YQ9MQ5VI" -> "CWT000XXX")
+    const formattedBookingId = formatBookingId(bookingId);
 
     // Calculate total
     const totalAmount = formattedTrips.reduce((sum, trip) => sum + trip.price, 0);
@@ -75,7 +81,7 @@ export async function POST(request: NextRequest) {
     const emailData: BookingEmailData = {
       customerEmail,
       customerName: customerName || 'Valued Customer',
-      bookingId,
+      bookingId: formattedBookingId, // Use formatted booking ID (CWT000XXX)
       trips: formattedTrips,
       totalAmount,
       transactionId,

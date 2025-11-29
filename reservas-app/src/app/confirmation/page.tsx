@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import BookingStepper from '@/components/booking/BookingStepper';
+import { useCart } from '@/contexts/CartContext';
 
 import { formatDate, formatTime, formatCurrency, formatBookingId } from '@/lib/formatters';
 
@@ -36,6 +37,7 @@ interface Trip {
 function ConfirmationPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { clearCart } = useCart();
 
   // Create supabase client once with useMemo to avoid recreation on every render
   const supabase = useMemo(() => createClient(), []);
@@ -44,6 +46,13 @@ function ConfirmationPageContent() {
 
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Clear cart when confirmation page loads successfully
+  useEffect(() => {
+    if (bookingId && trips.length > 0) {
+      clearCart();
+    }
+  }, [bookingId, trips.length, clearCart]);
 
   // Memoize the loadTrips function
   const loadTrips = useCallback(async () => {
@@ -306,10 +315,21 @@ function ConfirmationPageContent() {
                       </div>
                     </div>
                     
-                    {trip.pickup_address && (
-                      <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                        <p className="text-xs text-gray-500 mb-1">Pickup Address</p>
-                        <p className="text-sm font-medium">{trip.pickup_address}</p>
+                    {/* Pickup & Dropoff Addresses */}
+                    {(trip.pickup_address || trip.dropoff_address) && (
+                      <div className="mt-3 grid md:grid-cols-2 gap-3">
+                        {trip.pickup_address && (
+                          <div className="p-3 bg-green-50 rounded-lg border border-green-100">
+                            <p className="text-xs text-green-600 font-medium mb-1">Pickup Address</p>
+                            <p className="text-sm font-medium text-gray-800">{trip.pickup_address}</p>
+                          </div>
+                        )}
+                        {trip.dropoff_address && (
+                          <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
+                            <p className="text-xs text-blue-600 font-medium mb-1">Dropoff Address</p>
+                            <p className="text-sm font-medium text-gray-800">{trip.dropoff_address}</p>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
