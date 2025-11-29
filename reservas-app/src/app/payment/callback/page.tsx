@@ -1,4 +1,5 @@
 // src/app/payment/callback/page.tsx
+// Callback de Tilopay - Envía mensaje a la ventana padre para mostrar confirmación inline
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
@@ -25,6 +26,7 @@ function PaymentCallbackContent() {
   const [processing, setProcessing] = useState(true);
   const [result, setResult] = useState<PaymentResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [messageSent, setMessageSent] = useState(false);
 
   useEffect(() => {
     async function processPaymentCallback() {
@@ -170,22 +172,39 @@ function PaymentCallbackContent() {
 
         setProcessing(false);
 
-        // If successful, redirect to confirmation after a delay
-        if (isApproved && bookingId) {
-          const confirmationUrl = `/confirmation?booking_id=${bookingId}&payment=success`;
+        // ENVIAR MENSAJE A LA VENTANA PADRE
+        // Esto permite que la página de summary cambie a modo confirmación sin redirect
+        if (window.opener && !window.opener.closed) {
+          try {
+            window.opener.postMessage({
+              type: 'PAYMENT_COMPLETE',
+              success: isApproved,
+              transactionId,
+              authCode,
+              bookingId,
+              code,
+              description,
+            }, '*');
 
-          setTimeout(() => {
-            // Check if we're running in a popup
-            if (window.opener && !window.opener.closed) {
-              // Redirect the parent window to confirmation
-              window.opener.location.href = confirmationUrl;
-              // Close the popup
-              window.close();
-            } else {
-              // Normal redirect if not in popup
-              router.push(confirmationUrl);
+            setMessageSent(true);
+            console.log('Payment message sent to parent window');
+
+            // Si el pago fue exitoso, cerrar el popup automáticamente después de un momento
+            if (isApproved) {
+              setTimeout(() => {
+                window.close();
+              }, 2000);
             }
-          }, 2000);
+          } catch (err) {
+            console.error('Failed to send message to parent:', err);
+          }
+        } else {
+          // Si no hay ventana padre (usuario abrió directamente el callback), redirigir normalmente
+          if (isApproved && bookingId) {
+            setTimeout(() => {
+              router.push(`/confirmation?booking_id=${bookingId}&payment=success`);
+            }, 2000);
+          }
         }
       } catch (err) {
         console.error('Error processing payment callback:', err);
@@ -265,16 +284,29 @@ function PaymentCallbackContent() {
                 </div>
               </div>
 
-              <p className="text-center text-sm text-gray-500">
-                Redirecting to confirmation page...
-              </p>
+              {messageSent ? (
+                <p className="text-center text-sm text-gray-500">
+                  This window will close automatically...
+                </p>
+              ) : (
+                <p className="text-center text-sm text-gray-500">
+                  Redirecting to confirmation page...
+                </p>
+              )}
 
               <Button
                 onClick={() => {
                   const confirmationUrl = `/confirmation?booking_id=${result.bookingId}&payment=success`;
                   // Check if we're running in a popup
                   if (window.opener && !window.opener.closed) {
-                    window.opener.location.href = confirmationUrl;
+                    // Enviar mensaje y cerrar
+                    window.opener.postMessage({
+                      type: 'PAYMENT_COMPLETE',
+                      success: true,
+                      transactionId: result.transactionId,
+                      authCode: result.authCode,
+                      bookingId: result.bookingId,
+                    }, '*');
                     window.close();
                   } else {
                     router.push(confirmationUrl);
@@ -282,7 +314,7 @@ function PaymentCallbackContent() {
                 }}
                 className="w-full min-h-[48px]"
               >
-                View Confirmation
+                {messageSent ? 'Close Window' : 'View Confirmation'}
               </Button>
             </CardContent>
           </Card>
@@ -315,9 +347,13 @@ function PaymentCallbackContent() {
               <Button
                 variant="outline"
                 onClick={() => {
-                  // Check if we're running in a popup
+                  // Enviar mensaje de fallo y cerrar
                   if (window.opener && !window.opener.closed) {
-                    window.opener.location.href = '/';
+                    window.opener.postMessage({
+                      type: 'PAYMENT_COMPLETE',
+                      success: false,
+                      bookingId: result?.bookingId,
+                    }, '*');
                     window.close();
                   } else {
                     router.push('/');
