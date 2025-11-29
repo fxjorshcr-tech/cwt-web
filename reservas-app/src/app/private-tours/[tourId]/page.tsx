@@ -58,7 +58,6 @@ export default function TourDetailPage({ params }: PageProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassengerPicker, setShowPassengerPicker] = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(false);
 
   // Accordion states
   const [accordions, setAccordions] = useState({
@@ -298,12 +297,6 @@ export default function TourDetailPage({ params }: PageProps) {
 
   const handlePayNow = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!termsAccepted) {
-      toast.error('Please accept the terms and conditions');
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-      return;
-    }
 
     if (!validateForm()) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -737,9 +730,7 @@ export default function TourDetailPage({ params }: PageProps) {
                   totalPassengers={totalPassengers}
                   totalPrice={totalPrice}
                   isValidPassengerCount={isValidPassengerCount}
-                  termsAccepted={termsAccepted}
                   isSubmitting={isSubmitting}
-                  onTermsChange={setTermsAccepted}
                   onPayNow={handlePayNow}
                   onAddToCart={handleAddToCart}
                 />

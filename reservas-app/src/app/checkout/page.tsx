@@ -743,18 +743,15 @@ function CheckoutPageContent() {
 
                       {/* Terms & Pay Button */}
                       <div className="space-y-3">
-                        {/* Only show terms for shuttles - tours already accepted on tour page */}
-                        {!isTourBooking && (
-                          <TermsCheckbox
-                            checked={termsAccepted}
-                            onChange={setTermsAccepted}
-                            error={false}
-                          />
-                        )}
+                        <TermsCheckbox
+                          checked={termsAccepted}
+                          onChange={setTermsAccepted}
+                          error={false}
+                        />
 
                         <Button
                           onClick={handlePayNow}
-                          disabled={(!isTourBooking && !termsAccepted) || isProcessingPayment}
+                          disabled={!termsAccepted || isProcessingPayment}
                           className="w-full h-12 bg-green-600 hover:bg-green-700 text-white text-base font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {isProcessingPayment ? (

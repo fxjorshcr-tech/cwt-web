@@ -1,7 +1,6 @@
 ﻿// src/components/tours/booking/TourBookingSummary.tsx
 import Image from 'next/image';
 import { Clock, MapPin, Users, CheckCircle, ShoppingCart, ArrowRight, Loader2 } from 'lucide-react';
-import TermsCheckbox from '@/components/booking/TermsCheckbox';
 import { Tour } from '@/lib/supabase-tours';
 
 interface TourBookingSummaryProps {
@@ -10,9 +9,7 @@ interface TourBookingSummaryProps {
   totalPassengers: number;
   totalPrice: number;
   isValidPassengerCount: boolean;
-  termsAccepted: boolean;
   isSubmitting: boolean;
-  onTermsChange: (checked: boolean) => void;
   onPayNow: (e: React.FormEvent) => void;
   onAddToCart: (e: React.FormEvent) => void;
 }
@@ -33,9 +30,7 @@ export function TourBookingSummary({
   totalPassengers,
   totalPrice,
   isValidPassengerCount,
-  termsAccepted,
   isSubmitting,
-  onTermsChange,
   onPayNow,
   onAddToCart,
 }: TourBookingSummaryProps) {
@@ -112,16 +107,12 @@ export function TourBookingSummary({
             </div>
           </div>
 
-          <div className="pb-4 border-b border-gray-200">
-            <TermsCheckbox checked={termsAccepted} onChange={onTermsChange} error={false} />
-          </div>
-
           <div className="pt-4 border-t border-gray-200 flex flex-col gap-3">
             {/* Proceed to Checkout Button */}
             <button
               type="button"
               onClick={onPayNow}
-              disabled={isSubmitting || !isValidPassengerCount || !termsAccepted}
+              disabled={isSubmitting || !isValidPassengerCount}
               className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base"
             >
               {isSubmitting ? (
