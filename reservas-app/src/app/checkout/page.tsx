@@ -283,7 +283,7 @@ function CheckoutPageContent() {
           customer_phone: customerData.phone,
           customer_country: customerData.country,
         })
-        .eq('booking_id', bookingId);
+        .eq('booking_id', bookingId as string);
 
       if (updateError) {
         console.error('Error updating customer info:', updateError);
