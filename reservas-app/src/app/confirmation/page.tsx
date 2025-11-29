@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import BookingStepper from '@/components/booking/BookingStepper';
+import { useCart } from '@/contexts/CartContext';
 
 import { formatDate, formatTime, formatCurrency, formatBookingId } from '@/lib/formatters';
 
@@ -33,21 +34,55 @@ interface Trip {
   customer_phone: string | null;
 }
 
+interface TourBooking {
+  id: string;
+  booking_id: string;
+  tour_slug: string;
+  tour_name: string;
+  date: string;
+  adults: number;
+  children: number;
+  base_price: number;
+  price_per_extra_person: number;
+  total_price: number;
+  hotel: string;
+  special_requests: string | null;
+  status: string;
+  customer_first_name: string | null;
+  customer_last_name: string | null;
+  customer_email: string | null;
+  customer_phone: string | null;
+}
+
 function ConfirmationPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { clearCart } = useCart();
 
   // Create supabase client once with useMemo to avoid recreation on every render
   const supabase = useMemo(() => createClient(), []);
 
   const bookingId = searchParams.get('booking_id');
+  const tourBookingId = searchParams.get('tour_booking_id');
+
+  // Determine booking type
+  const isTourBooking = !!tourBookingId;
+  const effectiveBookingId = tourBookingId || bookingId;
 
   const [trips, setTrips] = useState<Trip[]>([]);
+  const [tourBooking, setTourBooking] = useState<TourBooking | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Memoize the loadTrips function
-  const loadTrips = useCallback(async () => {
-    if (!bookingId) {
+  // Clear cart when confirmation page loads successfully
+  useEffect(() => {
+    if (effectiveBookingId && (trips.length > 0 || tourBooking)) {
+      clearCart();
+    }
+  }, [effectiveBookingId, trips.length, tourBooking, clearCart]);
+
+  // Memoize the loadBooking function
+  const loadBooking = useCallback(async () => {
+    if (!effectiveBookingId) {
       router.push('/');
       return;
     }
@@ -55,28 +90,44 @@ function ConfirmationPageContent() {
     try {
       setLoading(true);
 
-      const { data, error } = await supabase
-        .from('trips')
-        .select('*')
-        .eq('booking_id', bookingId)
-        .order('created_at', { ascending: true });
+      if (isTourBooking) {
+        // Load tour booking
+        const { data, error } = await supabase
+          .from('tour_bookings')
+          .select('*')
+          .eq('booking_id', tourBookingId)
+          .single();
 
-      if (error) throw error;
-      if (!data || data.length === 0) throw new Error('No trips found');
+        if (error) throw error;
+        if (!data) throw new Error('Tour booking not found');
 
-      setTrips(data as Trip[]);
-      setLoading(false);
+        setTourBooking(data as TourBooking);
+        setLoading(false);
+      } else {
+        // Load shuttle trips
+        const { data, error } = await supabase
+          .from('trips')
+          .select('*')
+          .eq('booking_id', bookingId as string)
+          .order('created_at', { ascending: true });
+
+        if (error) throw error;
+        if (!data || data.length === 0) throw new Error('No trips found');
+
+        setTrips(data as Trip[]);
+        setLoading(false);
+      }
     } catch (error) {
-      console.error('Error loading trips:', error);
+      console.error('Error loading booking:', error);
       router.push('/');
     }
-  }, [bookingId, supabase, router]);
+  }, [effectiveBookingId, isTourBooking, tourBookingId, bookingId, supabase, router]);
 
   useEffect(() => {
-    loadTrips();
-  }, [loadTrips]);
+    loadBooking();
+  }, [loadBooking]);
 
-  if (!bookingId) {
+  if (!effectiveBookingId) {
     return (
       <>
         <BookingNavbar />
@@ -119,8 +170,8 @@ function ConfirmationPageContent() {
     );
   }
 
-  // ✅ CORREGIDO: Validar que trips tenga elementos antes de acceder
-  if (trips.length === 0) {
+  // ✅ CORREGIDO: Validar que trips o tourBooking tengan datos
+  if (!isTourBooking && trips.length === 0) {
     return (
       <>
         <BookingNavbar />
@@ -141,9 +192,40 @@ function ConfirmationPageContent() {
     );
   }
 
-  // ✅ Ahora es seguro acceder a trips porque ya verificamos que no está vacío
-  const grandTotal = trips.reduce((sum, trip) => sum + (trip.final_price || trip.price), 0);
-  const customerInfo = trips[0];
+  if (isTourBooking && !tourBooking) {
+    return (
+      <>
+        <BookingNavbar />
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <Card className="max-w-md mx-4">
+            <CardHeader>
+              <CardTitle className="text-red-600">Tour Booking Not Found</CardTitle>
+              <CardDescription>We couldn&apos;t find your tour booking details</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button onClick={() => router.push('/private-tours')} className="w-full min-h-[48px]">
+                Browse Tours
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </>
+    );
+  }
+
+  // ✅ Ahora es seguro acceder a trips o tourBooking
+  const grandTotal = isTourBooking && tourBooking
+    ? tourBooking.total_price
+    : trips.reduce((sum, trip) => sum + (trip.final_price || trip.price), 0);
+
+  const customerInfo = isTourBooking && tourBooking
+    ? {
+        customer_first_name: tourBooking.customer_first_name,
+        customer_last_name: tourBooking.customer_last_name,
+        customer_email: tourBooking.customer_email,
+        customer_phone: tourBooking.customer_phone,
+      }
+    : trips[0];
 
   return (
     <>
@@ -213,7 +295,7 @@ function ConfirmationPageContent() {
                 <div className="text-center">
                   <p className="text-sm text-gray-600 mb-3">Your Booking Reference</p>
                   <p className="text-3xl md:text-4xl font-mono font-bold text-blue-900 mb-3">
-                    {formatBookingId(bookingId)}
+                    {formatBookingId(effectiveBookingId)}
                   </p>
                   <p className="text-sm text-gray-600 mb-4">
                     Please save this reference number for your records
@@ -267,7 +349,52 @@ function ConfirmationPageContent() {
               </Card>
             )}
 
-            {/* Trips Summary */}
+            {/* Tour Booking Details */}
+            {isTourBooking && tourBooking && (
+              <Card className="mb-8 animate-in fade-in slide-in-from-right duration-700 delay-700">
+                <CardHeader>
+                  <CardTitle>Your Tour Details</CardTitle>
+                  <CardDescription>Private tour confirmed</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <div className="flex items-start gap-3 mb-4">
+                      <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                        <MapPin className="h-5 w-5 text-green-600" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-xl text-gray-900 mb-1">
+                          {tourBooking.tour_name}
+                        </h3>
+                        <div className="grid md:grid-cols-2 gap-3 mt-3">
+                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <Calendar className="h-4 w-4" />
+                            <span>{formatDate(tourBooking.date)}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <Users className="h-4 w-4" />
+                            <span>{tourBooking.adults} Adult{tourBooking.adults !== 1 ? 's' : ''}{tourBooking.children > 0 && `, ${tourBooking.children} Child${tourBooking.children !== 1 ? 'ren' : ''}`}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <MapPin className="h-4 w-4" />
+                            <span>Pickup: {tourBooking.hotel}</span>
+                          </div>
+                        </div>
+                        <div className="mt-4 flex justify-between items-center pt-3 border-t">
+                          <span className="font-semibold text-gray-900">Tour Total</span>
+                          <span className="text-2xl font-bold text-blue-600">
+                            {formatCurrency(tourBooking.total_price)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Shuttle Trips Summary */}
+            {!isTourBooking && trips.length > 0 && (
             <Card className="mb-8 animate-in fade-in slide-in-from-right duration-700 delay-700">
               <CardHeader>
                 <CardTitle>Your Trip Details</CardTitle>
@@ -306,10 +433,21 @@ function ConfirmationPageContent() {
                       </div>
                     </div>
                     
-                    {trip.pickup_address && (
-                      <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                        <p className="text-xs text-gray-500 mb-1">Pickup Address</p>
-                        <p className="text-sm font-medium">{trip.pickup_address}</p>
+                    {/* Pickup & Dropoff Addresses */}
+                    {(trip.pickup_address || trip.dropoff_address) && (
+                      <div className="mt-3 grid md:grid-cols-2 gap-3">
+                        {trip.pickup_address && (
+                          <div className="p-3 bg-green-50 rounded-lg border border-green-100">
+                            <p className="text-xs text-green-600 font-medium mb-1">Pickup Address</p>
+                            <p className="text-sm font-medium text-gray-800">{trip.pickup_address}</p>
+                          </div>
+                        )}
+                        {trip.dropoff_address && (
+                          <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
+                            <p className="text-xs text-blue-600 font-medium mb-1">Dropoff Address</p>
+                            <p className="text-sm font-medium text-gray-800">{trip.dropoff_address}</p>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -325,6 +463,7 @@ function ConfirmationPageContent() {
                 </div>
               </CardContent>
             </Card>
+            )}
 
             {/* Next Steps */}
             <Card className="mb-8 bg-gradient-to-r from-green-50 to-blue-50 border-green-200 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-800">

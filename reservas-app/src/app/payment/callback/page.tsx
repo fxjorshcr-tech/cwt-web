@@ -25,15 +25,19 @@ function PaymentCallbackContent() {
         const orderHash = searchParams.get('OrderHash') || '';
         const returnDataEncoded = searchParams.get('returnData') || '';
 
-        // Decode returnData to get bookingId
+        // Decode returnData to get bookingId and booking type
         let bookingId: string | null = null;
+        let bookingType: 'shuttle' | 'tour' = 'shuttle';
         let tripIds: string[] = [];
+        let tourBookingId: string | null = null;
 
         if (returnDataEncoded) {
           try {
             const decoded = JSON.parse(atob(returnDataEncoded));
             bookingId = decoded.bookingId || null;
+            bookingType = decoded.bookingType || 'shuttle';
             tripIds = decoded.tripIds || [];
+            tourBookingId = decoded.tourBookingId || null;
           } catch (e) {
             console.error('Failed to decode returnData:', e);
           }
@@ -41,8 +45,10 @@ function PaymentCallbackContent() {
 
         // Fallback: extract bookingId from orderId
         if (!bookingId && orderId) {
-          bookingId = orderId.startsWith('booking_') ? orderId : `booking_${orderId}`;
+          bookingId = orderId.startsWith('booking_') || orderId.startsWith('tour_') ? orderId : `booking_${orderId}`;
         }
+
+        const isTourBooking = bookingType === 'tour';
 
         // Check if payment was successful
         const approved = code === '1';
@@ -57,7 +63,7 @@ function PaymentCallbackContent() {
           paymentStatus = 'error';
         }
 
-        console.log('[Callback] Payment result:', { code, approved, bookingId, transactionId });
+        console.log('[Callback] Payment result:', { code, approved, bookingId, bookingType, transactionId });
 
         // Procesar el backend
         if (bookingId) {
@@ -68,9 +74,11 @@ function PaymentCallbackContent() {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 bookingId,
+                bookingType,
                 status: paymentStatus,
                 amount: 0,
                 tripIds,
+                tourBookingId,
                 tilopayTransactionId: transactionId,
                 tilopayAuthCode: authCode,
                 tilopayCode: code,
@@ -90,6 +98,7 @@ function PaymentCallbackContent() {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 bookingId,
+                bookingType,
                 paymentStatus: approved ? 'approved' : 'rejected',
                 transactionId,
                 authCode,
@@ -104,16 +113,29 @@ function PaymentCallbackContent() {
           // Enviar email de confirmación si el pago fue aprobado
           if (approved) {
             try {
-              console.log('[Callback] Sending confirmation email for:', bookingId);
-              await fetch('/api/email/send-confirmation', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  bookingId,
-                  transactionId,
-                  authCode,
-                }),
-              });
+              console.log('[Callback] Sending confirmation email for:', bookingId, 'type:', bookingType);
+              // For tours, we need a different email endpoint or handling
+              if (isTourBooking) {
+                await fetch('/api/email/send-tour-confirmation', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    bookingId,
+                    transactionId,
+                    authCode,
+                  }),
+                });
+              } else {
+                await fetch('/api/email/send-confirmation', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    bookingId,
+                    transactionId,
+                    authCode,
+                  }),
+                });
+              }
               console.log('[Callback] Email sent');
             } catch (err) {
               console.error('Failed to send confirmation email:', err);
@@ -126,7 +148,11 @@ function PaymentCallbackContent() {
           setStatus('redirecting');
           // Pequeño delay para mostrar el mensaje
           setTimeout(() => {
-            router.push(`/confirmation?booking_id=${bookingId}`);
+            if (isTourBooking) {
+              router.push(`/confirmation?tour_booking_id=${bookingId}`);
+            } else {
+              router.push(`/confirmation?booking_id=${bookingId}`);
+            }
           }, 500);
         } else {
           // Pago fallido - mostrar error

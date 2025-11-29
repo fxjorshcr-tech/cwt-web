@@ -83,14 +83,40 @@ interface Trip {
   customer_phone?: string | null;
 }
 
+interface TourBooking {
+  id: string;
+  booking_id: string;
+  tour_slug: string;
+  tour_name: string;
+  date: string;
+  adults: number;
+  children: number;
+  base_price: number;
+  price_per_extra_person: number;
+  total_price: number;
+  hotel: string;
+  special_requests: string | null;
+  status: string;
+  customer_first_name?: string | null;
+  customer_last_name?: string | null;
+  customer_email?: string | null;
+  customer_phone?: string | null;
+}
+
 function CheckoutPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClient();
 
   const bookingId = searchParams.get('booking_id');
+  const tourBookingId = searchParams.get('tour_booking_id');
+
+  // Determine booking type
+  const isTourBooking = !!tourBookingId;
+  const effectiveBookingId = tourBookingId || bookingId;
 
   const [trips, setTrips] = useState<Trip[]>([]);
+  const [tourBooking, setTourBooking] = useState<TourBooking | null>(null);
   const [loading, setLoading] = useState(true);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -109,33 +135,52 @@ function CheckoutPageContent() {
   // Get current country's phone prefix
   const currentCountry = COUNTRIES.find(c => c.code === customerInfo.country) || COUNTRIES[0];
 
-  // Cargar trips desde Supabase
+  // Cargar trips o tour booking desde Supabase
   useEffect(() => {
-    async function loadTrips() {
-      if (!bookingId) return;
+    async function loadBooking() {
+      if (!effectiveBookingId) return;
 
       try {
         setLoading(true);
 
-        // Cargar trips desde Supabase (ya fueron guardados en summary)
-        const existingTripIds = await checkExistingTrips(supabase, bookingId);
+        if (isTourBooking) {
+          // Load tour booking from tour_bookings table
+          const { data: tourData, error: tourError } = await supabase
+            .from('tour_bookings')
+            .select('*')
+            .eq('booking_id', tourBookingId)
+            .single();
 
-        if (existingTripIds.length === 0) {
-          toast.error('Booking not found. Please start over.');
-          router.push('/');
-          return;
+          if (tourError || !tourData) {
+            console.error('Error loading tour booking:', tourError);
+            toast.error('Booking not found. Please start over.');
+            router.push('/private-tours');
+            return;
+          }
+
+          setTourBooking(tourData as TourBooking);
+          setLoading(false);
+        } else {
+          // Load shuttle trips from trips table
+          const existingTripIds = await checkExistingTrips(supabase, bookingId as string);
+
+          if (existingTripIds.length === 0) {
+            toast.error('Booking not found. Please start over.');
+            router.push('/');
+            return;
+          }
+
+          const loadedTrips = await loadTripsFromSupabase(supabase, bookingId as string);
+
+          if (!loadedTrips || loadedTrips.length === 0) {
+            toast.error('Failed to load booking. Please try again.');
+            router.push('/');
+            return;
+          }
+
+          setTrips(loadedTrips as Trip[]);
+          setLoading(false);
         }
-
-        const loadedTrips = await loadTripsFromSupabase(supabase, bookingId);
-
-        if (!loadedTrips || loadedTrips.length === 0) {
-          toast.error('Failed to load booking. Please try again.');
-          router.push('/');
-          return;
-        }
-
-        setTrips(loadedTrips as Trip[]);
-        setLoading(false);
       } catch (error) {
         console.error('Error loading booking:', error);
         toast.error('Failed to load booking. Please start over.');
@@ -143,23 +188,31 @@ function CheckoutPageContent() {
       }
     }
 
-    loadTrips();
-  }, [bookingId, router, supabase]);
+    loadBooking();
+  }, [effectiveBookingId, isTourBooking, tourBookingId, bookingId, router, supabase]);
 
-  const grandTotal = useMemo(
-    () => trips.reduce((sum, trip) => sum + (trip.final_price || trip.price), 0),
-    [trips]
-  );
+  const grandTotal = useMemo(() => {
+    if (isTourBooking && tourBooking) {
+      return tourBooking.total_price;
+    }
+    return trips.reduce((sum, trip) => sum + (trip.final_price || trip.price), 0);
+  }, [isTourBooking, tourBooking, trips]);
 
-  const totalPassengers = useMemo(
-    () => trips.reduce((sum, trip) => sum + trip.adults + trip.children, 0),
-    [trips]
-  );
+  const totalPassengers = useMemo(() => {
+    if (isTourBooking && tourBooking) {
+      return tourBooking.adults + tourBooking.children;
+    }
+    return trips.reduce((sum, trip) => sum + trip.adults + trip.children, 0);
+  }, [isTourBooking, tourBooking, trips]);
 
   const totalWithFees = useMemo(() => {
+    // Tours don't have service fees - price is all-inclusive
+    if (isTourBooking) {
+      return grandTotal;
+    }
     const fees = grandTotal * PRICING_CONFIG.FEES_PERCENTAGE;
     return grandTotal + fees;
-  }, [grandTotal]);
+  }, [isTourBooking, grandTotal]);
 
   // Validar formulario de cliente
   const validateCustomerForm = (): boolean => {
@@ -219,47 +272,90 @@ function CheckoutPageContent() {
       const fullPhone = `${currentCountry.phonePrefix} ${phoneNumber}`;
       const customerData = { ...customerInfo, phone: fullPhone };
 
-      // Guardar información del cliente en Supabase
-      const { error: updateError } = await supabase
-        .from('trips')
-        .update({
-          customer_first_name: customerData.firstName,
-          customer_last_name: customerData.lastName,
-          customer_email: customerData.email,
-          customer_phone: customerData.phone,
-          customer_country: customerData.country,
-        })
-        .eq('booking_id', bookingId as string);
+      if (isTourBooking && tourBooking) {
+        // Update customer info in tour_bookings table
+        const { error: updateError } = await supabase
+          .from('tour_bookings')
+          .update({
+            customer_first_name: customerData.firstName,
+            customer_last_name: customerData.lastName,
+            customer_email: customerData.email,
+            customer_phone: customerData.phone,
+            customer_country: customerData.country,
+          })
+          .eq('booking_id', tourBookingId as string);
 
-      if (updateError) {
-        console.error('Error updating customer info:', updateError);
-      }
+        if (updateError) {
+          console.error('Error updating tour customer info:', updateError);
+        }
 
-      // Llamar a la API de Tilopay
-      const response = await fetch('/api/tilopay/create-payment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          bookingId,
-          amount: totalWithFees,
-          currency: 'USD',
-          tripIds: trips.map(t => t.id),
-          customerInfo: customerData,
-        }),
-      });
+        // Llamar a la API de Tilopay for tour
+        const response = await fetch('/api/tilopay/create-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            bookingId: tourBookingId,
+            bookingType: 'tour',
+            amount: totalWithFees,
+            currency: 'USD',
+            tourBookingId: tourBooking.id,
+            customerInfo: customerData,
+          }),
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Failed to create payment');
-      }
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || 'Failed to create payment');
+        }
 
-      // Redirigir directamente a Tilopay (página completa, no popup)
-      if (data.paymentUrl) {
-        // Redirigir a la página de pago de Tilopay
-        window.location.href = data.paymentUrl;
+        if (data.paymentUrl) {
+          window.location.href = data.paymentUrl;
+        } else {
+          throw new Error('No payment URL received');
+        }
       } else {
-        throw new Error('No payment URL received');
+        // Guardar información del cliente en Supabase (shuttles)
+        const { error: updateError } = await supabase
+          .from('trips')
+          .update({
+            customer_first_name: customerData.firstName,
+            customer_last_name: customerData.lastName,
+            customer_email: customerData.email,
+            customer_phone: customerData.phone,
+            customer_country: customerData.country,
+          })
+          .eq('booking_id', bookingId as string);
+
+        if (updateError) {
+          console.error('Error updating customer info:', updateError);
+        }
+
+        // Llamar a la API de Tilopay for shuttles
+        const response = await fetch('/api/tilopay/create-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            bookingId,
+            bookingType: 'shuttle',
+            amount: totalWithFees,
+            currency: 'USD',
+            tripIds: trips.map(t => t.id),
+            customerInfo: customerData,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || 'Failed to create payment');
+        }
+
+        if (data.paymentUrl) {
+          window.location.href = data.paymentUrl;
+        } else {
+          throw new Error('No payment URL received');
+        }
       }
     } catch (error) {
       console.error('Payment error:', error);
@@ -268,7 +364,7 @@ function CheckoutPageContent() {
     }
   };
 
-  if (!bookingId) {
+  if (!effectiveBookingId) {
     return (
       <>
         <BookingNavbar />
@@ -330,7 +426,7 @@ function CheckoutPageContent() {
     );
   }
 
-  if (trips.length === 0) {
+  if (!isTourBooking && trips.length === 0) {
     return (
       <>
         <BookingNavbar />
@@ -342,6 +438,26 @@ function CheckoutPageContent() {
             <CardContent>
               <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
                 Return Home
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </>
+    );
+  }
+
+  if (isTourBooking && !tourBooking) {
+    return (
+      <>
+        <BookingNavbar />
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <Card className="max-w-md mx-4">
+            <CardHeader>
+              <CardTitle className="text-red-600">Tour Booking Not Found</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Button onClick={() => router.push('/private-tours')} className="w-full min-h-[48px]">
+                Browse Tours
               </Button>
             </CardContent>
           </Card>
@@ -516,12 +632,18 @@ function CheckoutPageContent() {
 
                 {/* Back button */}
                 <Button
-                  onClick={() => router.push(`/summary?booking_id=${bookingId}`)}
+                  onClick={() => {
+                    if (isTourBooking) {
+                      router.push('/private-tours');
+                    } else {
+                      router.push(`/summary?booking_id=${bookingId}`);
+                    }
+                  }}
                   variant="ghost"
                   className="text-gray-600 hover:text-gray-900"
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to Summary
+                  {isTourBooking ? 'Back to Tours' : 'Back to Summary'}
                 </Button>
               </div>
 
@@ -536,8 +658,30 @@ function CheckoutPageContent() {
                     </CardHeader>
                     <CardContent className="p-4 space-y-4">
 
-                      {/* Trips */}
-                      {trips.map((trip, index) => (
+                      {/* Tour Booking */}
+                      {isTourBooking && tourBooking && (
+                        <div>
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <p className="text-sm font-semibold text-gray-900">
+                                {tourBooking.tour_name}
+                              </p>
+                              <p className="text-xs text-gray-500 mt-0.5">
+                                {formatDate(tourBooking.date)} • {tourBooking.adults + tourBooking.children} passengers
+                              </p>
+                              <p className="text-xs text-gray-500 mt-0.5">
+                                Pickup: {tourBooking.hotel}
+                              </p>
+                            </div>
+                            <p className="text-sm font-bold text-gray-900">
+                              {formatCurrency(tourBooking.total_price)}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Shuttle Trips */}
+                      {!isTourBooking && trips.map((trip, index) => (
                         <div key={trip.id} className={`${index > 0 ? 'pt-3 border-t border-gray-100' : ''}`}>
                           <div className="flex justify-between items-start">
                             <div className="flex-1">
@@ -559,19 +703,28 @@ function CheckoutPageContent() {
                       {/* Separator */}
                       <div className="border-t border-gray-200" />
 
-                      {/* Subtotal & Fees */}
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">Subtotal</span>
-                          <span className="text-sm font-semibold">{formatCurrency(grandTotal)}</span>
+                      {/* Subtotal & Fees - Only for shuttles */}
+                      {!isTourBooking && (
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Subtotal</span>
+                            <span className="text-sm font-semibold">{formatCurrency(grandTotal)}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Service Fee ({(PRICING_CONFIG.FEES_PERCENTAGE * 100).toFixed(0)}%)</span>
+                            <span className="text-sm font-medium text-gray-600">
+                              +{formatCurrency(grandTotal * PRICING_CONFIG.FEES_PERCENTAGE)}
+                            </span>
+                          </div>
                         </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">Service Fee ({(PRICING_CONFIG.FEES_PERCENTAGE * 100).toFixed(0)}%)</span>
-                          <span className="text-sm font-medium text-gray-600">
-                            +{formatCurrency(grandTotal * PRICING_CONFIG.FEES_PERCENTAGE)}
-                          </span>
+                      )}
+
+                      {/* Tour pricing note */}
+                      {isTourBooking && (
+                        <div className="text-xs text-gray-500 text-center">
+                          All-inclusive price • No additional fees
                         </div>
-                      </div>
+                      )}
 
                       {/* Separator */}
                       <div className="border-t border-gray-200" />

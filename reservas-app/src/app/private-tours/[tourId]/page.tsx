@@ -19,6 +19,7 @@ import {
   PickupLocationForm,
 } from '@/components/tours/booking';
 import { FAQsWidget } from '@/components/booking/FAQsWidget';
+import { CartCheckoutModal } from '@/components/cart';
 import { createClient } from '@/lib/supabase/client';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from 'sonner';
@@ -43,7 +44,7 @@ export default function TourDetailPage({ params }: PageProps) {
   const router = useRouter();
   // Create supabase client once with useMemo to avoid recreation on every render
   const supabase = useMemo(() => createClient(), []);
-  const { addItem } = useCart();
+  const { addItem, itemCount: cartItemCount, totalAmount: cartTotal } = useCart();
 
   const [tour, setTour] = useState<Tour | null>(null);
   const [loading, setLoading] = useState(true);
@@ -59,6 +60,8 @@ export default function TourDetailPage({ params }: PageProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassengerPicker, setShowPassengerPicker] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [showCartCheckoutModal, setShowCartCheckoutModal] = useState(false);
+  const [pendingTourBookingId, setPendingTourBookingId] = useState<string | null>(null);
 
   // Accordion states
   const [accordions, setAccordions] = useState({
@@ -316,14 +319,62 @@ export default function TourDetailPage({ params }: PageProps) {
       const tourData = await saveTourToSupabase();
 
       if (tourData) {
-        toast.info('WeTravel payment integration - Coming soon!');
+        // Check if there are items in cart - show modal to confirm
+        if (cartItemCount > 0) {
+          setPendingTourBookingId(tourData.booking_id);
+          setShowCartCheckoutModal(true);
+          setIsSubmitting(false);
+          return;
+        }
+
+        // No cart items, proceed directly to checkout
+        router.push(`/checkout?tour_booking_id=${tourData.booking_id}`);
       }
     } catch (error) {
       console.error('Error:', error);
       toast.error('Failed to process booking');
-    } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Proceed to checkout with only current tour booking
+  const proceedToCheckoutOnly = () => {
+    setShowCartCheckoutModal(false);
+    if (pendingTourBookingId) {
+      router.push(`/checkout?tour_booking_id=${pendingTourBookingId}`);
+    }
+  };
+
+  // Add current tour to cart and proceed to checkout with all items
+  const proceedWithFullCart = () => {
+    setShowCartCheckoutModal(false);
+    if (pendingTourBookingId && tour && formData.date) {
+      // Add the current tour to cart
+      addItem({
+        type: 'tour',
+        id: pendingTourBookingId,
+        tourSlug: tour.slug,
+        tourName: tour.name,
+        date: formData.date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+        }),
+        adults: formData.adults,
+        children: formData.children,
+        price: totalPrice,
+        hotel: formData.hotel.trim(),
+      });
+
+      // Navigate to cart checkout (includes all cart items)
+      router.push('/checkout');
+    }
+  };
+
+  // Navigate to cart page
+  const handleViewCart = () => {
+    setShowCartCheckoutModal(false);
+    router.push('/cart');
   };
 
   const handleAdultsChange = (increment: boolean) => {
@@ -365,6 +416,17 @@ export default function TourDetailPage({ params }: PageProps) {
   return (
     <>
       <BookingNavbar />
+      <CartCheckoutModal
+        isOpen={showCartCheckoutModal}
+        onClose={() => setShowCartCheckoutModal(false)}
+        cartItemCount={cartItemCount}
+        cartTotal={cartTotal}
+        currentBookingTotal={totalPrice}
+        isLoading={isSubmitting}
+        onPayAll={proceedWithFullCart}
+        onPayOnlyThis={proceedToCheckoutOnly}
+        onViewCart={handleViewCart}
+      />
 
       {/* Hero Section */}
       <section className="relative h-[60vh] sm:h-[70vh] min-h-[450px] sm:min-h-[500px] flex items-end">

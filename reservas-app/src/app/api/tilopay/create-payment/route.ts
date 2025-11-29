@@ -17,9 +17,11 @@ interface CustomerInfo {
 
 interface PaymentRequestBody {
   bookingId: string;
+  bookingType?: 'shuttle' | 'tour';
   amount: number;
   currency?: string;
   tripIds?: string[];
+  tourBookingId?: string;
   customerInfo?: CustomerInfo;
 }
 
@@ -35,7 +37,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { bookingId, amount, currency = 'USD', tripIds, customerInfo } = body;
+    const { bookingId, bookingType = 'shuttle', amount, currency = 'USD', tripIds, tourBookingId, customerInfo } = body;
 
     // Get Tilopay access token
     const token = await getTilopayToken();
@@ -65,7 +67,9 @@ export async function POST(request: NextRequest) {
     // Encode booking data to return after payment
     const returnData = encodeReturnData({
       bookingId,
+      bookingType,
       tripIds,
+      tourBookingId,
       timestamp: Date.now(),
     });
 
@@ -131,10 +135,12 @@ export async function POST(request: NextRequest) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             bookingId,
+            bookingType,
             status: 'error',
             amount,
             currency,
             tripIds,
+            tourBookingId,
             customerEmail: email,
             customerFirstName: firstName,
             customerLastName: lastName,
@@ -165,10 +171,12 @@ export async function POST(request: NextRequest) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           bookingId,
+          bookingType,
           status: 'initiated',
           amount,
           currency,
           tripIds,
+          tourBookingId,
           customerEmail: email,
           customerFirstName: firstName,
           customerLastName: lastName,
