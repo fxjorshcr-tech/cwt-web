@@ -149,7 +149,7 @@ export default function CartPage() {
       const cartBookingId = `cart_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
 
       // Update customer info for all shuttle bookings
-      const shuttleBookingIds = [...new Set(shuttles.map(s => s.bookingId))];
+      const shuttleBookingIds = Array.from(new Set(shuttles.map(s => s.bookingId)));
       for (const bookingId of shuttleBookingIds) {
         await supabase
           .from('trips')
