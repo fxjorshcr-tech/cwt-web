@@ -47,6 +47,7 @@ export default function TransfersPage() {
               sizes="100vw"
               className="object-cover"
               priority
+              
             />
             <div className="absolute inset-0 bg-black/50" />
             <div className="absolute inset-0 bg-gradient-to-t from-blue-900/40 via-transparent to-transparent" />

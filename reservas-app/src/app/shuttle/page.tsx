@@ -128,6 +128,7 @@ export default async function MostBookedPage() {
               sizes="100vw"
               className="object-cover"
               priority
+              
             />
             {/* Darker overlay for better text contrast */}
             <div className="absolute inset-0 bg-black/60" />

@@ -1,9 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Optimización de producción
   reactStrictMode: true,
 
-  // Optimización de imágenes
   images: {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
@@ -25,15 +23,12 @@ const nextConfig = {
     ],
   },
 
-  // Optimización de compilación
   compiler: {
-    // Eliminar console.log en producción
     removeConsole: process.env.NODE_ENV === 'production' ? {
       exclude: ['error', 'warn'],
     } : false,
   },
 
-  // Configuración experimental para mejor performance
   experimental: {
     optimizeCss: true,
     optimizePackageImports: ['lucide-react', '@supabase/supabase-js'],
