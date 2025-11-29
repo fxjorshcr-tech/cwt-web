@@ -99,7 +99,7 @@ function PaymentCallbackContent() {
             // Update payment status for all cart items
             try {
               // Update all shuttle bookings
-              const uniqueShuttleBookingIds = [...new Set(cartItems.shuttles.map(s => s.bookingId))];
+              const uniqueShuttleBookingIds = Array.from(new Set(cartItems.shuttles.map(s => s.bookingId)));
               for (const shuttleBookingId of uniqueShuttleBookingIds) {
                 await fetch('/api/payment/update-status', {
                   method: 'POST',
@@ -162,7 +162,7 @@ function PaymentCallbackContent() {
 
               if (isCartBooking && cartItems) {
                 // Send emails for all cart items
-                const uniqueShuttleBookingIds = [...new Set(cartItems.shuttles.map(s => s.bookingId))];
+                const uniqueShuttleBookingIds = Array.from(new Set(cartItems.shuttles.map(s => s.bookingId)));
                 for (const shuttleBookingId of uniqueShuttleBookingIds) {
                   await fetch('/api/email/send-confirmation', {
                     method: 'POST',
@@ -223,7 +223,7 @@ function PaymentCallbackContent() {
               const params = new URLSearchParams();
               params.set('cart_booking_id', bookingId);
               if (cartItems.shuttles.length > 0) {
-                const shuttleBookingIds = [...new Set(cartItems.shuttles.map(s => s.bookingId))];
+                const shuttleBookingIds = Array.from(new Set(cartItems.shuttles.map(s => s.bookingId)));
                 params.set('shuttle_booking_ids', shuttleBookingIds.join(','));
               }
               if (cartItems.tours.length > 0) {
