@@ -170,12 +170,15 @@ function ConfirmationPageContent() {
         if (error) throw error;
         if (!data || data.length === 0) throw new Error('No trips found');
 
-        // Debug: Log voucher data
-        console.log('[Confirmation] Loaded trips:', JSON.stringify(data, null, 2));
-        console.log('[Confirmation] First trip voucher_number:', data[0]?.voucher_number);
-        console.log('[Confirmation] First trip booking_number:', data[0]?.booking_number);
+        // Cast data to Trip[] for proper typing
+        const tripData = data as unknown as Trip[];
 
-        setTrips(data as unknown as Trip[]);
+        // Debug: Log voucher data
+        console.log('[Confirmation] Loaded trips:', JSON.stringify(tripData, null, 2));
+        console.log('[Confirmation] First trip voucher_number:', tripData[0]?.voucher_number);
+        console.log('[Confirmation] First trip booking_number:', tripData[0]?.booking_number);
+
+        setTrips(tripData);
         setLoading(false);
       }
     } catch (error) {
