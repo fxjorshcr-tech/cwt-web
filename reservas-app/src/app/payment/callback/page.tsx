@@ -94,11 +94,40 @@ function PaymentCallbackContent() {
             console.error('Failed to log payment:', err);
           }
 
-          // Update payment status
-          if (isCartBooking && cartItems) {
-            // Update payment status for all cart items
+          // Process payment based on booking type
+          if (isCartBooking && cartItems && approved) {
+            // CART BOOKING: Use unified process-cart-success endpoint
+            // This generates booking numbers, vouchers, updates payment status, and sends ONE consolidated email
             try {
-              // Update all shuttle bookings
+              const uniqueShuttleBookingIds = Array.from(new Set(cartItems.shuttles.map(s => s.bookingId)));
+              const tourIds = cartItems.tours.map(t => t.id);
+
+              console.log('[Callback] Processing cart success with unified endpoint');
+              const cartResponse = await fetch('/api/payment/process-cart-success', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  shuttleBookingIds: uniqueShuttleBookingIds,
+                  tourIds,
+                  transactionId,
+                  authCode,
+                  paymentCode: code,
+                  paymentDescription: description,
+                }),
+              });
+
+              const cartResult = await cartResponse.json();
+              if (cartResult.success) {
+                console.log('[Callback] Cart processed successfully:', cartResult.bookingNumber);
+              } else {
+                console.error('[Callback] Cart processing failed:', cartResult.error);
+              }
+            } catch (err) {
+              console.error('Failed to process cart:', err);
+            }
+          } else if (isCartBooking && cartItems && !approved) {
+            // Cart payment rejected - update status only
+            try {
               const uniqueShuttleBookingIds = Array.from(new Set(cartItems.shuttles.map(s => s.bookingId)));
               for (const shuttleBookingId of uniqueShuttleBookingIds) {
                 await fetch('/api/payment/update-status', {
@@ -107,7 +136,7 @@ function PaymentCallbackContent() {
                   body: JSON.stringify({
                     bookingId: shuttleBookingId,
                     bookingType: 'shuttle',
-                    paymentStatus: approved ? 'approved' : 'rejected',
+                    paymentStatus: 'rejected',
                     transactionId,
                     authCode,
                     paymentCode: code,
@@ -115,27 +144,23 @@ function PaymentCallbackContent() {
                   }),
                 });
               }
-
-              // Update all tour bookings
               for (const tour of cartItems.tours) {
-                // Find the booking_id for this tour from Supabase
                 await fetch('/api/payment/update-tour-by-id', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
                     tourId: tour.id,
-                    paymentStatus: approved ? 'approved' : 'rejected',
+                    paymentStatus: 'rejected',
                     transactionId,
                     authCode,
-                    paymentCode: code,
-                    paymentDescription: description,
                   }),
                 });
               }
             } catch (err) {
-              console.error('Failed to update cart payment status:', err);
+              console.error('Failed to update rejected cart status:', err);
             }
           } else {
+            // SINGLE BOOKING (shuttle or tour)
             try {
               await fetch('/api/payment/update-status', {
                 method: 'POST',
@@ -153,62 +178,37 @@ function PaymentCallbackContent() {
             } catch (err) {
               console.error('Failed to update payment status:', err);
             }
-          }
 
-          // Enviar email de confirmación si el pago fue aprobado
-          if (approved) {
-            try {
-              console.log('[Callback] Sending confirmation email for:', bookingId, 'type:', bookingType);
+            // Send confirmation email for single bookings
+            if (approved) {
+              try {
+                console.log('[Callback] Sending confirmation email for:', bookingId, 'type:', bookingType);
 
-              if (isCartBooking && cartItems) {
-                // Send emails for all cart items
-                const uniqueShuttleBookingIds = Array.from(new Set(cartItems.shuttles.map(s => s.bookingId)));
-                for (const shuttleBookingId of uniqueShuttleBookingIds) {
+                if (isTourBooking) {
+                  await fetch('/api/email/send-tour-confirmation', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      bookingId,
+                      transactionId,
+                      authCode,
+                    }),
+                  });
+                } else {
                   await fetch('/api/email/send-confirmation', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                      bookingId: shuttleBookingId,
+                      bookingId,
                       transactionId,
                       authCode,
                     }),
                   });
                 }
-                for (const tour of cartItems.tours) {
-                  await fetch('/api/email/send-tour-confirmation-by-id', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      tourId: tour.id,
-                      transactionId,
-                      authCode,
-                    }),
-                  });
-                }
-              } else if (isTourBooking) {
-                await fetch('/api/email/send-tour-confirmation', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    bookingId,
-                    transactionId,
-                    authCode,
-                  }),
-                });
-              } else {
-                await fetch('/api/email/send-confirmation', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    bookingId,
-                    transactionId,
-                    authCode,
-                  }),
-                });
+                console.log('[Callback] Email sent');
+              } catch (err) {
+                console.error('Failed to send confirmation email:', err);
               }
-              console.log('[Callback] Email sent');
-            } catch (err) {
-              console.error('Failed to send confirmation email:', err);
             }
           }
         }
