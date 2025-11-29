@@ -203,7 +203,7 @@ function ConfirmationPageContent() {
       <>
         <BookingNavbar />
         {/* Hero Skeleton - Same height as real hero (h-48 sm:h-56 md:h-64) with z-index */}
-        <section className="relative z-10 h-48 sm:h-56 md:h-64 w-full overflow-hidden">
+        <section className="relative h-48 sm:h-56 md:h-64 w-full overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-green-600 via-green-500 to-green-700 animate-pulse" />
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center px-4">
@@ -311,8 +311,8 @@ function ConfirmationPageContent() {
     <>
       <BookingNavbar />
 
-      {/* Hero Section - Confirmation - FORCED VISIBILITY with z-index */}
-      <section className="relative z-10 h-48 sm:h-56 md:h-64 w-full overflow-hidden">
+      {/* Hero Section - Confirmation */}
+      <section className="relative h-48 sm:h-56 md:h-64 w-full overflow-hidden">
         <Image
           src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/puerto-viejo-costa-rica-beach.webp"
           alt="Booking Confirmed"
@@ -684,7 +684,7 @@ export default function ConfirmationPage() {
       <>
         <BookingNavbar />
         {/* Hero Skeleton - Same height as real hero (h-48 sm:h-56 md:h-64) with z-index */}
-        <section className="relative z-10 h-48 sm:h-56 md:h-64 w-full overflow-hidden">
+        <section className="relative h-48 sm:h-56 md:h-64 w-full overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-green-600 via-green-500 to-green-700 animate-pulse" />
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center px-4">

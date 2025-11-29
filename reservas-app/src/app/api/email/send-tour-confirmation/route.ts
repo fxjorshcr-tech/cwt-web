@@ -61,8 +61,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Format booking ID for display
-    const formattedBookingId = formatBookingId(bookingId);
+    // Use booking_number from database if available, otherwise format the old booking ID
+    const formattedBookingId = tourBooking.booking_number || formatBookingId(bookingId);
+    const voucherNumber = tourBooking.voucher_number || null;
 
     // Format date for display
     const tourDate = new Date(tourBooking.date).toLocaleDateString('en-US', {
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; margin: 0; padding: 0; background-color: #f5f5f5;">
   <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
     <div style="background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%); border-radius: 12px 12px 0 0; padding: 32px; text-align: center;">
-      <h1 style="color: white; margin: 0; font-size: 28px;">Tour Booking Confirmed!</h1>
+      <h1 style="color: white; margin: 0; font-size: 28px;">🎉 Tour Booking Confirmed!</h1>
       <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0;">Thank you for choosing Can't Wait Travel CR</p>
     </div>
 
@@ -93,35 +94,44 @@ export async function POST(request: NextRequest) {
 
       <p style="color: #666;">Your tour has been booked and payment has been processed successfully.</p>
 
-      <div style="background: #e8f4fd; border-left: 4px solid #2563eb; padding: 12px 16px; margin: 20px 0; border-radius: 0 8px 8px 0;">
-        <p style="margin: 0; font-size: 14px;">
-          <strong>Booking Reference:</strong> ${formattedBookingId}
-        </p>
+      <div style="background: linear-gradient(135deg, #e8f4fd 0%, #dbeafe 100%); border-left: 4px solid #2563eb; padding: 16px 20px; margin: 20px 0; border-radius: 0 12px 12px 0;">
+        <p style="margin: 0; font-size: 12px; color: #3b82f6; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Booking Reference</p>
+        <p style="margin: 4px 0 0 0; font-size: 24px; font-weight: bold; color: #1a365d; font-family: monospace;">${formattedBookingId}</p>
       </div>
 
-      <h2 style="color: #1a365d; font-size: 18px; margin-top: 24px;">Tour Details</h2>
+      <h2 style="color: #1a365d; font-size: 18px; margin-top: 24px;">🎯 Tour Details</h2>
 
-      <div style="background: #f8f9fa; border-radius: 8px; padding: 16px; margin-bottom: 12px;">
-        <h3 style="margin: 0 0 12px 0; color: #1a365d; font-size: 18px;">
-          ${tourBooking.tour_name}
-        </h3>
+      <div style="background: #f8f9fa; border-radius: 8px; padding: 16px; margin-bottom: 12px; border-left: 4px solid #22c55e;">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+          <h3 style="margin: 0; color: #1a365d; font-size: 18px;">
+            ${tourBooking.tour_name}
+          </h3>
+          <span style="font-weight: 600; color: #22c55e;">$${tourBooking.total_price.toFixed(2)}</span>
+        </div>
+        ${voucherNumber ? `
+        <div style="margin-bottom: 12px;">
+          <span style="font-size: 11px; color: #6b7280; font-family: monospace; background: #e5e7eb; padding: 4px 8px; border-radius: 4px;">
+            Voucher: ${voucherNumber}
+          </span>
+        </div>
+        ` : ''}
         <table style="width: 100%; font-size: 14px;">
           <tr>
-            <td style="color: #666; padding: 4px 0;">Date:</td>
+            <td style="color: #666; padding: 4px 0;">📅 Date:</td>
             <td style="text-align: right; font-weight: 500;">${tourDate}</td>
           </tr>
           <tr>
-            <td style="color: #666; padding: 4px 0;">Adults:</td>
+            <td style="color: #666; padding: 4px 0;">👥 Adults:</td>
             <td style="text-align: right; font-weight: 500;">${tourBooking.adults}</td>
           </tr>
           ${tourBooking.children > 0 ? `
           <tr>
-            <td style="color: #666; padding: 4px 0;">Children:</td>
+            <td style="color: #666; padding: 4px 0;">👶 Children:</td>
             <td style="text-align: right; font-weight: 500;">${tourBooking.children}</td>
           </tr>
           ` : ''}
           <tr>
-            <td style="color: #666; padding: 4px 0;">Pickup Location:</td>
+            <td style="color: #666; padding: 4px 0;">📍 Pickup Location:</td>
             <td style="text-align: right; font-weight: 500;">${tourBooking.hotel}</td>
           </tr>
         </table>
@@ -218,6 +228,7 @@ export async function POST(request: NextRequest) {
     const { data: emailResult, error: emailError } = await resend.emails.send({
       from: 'Can\'t Wait Travel CR <noreply@cantwaittravelcr.com>',
       to: [customerEmail],
+      bcc: ['mybooking@cantwaittravelcr.com'],
       subject: `Tour Booking Confirmed - ${formattedBookingId}`,
       html: emailHtml,
     });

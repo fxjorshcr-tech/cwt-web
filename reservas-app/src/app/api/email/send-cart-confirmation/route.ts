@@ -95,6 +95,7 @@ export async function POST(request: NextRequest) {
     const { data: emailResult, error: emailError } = await resend.emails.send({
       from: "Can't Wait Travel CR <noreply@cantwaittravelcr.com>",
       to: [customerEmail],
+      bcc: ['mybooking@cantwaittravelcr.com'],
       subject: `Booking Confirmed - ${bookingNumber}`,
       html: emailHtml,
     });
