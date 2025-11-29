@@ -2,7 +2,6 @@
 const nextConfig = {
   // Optimización de producción
   reactStrictMode: true,
-  swcMinify: true, // Minificación rápida con SWC
 
   // Optimización de imágenes
   images: {
