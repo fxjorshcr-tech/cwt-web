@@ -83,16 +83,26 @@ export async function POST(request: NextRequest) {
     };
 
     console.log('[Email API] Sending confirmation to:', customerEmail);
+    console.log('[Email API] Email data:', JSON.stringify({
+      customerEmail,
+      customerName,
+      bookingId,
+      tripsCount: formattedTrips.length,
+      totalAmount,
+    }));
 
     // Send the email
     const emailSent = await sendBookingConfirmationEmail(emailData);
 
     if (!emailSent) {
+      console.error('[Email API] Failed to send email - sendBookingConfirmationEmail returned false');
       return NextResponse.json(
         { error: 'Failed to send email' },
         { status: 500 }
       );
     }
+
+    console.log('[Email API] Email sent successfully to:', customerEmail);
 
     // Update trips to mark email as sent
     await supabase

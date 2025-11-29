@@ -1,32 +1,20 @@
 // src/app/payment/callback/page.tsx
-// Callback de Tilopay - Envía mensaje a la ventana padre para mostrar confirmación inline
+// Callback de Tilopay - Procesa el pago y cierra el popup inmediatamente
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Loader2, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import BookingNavbar from '@/components/booking/BookingNavbar';
-
-interface PaymentResult {
-  success: boolean;
-  code: string;
-  description: string;
-  authCode: string;
-  orderId: string;
-  transactionId: string;
-  bookingId: string | null;
-}
 
 function PaymentCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [processing, setProcessing] = useState(true);
-  const [result, setResult] = useState<PaymentResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [messageSent, setMessageSent] = useState(false);
+  const [status, setStatus] = useState<'processing' | 'success' | 'failed' | 'closing'>('processing');
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   useEffect(() => {
     async function processPaymentCallback() {
@@ -54,9 +42,8 @@ function PaymentCallbackContent() {
           }
         }
 
-        // Fallback: extract bookingId from orderId if not in returnData
+        // Fallback: extract bookingId from orderId
         if (!bookingId && orderId) {
-          // orderId format: booking_XXXXX or just the bookingId itself
           bookingId = orderId.startsWith('booking_') ? orderId : `booking_${orderId}`;
         }
 
@@ -73,16 +60,16 @@ function PaymentCallbackContent() {
           paymentStatus = 'error';
         }
 
-        // Log payment result to payment_logs table
+        // Log payment result
         if (bookingId) {
           try {
-            const logResponse = await fetch('/api/payment/log', {
+            await fetch('/api/payment/log', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 bookingId,
                 status: paymentStatus,
-                amount: 0, // Amount is stored in the initiated log
+                amount: 0,
                 tripIds,
                 tilopayTransactionId: transactionId,
                 tilopayAuthCode: authCode,
@@ -98,23 +85,16 @@ function PaymentCallbackContent() {
                   transactionId,
                   orderHash,
                   returnData: returnDataEncoded,
-                  allParams: Object.fromEntries(searchParams.entries()),
                 },
               }),
             });
-
-            const logData = await logResponse.json();
-            console.log('Payment logged:', logData);
           } catch (err) {
             console.error('Failed to log payment:', err);
-            // Don't block the user flow if logging fails
           }
-        }
 
-        // Save payment status to trips table
-        if (bookingId) {
+          // Update payment status in trips table
           try {
-            const response = await fetch('/api/payment/update-status', {
+            await fetch('/api/payment/update-status', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -126,22 +106,14 @@ function PaymentCallbackContent() {
                 paymentDescription: description,
               }),
             });
-
-            const data = await response.json();
-            console.log('Payment status update:', data);
-
-            if (data.needsMigration) {
-              console.log('Note: Payment columns need to be added to Supabase trips table');
-            }
           } catch (err) {
             console.error('Failed to update payment status:', err);
-            // Don't block the user flow if status update fails
           }
 
-          // Send confirmation email if payment was approved
+          // Send confirmation email if approved
           if (isApproved) {
             try {
-              const emailResponse = await fetch('/api/email/send-confirmation', {
+              await fetch('/api/email/send-confirmation', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -150,180 +122,118 @@ function PaymentCallbackContent() {
                   authCode,
                 }),
               });
-
-              const emailData = await emailResponse.json();
-              console.log('Confirmation email:', emailData);
+              console.log('Confirmation email sent');
             } catch (err) {
               console.error('Failed to send confirmation email:', err);
-              // Don't block the user flow if email fails
             }
           }
         }
 
-        setResult({
-          success: isApproved,
-          code,
-          description,
-          authCode,
-          orderId,
-          transactionId,
-          bookingId,
-        });
-
-        setProcessing(false);
-
-        // ENVIAR MENSAJE A LA VENTANA PADRE
-        // Esto permite que la página de summary cambie a modo confirmación sin redirect
+        // Si estamos en un popup, enviar mensaje y cerrar INMEDIATAMENTE
         if (window.opener && !window.opener.closed) {
-          try {
-            window.opener.postMessage({
-              type: 'PAYMENT_COMPLETE',
-              success: isApproved,
-              transactionId,
-              authCode,
-              bookingId,
-              code,
-              description,
-            }, '*');
+          console.log('Sending message to parent and closing popup...');
 
-            setMessageSent(true);
-            console.log('Payment message sent to parent window');
+          // Enviar mensaje a la ventana padre
+          window.opener.postMessage({
+            type: 'PAYMENT_COMPLETE',
+            success: isApproved,
+            transactionId,
+            authCode,
+            bookingId,
+            code,
+            description,
+          }, '*');
 
-            // Si el pago fue exitoso, cerrar el popup automáticamente después de un momento
-            if (isApproved) {
-              setTimeout(() => {
-                window.close();
-              }, 2000);
+          // Cambiar estado a "closing" para mostrar mensaje apropiado
+          setStatus('closing');
+
+          // Cerrar el popup después de un breve momento
+          setTimeout(() => {
+            window.close();
+          }, 500);
+
+          // Fallback: si window.close() no funciona (algunos browsers lo bloquean)
+          // redirigir después de 2 segundos
+          setTimeout(() => {
+            if (isApproved && bookingId) {
+              window.location.href = `/confirmation?booking_id=${bookingId}&payment=success`;
             }
-          } catch (err) {
-            console.error('Failed to send message to parent:', err);
-          }
+          }, 2500);
+
         } else {
-          // Si no hay ventana padre (usuario abrió directamente el callback), redirigir normalmente
-          if (isApproved && bookingId) {
+          // No estamos en popup, mostrar resultado normal
+          if (isApproved) {
+            setStatus('success');
             setTimeout(() => {
-              router.push(`/confirmation?booking_id=${bookingId}&payment=success`);
+              if (bookingId) {
+                router.push(`/confirmation?booking_id=${bookingId}&payment=success`);
+              }
             }, 2000);
+          } else {
+            setStatus('failed');
+            setErrorMessage(description || 'Payment failed');
           }
         }
+
       } catch (err) {
         console.error('Error processing payment callback:', err);
-        setError('Failed to process payment response');
-        setProcessing(false);
+        setStatus('failed');
+        setErrorMessage('Failed to process payment');
       }
     }
 
     processPaymentCallback();
   }, [searchParams, router]);
 
-  if (processing) {
+  // Estado: Procesando
+  if (status === 'processing') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Card className="max-w-md mx-4 text-center">
+          <CardHeader>
+            <Loader2 className="h-16 w-16 animate-spin text-blue-600 mx-auto mb-4" />
+            <CardTitle>Processing Payment</CardTitle>
+            <CardDescription>Please wait...</CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    );
+  }
+
+  // Estado: Cerrando popup
+  if (status === 'closing') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Card className="max-w-md mx-4 text-center">
+          <CardHeader>
+            <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+            <CardTitle className="text-green-600">Payment Successful!</CardTitle>
+            <CardDescription>Closing this window...</CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    );
+  }
+
+  // Estado: Éxito (solo si no es popup)
+  if (status === 'success') {
     return (
       <>
         <BookingNavbar />
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
           <Card className="max-w-md mx-4 text-center">
             <CardHeader>
-              <Loader2 className="h-16 w-16 animate-spin text-blue-600 mx-auto mb-4" />
-              <CardTitle>Processing Payment</CardTitle>
-              <CardDescription>Please wait while we confirm your payment...</CardDescription>
-            </CardHeader>
-          </Card>
-        </div>
-      </>
-    );
-  }
-
-  if (error) {
-    return (
-      <>
-        <BookingNavbar />
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <Card className="max-w-md mx-4">
-            <CardHeader className="text-center">
-              <AlertCircle className="h-16 w-16 text-yellow-500 mx-auto mb-4" />
-              <CardTitle className="text-yellow-600">Processing Error</CardTitle>
-              <CardDescription>{error}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
-                Return Home
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </>
-    );
-  }
-
-  if (result?.success) {
-    return (
-      <>
-        <BookingNavbar />
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <Card className="max-w-md mx-4">
-            <CardHeader className="text-center">
               <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
               <CardTitle className="text-green-600">Payment Successful!</CardTitle>
-              <CardDescription>
-                Your payment has been processed successfully.
-              </CardDescription>
+              <CardDescription>Redirecting to confirmation...</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Transaction ID:</span>
-                  <span className="font-medium">{result.transactionId}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Authorization:</span>
-                  <span className="font-medium">{result.authCode}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Order:</span>
-                  <span className="font-medium">{result.orderId}</span>
-                </div>
-              </div>
-
-              {messageSent ? (
-                <p className="text-center text-sm text-gray-500">
-                  This window will close automatically...
-                </p>
-              ) : (
-                <p className="text-center text-sm text-gray-500">
-                  Redirecting to confirmation page...
-                </p>
-              )}
-
-              <Button
-                onClick={() => {
-                  const confirmationUrl = `/confirmation?booking_id=${result.bookingId}&payment=success`;
-                  // Check if we're running in a popup
-                  if (window.opener && !window.opener.closed) {
-                    // Enviar mensaje y cerrar
-                    window.opener.postMessage({
-                      type: 'PAYMENT_COMPLETE',
-                      success: true,
-                      transactionId: result.transactionId,
-                      authCode: result.authCode,
-                      bookingId: result.bookingId,
-                    }, '*');
-                    window.close();
-                  } else {
-                    router.push(confirmationUrl);
-                  }
-                }}
-                className="w-full min-h-[48px]"
-              >
-                {messageSent ? 'Close Window' : 'View Confirmation'}
-              </Button>
-            </CardContent>
           </Card>
         </div>
       </>
     );
   }
 
-  // Payment failed
+  // Estado: Fallido
   return (
     <>
       <BookingNavbar />
@@ -332,55 +242,12 @@ function PaymentCallbackContent() {
           <CardHeader className="text-center">
             <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
             <CardTitle className="text-red-600">Payment Failed</CardTitle>
-            <CardDescription>
-              {result?.description || 'Your payment could not be processed.'}
-            </CardDescription>
+            <CardDescription>{errorMessage}</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {result?.code && (
-              <div className="bg-red-50 rounded-lg p-4 text-sm text-red-700">
-                Error code: {result.code}
-              </div>
-            )}
-
-            <div className="flex gap-3">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  // Enviar mensaje de fallo y cerrar
-                  if (window.opener && !window.opener.closed) {
-                    window.opener.postMessage({
-                      type: 'PAYMENT_COMPLETE',
-                      success: false,
-                      bookingId: result?.bookingId,
-                    }, '*');
-                    window.close();
-                  } else {
-                    router.push('/');
-                  }
-                }}
-                className="flex-1 min-h-[48px]"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={() => {
-                  const summaryUrl = result?.bookingId
-                    ? `/summary?booking_id=${result.bookingId}`
-                    : '/';
-                  // Check if we're running in a popup
-                  if (window.opener && !window.opener.closed) {
-                    window.opener.location.href = summaryUrl;
-                    window.close();
-                  } else {
-                    router.push(summaryUrl);
-                  }
-                }}
-                className="flex-1 min-h-[48px]"
-              >
-                Try Again
-              </Button>
-            </div>
+          <CardContent>
+            <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
+              Return Home
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -392,12 +259,9 @@ export default function PaymentCallbackPage() {
   return (
     <Suspense
       fallback={
-        <>
-          <BookingNavbar />
-          <div className="min-h-screen flex items-center justify-center bg-gray-50">
-            <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
-          </div>
-        </>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
+        </div>
       }
     >
       <PaymentCallbackContent />

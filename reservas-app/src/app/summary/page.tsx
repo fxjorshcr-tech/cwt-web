@@ -970,6 +970,7 @@ function SummaryPageContent() {
         <div className="py-6 sm:py-10">
           <div className="max-w-5xl mx-auto px-4">
             <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+              {/* COLUMNA IZQUIERDA - Trip Details y FAQs */}
               <div className="lg:col-span-2 space-y-4 sm:space-y-6">
                 {trips.map((trip, index) => (
                   <TripSummaryCard
@@ -981,124 +982,13 @@ function SummaryPageContent() {
                   />
                 ))}
 
-                {/* ========================================
-                    SECCIÓN DE INFORMACIÓN DEL CLIENTE (INLINE)
-                    ======================================== */}
-                <Card className="shadow-lg">
-                  <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
-                    <div className="flex items-center gap-3">
-                      <CreditCard className="h-6 w-6" />
-                      <div>
-                        <CardTitle className="text-white text-lg">Billing Information</CardTitle>
-                        <CardDescription className="text-blue-100">
-                          Enter your details to proceed to payment
-                        </CardDescription>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-6 space-y-4">
-                    {/* Name fields */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="firstName">First Name *</Label>
-                        <Input
-                          id="firstName"
-                          value={customerInfo.firstName}
-                          onChange={(e) => handleCustomerInfoChange('firstName', e.target.value)}
-                          placeholder="John"
-                          disabled={isProcessingPayment}
-                          className={formErrors.firstName ? 'border-red-500' : ''}
-                        />
-                        {formErrors.firstName && (
-                          <p className="text-red-500 text-xs mt-1">{formErrors.firstName}</p>
-                        )}
-                      </div>
-                      <div>
-                        <Label htmlFor="lastName">Last Name *</Label>
-                        <Input
-                          id="lastName"
-                          value={customerInfo.lastName}
-                          onChange={(e) => handleCustomerInfoChange('lastName', e.target.value)}
-                          placeholder="Doe"
-                          disabled={isProcessingPayment}
-                          className={formErrors.lastName ? 'border-red-500' : ''}
-                        />
-                        {formErrors.lastName && (
-                          <p className="text-red-500 text-xs mt-1">{formErrors.lastName}</p>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Email */}
-                    <div>
-                      <Label htmlFor="email">Email Address *</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={customerInfo.email}
-                        onChange={(e) => handleCustomerInfoChange('email', e.target.value)}
-                        placeholder="john@example.com"
-                        disabled={isProcessingPayment}
-                        className={formErrors.email ? 'border-red-500' : ''}
-                      />
-                      {formErrors.email && (
-                        <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>
-                      )}
-                    </div>
-
-                    {/* Country */}
-                    <div>
-                      <Label htmlFor="country">Country *</Label>
-                      <select
-                        id="country"
-                        value={customerInfo.country}
-                        onChange={(e) => handleCustomerInfoChange('country', e.target.value)}
-                        disabled={isProcessingPayment}
-                        className="w-full h-10 px-3 rounded-md border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        {COUNTRIES.map((country) => (
-                          <option key={country.code} value={country.code}>
-                            {country.name} ({country.phonePrefix})
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Phone with country code */}
-                    <div>
-                      <Label htmlFor="phone">Phone Number *</Label>
-                      <div className="flex gap-2">
-                        <div className="flex items-center justify-center px-3 h-10 bg-gray-100 border border-gray-300 rounded-md text-sm font-medium min-w-[70px]">
-                          {currentCountry.phonePrefix}
-                        </div>
-                        <Input
-                          id="phone"
-                          type="tel"
-                          value={phoneNumber}
-                          onChange={(e) => handlePhoneChange(e.target.value)}
-                          placeholder="8888 8888"
-                          disabled={isProcessingPayment}
-                          className={`flex-1 ${formErrors.phone ? 'border-red-500' : ''}`}
-                        />
-                      </div>
-                      {formErrors.phone && (
-                        <p className="text-red-500 text-xs mt-1">{formErrors.phone}</p>
-                      )}
-                    </div>
-
-                    {/* Security badge */}
-                    <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 rounded-lg p-3">
-                      <Shield className="h-5 w-5 text-green-600" />
-                      <span>Your payment is secured with 256-bit SSL encryption</span>
-                    </div>
-                  </CardContent>
-                </Card>
-
                 <FAQSection faqs={POPULAR_FAQS} onViewAll={() => setShowFAQModal(true)} />
               </div>
 
-              <div className="lg:col-span-1">
-                <div className="sticky top-[140px] space-y-6">
+              {/* COLUMNA DERECHA - Order Summary + Billing Info */}
+              <div className="lg:col-span-1 space-y-4">
+                {/* Order Summary - Sticky en desktop */}
+                <div className="lg:sticky lg:top-[100px]">
                   <OrderSummaryCard
                     trips={trips}
                     totalPassengers={totalPassengers}
@@ -1110,12 +1000,122 @@ function SummaryPageContent() {
                     onPayNow={handlePayNow}
                     onAddToCart={handleAddToCartAndContinue}
                     onBackToDetails={() => {
-                      // Ir al ÚLTIMO trip (el más reciente completado)
                       const lastTripIndex = trips.length - 1;
                       router.push(`/booking-details?booking_id=${bookingId}&trip=${lastTripIndex}&from=summary`);
                     }}
                   />
                 </div>
+
+                {/* Billing Information - Debajo del Order Summary */}
+                <Card className="shadow-lg">
+                  <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg py-3">
+                    <div className="flex items-center gap-2">
+                      <CreditCard className="h-5 w-5" />
+                      <div>
+                        <CardTitle className="text-white text-base">Billing Information</CardTitle>
+                        <CardDescription className="text-blue-100 text-xs">
+                          Enter your details to pay
+                        </CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-4 space-y-3">
+                    {/* Name fields */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label htmlFor="firstName" className="text-xs">First Name *</Label>
+                        <Input
+                          id="firstName"
+                          value={customerInfo.firstName}
+                          onChange={(e) => handleCustomerInfoChange('firstName', e.target.value)}
+                          placeholder="John"
+                          disabled={isProcessingPayment}
+                          className={`h-9 text-sm ${formErrors.firstName ? 'border-red-500' : ''}`}
+                        />
+                        {formErrors.firstName && (
+                          <p className="text-red-500 text-xs mt-0.5">{formErrors.firstName}</p>
+                        )}
+                      </div>
+                      <div>
+                        <Label htmlFor="lastName" className="text-xs">Last Name *</Label>
+                        <Input
+                          id="lastName"
+                          value={customerInfo.lastName}
+                          onChange={(e) => handleCustomerInfoChange('lastName', e.target.value)}
+                          placeholder="Doe"
+                          disabled={isProcessingPayment}
+                          className={`h-9 text-sm ${formErrors.lastName ? 'border-red-500' : ''}`}
+                        />
+                        {formErrors.lastName && (
+                          <p className="text-red-500 text-xs mt-0.5">{formErrors.lastName}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Email */}
+                    <div>
+                      <Label htmlFor="email" className="text-xs">Email Address *</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={customerInfo.email}
+                        onChange={(e) => handleCustomerInfoChange('email', e.target.value)}
+                        placeholder="john@example.com"
+                        disabled={isProcessingPayment}
+                        className={`h-9 text-sm ${formErrors.email ? 'border-red-500' : ''}`}
+                      />
+                      {formErrors.email && (
+                        <p className="text-red-500 text-xs mt-0.5">{formErrors.email}</p>
+                      )}
+                    </div>
+
+                    {/* Country */}
+                    <div>
+                      <Label htmlFor="country" className="text-xs">Country *</Label>
+                      <select
+                        id="country"
+                        value={customerInfo.country}
+                        onChange={(e) => handleCustomerInfoChange('country', e.target.value)}
+                        disabled={isProcessingPayment}
+                        className="w-full h-9 px-3 rounded-md border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        {COUNTRIES.map((country) => (
+                          <option key={country.code} value={country.code}>
+                            {country.name} ({country.phonePrefix})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Phone with country code */}
+                    <div>
+                      <Label htmlFor="phone" className="text-xs">Phone Number *</Label>
+                      <div className="flex gap-2">
+                        <div className="flex items-center justify-center px-2 h-9 bg-gray-100 border border-gray-300 rounded-md text-xs font-medium min-w-[60px]">
+                          {currentCountry.phonePrefix}
+                        </div>
+                        <Input
+                          id="phone"
+                          type="tel"
+                          value={phoneNumber}
+                          onChange={(e) => handlePhoneChange(e.target.value)}
+                          placeholder="8888 8888"
+                          disabled={isProcessingPayment}
+                          className={`flex-1 h-9 text-sm ${formErrors.phone ? 'border-red-500' : ''}`}
+                        />
+                      </div>
+                      {formErrors.phone && (
+                        <p className="text-red-500 text-xs mt-0.5">{formErrors.phone}</p>
+                      )}
+                    </div>
+
+                    {/* Security badge */}
+                    <div className="flex items-center gap-2 text-xs text-gray-500 bg-gray-50 rounded-lg p-2">
+                      <Shield className="h-4 w-4 text-green-600 flex-shrink-0" />
+                      <span>Secured with 256-bit SSL encryption</span>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             </div>
           </div>
