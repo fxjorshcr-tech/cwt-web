@@ -34,13 +34,13 @@ export default function AboutPage() {
         <section className="relative h-[60vh] min-h-[500px] max-h-[700px]">
           <div className="absolute inset-0 z-0">
             <Image
-              src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/aerial-view-conchal-beach.webp?width=1600&quality=60"
+              src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/aerial-view-conchal-beach.webp"
               alt="About Can't Wait Travel Costa Rica"
               fill
               sizes="100vw"
               className="object-cover"
               priority
-              quality={70}
+              
             />
             <div className="absolute inset-0 bg-black/60" />
           </div>
