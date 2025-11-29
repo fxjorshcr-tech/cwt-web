@@ -223,7 +223,7 @@ function PaymentCallbackContent() {
               const params = new URLSearchParams();
               params.set('cart_booking_id', bookingId);
               if (cartItems.shuttles.length > 0) {
-                const shuttleBookingIds = [...new Set(cartItems.shuttles.map(s => s.bookingId))];
+                const shuttleBookingIds = Array.from(new Set(cartItems.shuttles.map(s => s.bookingId)));
                 params.set('shuttle_booking_ids', shuttleBookingIds.join(','));
               }
               if (cartItems.tours.length > 0) {
