@@ -109,11 +109,12 @@ function ConfirmationPageContent() {
           for (const id of shuttleBookingIds) {
             const { data, error } = await supabase
               .from('trips')
-              .select('*')
+              .select('id, booking_id, from_location, to_location, date, pickup_time, adults, children, price, final_price, pickup_address, dropoff_address, customer_first_name, customer_last_name, customer_email, customer_phone, booking_number, voucher_number, created_at')
               .eq('booking_id', id)
               .order('created_at', { ascending: true });
 
             if (!error && data) {
+              console.log('[Confirmation] Cart shuttle trips loaded:', data);
               allTrips.push(...(data as unknown as Trip[]));
             }
           }
@@ -125,11 +126,12 @@ function ConfirmationPageContent() {
           for (const id of tourIds) {
             const { data, error } = await supabase
               .from('tour_bookings')
-              .select('*')
+              .select('id, booking_id, tour_slug, tour_name, date, adults, children, base_price, price_per_extra_person, total_price, hotel, special_requests, status, customer_first_name, customer_last_name, customer_email, customer_phone, booking_number, voucher_number')
               .eq('id', id)
               .single();
 
             if (!error && data) {
+              console.log('[Confirmation] Cart tour loaded:', data);
               allTourBookings.push(data as unknown as TourBooking);
             }
           }
@@ -143,33 +145,35 @@ function ConfirmationPageContent() {
         setTourBookings(allTourBookings);
         setLoading(false);
       } else if (isTourBooking) {
-        // Load tour booking
+        // Load tour booking - explicitly select all needed columns including voucher
         const { data, error } = await supabase
           .from('tour_bookings')
-          .select('*')
+          .select('id, booking_id, tour_slug, tour_name, date, adults, children, base_price, price_per_extra_person, total_price, hotel, special_requests, status, customer_first_name, customer_last_name, customer_email, customer_phone, booking_number, voucher_number')
           .eq('booking_id', tourBookingId)
           .single();
 
         if (error) throw error;
         if (!data) throw new Error('Tour booking not found');
 
+        console.log('[Confirmation] Single tour booking loaded:', data);
+        console.log('[Confirmation] Tour voucher_number:', data?.voucher_number);
         setTourBooking(data as unknown as TourBooking);
         setLoading(false);
       } else {
-        // Load shuttle trips
+        // Load shuttle trips - explicitly select all needed columns including voucher
         const { data, error } = await supabase
           .from('trips')
-          .select('*')
+          .select('id, booking_id, from_location, to_location, date, pickup_time, adults, children, price, final_price, pickup_address, dropoff_address, customer_first_name, customer_last_name, customer_email, customer_phone, booking_number, voucher_number, created_at')
           .eq('booking_id', bookingId as string)
           .order('created_at', { ascending: true });
 
         if (error) throw error;
         if (!data || data.length === 0) throw new Error('No trips found');
 
-        // Debug: Log voucher data (cast to any to bypass Supabase types)
-        console.log('[Confirmation] Loaded trips:', data);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        console.log('[Confirmation] First trip voucher_number:', (data[0] as any)?.voucher_number);
+        // Debug: Log voucher data
+        console.log('[Confirmation] Loaded trips:', JSON.stringify(data, null, 2));
+        console.log('[Confirmation] First trip voucher_number:', data[0]?.voucher_number);
+        console.log('[Confirmation] First trip booking_number:', data[0]?.booking_number);
 
         setTrips(data as unknown as Trip[]);
         setLoading(false);
