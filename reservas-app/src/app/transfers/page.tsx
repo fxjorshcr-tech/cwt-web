@@ -41,13 +41,12 @@ export default function TransfersPage() {
         <section className="relative h-[50vh] min-h-[400px]">
           <div className="absolute inset-0 z-0">
             <Image
-              src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/aerial-view-conchal-beach.webp?width=1600&quality=70"
+              src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/aerial-view-conchal-beach.webp"
               alt="Costa Rica Private Transportation Services"
               fill
               sizes="100vw"
               className="object-cover"
               priority
-              quality={70}
             />
             <div className="absolute inset-0 bg-black/50" />
             <div className="absolute inset-0 bg-gradient-to-t from-blue-900/40 via-transparent to-transparent" />
