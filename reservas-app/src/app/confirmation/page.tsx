@@ -5,7 +5,7 @@
 import { useEffect, useState, Suspense, useCallback, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
-import { CheckCircle, Calendar, Users, MapPin, Mail, Phone, User, Loader2, Home, Download, PartyPopper, PawPrint, Heart } from 'lucide-react';
+import { CheckCircle, Calendar, Users, MapPin, Mail, Phone, User, Loader2, Home, Download, PartyPopper, PawPrint, Heart, Dog } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -102,8 +102,8 @@ function ConfirmationPageContent() {
     return (
       <>
         <BookingNavbar />
-        {/* Hero Skeleton */}
-        <section className="relative h-40 sm:h-48 md:h-56 w-full overflow-hidden">
+        {/* Hero Skeleton - Same height as real hero (h-48 sm:h-56 md:h-64) */}
+        <section className="relative h-48 sm:h-56 md:h-64 w-full overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-green-600 via-green-500 to-green-700 animate-pulse" />
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center px-4">
@@ -392,13 +392,16 @@ function ConfirmationPageContent() {
               </p>
             </div>
 
-            {/* Animal Love Badge */}
+            {/* Animal Love Badge with Dog */}
             <div className="mt-16 flex justify-center animate-in fade-in duration-700 delay-1000">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-50 to-orange-50 rounded-full border border-amber-200/50 shadow-sm">
-                <PawPrint className="h-4 w-4 text-amber-600" />
-                <span className="text-xs font-medium text-amber-800">We respect & love animals</span>
-                <Heart className="h-3 w-3 text-red-400 fill-red-400" />
-                <PawPrint className="h-4 w-4 text-amber-600" />
+              <div className="inline-flex items-center gap-3 px-5 py-3 bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 rounded-full border border-amber-200/50 shadow-md hover:shadow-lg transition-shadow">
+                <Dog className="h-6 w-6 text-amber-700" />
+                <div className="flex items-center gap-2">
+                  <PawPrint className="h-4 w-4 text-amber-500" />
+                  <span className="text-sm font-medium text-amber-800">We respect & love animals</span>
+                  <Heart className="h-4 w-4 text-red-500 fill-red-500" />
+                  <PawPrint className="h-4 w-4 text-amber-500" />
+                </div>
               </div>
             </div>
 
@@ -414,8 +417,8 @@ export default function ConfirmationPage() {
     <Suspense fallback={
       <>
         <BookingNavbar />
-        {/* Hero Skeleton */}
-        <section className="relative h-40 sm:h-48 md:h-56 w-full overflow-hidden">
+        {/* Hero Skeleton - Same height as real hero (h-48 sm:h-56 md:h-64) */}
+        <section className="relative h-48 sm:h-56 md:h-64 w-full overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-green-600 via-green-500 to-green-700 animate-pulse" />
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center px-4">
