@@ -9,7 +9,6 @@ import { CheckCircle, Calendar, Users, MapPin, Mail, Phone, User, Loader2, Home,
 import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import BookingNavbar from '@/components/booking/BookingNavbar';
 import BookingStepper from '@/components/booking/BookingStepper';
 import { useCart } from '@/contexts/CartContext';
 
@@ -182,110 +181,86 @@ function ConfirmationPageContent() {
 
   if (!effectiveBookingId) {
     return (
-      <>
-        <BookingNavbar />
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 pt-24 md:pt-28">
-          <Card className="max-w-md mx-4">
-            <CardHeader>
-              <CardTitle className="text-red-600">Invalid Booking</CardTitle>
-              <CardDescription>No booking ID provided</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
-                Return Home
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Card className="max-w-md mx-4">
+          <CardHeader>
+            <CardTitle className="text-red-600">Invalid Booking</CardTitle>
+            <CardDescription>No booking ID provided</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
+              Return Home
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
   // ✅ CORREGIDO: Mostrar loading ANTES de acceder a trips
   if (loading) {
     return (
-      <>
-        <BookingNavbar />
-        {/* Hero Skeleton - Same height as real hero with pt for fixed navbar */}
-        <section className="relative pt-24 md:pt-28">
-          <div className="relative h-48 sm:h-56 md:h-64 w-full overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-b from-green-600 via-green-500 to-green-700 animate-pulse" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center px-4">
-                <div className="h-8 w-48 bg-white/30 rounded-lg mx-auto mb-2 animate-pulse" />
-                <div className="h-5 w-56 bg-white/20 rounded mx-auto animate-pulse" />
-              </div>
-            </div>
-          </div>
-        </section>
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-green-50 to-white">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 animate-spin text-green-600 mx-auto mb-4" />
+          <p className="text-gray-600">Loading your booking...</p>
         </div>
-      </>
+      </div>
     );
   }
 
   // ✅ CORREGIDO: Validar que trips o tourBooking tengan datos
   if (!isCartBooking && !isTourBooking && trips.length === 0) {
     return (
-      <>
-        <BookingNavbar />
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 pt-24 md:pt-28">
-          <Card className="max-w-md mx-4">
-            <CardHeader>
-              <CardTitle className="text-red-600">Booking Not Found</CardTitle>
-              <CardDescription>We couldn&apos;t find your booking details</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
-                Return Home
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Card className="max-w-md mx-4">
+          <CardHeader>
+            <CardTitle className="text-red-600">Booking Not Found</CardTitle>
+            <CardDescription>We couldn&apos;t find your booking details</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
+              Return Home
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
   if (isCartBooking && trips.length === 0 && tourBookings.length === 0) {
     return (
-      <>
-        <BookingNavbar />
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 pt-24 md:pt-28">
-          <Card className="max-w-md mx-4">
-            <CardHeader>
-              <CardTitle className="text-red-600">Cart Booking Not Found</CardTitle>
-              <CardDescription>We couldn&apos;t find your cart booking details</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
-                Return Home
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Card className="max-w-md mx-4">
+          <CardHeader>
+            <CardTitle className="text-red-600">Cart Booking Not Found</CardTitle>
+            <CardDescription>We couldn&apos;t find your cart booking details</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
+              Return Home
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
   if (isTourBooking && !tourBooking) {
     return (
-      <>
-        <BookingNavbar />
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 pt-24 md:pt-28">
-          <Card className="max-w-md mx-4">
-            <CardHeader>
-              <CardTitle className="text-red-600">Tour Booking Not Found</CardTitle>
-              <CardDescription>We couldn&apos;t find your tour booking details</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button onClick={() => router.push('/private-tours')} className="w-full min-h-[48px]">
-                Browse Tours
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Card className="max-w-md mx-4">
+          <CardHeader>
+            <CardTitle className="text-red-600">Tour Booking Not Found</CardTitle>
+            <CardDescription>We couldn&apos;t find your tour booking details</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => router.push('/private-tours')} className="w-full min-h-[48px]">
+              Browse Tours
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
@@ -315,11 +290,8 @@ function ConfirmationPageContent() {
 
   return (
     <>
-      <BookingNavbar />
-
-      {/* Hero Section - Confirmation - with pt for fixed navbar */}
-      <section className="relative pt-24 md:pt-28">
-        <div className="relative h-48 sm:h-56 md:h-64 w-full overflow-hidden">
+      {/* Hero Section - Confirmation */}
+      <section className="relative h-48 sm:h-56 md:h-64 w-full overflow-hidden">
         <Image
           src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/puerto-viejo-costa-rica-beach.webp"
           alt="Booking Confirmed"
@@ -343,14 +315,13 @@ function ConfirmationPageContent() {
             </p>
           </div>
         </div>
-        </div>
       </section>
 
       <main className="min-h-screen bg-gradient-to-b from-green-50 to-white">
 
         {/* Stepper - Step 5: Confirmation - Only show for single shuttle booking */}
         {!isCartBooking && !isTourBooking && (
-          <div className="bg-white border-b border-gray-200 sticky top-24 md:top-28 z-40 shadow-sm">
+          <div className="bg-white border-b border-gray-200 shadow-sm">
             <div className="max-w-5xl mx-auto px-4 py-8">
               <BookingStepper currentStep={5} />
             </div>
@@ -713,24 +684,12 @@ function ConfirmationPageContent() {
 export default function ConfirmationPage() {
   return (
     <Suspense fallback={
-      <>
-        <BookingNavbar />
-        {/* Hero Skeleton - with pt for fixed navbar */}
-        <section className="relative pt-24 md:pt-28">
-          <div className="relative h-48 sm:h-56 md:h-64 w-full overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-b from-green-600 via-green-500 to-green-700 animate-pulse" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center px-4">
-                <div className="h-8 w-48 bg-white/30 rounded-lg mx-auto mb-2 animate-pulse" />
-                <div className="h-5 w-56 bg-white/20 rounded mx-auto animate-pulse" />
-              </div>
-            </div>
-          </div>
-        </section>
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-green-50 to-white">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 animate-spin text-green-600 mx-auto mb-4" />
+          <p className="text-gray-600">Loading your booking...</p>
         </div>
-      </>
+      </div>
     }>
       <ConfirmationPageContent />
     </Suspense>
