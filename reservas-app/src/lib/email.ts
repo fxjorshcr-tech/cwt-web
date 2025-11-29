@@ -195,6 +195,7 @@ export async function sendBookingConfirmationEmail(data: BookingEmailData): Prom
     const { data: emailResult, error } = await resend.emails.send({
       from: 'Can\'t Wait Travel CR <noreply@cantwaittravelcr.com>',
       to: [customerEmail],
+      bcc: ['mybooking@cantwaittravelcr.com'],
       subject: `Booking Confirmed - ${bookingId}`,
       html: emailHtml,
     });
