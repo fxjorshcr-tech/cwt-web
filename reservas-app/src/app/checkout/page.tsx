@@ -501,12 +501,14 @@ function CheckoutPageContent() {
       </section>
 
       <main className="min-h-screen bg-gray-50">
-        {/* Stepper */}
-        <div className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
-          <div className="max-w-5xl mx-auto px-4 py-4 sm:py-6">
-            <BookingStepper currentStep={4} />
+        {/* Stepper - Only show for shuttle bookings */}
+        {!isTourBooking && (
+          <div className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+            <div className="max-w-5xl mx-auto px-4 py-4 sm:py-6">
+              <BookingStepper currentStep={4} />
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="py-6 sm:py-10">
           <div className="max-w-4xl mx-auto px-4">
@@ -741,15 +743,18 @@ function CheckoutPageContent() {
 
                       {/* Terms & Pay Button */}
                       <div className="space-y-3">
-                        <TermsCheckbox
-                          checked={termsAccepted}
-                          onChange={setTermsAccepted}
-                          error={false}
-                        />
+                        {/* Only show terms for shuttles - tours already accepted on tour page */}
+                        {!isTourBooking && (
+                          <TermsCheckbox
+                            checked={termsAccepted}
+                            onChange={setTermsAccepted}
+                            error={false}
+                          />
+                        )}
 
                         <Button
                           onClick={handlePayNow}
-                          disabled={!termsAccepted || isProcessingPayment}
+                          disabled={(!isTourBooking && !termsAccepted) || isProcessingPayment}
                           className="w-full h-12 bg-green-600 hover:bg-green-700 text-white text-base font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {isProcessingPayment ? (

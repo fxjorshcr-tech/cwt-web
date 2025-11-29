@@ -366,8 +366,8 @@ export default function TourDetailPage({ params }: PageProps) {
         hotel: formData.hotel.trim(),
       });
 
-      // Navigate to cart checkout (includes all cart items)
-      router.push('/checkout');
+      // Navigate to checkout with the current tour (cart already has other items)
+      router.push(`/checkout?tour_booking_id=${pendingTourBookingId}`);
     }
   };
 
