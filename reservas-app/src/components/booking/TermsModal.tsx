@@ -67,7 +67,7 @@ export default function TermsModal({ isOpen, onClose }: TermsModalProps) {
     <div className="fixed inset-0 z-[100]">
       {/* Backdrop - Solid background to hide content behind */}
       <div
-        className="fixed inset-0 bg-gray-900/95"
+        className="fixed inset-0 bg-black"
         onClick={onClose}
       />
 
