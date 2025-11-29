@@ -132,22 +132,46 @@ function CheckoutPageContent() {
 
   // Escuchar mensajes del popup de Tilopay
   useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
+    const handleMessage = async (event: MessageEvent) => {
       if (event.data && event.data.type === 'PAYMENT_COMPLETE') {
         const { success, transactionId, authCode, bookingId: paymentBookingId } = event.data;
 
         if (success) {
+          const finalBookingId = paymentBookingId || bookingId || '';
+
           setPaymentResult({
             success: true,
             transactionId: transactionId || '',
             authCode: authCode || '',
-            bookingId: paymentBookingId || bookingId || '',
+            bookingId: finalBookingId,
           });
           setPageMode('confirmation');
           setIsProcessingPayment(false);
 
+          // Enviar email de confirmación desde aquí (no desde el popup)
+          try {
+            console.log('[Checkout] Sending confirmation email for:', finalBookingId);
+            const emailResponse = await fetch('/api/email/send-confirmation', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                bookingId: finalBookingId,
+                transactionId,
+                authCode,
+              }),
+            });
+            const emailResult = await emailResponse.json();
+            if (emailResult.success) {
+              console.log('[Checkout] Confirmation email sent successfully');
+            } else {
+              console.error('[Checkout] Failed to send email:', emailResult.error);
+            }
+          } catch (err) {
+            console.error('[Checkout] Error sending confirmation email:', err);
+          }
+
           // Recargar trips desde Supabase para obtener la info actualizada
-          loadTripsFromSupabase(supabase, paymentBookingId || bookingId || '').then((updatedTrips) => {
+          loadTripsFromSupabase(supabase, finalBookingId).then((updatedTrips) => {
             if (updatedTrips && updatedTrips.length > 0) {
               setTrips(updatedTrips as Trip[]);
             }

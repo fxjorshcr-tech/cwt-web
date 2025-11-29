@@ -110,14 +110,7 @@ function PaymentCallbackContent() {
             }),
           }).catch(err => console.error('Failed to update payment status:', err));
 
-          // Send confirmation email if approved (no await)
-          if (isApproved) {
-            fetch('/api/email/send-confirmation', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ bookingId, transactionId, authCode }),
-            }).catch(err => console.error('Failed to send confirmation email:', err));
-          }
+          // Email is now sent from the checkout page after receiving the message
         }
 
         // Si es popup, cerrar inmediatamente
