@@ -19,7 +19,6 @@ import {
   PickupLocationForm,
 } from '@/components/tours/booking';
 import { FAQsWidget } from '@/components/booking/FAQsWidget';
-import { CartCheckoutModal } from '@/components/cart';
 import { createClient } from '@/lib/supabase/client';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from 'sonner';
@@ -44,7 +43,7 @@ export default function TourDetailPage({ params }: PageProps) {
   const router = useRouter();
   // Create supabase client once with useMemo to avoid recreation on every render
   const supabase = useMemo(() => createClient(), []);
-  const { addItem, itemCount: cartItemCount, totalAmount: cartTotal } = useCart();
+  const { addItem, itemCount: cartItemCount } = useCart();
 
   const [tour, setTour] = useState<Tour | null>(null);
   const [loading, setLoading] = useState(true);
@@ -60,8 +59,6 @@ export default function TourDetailPage({ params }: PageProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassengerPicker, setShowPassengerPicker] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const [showCartCheckoutModal, setShowCartCheckoutModal] = useState(false);
-  const [pendingTourBookingId, setPendingTourBookingId] = useState<string | null>(null);
 
   // Accordion states
   const [accordions, setAccordions] = useState({
@@ -319,10 +316,27 @@ export default function TourDetailPage({ params }: PageProps) {
       const tourData = await saveTourToSupabase();
 
       if (tourData) {
-        // Check if there are items in cart - show modal to confirm
+        // Check if there are items in cart - redirect to cart for unified checkout
         if (cartItemCount > 0) {
-          setPendingTourBookingId(tourData.booking_id);
-          setShowCartCheckoutModal(true);
+          // Add the current tour to cart
+          addItem({
+            type: 'tour',
+            id: tourData.id,
+            tourSlug: tour.slug,
+            tourName: tour.name,
+            date: formData.date!.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+            }),
+            adults: formData.adults,
+            children: formData.children,
+            price: totalPrice,
+            hotel: formData.hotel.trim(),
+          });
+
+          toast.success('Tour added to cart!');
+          router.push('/cart');
           setIsSubmitting(false);
           return;
         }
@@ -335,46 +349,6 @@ export default function TourDetailPage({ params }: PageProps) {
       toast.error('Failed to process booking');
       setIsSubmitting(false);
     }
-  };
-
-  // Proceed to checkout with only current tour booking
-  const proceedToCheckoutOnly = () => {
-    setShowCartCheckoutModal(false);
-    if (pendingTourBookingId) {
-      router.push(`/checkout?tour_booking_id=${pendingTourBookingId}`);
-    }
-  };
-
-  // Add current tour to cart and proceed to checkout with all items
-  const proceedWithFullCart = () => {
-    setShowCartCheckoutModal(false);
-    if (pendingTourBookingId && tour && formData.date) {
-      // Add the current tour to cart
-      addItem({
-        type: 'tour',
-        id: pendingTourBookingId,
-        tourSlug: tour.slug,
-        tourName: tour.name,
-        date: formData.date.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric',
-        }),
-        adults: formData.adults,
-        children: formData.children,
-        price: totalPrice,
-        hotel: formData.hotel.trim(),
-      });
-
-      // Navigate to checkout with the current tour (cart already has other items)
-      router.push(`/checkout?tour_booking_id=${pendingTourBookingId}`);
-    }
-  };
-
-  // Navigate to cart page
-  const handleViewCart = () => {
-    setShowCartCheckoutModal(false);
-    router.push('/cart');
   };
 
   const handleAdultsChange = (increment: boolean) => {
@@ -416,17 +390,6 @@ export default function TourDetailPage({ params }: PageProps) {
   return (
     <>
       <BookingNavbar />
-      <CartCheckoutModal
-        isOpen={showCartCheckoutModal}
-        onClose={() => setShowCartCheckoutModal(false)}
-        cartItemCount={cartItemCount}
-        cartTotal={cartTotal}
-        currentBookingTotal={totalPrice}
-        isLoading={isSubmitting}
-        onPayAll={proceedWithFullCart}
-        onPayOnlyThis={proceedToCheckoutOnly}
-        onViewCart={handleViewCart}
-      />
 
       {/* Hero Section */}
       <section className="relative h-[60vh] sm:h-[70vh] min-h-[450px] sm:min-h-[500px] flex items-end">

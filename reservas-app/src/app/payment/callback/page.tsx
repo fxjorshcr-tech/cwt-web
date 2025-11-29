@@ -27,9 +27,10 @@ function PaymentCallbackContent() {
 
         // Decode returnData to get bookingId and booking type
         let bookingId: string | null = null;
-        let bookingType: 'shuttle' | 'tour' = 'shuttle';
+        let bookingType: 'shuttle' | 'tour' | 'cart' = 'shuttle';
         let tripIds: string[] = [];
         let tourBookingId: string | null = null;
+        let cartItems: { shuttles: { id: string; bookingId: string }[]; tours: { id: string }[] } | null = null;
 
         if (returnDataEncoded) {
           try {
@@ -38,6 +39,7 @@ function PaymentCallbackContent() {
             bookingType = decoded.bookingType || 'shuttle';
             tripIds = decoded.tripIds || [];
             tourBookingId = decoded.tourBookingId || null;
+            cartItems = decoded.cartItems || null;
           } catch (e) {
             console.error('Failed to decode returnData:', e);
           }
@@ -45,10 +47,11 @@ function PaymentCallbackContent() {
 
         // Fallback: extract bookingId from orderId
         if (!bookingId && orderId) {
-          bookingId = orderId.startsWith('booking_') || orderId.startsWith('tour_') ? orderId : `booking_${orderId}`;
+          bookingId = orderId.startsWith('booking_') || orderId.startsWith('tour_') || orderId.startsWith('cart_') ? orderId : `booking_${orderId}`;
         }
 
         const isTourBooking = bookingType === 'tour';
+        const isCartBooking = bookingType === 'cart';
 
         // Check if payment was successful
         const approved = code === '1';
@@ -92,30 +95,97 @@ function PaymentCallbackContent() {
           }
 
           // Update payment status
-          try {
-            await fetch('/api/payment/update-status', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                bookingId,
-                bookingType,
-                paymentStatus: approved ? 'approved' : 'rejected',
-                transactionId,
-                authCode,
-                paymentCode: code,
-                paymentDescription: description,
-              }),
-            });
-          } catch (err) {
-            console.error('Failed to update payment status:', err);
+          if (isCartBooking && cartItems) {
+            // Update payment status for all cart items
+            try {
+              // Update all shuttle bookings
+              const uniqueShuttleBookingIds = [...new Set(cartItems.shuttles.map(s => s.bookingId))];
+              for (const shuttleBookingId of uniqueShuttleBookingIds) {
+                await fetch('/api/payment/update-status', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    bookingId: shuttleBookingId,
+                    bookingType: 'shuttle',
+                    paymentStatus: approved ? 'approved' : 'rejected',
+                    transactionId,
+                    authCode,
+                    paymentCode: code,
+                    paymentDescription: description,
+                  }),
+                });
+              }
+
+              // Update all tour bookings
+              for (const tour of cartItems.tours) {
+                // Find the booking_id for this tour from Supabase
+                await fetch('/api/payment/update-tour-by-id', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    tourId: tour.id,
+                    paymentStatus: approved ? 'approved' : 'rejected',
+                    transactionId,
+                    authCode,
+                    paymentCode: code,
+                    paymentDescription: description,
+                  }),
+                });
+              }
+            } catch (err) {
+              console.error('Failed to update cart payment status:', err);
+            }
+          } else {
+            try {
+              await fetch('/api/payment/update-status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  bookingId,
+                  bookingType,
+                  paymentStatus: approved ? 'approved' : 'rejected',
+                  transactionId,
+                  authCode,
+                  paymentCode: code,
+                  paymentDescription: description,
+                }),
+              });
+            } catch (err) {
+              console.error('Failed to update payment status:', err);
+            }
           }
 
           // Enviar email de confirmación si el pago fue aprobado
           if (approved) {
             try {
               console.log('[Callback] Sending confirmation email for:', bookingId, 'type:', bookingType);
-              // For tours, we need a different email endpoint or handling
-              if (isTourBooking) {
+
+              if (isCartBooking && cartItems) {
+                // Send emails for all cart items
+                const uniqueShuttleBookingIds = [...new Set(cartItems.shuttles.map(s => s.bookingId))];
+                for (const shuttleBookingId of uniqueShuttleBookingIds) {
+                  await fetch('/api/email/send-confirmation', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      bookingId: shuttleBookingId,
+                      transactionId,
+                      authCode,
+                    }),
+                  });
+                }
+                for (const tour of cartItems.tours) {
+                  await fetch('/api/email/send-tour-confirmation-by-id', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      tourId: tour.id,
+                      transactionId,
+                      authCode,
+                    }),
+                  });
+                }
+              } else if (isTourBooking) {
                 await fetch('/api/email/send-tour-confirmation', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
@@ -148,7 +218,19 @@ function PaymentCallbackContent() {
           setStatus('redirecting');
           // Pequeño delay para mostrar el mensaje
           setTimeout(() => {
-            if (isTourBooking) {
+            if (isCartBooking && cartItems) {
+              // Build query params with all cart item IDs
+              const params = new URLSearchParams();
+              params.set('cart_booking_id', bookingId);
+              if (cartItems.shuttles.length > 0) {
+                const shuttleBookingIds = [...new Set(cartItems.shuttles.map(s => s.bookingId))];
+                params.set('shuttle_booking_ids', shuttleBookingIds.join(','));
+              }
+              if (cartItems.tours.length > 0) {
+                params.set('tour_ids', cartItems.tours.map(t => t.id).join(','));
+              }
+              router.push(`/confirmation?${params.toString()}`);
+            } else if (isTourBooking) {
               router.push(`/confirmation?tour_booking_id=${bookingId}`);
             } else {
               router.push(`/confirmation?booking_id=${bookingId}`);

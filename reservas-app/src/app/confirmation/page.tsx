@@ -64,21 +64,26 @@ function ConfirmationPageContent() {
 
   const bookingId = searchParams.get('booking_id');
   const tourBookingId = searchParams.get('tour_booking_id');
+  const cartBookingId = searchParams.get('cart_booking_id');
+  const shuttleBookingIdsParam = searchParams.get('shuttle_booking_ids');
+  const tourIdsParam = searchParams.get('tour_ids');
 
   // Determine booking type
   const isTourBooking = !!tourBookingId;
-  const effectiveBookingId = tourBookingId || bookingId;
+  const isCartBooking = !!cartBookingId;
+  const effectiveBookingId = cartBookingId || tourBookingId || bookingId;
 
   const [trips, setTrips] = useState<Trip[]>([]);
   const [tourBooking, setTourBooking] = useState<TourBooking | null>(null);
+  const [tourBookings, setTourBookings] = useState<TourBooking[]>([]); // For cart with multiple tours
   const [loading, setLoading] = useState(true);
 
   // Clear cart when confirmation page loads successfully
   useEffect(() => {
-    if (effectiveBookingId && (trips.length > 0 || tourBooking)) {
+    if (effectiveBookingId && (trips.length > 0 || tourBooking || tourBookings.length > 0)) {
       clearCart();
     }
-  }, [effectiveBookingId, trips.length, tourBooking, clearCart]);
+  }, [effectiveBookingId, trips.length, tourBooking, tourBookings.length, clearCart]);
 
   // Memoize the loadBooking function
   const loadBooking = useCallback(async () => {
@@ -90,7 +95,51 @@ function ConfirmationPageContent() {
     try {
       setLoading(true);
 
-      if (isTourBooking) {
+      if (isCartBooking) {
+        // Load all cart items
+        const allTrips: Trip[] = [];
+        const allTourBookings: TourBooking[] = [];
+
+        // Load shuttle trips from comma-separated booking IDs
+        if (shuttleBookingIdsParam) {
+          const shuttleBookingIds = shuttleBookingIdsParam.split(',');
+          for (const id of shuttleBookingIds) {
+            const { data, error } = await supabase
+              .from('trips')
+              .select('*')
+              .eq('booking_id', id)
+              .order('created_at', { ascending: true });
+
+            if (!error && data) {
+              allTrips.push(...(data as Trip[]));
+            }
+          }
+        }
+
+        // Load tour bookings from comma-separated tour IDs
+        if (tourIdsParam) {
+          const tourIds = tourIdsParam.split(',');
+          for (const id of tourIds) {
+            const { data, error } = await supabase
+              .from('tour_bookings')
+              .select('*')
+              .eq('id', id)
+              .single();
+
+            if (!error && data) {
+              allTourBookings.push(data as TourBooking);
+            }
+          }
+        }
+
+        if (allTrips.length === 0 && allTourBookings.length === 0) {
+          throw new Error('No bookings found');
+        }
+
+        setTrips(allTrips);
+        setTourBookings(allTourBookings);
+        setLoading(false);
+      } else if (isTourBooking) {
         // Load tour booking
         const { data, error } = await supabase
           .from('tour_bookings')
@@ -121,7 +170,7 @@ function ConfirmationPageContent() {
       console.error('Error loading booking:', error);
       router.push('/');
     }
-  }, [effectiveBookingId, isTourBooking, tourBookingId, bookingId, supabase, router]);
+  }, [effectiveBookingId, isCartBooking, isTourBooking, tourBookingId, bookingId, shuttleBookingIdsParam, tourIdsParam, supabase, router]);
 
   useEffect(() => {
     loadBooking();
@@ -171,7 +220,7 @@ function ConfirmationPageContent() {
   }
 
   // ✅ CORREGIDO: Validar que trips o tourBooking tengan datos
-  if (!isTourBooking && trips.length === 0) {
+  if (!isCartBooking && !isTourBooking && trips.length === 0) {
     return (
       <>
         <BookingNavbar />
@@ -180,6 +229,27 @@ function ConfirmationPageContent() {
             <CardHeader>
               <CardTitle className="text-red-600">Booking Not Found</CardTitle>
               <CardDescription>We couldn&apos;t find your booking details</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
+                Return Home
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </>
+    );
+  }
+
+  if (isCartBooking && trips.length === 0 && tourBookings.length === 0) {
+    return (
+      <>
+        <BookingNavbar />
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <Card className="max-w-md mx-4">
+            <CardHeader>
+              <CardTitle className="text-red-600">Cart Booking Not Found</CardTitle>
+              <CardDescription>We couldn&apos;t find your cart booking details</CardDescription>
             </CardHeader>
             <CardContent>
               <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
@@ -214,18 +284,28 @@ function ConfirmationPageContent() {
   }
 
   // ✅ Ahora es seguro acceder a trips o tourBooking
-  const grandTotal = isTourBooking && tourBooking
-    ? tourBooking.total_price
-    : trips.reduce((sum, trip) => sum + (trip.final_price || trip.price), 0);
+  const shuttleTotal = trips.reduce((sum, trip) => sum + (trip.final_price || trip.price), 0);
+  const toursTotal = isCartBooking
+    ? tourBookings.reduce((sum, t) => sum + t.total_price, 0)
+    : (isTourBooking && tourBooking ? tourBooking.total_price : 0);
+  const grandTotal = shuttleTotal + toursTotal;
 
-  const customerInfo = isTourBooking && tourBooking
-    ? {
-        customer_first_name: tourBooking.customer_first_name,
-        customer_last_name: tourBooking.customer_last_name,
-        customer_email: tourBooking.customer_email,
-        customer_phone: tourBooking.customer_phone,
-      }
-    : trips[0];
+  // Get customer info from first available booking
+  const customerInfo = isCartBooking
+    ? (trips[0] || tourBookings[0] ? {
+        customer_first_name: trips[0]?.customer_first_name || tourBookings[0]?.customer_first_name,
+        customer_last_name: trips[0]?.customer_last_name || tourBookings[0]?.customer_last_name,
+        customer_email: trips[0]?.customer_email || tourBookings[0]?.customer_email,
+        customer_phone: trips[0]?.customer_phone || tourBookings[0]?.customer_phone,
+      } : null)
+    : (isTourBooking && tourBooking
+        ? {
+            customer_first_name: tourBooking.customer_first_name,
+            customer_last_name: tourBooking.customer_last_name,
+            customer_email: tourBooking.customer_email,
+            customer_phone: tourBooking.customer_phone,
+          }
+        : trips[0]);
 
   return (
     <>
@@ -260,12 +340,14 @@ function ConfirmationPageContent() {
 
       <main className="min-h-screen bg-gradient-to-b from-green-50 to-white">
 
-        {/* Stepper - Step 5: Confirmation */}
-        <div className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
-          <div className="max-w-5xl mx-auto px-4 py-8">
-            <BookingStepper currentStep={5} />
+        {/* Stepper - Step 5: Confirmation - Only show for single shuttle booking */}
+        {!isCartBooking && !isTourBooking && (
+          <div className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+            <div className="max-w-5xl mx-auto px-4 py-8">
+              <BookingStepper currentStep={5} />
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="py-16">
           <div className="max-w-4xl mx-auto px-4">
@@ -393,8 +475,53 @@ function ConfirmationPageContent() {
               </Card>
             )}
 
+            {/* Cart Tour Bookings */}
+            {isCartBooking && tourBookings.length > 0 && (
+              <Card className="mb-8 animate-in fade-in slide-in-from-right duration-700 delay-700">
+                <CardHeader>
+                  <CardTitle>Your Tour Bookings</CardTitle>
+                  <CardDescription>{tourBookings.length} confirmed tour{tourBookings.length !== 1 ? 's' : ''}</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {tourBookings.map((tour, index) => (
+                    <div key={tour.id} className={`${index > 0 ? 'pt-6 border-t' : ''}`}>
+                      <div className="flex items-start gap-3 mb-4">
+                        <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                          <MapPin className="h-5 w-5 text-green-600" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-xl text-gray-900 mb-1">
+                            {tour.tour_name}
+                          </h3>
+                          <div className="grid md:grid-cols-2 gap-3 mt-3">
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                              <Calendar className="h-4 w-4" />
+                              <span>{formatDate(tour.date)}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                              <Users className="h-4 w-4" />
+                              <span>{tour.adults} Adult{tour.adults !== 1 ? 's' : ''}{tour.children > 0 && `, ${tour.children} Child${tour.children !== 1 ? 'ren' : ''}`}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                              <MapPin className="h-4 w-4" />
+                              <span>Pickup: {tour.hotel}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-lg font-bold text-blue-600">
+                            {formatCurrency(tour.total_price)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
+
             {/* Shuttle Trips Summary */}
-            {!isTourBooking && trips.length > 0 && (
+            {(isCartBooking || !isTourBooking) && trips.length > 0 && (
             <Card className="mb-8 animate-in fade-in slide-in-from-right duration-700 delay-700">
               <CardHeader>
                 <CardTitle>Your Trip Details</CardTitle>
