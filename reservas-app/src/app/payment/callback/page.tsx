@@ -8,8 +8,9 @@ import { Loader2, CheckCircle, XCircle, X } from 'lucide-react';
 
 function PaymentCallbackContent() {
   const searchParams = useSearchParams();
-  const [status, setStatus] = useState<'processing' | 'closing' | 'close-manual' | 'failed'>('processing');
-  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [status, setStatus] = useState<'processing' | 'done' | 'failed'>('processing');
+  const [isApproved, setIsApproved] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     async function processPaymentCallback() {
@@ -43,11 +44,12 @@ function PaymentCallbackContent() {
         }
 
         // Check if payment was successful
-        const isApproved = code === '1';
+        const approved = code === '1';
+        setIsApproved(approved);
 
         // Determine payment status for logging
         let paymentStatus: 'approved' | 'rejected' | 'error' | 'cancelled' = 'rejected';
-        if (isApproved) {
+        if (approved) {
           paymentStatus = 'approved';
         } else if (code === '0' || code === '') {
           paymentStatus = 'cancelled';
@@ -55,29 +57,52 @@ function PaymentCallbackContent() {
           paymentStatus = 'error';
         }
 
-        // PRIMERO: Si estamos en un popup, enviar mensaje INMEDIATAMENTE
-        const isPopup = window.opener && !window.opener.closed;
+        // SIEMPRE intentar enviar mensaje al padre, incluso si opener parece null
+        // Algunos browsers pierden la referencia pero el mensaje aún puede llegar
+        const messageData = {
+          type: 'PAYMENT_COMPLETE',
+          success: approved,
+          transactionId,
+          authCode,
+          bookingId,
+          code,
+          description,
+        };
 
-        if (isPopup) {
-          console.log('Popup detected - sending message to parent FIRST');
+        console.log('[Callback] Attempting to send message to parent:', messageData);
 
-          // Enviar mensaje al padre ANTES de hacer cualquier otra cosa
-          window.opener.postMessage({
-            type: 'PAYMENT_COMPLETE',
-            success: isApproved,
-            transactionId,
-            authCode,
-            bookingId,
-            code,
-            description,
-          }, '*');
-
-          console.log('Message sent to parent');
+        // Intentar múltiples métodos para enviar el mensaje
+        try {
+          if (window.opener && !window.opener.closed) {
+            window.opener.postMessage(messageData, '*');
+            console.log('[Callback] Message sent via window.opener');
+          }
+        } catch (e) {
+          console.log('[Callback] window.opener failed:', e);
         }
 
-        // Ahora procesar el backend (log, update status, email)
+        try {
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage(messageData, '*');
+            console.log('[Callback] Message sent via window.parent');
+          }
+        } catch (e) {
+          console.log('[Callback] window.parent failed:', e);
+        }
+
+        // También intentar broadcast
+        try {
+          const bc = new BroadcastChannel('payment_channel');
+          bc.postMessage(messageData);
+          bc.close();
+          console.log('[Callback] Message sent via BroadcastChannel');
+        } catch (e) {
+          console.log('[Callback] BroadcastChannel failed:', e);
+        }
+
+        // Procesar el backend (sin bloquear)
         if (bookingId) {
-          // Log payment result (no await para no bloquear)
+          // Log payment result
           fetch('/api/payment/log', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -92,62 +117,52 @@ function PaymentCallbackContent() {
               tilopayDescription: description,
               tilopayOrderId: orderId,
               tilopayOrderHash: orderHash,
-              rawResponse: { code, description, auth: authCode, order: orderId, transactionId, orderHash },
             }),
           }).catch(err => console.error('Failed to log payment:', err));
 
-          // Update payment status (no await)
+          // Update payment status
           fetch('/api/payment/update-status', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               bookingId,
-              paymentStatus: isApproved ? 'approved' : 'rejected',
+              paymentStatus: approved ? 'approved' : 'rejected',
               transactionId,
               authCode,
               paymentCode: code,
               paymentDescription: description,
             }),
           }).catch(err => console.error('Failed to update payment status:', err));
-
-          // Email is now sent from the checkout page after receiving the message
         }
 
-        // Si es popup, cerrar inmediatamente
-        if (isPopup) {
-          setStatus('closing');
-
-          // Intentar cerrar
-          window.close();
-
-          // Si después de 1 segundo sigue abierto, mostrar mensaje para cerrar manualmente
-          setTimeout(() => {
-            setStatus('close-manual');
-          }, 1000);
-
+        // Marcar como completado
+        if (!approved) {
+          setErrorMessage(description || 'Payment was not approved');
+          setStatus('failed');
         } else {
-          // NO es popup - esto no debería pasar normalmente
-          // Redirigir a home o mostrar error
-          if (!isApproved) {
-            setStatus('failed');
-            setErrorMessage(description || 'Payment failed');
-          } else {
-            // Si no es popup y el pago fue exitoso, redirigir a confirmation
-            window.location.href = `/confirmation?booking_id=${bookingId}&payment=success`;
-          }
+          setStatus('done');
         }
+
+        // Intentar cerrar la ventana
+        setTimeout(() => {
+          try {
+            window.close();
+          } catch (e) {
+            console.log('[Callback] window.close failed:', e);
+          }
+        }, 500);
 
       } catch (err) {
         console.error('Error processing payment callback:', err);
         setStatus('failed');
-        setErrorMessage('Failed to process payment');
+        setErrorMessage('Error processing payment');
       }
     }
 
     processPaymentCallback();
   }, [searchParams]);
 
-  // Estado: Procesando
+  // Loading
   if (status === 'processing') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
@@ -159,53 +174,50 @@ function PaymentCallbackContent() {
     );
   }
 
-  // Estado: Cerrando
-  if (status === 'closing') {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-center p-8">
-          <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
-          <p className="text-green-600 font-bold text-lg">Payment Successful!</p>
-          <p className="text-gray-500 text-sm mt-2">Closing window...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Estado: Cerrar manualmente (window.close() no funcionó)
-  if (status === 'close-manual') {
+  // Success - show close button
+  if (status === 'done' && isApproved) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center p-8 max-w-sm">
-          <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-          <p className="text-green-600 font-bold text-xl mb-2">Payment Successful!</p>
-          <p className="text-gray-600 mb-6">
-            Your payment has been processed. Please close this window to see your confirmation.
+          <CheckCircle className="h-20 w-20 text-green-500 mx-auto mb-6" />
+          <h1 className="text-2xl font-bold text-green-600 mb-2">Payment Successful!</h1>
+          <p className="text-gray-600 mb-8">
+            Please close this window to see your booking confirmation.
           </p>
           <button
-            onClick={() => window.close()}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center gap-2"
+            onClick={() => {
+              try { window.close(); } catch(e) { /* ignore */ }
+            }}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-xl flex items-center justify-center gap-2 text-lg"
           >
-            <X className="h-5 w-5" />
+            <X className="h-6 w-6" />
             Close This Window
           </button>
+          <p className="text-sm text-gray-400 mt-4">
+            If this window doesn't close, please close it manually.
+          </p>
         </div>
       </div>
     );
   }
 
-  // Estado: Fallido
+  // Failed
   return (
     <div className="min-h-screen flex items-center justify-center bg-white">
       <div className="text-center p-8 max-w-sm">
-        <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-        <p className="text-red-600 font-bold text-xl mb-2">Payment Failed</p>
-        <p className="text-gray-600 mb-6">{errorMessage || 'There was an issue processing your payment.'}</p>
+        <XCircle className="h-20 w-20 text-red-500 mx-auto mb-6" />
+        <h1 className="text-2xl font-bold text-red-600 mb-2">Payment Failed</h1>
+        <p className="text-gray-600 mb-8">
+          {errorMessage || 'There was an issue with your payment.'}
+        </p>
         <button
-          onClick={() => window.close()}
-          className="w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg"
+          onClick={() => {
+            try { window.close(); } catch(e) { /* ignore */ }
+          }}
+          className="w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-4 px-6 rounded-xl flex items-center justify-center gap-2 text-lg"
         >
-          Close Window
+          <X className="h-6 w-6" />
+          Close This Window
         </button>
       </div>
     </div>

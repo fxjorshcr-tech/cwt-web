@@ -130,61 +130,91 @@ function CheckoutPageContent() {
   // Get current country's phone prefix
   const currentCountry = COUNTRIES.find(c => c.code === customerInfo.country) || COUNTRIES[0];
 
-  // Escuchar mensajes del popup de Tilopay
-  useEffect(() => {
-    const handleMessage = async (event: MessageEvent) => {
-      if (event.data && event.data.type === 'PAYMENT_COMPLETE') {
-        const { success, transactionId, authCode, bookingId: paymentBookingId } = event.data;
+  // Handler para procesar el mensaje de pago completado
+  const handlePaymentComplete = async (data: { success: boolean; transactionId?: string; authCode?: string; bookingId?: string }) => {
+    const { success, transactionId, authCode, bookingId: paymentBookingId } = data;
 
-        if (success) {
-          const finalBookingId = paymentBookingId || bookingId || '';
+    if (success) {
+      const finalBookingId = paymentBookingId || bookingId || '';
 
-          setPaymentResult({
-            success: true,
-            transactionId: transactionId || '',
-            authCode: authCode || '',
+      setPaymentResult({
+        success: true,
+        transactionId: transactionId || '',
+        authCode: authCode || '',
+        bookingId: finalBookingId,
+      });
+      setPageMode('confirmation');
+      setIsProcessingPayment(false);
+
+      // Enviar email de confirmación desde aquí (no desde el popup)
+      try {
+        console.log('[Checkout] Sending confirmation email for:', finalBookingId);
+        const emailResponse = await fetch('/api/email/send-confirmation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
             bookingId: finalBookingId,
-          });
-          setPageMode('confirmation');
-          setIsProcessingPayment(false);
-
-          // Enviar email de confirmación desde aquí (no desde el popup)
-          try {
-            console.log('[Checkout] Sending confirmation email for:', finalBookingId);
-            const emailResponse = await fetch('/api/email/send-confirmation', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                bookingId: finalBookingId,
-                transactionId,
-                authCode,
-              }),
-            });
-            const emailResult = await emailResponse.json();
-            if (emailResult.success) {
-              console.log('[Checkout] Confirmation email sent successfully');
-            } else {
-              console.error('[Checkout] Failed to send email:', emailResult.error);
-            }
-          } catch (err) {
-            console.error('[Checkout] Error sending confirmation email:', err);
-          }
-
-          // Recargar trips desde Supabase para obtener la info actualizada
-          loadTripsFromSupabase(supabase, finalBookingId).then((updatedTrips) => {
-            if (updatedTrips && updatedTrips.length > 0) {
-              setTrips(updatedTrips as Trip[]);
-            }
-          });
+            transactionId,
+            authCode,
+          }),
+        });
+        const emailResult = await emailResponse.json();
+        if (emailResult.success) {
+          console.log('[Checkout] Confirmation email sent successfully');
         } else {
-          setIsProcessingPayment(false);
-          toast.error('Payment failed. Please try again.');
+          console.error('[Checkout] Failed to send email:', emailResult.error);
         }
+      } catch (err) {
+        console.error('[Checkout] Error sending confirmation email:', err);
+      }
+
+      // Recargar trips desde Supabase para obtener la info actualizada
+      loadTripsFromSupabase(supabase, finalBookingId).then((updatedTrips) => {
+        if (updatedTrips && updatedTrips.length > 0) {
+          setTrips(updatedTrips as Trip[]);
+        }
+      });
+    } else {
+      setIsProcessingPayment(false);
+      toast.error('Payment failed. Please try again.');
+    }
+  };
+
+  // Escuchar mensajes del popup de Tilopay via postMessage
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data && event.data.type === 'PAYMENT_COMPLETE') {
+        console.log('[Checkout] Received postMessage:', event.data);
+        handlePaymentComplete(event.data);
       }
     };
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
+  }, [bookingId, supabase]);
+
+  // Escuchar mensajes via BroadcastChannel (fallback cuando postMessage no funciona)
+  useEffect(() => {
+    let bc: BroadcastChannel | null = null;
+
+    try {
+      bc = new BroadcastChannel('payment_channel');
+      bc.onmessage = (event) => {
+        if (event.data && event.data.type === 'PAYMENT_COMPLETE') {
+          console.log('[Checkout] Received BroadcastChannel message:', event.data);
+          handlePaymentComplete(event.data);
+        }
+      };
+      console.log('[Checkout] BroadcastChannel listener registered');
+    } catch (e) {
+      console.log('[Checkout] BroadcastChannel not supported:', e);
+    }
+
+    return () => {
+      if (bc) {
+        bc.close();
+      }
+    };
   }, [bookingId, supabase]);
 
   // Cargar trips desde Supabase
