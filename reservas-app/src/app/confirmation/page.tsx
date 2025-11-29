@@ -149,8 +149,8 @@ function ConfirmationPageContent() {
     <>
       <BookingNavbar />
 
-      {/* Hero Section */}
-      <section className="relative h-40 sm:h-48 md:h-56 w-full overflow-hidden">
+      {/* Hero Section - Confirmation */}
+      <section className="relative h-48 sm:h-56 md:h-64 w-full overflow-hidden">
         <Image
           src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/puerto-viejo-costa-rica-beach.webp"
           alt="Booking Confirmed"
