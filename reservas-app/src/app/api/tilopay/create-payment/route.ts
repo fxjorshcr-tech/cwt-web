@@ -15,13 +15,19 @@ interface CustomerInfo {
   country: string;
 }
 
+interface CartItems {
+  shuttles: { id: string; bookingId: string; price: number }[];
+  tours: { id: string; price: number }[];
+}
+
 interface PaymentRequestBody {
   bookingId: string;
-  bookingType?: 'shuttle' | 'tour';
+  bookingType?: 'shuttle' | 'tour' | 'cart';
   amount: number;
   currency?: string;
   tripIds?: string[];
   tourBookingId?: string;
+  cartItems?: CartItems;
   customerInfo?: CustomerInfo;
 }
 
@@ -37,7 +43,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { bookingId, bookingType = 'shuttle', amount, currency = 'USD', tripIds, tourBookingId, customerInfo } = body;
+    const { bookingId, bookingType = 'shuttle', amount, currency = 'USD', tripIds, tourBookingId, cartItems, customerInfo } = body;
 
     // Get Tilopay access token
     const token = await getTilopayToken();
@@ -70,6 +76,7 @@ export async function POST(request: NextRequest) {
       bookingType,
       tripIds,
       tourBookingId,
+      cartItems,
       timestamp: Date.now(),
     });
 
