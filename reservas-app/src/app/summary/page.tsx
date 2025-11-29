@@ -381,8 +381,8 @@ function SummaryPageContent() {
       });
     });
 
-    // Navegar a checkout (el checkout mostrará todo el carrito)
-    router.push('/checkout');
+    // Navegar a checkout con el booking actual (el carrito ya tiene los otros items)
+    router.push(`/checkout?booking_id=${bookingId}`);
   };
 
   // Navigate to cart page
