@@ -99,7 +99,7 @@ function PaymentCallbackContent() {
             // Update payment status for all cart items
             try {
               // Update all shuttle bookings
-              const uniqueShuttleBookingIds = [...new Set(cartItems.shuttles.map(s => s.bookingId))];
+              const uniqueShuttleBookingIds = Array.from(new Set(cartItems.shuttles.map(s => s.bookingId)));
               for (const shuttleBookingId of uniqueShuttleBookingIds) {
                 await fetch('/api/payment/update-status', {
                   method: 'POST',
@@ -162,7 +162,7 @@ function PaymentCallbackContent() {
 
               if (isCartBooking && cartItems) {
                 // Send emails for all cart items
-                const uniqueShuttleBookingIds = [...new Set(cartItems.shuttles.map(s => s.bookingId))];
+                const uniqueShuttleBookingIds = Array.from(new Set(cartItems.shuttles.map(s => s.bookingId)));
                 for (const shuttleBookingId of uniqueShuttleBookingIds) {
                   await fetch('/api/email/send-confirmation', {
                     method: 'POST',
