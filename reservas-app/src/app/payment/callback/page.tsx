@@ -1,16 +1,16 @@
 // src/app/payment/callback/page.tsx
-// Callback de Tilopay - SOLO procesa y cierra, NUNCA muestra confirmación
+// Callback de Tilopay - SOLO procesa, envía mensaje y CIERRA
+// NO muestra ninguna confirmación - solo "Cerrando..."
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Loader2, CheckCircle, XCircle, X } from 'lucide-react';
+import { Loader2, X } from 'lucide-react';
 
 function PaymentCallbackContent() {
   const searchParams = useSearchParams();
-  const [status, setStatus] = useState<'processing' | 'done' | 'failed'>('processing');
-  const [isApproved, setIsApproved] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  // Solo 2 estados: procesando o intentando cerrar
+  const [status, setStatus] = useState<'processing' | 'closing'>('processing');
 
   useEffect(() => {
     async function processPaymentCallback() {
@@ -45,7 +45,6 @@ function PaymentCallbackContent() {
 
         // Check if payment was successful
         const approved = code === '1';
-        setIsApproved(approved);
 
         // Determine payment status for logging
         let paymentStatus: 'approved' | 'rejected' | 'error' | 'cancelled' = 'rejected';
@@ -135,90 +134,63 @@ function PaymentCallbackContent() {
           }).catch(err => console.error('Failed to update payment status:', err));
         }
 
-        // Marcar como completado
-        if (!approved) {
-          setErrorMessage(description || 'Payment was not approved');
-          setStatus('failed');
-        } else {
-          setStatus('done');
-        }
+        // Cambiar a estado "cerrando" inmediatamente
+        setStatus('closing');
 
-        // Intentar cerrar la ventana
-        setTimeout(() => {
+        // Intentar cerrar la ventana múltiples veces
+        const tryClose = () => {
           try {
             window.close();
           } catch (e) {
             console.log('[Callback] window.close failed:', e);
           }
-        }, 500);
+        };
+
+        // Intentar cerrar inmediatamente
+        tryClose();
+        // Intentar de nuevo después de 100ms
+        setTimeout(tryClose, 100);
+        // Y otra vez después de 500ms
+        setTimeout(tryClose, 500);
+        // Y una última vez después de 1 segundo
+        setTimeout(tryClose, 1000);
 
       } catch (err) {
         console.error('Error processing payment callback:', err);
-        setStatus('failed');
-        setErrorMessage('Error processing payment');
+        // Aún así intentar cerrar
+        setStatus('closing');
+        setTimeout(() => {
+          try { window.close(); } catch (e) { /* ignore */ }
+        }, 100);
       }
     }
 
     processPaymentCallback();
   }, [searchParams]);
 
-  // Loading
-  if (status === 'processing') {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-center p-8">
-          <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
-          <p className="text-gray-600 font-medium">Processing payment...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Success - show close button
-  if (status === 'done' && isApproved) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-center p-8 max-w-sm">
-          <CheckCircle className="h-20 w-20 text-green-500 mx-auto mb-6" />
-          <h1 className="text-2xl font-bold text-green-600 mb-2">Payment Successful!</h1>
-          <p className="text-gray-600 mb-8">
-            Please close this window to see your booking confirmation.
-          </p>
-          <button
-            onClick={() => {
-              try { window.close(); } catch(e) { /* ignore */ }
-            }}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-xl flex items-center justify-center gap-2 text-lg"
-          >
-            <X className="h-6 w-6" />
-            Close This Window
-          </button>
-          <p className="text-sm text-gray-400 mt-4">
-            If this window doesn't close, please close it manually.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // Failed
+  // Siempre mostrar UI mínima - solo "Cerrando..." o botón para cerrar manualmente
   return (
     <div className="min-h-screen flex items-center justify-center bg-white">
-      <div className="text-center p-8 max-w-sm">
-        <XCircle className="h-20 w-20 text-red-500 mx-auto mb-6" />
-        <h1 className="text-2xl font-bold text-red-600 mb-2">Payment Failed</h1>
-        <p className="text-gray-600 mb-8">
-          {errorMessage || 'There was an issue with your payment.'}
-        </p>
-        <button
-          onClick={() => {
-            try { window.close(); } catch(e) { /* ignore */ }
-          }}
-          className="w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-4 px-6 rounded-xl flex items-center justify-center gap-2 text-lg"
-        >
-          <X className="h-6 w-6" />
-          Close This Window
-        </button>
+      <div className="text-center p-8">
+        {status === 'processing' ? (
+          <>
+            <Loader2 className="h-8 w-8 animate-spin text-gray-400 mx-auto mb-3" />
+            <p className="text-gray-500 text-sm">Processing...</p>
+          </>
+        ) : (
+          <>
+            <Loader2 className="h-8 w-8 animate-spin text-gray-400 mx-auto mb-3" />
+            <p className="text-gray-500 text-sm mb-4">Closing...</p>
+            <button
+              onClick={() => {
+                try { window.close(); } catch(e) { /* ignore */ }
+              }}
+              className="text-blue-600 hover:text-blue-700 text-sm underline"
+            >
+              Click here if window doesn't close
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
