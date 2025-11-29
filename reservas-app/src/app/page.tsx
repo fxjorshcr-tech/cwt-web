@@ -185,7 +185,7 @@ export default async function Home() {
                   </svg>
                 </a>
                 <a
-                  href="https://instagram.com/cantwaittravelcr"
+                  href="https://www.instagram.com/cwtcostarica/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-white/20 hover:bg-white/30 backdrop-blur-md p-2.5 sm:p-3 rounded-full transition-all hover:scale-110 shadow-lg"
@@ -196,7 +196,7 @@ export default async function Home() {
                   </svg>
                 </a>
                 <a
-                  href="https://facebook.com/cantwaittravelcr"
+                  href="https://www.facebook.com/profile.php?id=61584479845603"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-white/20 hover:bg-white/30 backdrop-blur-md p-2.5 sm:p-3 rounded-full transition-all hover:scale-110 shadow-lg"

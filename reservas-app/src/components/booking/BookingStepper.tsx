@@ -1,5 +1,5 @@
 // src/components/booking/BookingStepper.tsx
-// ✅ UPDATED - 5 steps with Preview
+// ✅ UPDATED - 6 steps with Checkout
 
 'use client';
 
@@ -11,7 +11,7 @@ function cn(...classes: (string | boolean | undefined)[]) {
 }
 
 interface BookingStepperProps {
-  currentStep: number; // 0: Search, 1: Preview, 2: Details, 3: Summary, 4: Confirmation
+  currentStep: number; // 0: Search, 1: Preview, 2: Details, 3: Summary, 4: Checkout, 5: Confirmation
 }
 
 const steps = [
@@ -19,7 +19,8 @@ const steps = [
   { id: 1, label: 'Preview' },
   { id: 2, label: 'Details' },
   { id: 3, label: 'Summary' },
-  { id: 4, label: 'Confirmation' },
+  { id: 4, label: 'Checkout' },
+  { id: 5, label: 'Confirmation' },
 ];
 
 export default function BookingStepper({ currentStep }: BookingStepperProps) {

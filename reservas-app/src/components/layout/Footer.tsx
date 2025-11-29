@@ -47,7 +47,7 @@ export default function Footer() {
                   </svg>
                 </a>
                 <a
-                  href="https://instagram.com/cantwaittravelcr"
+                  href="https://www.instagram.com/cwtcostarica/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-400 hover:text-pink-500 transition-colors p-2 rounded-full hover:bg-gray-800"
@@ -58,7 +58,7 @@ export default function Footer() {
                   </svg>
                 </a>
                 <a
-                  href="https://facebook.com/cantwaittravelcr"
+                  href="https://www.facebook.com/profile.php?id=61584479845603"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-400 hover:text-blue-500 transition-colors p-2 rounded-full hover:bg-gray-800"
