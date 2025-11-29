@@ -1,0 +1,663 @@
+// src/app/checkout/page.tsx
+// Página de checkout - billing info y redirige a Tilopay para pagar
+'use client';
+
+import { useEffect, useState, useMemo, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Image from 'next/image';
+import {
+  Loader2,
+  CreditCard,
+  Shield,
+  ArrowLeft,
+  Lock
+} from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import BookingNavbar from '@/components/booking/BookingNavbar';
+import BookingStepper from '@/components/booking/BookingStepper';
+import TermsCheckbox from '@/components/booking/TermsCheckbox';
+import { toast } from 'sonner';
+import { formatDate, formatCurrency } from '@/lib/formatters';
+import { PRICING_CONFIG } from '@/lib/pricing-config';
+import {
+  checkExistingTrips,
+  loadTripsFromSupabase,
+} from '@/utils/supabaseHelpers';
+
+// Country codes with phone prefixes
+const COUNTRIES = [
+  { code: 'CR', name: 'Costa Rica', phonePrefix: '+506' },
+  { code: 'US', name: 'United States', phonePrefix: '+1' },
+  { code: 'CA', name: 'Canada', phonePrefix: '+1' },
+  { code: 'MX', name: 'Mexico', phonePrefix: '+52' },
+  { code: 'GT', name: 'Guatemala', phonePrefix: '+502' },
+  { code: 'PA', name: 'Panama', phonePrefix: '+507' },
+  { code: 'CO', name: 'Colombia', phonePrefix: '+57' },
+  { code: 'ES', name: 'Spain', phonePrefix: '+34' },
+  { code: 'UK', name: 'United Kingdom', phonePrefix: '+44' },
+  { code: 'DE', name: 'Germany', phonePrefix: '+49' },
+  { code: 'FR', name: 'France', phonePrefix: '+33' },
+  { code: 'BR', name: 'Brazil', phonePrefix: '+55' },
+  { code: 'AR', name: 'Argentina', phonePrefix: '+54' },
+  { code: 'CL', name: 'Chile', phonePrefix: '+56' },
+  { code: 'PE', name: 'Peru', phonePrefix: '+51' },
+  { code: 'OTHER', name: 'Other', phonePrefix: '+' },
+];
+
+interface CustomerInfo {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  country: string;
+}
+
+interface Trip {
+  id: string;
+  booking_id: string;
+  from_location: string;
+  to_location: string;
+  date: string;
+  pickup_time: string;
+  adults: number;
+  children: number;
+  price: number;
+  final_price: number | null;
+  night_surcharge: number | null;
+  add_ons: string[] | null;
+  add_ons_price: number | null;
+  pickup_address: string | null;
+  dropoff_address: string | null;
+  flight_number: string | null;
+  airline: string | null;
+  special_requests: string | null;
+  children_ages: number[] | null;
+  duration?: string | null;
+  customer_first_name?: string | null;
+  customer_last_name?: string | null;
+  customer_email?: string | null;
+  customer_phone?: string | null;
+}
+
+function CheckoutPageContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const supabase = createClient();
+
+  const bookingId = searchParams.get('booking_id');
+
+  const [trips, setTrips] = useState<Trip[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+
+  // Estado del formulario de cliente
+  const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    country: 'US',
+  });
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [formErrors, setFormErrors] = useState<Partial<CustomerInfo>>({});
+
+  // Get current country's phone prefix
+  const currentCountry = COUNTRIES.find(c => c.code === customerInfo.country) || COUNTRIES[0];
+
+  // Cargar trips desde Supabase
+  useEffect(() => {
+    async function loadTrips() {
+      if (!bookingId) return;
+
+      try {
+        setLoading(true);
+
+        // Cargar trips desde Supabase (ya fueron guardados en summary)
+        const existingTripIds = await checkExistingTrips(supabase, bookingId);
+
+        if (existingTripIds.length === 0) {
+          toast.error('Booking not found. Please start over.');
+          router.push('/');
+          return;
+        }
+
+        const loadedTrips = await loadTripsFromSupabase(supabase, bookingId);
+
+        if (!loadedTrips || loadedTrips.length === 0) {
+          toast.error('Failed to load booking. Please try again.');
+          router.push('/');
+          return;
+        }
+
+        setTrips(loadedTrips as Trip[]);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error loading booking:', error);
+        toast.error('Failed to load booking. Please start over.');
+        router.push('/');
+      }
+    }
+
+    loadTrips();
+  }, [bookingId, router, supabase]);
+
+  const grandTotal = useMemo(
+    () => trips.reduce((sum, trip) => sum + (trip.final_price || trip.price), 0),
+    [trips]
+  );
+
+  const totalPassengers = useMemo(
+    () => trips.reduce((sum, trip) => sum + trip.adults + trip.children, 0),
+    [trips]
+  );
+
+  const totalWithFees = useMemo(() => {
+    const fees = grandTotal * PRICING_CONFIG.FEES_PERCENTAGE;
+    return grandTotal + fees;
+  }, [grandTotal]);
+
+  // Validar formulario de cliente
+  const validateCustomerForm = (): boolean => {
+    const newErrors: Partial<CustomerInfo> = {};
+
+    if (!customerInfo.firstName.trim()) {
+      newErrors.firstName = 'First name is required';
+    }
+    if (!customerInfo.lastName.trim()) {
+      newErrors.lastName = 'Last name is required';
+    }
+    if (!customerInfo.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerInfo.email)) {
+      newErrors.email = 'Please enter a valid email';
+    }
+    if (!phoneNumber.trim()) {
+      newErrors.phone = 'Phone is required';
+    } else if (phoneNumber.length < 6) {
+      newErrors.phone = 'Please enter a valid phone number';
+    }
+
+    setFormErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleCustomerInfoChange = (field: keyof CustomerInfo, value: string) => {
+    setCustomerInfo((prev) => ({ ...prev, [field]: value }));
+    if (formErrors[field]) {
+      setFormErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
+  };
+
+  const handlePhoneChange = (value: string) => {
+    const cleaned = value.replace(/\D/g, '');
+    setPhoneNumber(cleaned);
+    if (formErrors.phone) {
+      setFormErrors((prev) => ({ ...prev, phone: undefined }));
+    }
+  };
+
+  // HANDLE PAY NOW
+  const handlePayNow = async () => {
+    if (!termsAccepted) {
+      toast.error('Please accept the terms and conditions');
+      return;
+    }
+
+    if (!validateCustomerForm()) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    setIsProcessingPayment(true);
+
+    try {
+      const fullPhone = `${currentCountry.phonePrefix} ${phoneNumber}`;
+      const customerData = { ...customerInfo, phone: fullPhone };
+
+      // Guardar información del cliente en Supabase
+      const { error: updateError } = await supabase
+        .from('trips')
+        .update({
+          customer_first_name: customerData.firstName,
+          customer_last_name: customerData.lastName,
+          customer_email: customerData.email,
+          customer_phone: customerData.phone,
+          customer_country: customerData.country,
+        })
+        .eq('booking_id', bookingId as string);
+
+      if (updateError) {
+        console.error('Error updating customer info:', updateError);
+      }
+
+      // Llamar a la API de Tilopay
+      const response = await fetch('/api/tilopay/create-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bookingId,
+          amount: totalWithFees,
+          currency: 'USD',
+          tripIds: trips.map(t => t.id),
+          customerInfo: customerData,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to create payment');
+      }
+
+      // Redirigir directamente a Tilopay (página completa, no popup)
+      if (data.paymentUrl) {
+        // Redirigir a la página de pago de Tilopay
+        window.location.href = data.paymentUrl;
+      } else {
+        throw new Error('No payment URL received');
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      toast.error('Failed to process payment. Please try again.');
+      setIsProcessingPayment(false);
+    }
+  };
+
+  if (!bookingId) {
+    return (
+      <>
+        <BookingNavbar />
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <Card className="max-w-md mx-4">
+            <CardHeader>
+              <CardTitle className="text-red-600">Invalid Booking</CardTitle>
+              <CardDescription>No booking ID provided</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
+                Return Home
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </>
+    );
+  }
+
+  if (loading) {
+    return (
+      <>
+        <BookingNavbar />
+
+        {/* Hero Skeleton */}
+        <section className="relative h-40 sm:h-48 md:h-56 w-full overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-600 via-gray-500 to-gray-700 animate-pulse" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-center px-4">
+              <div className="h-8 w-48 bg-white/30 rounded-lg mx-auto mb-2 animate-pulse" />
+              <div className="h-5 w-56 bg-white/20 rounded mx-auto animate-pulse" />
+            </div>
+          </div>
+        </section>
+
+        {/* Stepper Skeleton */}
+        <div className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+          <div className="max-w-5xl mx-auto px-4 py-4 sm:py-6">
+            <div className="flex items-center justify-between">
+              {[1, 2, 3, 4].map((step) => (
+                <div key={step} className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-full bg-gray-200 animate-pulse" />
+                  <div className="hidden sm:block h-4 w-20 bg-gray-200 rounded animate-pulse" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="py-6 sm:py-10 bg-gray-50 min-h-screen">
+          <div className="max-w-4xl mx-auto px-4">
+            <div className="flex justify-center items-center py-20">
+              <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (trips.length === 0) {
+    return (
+      <>
+        <BookingNavbar />
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <Card className="max-w-md mx-4">
+            <CardHeader>
+              <CardTitle className="text-red-600">No Trips Found</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
+                Return Home
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </>
+    );
+  }
+
+  // ========================================
+  // CHECKOUT - Formulario de pago
+  // ========================================
+  return (
+    <>
+      <BookingNavbar />
+
+      {/* Hero Section */}
+      <section className="relative h-40 sm:h-48 md:h-56 w-full overflow-hidden">
+        <Image
+          src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/puerto-viejo-costa-rica-beach.webp"
+          alt="Secure Checkout"
+          fill
+          className="object-cover"
+          style={{ objectPosition: '50% 65%' }}
+          priority
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center text-white px-4">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Lock className="h-5 w-5 sm:h-6 sm:w-6" />
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold drop-shadow-lg">
+                Secure Checkout
+              </h1>
+            </div>
+            <p className="text-sm sm:text-base md:text-lg drop-shadow-md">
+              Complete your booking in a few simple steps
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <main className="min-h-screen bg-gray-50">
+        {/* Stepper */}
+        <div className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+          <div className="max-w-5xl mx-auto px-4 py-4 sm:py-6">
+            <BookingStepper currentStep={4} />
+          </div>
+        </div>
+
+        <div className="py-6 sm:py-10">
+          <div className="max-w-4xl mx-auto px-4">
+            <div className="grid lg:grid-cols-5 gap-6 lg:gap-8">
+
+              {/* LEFT COLUMN - Billing Form (wider) */}
+              <div className="lg:col-span-3 space-y-6">
+
+                {/* Billing Information Card */}
+                <Card className="shadow-lg">
+                  <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+                    <div className="flex items-center gap-3">
+                      <CreditCard className="h-6 w-6" />
+                      <div>
+                        <CardTitle className="text-white text-xl">Billing Information</CardTitle>
+                        <CardDescription className="text-blue-100">
+                          Enter your details to complete the payment
+                        </CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-6 space-y-5">
+                    {/* Name fields */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="firstName" className="text-sm font-medium">First Name *</Label>
+                        <Input
+                          id="firstName"
+                          value={customerInfo.firstName}
+                          onChange={(e) => handleCustomerInfoChange('firstName', e.target.value)}
+                          placeholder="John"
+                          disabled={isProcessingPayment}
+                          className={`h-11 mt-1.5 ${formErrors.firstName ? 'border-red-500' : ''}`}
+                        />
+                        {formErrors.firstName && (
+                          <p className="text-red-500 text-xs mt-1">{formErrors.firstName}</p>
+                        )}
+                      </div>
+                      <div>
+                        <Label htmlFor="lastName" className="text-sm font-medium">Last Name *</Label>
+                        <Input
+                          id="lastName"
+                          value={customerInfo.lastName}
+                          onChange={(e) => handleCustomerInfoChange('lastName', e.target.value)}
+                          placeholder="Doe"
+                          disabled={isProcessingPayment}
+                          className={`h-11 mt-1.5 ${formErrors.lastName ? 'border-red-500' : ''}`}
+                        />
+                        {formErrors.lastName && (
+                          <p className="text-red-500 text-xs mt-1">{formErrors.lastName}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Email */}
+                    <div>
+                      <Label htmlFor="email" className="text-sm font-medium">Email Address *</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={customerInfo.email}
+                        onChange={(e) => handleCustomerInfoChange('email', e.target.value)}
+                        placeholder="john@example.com"
+                        disabled={isProcessingPayment}
+                        className={`h-11 mt-1.5 ${formErrors.email ? 'border-red-500' : ''}`}
+                      />
+                      {formErrors.email && (
+                        <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>
+                      )}
+                      <p className="text-xs text-gray-500 mt-1">We'll send your confirmation to this email</p>
+                    </div>
+
+                    {/* Country */}
+                    <div>
+                      <Label htmlFor="country" className="text-sm font-medium">Country *</Label>
+                      <select
+                        id="country"
+                        value={customerInfo.country}
+                        onChange={(e) => handleCustomerInfoChange('country', e.target.value)}
+                        disabled={isProcessingPayment}
+                        className="w-full h-11 mt-1.5 px-3 rounded-md border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        {COUNTRIES.map((country) => (
+                          <option key={country.code} value={country.code}>
+                            {country.name} ({country.phonePrefix})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Phone with country code */}
+                    <div>
+                      <Label htmlFor="phone" className="text-sm font-medium">Phone Number *</Label>
+                      <div className="flex gap-2 mt-1.5">
+                        <div className="flex items-center justify-center px-4 h-11 bg-gray-100 border border-gray-300 rounded-md text-sm font-medium min-w-[70px]">
+                          {currentCountry.phonePrefix}
+                        </div>
+                        <Input
+                          id="phone"
+                          type="tel"
+                          value={phoneNumber}
+                          onChange={(e) => handlePhoneChange(e.target.value)}
+                          placeholder="8888 8888"
+                          disabled={isProcessingPayment}
+                          className={`flex-1 h-11 ${formErrors.phone ? 'border-red-500' : ''}`}
+                        />
+                      </div>
+                      {formErrors.phone && (
+                        <p className="text-red-500 text-xs mt-1">{formErrors.phone}</p>
+                      )}
+                    </div>
+
+                    {/* Security badge */}
+                    <div className="flex items-center gap-3 text-sm text-gray-600 bg-green-50 rounded-lg p-4 border border-green-100">
+                      <Shield className="h-6 w-6 text-green-600 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium text-green-800">Secure Payment</p>
+                        <p className="text-xs text-green-700">Your data is protected with 256-bit SSL encryption</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Back button */}
+                <Button
+                  onClick={() => router.push(`/summary?booking_id=${bookingId}`)}
+                  variant="ghost"
+                  className="text-gray-600 hover:text-gray-900"
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back to Summary
+                </Button>
+              </div>
+
+              {/* RIGHT COLUMN - Order Summary */}
+              <div className="lg:col-span-2">
+                <div className="lg:sticky lg:top-[100px] space-y-4">
+
+                  {/* Order Summary Card */}
+                  <Card className="shadow-lg">
+                    <CardHeader className="border-b border-gray-200 pb-3">
+                      <CardTitle className="text-lg">Order Summary</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-4 space-y-4">
+
+                      {/* Trips */}
+                      {trips.map((trip, index) => (
+                        <div key={trip.id} className={`${index > 0 ? 'pt-3 border-t border-gray-100' : ''}`}>
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <p className="text-sm font-semibold text-gray-900">
+                                {trips.length > 1 && `Trip ${index + 1}: `}
+                                {trip.from_location} → {trip.to_location}
+                              </p>
+                              <p className="text-xs text-gray-500 mt-0.5">
+                                {formatDate(trip.date)} • {trip.adults + trip.children} passengers
+                              </p>
+                            </div>
+                            <p className="text-sm font-bold text-gray-900">
+                              {formatCurrency(trip.final_price || trip.price)}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+
+                      {/* Separator */}
+                      <div className="border-t border-gray-200" />
+
+                      {/* Subtotal & Fees */}
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">Subtotal</span>
+                          <span className="text-sm font-semibold">{formatCurrency(grandTotal)}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">Service Fee ({(PRICING_CONFIG.FEES_PERCENTAGE * 100).toFixed(0)}%)</span>
+                          <span className="text-sm font-medium text-gray-600">
+                            +{formatCurrency(grandTotal * PRICING_CONFIG.FEES_PERCENTAGE)}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Separator */}
+                      <div className="border-t border-gray-200" />
+
+                      {/* Total */}
+                      <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4">
+                        <div className="flex justify-between items-center">
+                          <span className="text-base font-bold text-gray-900">Total</span>
+                          <span className="text-2xl font-bold text-blue-600">
+                            {formatCurrency(totalWithFees)}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Terms & Pay Button */}
+                      <div className="space-y-3">
+                        <TermsCheckbox
+                          checked={termsAccepted}
+                          onChange={setTermsAccepted}
+                          error={false}
+                        />
+
+                        <Button
+                          onClick={handlePayNow}
+                          disabled={!termsAccepted || isProcessingPayment}
+                          className="w-full h-12 bg-green-600 hover:bg-green-700 text-white text-base font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {isProcessingPayment ? (
+                            <>
+                              <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                              Processing...
+                            </>
+                          ) : (
+                            <>
+                              <Lock className="h-5 w-5 mr-2" />
+                              Pay {formatCurrency(totalWithFees)}
+                            </>
+                          )}
+                        </Button>
+
+                        <p className="text-xs text-center text-gray-500">
+                          You will be redirected to our secure payment provider
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Trust Badges */}
+                  <div className="flex items-center justify-center gap-4 text-xs text-gray-500">
+                    <div className="flex items-center gap-1">
+                      <Shield className="h-4 w-4 text-green-600" />
+                      <span>SSL Secured</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <CreditCard className="h-4 w-4 text-blue-600" />
+                      <span>Safe Payment</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense
+      fallback={
+        <>
+          <BookingNavbar />
+          <section className="relative h-40 sm:h-48 md:h-56 w-full overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-b from-gray-600 via-gray-500 to-gray-700 animate-pulse" />
+          </section>
+          <div className="py-6 sm:py-10 bg-gray-50 min-h-screen">
+            <div className="max-w-4xl mx-auto px-4 flex justify-center items-center py-20">
+              <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
+            </div>
+          </div>
+        </>
+      }
+    >
+      <CheckoutPageContent />
+    </Suspense>
+  );
+}

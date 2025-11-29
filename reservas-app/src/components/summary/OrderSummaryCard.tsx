@@ -1,9 +1,9 @@
-﻿// src/components/summary/OrderSummaryCard.tsx
-// ✅ ACTUALIZADO: Pay Now habilitado para pagos online
-import { ArrowLeft, ShoppingCart, Moon, Sparkles, CreditCard, Info, Loader2 } from 'lucide-react';
+// src/components/summary/OrderSummaryCard.tsx
+// Botón "Proceed to Checkout" para ir a la página de pago
+// Sin checkbox de términos - eso está en la página de checkout
+import { ArrowLeft, ShoppingCart, Moon, Sparkles, ArrowRight, Info, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import TermsCheckbox from '@/components/booking/TermsCheckbox';
 import { formatCurrency } from '@/lib/formatters';
 
 interface Trip {
@@ -18,11 +18,9 @@ interface OrderSummaryCardProps {
   trips: Trip[];
   totalPassengers: number;
   grandTotal: number;
-  termsAccepted: boolean;
   feesPercentage: number;
   isSaving?: boolean;
-  onTermsChange: (checked: boolean) => void;
-  onPayNow: () => void;
+  onProceedToCheckout: () => void;
   onAddToCart: () => void;
   onBackToDetails: () => void;
 }
@@ -41,18 +39,16 @@ export function OrderSummaryCard({
   trips,
   totalPassengers,
   grandTotal,
-  termsAccepted,
   feesPercentage,
   isSaving = false,
-  onTermsChange,
-  onPayNow,
+  onProceedToCheckout,
   onAddToCart,
   onBackToDetails,
 }: OrderSummaryCardProps) {
   const calculateTripSubtotal = (trip: Trip) => {
     const basePrice = trip.price;
     const nightSurcharge = trip.night_surcharge || 0;
-    
+
     let addOnsTotal = 0;
     if (trip.add_ons && trip.add_ons.length > 0) {
       if (trip.add_ons.includes('explorer_upgrade')) {
@@ -61,7 +57,7 @@ export function OrderSummaryCard({
         addOnsTotal = ADD_ON_PRICES['flex_protection'];
       }
     }
-    
+
     return basePrice + nightSurcharge + addOnsTotal;
   };
 
@@ -102,7 +98,7 @@ export function OrderSummaryCard({
           {trips.map((trip, index) => {
             const basePrice = trip.price;
             const nightSurcharge = trip.night_surcharge || 0;
-            
+
             let addOnsTotal = 0;
             let addOnName = '';
             if (trip.add_ons && trip.add_ons.length > 0) {
@@ -120,7 +116,7 @@ export function OrderSummaryCard({
                 {trips.length > 1 && (
                   <p className="text-xs font-bold text-gray-900 mb-2">Trip {index + 1}</p>
                 )}
-                
+
                 {/* Base Price */}
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-xs text-gray-700">Base Price</span>
@@ -171,7 +167,7 @@ export function OrderSummaryCard({
             <span className="text-sm font-semibold text-gray-900">Subtotal</span>
             <span className="text-base font-bold text-gray-900">{formatCurrency(allTripsSubtotal)}</span>
           </div>
-          
+
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-1.5">
               <span className="text-xs text-gray-600">Service Fee ({(feesPercentage * 100).toFixed(0)}%)</span>
@@ -202,13 +198,11 @@ export function OrderSummaryCard({
           </div>
         </div>
 
-        {/* Terms & Actions */}
+        {/* Actions - Sin checkbox de términos */}
         <div className="space-y-2.5">
-          <TermsCheckbox checked={termsAccepted} onChange={onTermsChange} error={false} />
-
           <Button
-            onClick={onPayNow}
-            disabled={!termsAccepted || isSaving}
+            onClick={onProceedToCheckout}
+            disabled={isSaving}
             className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSaving ? (
@@ -218,8 +212,8 @@ export function OrderSummaryCard({
               </>
             ) : (
               <>
-                <CreditCard className="h-4 w-4 mr-2" />
-                Pay Now
+                Proceed to Checkout
+                <ArrowRight className="h-4 w-4 ml-2" />
               </>
             )}
           </Button>

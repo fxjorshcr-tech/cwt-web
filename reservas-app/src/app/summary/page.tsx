@@ -1,16 +1,14 @@
 // src/app/summary/page.tsx
-// Flujo de pago integrado: formulario de cliente inline + confirmación en la misma página
+// Página de resumen de reserva - Flujo simplificado
 'use client';
 
-import { useEffect, useState, useMemo, Suspense, useCallback } from 'react';
+import { useEffect, useState, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Loader2, CheckCircle, Calendar, Users, MapPin, Mail, Phone, User, Home, Download, CreditCard, Shield } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import BookingStepper from '@/components/booking/BookingStepper';
 import FAQModal from '@/components/booking/FAQModal';
@@ -24,7 +22,7 @@ import {
   OrderSummaryCard,
 } from '@/components/summary';
 
-import { formatDate, formatTime, formatCurrency, formatBookingId } from '@/lib/formatters';
+import { formatDate, formatTime } from '@/lib/formatters';
 import { PRICING_CONFIG } from '@/lib/pricing-config';
 import {
   loadBookingFromLocalStorage,
@@ -38,34 +36,6 @@ import {
   insertTripsWithRetry,
   prepareTripForSupabase,
 } from '@/utils/supabaseHelpers';
-
-// Country codes with phone prefixes
-const COUNTRIES = [
-  { code: 'CR', name: 'Costa Rica', phonePrefix: '+506' },
-  { code: 'US', name: 'United States', phonePrefix: '+1' },
-  { code: 'CA', name: 'Canada', phonePrefix: '+1' },
-  { code: 'MX', name: 'Mexico', phonePrefix: '+52' },
-  { code: 'GT', name: 'Guatemala', phonePrefix: '+502' },
-  { code: 'PA', name: 'Panama', phonePrefix: '+507' },
-  { code: 'CO', name: 'Colombia', phonePrefix: '+57' },
-  { code: 'ES', name: 'Spain', phonePrefix: '+34' },
-  { code: 'UK', name: 'United Kingdom', phonePrefix: '+44' },
-  { code: 'DE', name: 'Germany', phonePrefix: '+49' },
-  { code: 'FR', name: 'France', phonePrefix: '+33' },
-  { code: 'BR', name: 'Brazil', phonePrefix: '+55' },
-  { code: 'AR', name: 'Argentina', phonePrefix: '+54' },
-  { code: 'CL', name: 'Chile', phonePrefix: '+56' },
-  { code: 'PE', name: 'Peru', phonePrefix: '+51' },
-  { code: 'OTHER', name: 'Other', phonePrefix: '+' },
-];
-
-interface CustomerInfo {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  country: string;
-}
 
 interface Trip {
   id: string;
@@ -89,17 +59,6 @@ interface Trip {
   children_ages: number[] | null;
   duration?: string | null;
   routeId?: number;
-  customer_first_name?: string | null;
-  customer_last_name?: string | null;
-  customer_email?: string | null;
-  customer_phone?: string | null;
-}
-
-interface PaymentResult {
-  success: boolean;
-  transactionId: string;
-  authCode: string;
-  bookingId: string;
 }
 
 // Nombres de Add-ons
@@ -144,65 +103,10 @@ function SummaryPageContent() {
 
   const bookingId = searchParams.get('booking_id');
 
-  // Estado de la página: 'summary' o 'confirmation'
-  const [pageMode, setPageMode] = useState<'summary' | 'confirmation'>('summary');
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
   const [showFAQModal, setShowFAQModal] = useState(false);
-  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(false);
   const [isSavingToSupabase, setIsSavingToSupabase] = useState(false);
-
-  // Estado del formulario de cliente (inline)
-  const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    country: 'US',
-  });
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [formErrors, setFormErrors] = useState<Partial<CustomerInfo>>({});
-
-  // Datos de confirmación del pago
-  const [paymentResult, setPaymentResult] = useState<PaymentResult | null>(null);
-
-  // Get current country's phone prefix
-  const currentCountry = COUNTRIES.find(c => c.code === customerInfo.country) || COUNTRIES[0];
-
-  // Escuchar mensajes del popup de Tilopay
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      // Verificar que el mensaje viene del popup de pago
-      if (event.data && event.data.type === 'PAYMENT_COMPLETE') {
-        const { success, transactionId, authCode, bookingId: paymentBookingId } = event.data;
-
-        if (success) {
-          setPaymentResult({
-            success: true,
-            transactionId: transactionId || '',
-            authCode: authCode || '',
-            bookingId: paymentBookingId || bookingId || '',
-          });
-          setPageMode('confirmation');
-          setIsProcessingPayment(false);
-
-          // Recargar trips desde Supabase para obtener la info actualizada
-          loadTripsFromSupabase(supabase, paymentBookingId || bookingId || '').then((updatedTrips) => {
-            if (updatedTrips && updatedTrips.length > 0) {
-              setTrips(updatedTrips as Trip[]);
-            }
-          });
-        } else {
-          setIsProcessingPayment(false);
-          toast.error('Payment failed. Please try again.');
-        }
-      }
-    };
-
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, [bookingId, supabase]);
 
   if (!bookingId) {
     return (
@@ -305,12 +209,6 @@ function SummaryPageContent() {
     () => trips.reduce((sum, trip) => sum + trip.adults + trip.children, 0),
     [trips]
   );
-
-  // Calcular total con fees
-  const totalWithFees = useMemo(() => {
-    const fees = grandTotal * PRICING_CONFIG.FEES_PERCENTAGE;
-    return grandTotal + fees;
-  }, [grandTotal]);
 
   // FUNCIÓN PARA GUARDAR EN SUPABASE
   const saveBookingToSupabase = async (): Promise<boolean> => {
@@ -424,153 +322,17 @@ function SummaryPageContent() {
     router.push('/transfers');
   };
 
-  // Validar formulario de cliente
-  const validateCustomerForm = (): boolean => {
-    const newErrors: Partial<CustomerInfo> = {};
-
-    if (!customerInfo.firstName.trim()) {
-      newErrors.firstName = 'First name is required';
-    }
-    if (!customerInfo.lastName.trim()) {
-      newErrors.lastName = 'Last name is required';
-    }
-    if (!customerInfo.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerInfo.email)) {
-      newErrors.email = 'Please enter a valid email';
-    }
-    if (!phoneNumber.trim()) {
-      newErrors.phone = 'Phone is required';
-    } else if (phoneNumber.length < 6) {
-      newErrors.phone = 'Please enter a valid phone number';
-    }
-
-    setFormErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  // Manejar cambios en campos de cliente
-  const handleCustomerInfoChange = (field: keyof CustomerInfo, value: string) => {
-    setCustomerInfo((prev) => ({ ...prev, [field]: value }));
-    if (formErrors[field]) {
-      setFormErrors((prev) => ({ ...prev, [field]: undefined }));
-    }
-  };
-
-  const handlePhoneChange = (value: string) => {
-    // Only allow digits
-    const cleaned = value.replace(/\D/g, '');
-    setPhoneNumber(cleaned);
-    if (formErrors.phone) {
-      setFormErrors((prev) => ({ ...prev, phone: undefined }));
-    }
-  };
-
-  // HANDLE PAY NOW - Validar formulario y procesar pago con Tilopay
-  const handlePayNow = async () => {
-    if (!termsAccepted) {
-      toast.error('Please accept the terms and conditions');
-      return;
-    }
-
-    // Validar formulario de cliente
-    if (!validateCustomerForm()) {
-      toast.error('Please fill in all required fields');
-      return;
-    }
-
-    // Guardar en Supabase primero
+  // HANDLE PROCEED TO CHECKOUT - Guardar en Supabase y navegar a checkout
+  const handleProceedToCheckout = async () => {
+    // Guardar en Supabase
     const saved = await saveBookingToSupabase();
 
     if (!saved) {
       return; // Si falla, no continuar
     }
 
-    setIsProcessingPayment(true);
-
-    try {
-      // Combinar prefijo de teléfono con número
-      const fullPhone = `${currentCountry.phonePrefix} ${phoneNumber}`;
-      const customerData = { ...customerInfo, phone: fullPhone };
-
-      // Guardar información del cliente en Supabase
-      const { error: updateError } = await supabase
-        .from('trips')
-        .update({
-          customer_first_name: customerData.firstName,
-          customer_last_name: customerData.lastName,
-          customer_email: customerData.email,
-          customer_phone: customerData.phone,
-          customer_country: customerData.country,
-        })
-        .eq('booking_id', bookingId);
-
-      if (updateError) {
-        console.error('Error updating customer info:', updateError);
-      }
-
-      // Llamar a la API de Tilopay
-      const response = await fetch('/api/tilopay/create-payment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          bookingId,
-          amount: totalWithFees,
-          currency: 'USD',
-          tripIds: trips.map(t => t.id),
-          customerInfo: customerData,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Failed to create payment');
-      }
-
-      // Abrir Tilopay en popup centrado
-      if (data.paymentUrl) {
-        // Calcular posición centrada del popup
-        const width = 500;
-        const height = 700;
-        const left = window.screenX + (window.outerWidth - width) / 2;
-        const top = window.screenY + (window.outerHeight - height) / 2;
-
-        const popup = window.open(
-          data.paymentUrl,
-          'TilopayPayment',
-          `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
-        );
-
-        // Si el popup fue bloqueado, redirigir normalmente
-        if (!popup || popup.closed) {
-          toast.info('Popup blocked. Redirecting to payment page...');
-          window.location.href = data.paymentUrl;
-          return;
-        }
-
-        // Monitorear el popup para cerrar cuando termine
-        const checkPopup = setInterval(() => {
-          if (popup.closed) {
-            clearInterval(checkPopup);
-            // Si el popup se cerró pero no recibimos mensaje, podría ser que el usuario lo cerró manualmente
-            setTimeout(() => {
-              if (pageMode !== 'confirmation') {
-                setIsProcessingPayment(false);
-              }
-            }, 1000);
-          }
-        }, 500);
-
-        toast.success('Payment window opened. Complete your payment there.');
-      } else {
-        throw new Error('No payment URL received');
-      }
-    } catch (error) {
-      console.error('Payment error:', error);
-      toast.error('Failed to process payment. Please try again.');
-      setIsProcessingPayment(false);
-    }
+    // Navegar a la página de checkout
+    router.push(`/checkout?booking_id=${bookingId}`);
   };
 
   if (loading) {
@@ -671,266 +433,7 @@ function SummaryPageContent() {
   }
 
   // ========================================
-  // MODO CONFIRMACIÓN - Pago exitoso
-  // ========================================
-  if (pageMode === 'confirmation') {
-    const confirmedCustomerInfo = trips[0];
-
-    return (
-      <>
-        <BookingNavbar />
-
-        <main className="min-h-screen bg-gradient-to-b from-green-50 to-white">
-
-          {/* Stepper - Step 4: Confirmation */}
-          <div className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
-            <div className="max-w-5xl mx-auto px-4 py-8">
-              <BookingStepper currentStep={4} />
-            </div>
-          </div>
-
-          <div className="py-16">
-            <div className="max-w-4xl mx-auto px-4">
-
-              {/* Success Header with Animation */}
-              <div className="text-center mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                <div className="inline-flex items-center justify-center w-24 h-24 bg-green-100 rounded-full mb-6 animate-in zoom-in duration-500 delay-150">
-                  <CheckCircle className="h-16 w-16 text-green-600 animate-in zoom-in duration-700 delay-300" />
-                </div>
-
-                <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4 animate-in fade-in slide-in-from-bottom-2 duration-700 delay-200">
-                  Congratulations!
-                </h1>
-
-                <p className="text-xl md:text-2xl text-gray-600 mb-2 animate-in fade-in duration-700 delay-300">
-                  Your booking has been confirmed
-                </p>
-
-                <p className="text-lg text-gray-500 animate-in fade-in duration-700 delay-400">
-                  Get ready for an amazing Costa Rica adventure!
-                </p>
-              </div>
-
-              {/* Booking ID Card */}
-              <Card className="mb-8 bg-gradient-to-r from-blue-50 to-green-50 border-blue-200 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
-                <CardContent className="py-8">
-                  <div className="text-center">
-                    <p className="text-sm text-gray-600 mb-3">Your Booking Reference</p>
-                    <p className="text-3xl md:text-4xl font-mono font-bold text-blue-900 mb-3">
-                      {formatBookingId(bookingId)}
-                    </p>
-                    <p className="text-sm text-gray-600 mb-4">
-                      Please save this reference number for your records
-                    </p>
-                    <div className="flex justify-center gap-3">
-                      <Button variant="outline" size="sm">
-                        <Download className="h-4 w-4 mr-2" />
-                        Download Receipt
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Customer Info */}
-              <Card className="mb-8 animate-in fade-in slide-in-from-left duration-700 delay-600">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="h-5 w-5 text-blue-600" />
-                    Customer Information
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="flex items-center gap-3">
-                      <User className="h-5 w-5 text-gray-400" />
-                      <div>
-                        <p className="text-sm text-gray-500">Name</p>
-                        <p className="font-semibold">
-                          {confirmedCustomerInfo?.customer_first_name || customerInfo.firstName} {confirmedCustomerInfo?.customer_last_name || customerInfo.lastName}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Mail className="h-5 w-5 text-gray-400" />
-                      <div>
-                        <p className="text-sm text-gray-500">Email</p>
-                        <p className="font-semibold break-all">{confirmedCustomerInfo?.customer_email || customerInfo.email}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Phone className="h-5 w-5 text-gray-400" />
-                      <div>
-                        <p className="text-sm text-gray-500">Phone</p>
-                        <p className="font-semibold">{confirmedCustomerInfo?.customer_phone || `${currentCountry.phonePrefix} ${phoneNumber}`}</p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Trips Summary */}
-              <Card className="mb-8 animate-in fade-in slide-in-from-right duration-700 delay-700">
-                <CardHeader>
-                  <CardTitle>Your Trip Details</CardTitle>
-                  <CardDescription>{trips.length} confirmed trip{trips.length !== 1 ? 's' : ''}</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {trips.map((trip, index) => (
-                    <div key={trip.id} className={`${index > 0 ? 'pt-6 border-t' : ''}`}>
-                      <div className="flex items-start gap-3 mb-4">
-                        <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                          <span className="text-sm font-bold text-blue-600">{index + 1}</span>
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-lg text-gray-900 mb-1">
-                            {trip.from_location} → {trip.to_location}
-                          </h3>
-                          <div className="grid md:grid-cols-2 gap-3 mt-3">
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                              <Calendar className="h-4 w-4" />
-                              <span>{formatDate(trip.date)}</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                              <Users className="h-4 w-4" />
-                              <span>{trip.adults} Adult{trip.adults !== 1 ? 's' : ''}{trip.children > 0 && `, ${trip.children} Child${trip.children !== 1 ? 'ren' : ''}`}</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                              <MapPin className="h-4 w-4" />
-                              <span>Pickup: {formatTime(trip.pickup_time)}</span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-lg font-bold text-blue-600">
-                            {formatCurrency(trip.final_price || trip.price)}
-                          </p>
-                        </div>
-                      </div>
-
-                      {trip.pickup_address && (
-                        <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                          <p className="text-xs text-gray-500 mb-1">Pickup Address</p>
-                          <p className="text-sm font-medium">{trip.pickup_address}</p>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-
-                  <div className="pt-6 border-t">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xl font-bold text-gray-900">Total Paid</span>
-                      <span className="text-3xl font-bold text-green-600">
-                        {formatCurrency(totalWithFees)}
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Payment Details */}
-              {paymentResult && (
-                <Card className="mb-8 bg-green-50 border-green-200 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-750">
-                  <CardHeader>
-                    <CardTitle className="text-green-900 flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5" />
-                      Payment Details
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid md:grid-cols-2 gap-4 text-sm">
-                      {paymentResult.transactionId && (
-                        <div>
-                          <p className="text-gray-500">Transaction ID</p>
-                          <p className="font-mono font-semibold">{paymentResult.transactionId}</p>
-                        </div>
-                      )}
-                      {paymentResult.authCode && (
-                        <div>
-                          <p className="text-gray-500">Authorization Code</p>
-                          <p className="font-mono font-semibold">{paymentResult.authCode}</p>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Next Steps */}
-              <Card className="mb-8 bg-gradient-to-r from-green-50 to-blue-50 border-green-200 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-800">
-                <CardHeader>
-                  <CardTitle className="text-green-900">What Happens Next?</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex gap-4">
-                    <div className="flex-shrink-0">
-                      <div className="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center">
-                        <CheckCircle className="h-5 w-5 text-white" />
-                      </div>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-green-900 mb-1">Confirmation Email Sent</h4>
-                      <p className="text-sm text-green-700">
-                        Check your inbox at <strong>{confirmedCustomerInfo?.customer_email || customerInfo.email}</strong> for your booking details and receipt.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-4">
-                    <div className="flex-shrink-0">
-                      <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center">
-                        <Mail className="h-5 w-5 text-white" />
-                      </div>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-green-900 mb-1">Need Assistance?</h4>
-                      <p className="text-sm text-green-700">
-                        Contact us anytime at <a href="mailto:mybooking@cantwaittravelcr.com" className="font-semibold underline">mybooking@cantwaittravelcr.com</a> or via <a href="https://wa.me/50685962438" className="font-semibold underline" target="_blank" rel="noopener noreferrer">WhatsApp</a>.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-4">
-                    <div className="flex-shrink-0">
-                      <div className="h-8 w-8 rounded-full bg-orange-500 flex items-center justify-center">
-                        <MapPin className="h-5 w-5 text-white" />
-                      </div>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-green-900 mb-1">Day of Travel</h4>
-                      <p className="text-sm text-green-700">
-                        Be ready at your pickup location 10 minutes before scheduled time. Have a great trip!
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Actions */}
-              <div className="text-center space-y-4 animate-in fade-in duration-700 delay-900">
-                <Button
-                  onClick={() => router.push('/')}
-                  size="lg"
-                  className="min-h-[52px] px-8"
-                >
-                  <Home className="h-5 w-5 mr-2" />
-                  Return to Home
-                </Button>
-
-                <p className="text-sm text-gray-500">
-                  Need help? Contact us on <a href="https://wa.me/50685962438" className="text-green-600 font-semibold hover:underline" target="_blank" rel="noopener noreferrer">WhatsApp</a>
-                </p>
-              </div>
-
-            </div>
-          </div>
-        </main>
-      </>
-    );
-  }
-
-  // ========================================
-  // MODO SUMMARY - Formulario de pago
+  // MODO SUMMARY - Resumen de reserva
   // ========================================
   return (
     <>
@@ -985,19 +488,16 @@ function SummaryPageContent() {
                 <FAQSection faqs={POPULAR_FAQS} onViewAll={() => setShowFAQModal(true)} />
               </div>
 
-              {/* COLUMNA DERECHA - Order Summary + Billing Info */}
-              <div className="lg:col-span-1 space-y-4">
-                {/* Order Summary - Sticky en desktop */}
+              {/* COLUMNA DERECHA - Order Summary */}
+              <div className="lg:col-span-1">
                 <div className="lg:sticky lg:top-[100px]">
                   <OrderSummaryCard
                     trips={trips}
                     totalPassengers={totalPassengers}
                     grandTotal={grandTotal}
-                    termsAccepted={termsAccepted}
                     feesPercentage={PRICING_CONFIG.FEES_PERCENTAGE}
-                    isSaving={isSavingToSupabase || isProcessingPayment}
-                    onTermsChange={setTermsAccepted}
-                    onPayNow={handlePayNow}
+                    isSaving={isSavingToSupabase}
+                    onProceedToCheckout={handleProceedToCheckout}
                     onAddToCart={handleAddToCartAndContinue}
                     onBackToDetails={() => {
                       const lastTripIndex = trips.length - 1;
@@ -1005,117 +505,6 @@ function SummaryPageContent() {
                     }}
                   />
                 </div>
-
-                {/* Billing Information - Debajo del Order Summary */}
-                <Card className="shadow-lg">
-                  <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg py-3">
-                    <div className="flex items-center gap-2">
-                      <CreditCard className="h-5 w-5" />
-                      <div>
-                        <CardTitle className="text-white text-base">Billing Information</CardTitle>
-                        <CardDescription className="text-blue-100 text-xs">
-                          Enter your details to pay
-                        </CardDescription>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-4 space-y-3">
-                    {/* Name fields */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label htmlFor="firstName" className="text-xs">First Name *</Label>
-                        <Input
-                          id="firstName"
-                          value={customerInfo.firstName}
-                          onChange={(e) => handleCustomerInfoChange('firstName', e.target.value)}
-                          placeholder="John"
-                          disabled={isProcessingPayment}
-                          className={`h-9 text-sm ${formErrors.firstName ? 'border-red-500' : ''}`}
-                        />
-                        {formErrors.firstName && (
-                          <p className="text-red-500 text-xs mt-0.5">{formErrors.firstName}</p>
-                        )}
-                      </div>
-                      <div>
-                        <Label htmlFor="lastName" className="text-xs">Last Name *</Label>
-                        <Input
-                          id="lastName"
-                          value={customerInfo.lastName}
-                          onChange={(e) => handleCustomerInfoChange('lastName', e.target.value)}
-                          placeholder="Doe"
-                          disabled={isProcessingPayment}
-                          className={`h-9 text-sm ${formErrors.lastName ? 'border-red-500' : ''}`}
-                        />
-                        {formErrors.lastName && (
-                          <p className="text-red-500 text-xs mt-0.5">{formErrors.lastName}</p>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Email */}
-                    <div>
-                      <Label htmlFor="email" className="text-xs">Email Address *</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={customerInfo.email}
-                        onChange={(e) => handleCustomerInfoChange('email', e.target.value)}
-                        placeholder="john@example.com"
-                        disabled={isProcessingPayment}
-                        className={`h-9 text-sm ${formErrors.email ? 'border-red-500' : ''}`}
-                      />
-                      {formErrors.email && (
-                        <p className="text-red-500 text-xs mt-0.5">{formErrors.email}</p>
-                      )}
-                    </div>
-
-                    {/* Country */}
-                    <div>
-                      <Label htmlFor="country" className="text-xs">Country *</Label>
-                      <select
-                        id="country"
-                        value={customerInfo.country}
-                        onChange={(e) => handleCustomerInfoChange('country', e.target.value)}
-                        disabled={isProcessingPayment}
-                        className="w-full h-9 px-3 rounded-md border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        {COUNTRIES.map((country) => (
-                          <option key={country.code} value={country.code}>
-                            {country.name} ({country.phonePrefix})
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Phone with country code */}
-                    <div>
-                      <Label htmlFor="phone" className="text-xs">Phone Number *</Label>
-                      <div className="flex gap-2">
-                        <div className="flex items-center justify-center px-2 h-9 bg-gray-100 border border-gray-300 rounded-md text-xs font-medium min-w-[60px]">
-                          {currentCountry.phonePrefix}
-                        </div>
-                        <Input
-                          id="phone"
-                          type="tel"
-                          value={phoneNumber}
-                          onChange={(e) => handlePhoneChange(e.target.value)}
-                          placeholder="8888 8888"
-                          disabled={isProcessingPayment}
-                          className={`flex-1 h-9 text-sm ${formErrors.phone ? 'border-red-500' : ''}`}
-                        />
-                      </div>
-                      {formErrors.phone && (
-                        <p className="text-red-500 text-xs mt-0.5">{formErrors.phone}</p>
-                      )}
-                    </div>
-
-                    {/* Security badge */}
-                    <div className="flex items-center gap-2 text-xs text-gray-500 bg-gray-50 rounded-lg p-2">
-                      <Shield className="h-4 w-4 text-green-600 flex-shrink-0" />
-                      <span>Secured with 256-bit SSL encryption</span>
-                    </div>
-                  </CardContent>
-                </Card>
               </div>
             </div>
           </div>

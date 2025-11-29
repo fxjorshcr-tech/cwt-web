@@ -4,7 +4,8 @@
 
 import { useEffect, useState, Suspense, useCallback, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { CheckCircle, Calendar, Users, MapPin, Mail, Phone, User, Loader2, Home, Download } from 'lucide-react';
+import Image from 'next/image';
+import { CheckCircle, Calendar, Users, MapPin, Mail, Phone, User, Loader2, Home, Download, PartyPopper, PawPrint, Heart } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -101,6 +102,16 @@ function ConfirmationPageContent() {
     return (
       <>
         <BookingNavbar />
+        {/* Hero Skeleton */}
+        <section className="relative h-40 sm:h-48 md:h-56 w-full overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-green-600 via-green-500 to-green-700 animate-pulse" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-center px-4">
+              <div className="h-8 w-48 bg-white/30 rounded-lg mx-auto mb-2 animate-pulse" />
+              <div className="h-5 w-56 bg-white/20 rounded mx-auto animate-pulse" />
+            </div>
+          </div>
+        </section>
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
           <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
         </div>
@@ -138,12 +149,39 @@ function ConfirmationPageContent() {
     <>
       <BookingNavbar />
 
+      {/* Hero Section */}
+      <section className="relative h-40 sm:h-48 md:h-56 w-full overflow-hidden">
+        <Image
+          src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/puerto-viejo-costa-rica-beach.webp"
+          alt="Booking Confirmed"
+          fill
+          className="object-cover"
+          style={{ objectPosition: '50% 65%' }}
+          priority
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center text-white px-4">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <PartyPopper className="h-5 w-5 sm:h-6 sm:w-6" />
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold drop-shadow-lg">
+                Booking Confirmed!
+              </h1>
+            </div>
+            <p className="text-sm sm:text-base md:text-lg drop-shadow-md">
+              Your Costa Rica adventure awaits
+            </p>
+          </div>
+        </div>
+      </section>
+
       <main className="min-h-screen bg-gradient-to-b from-green-50 to-white">
-        
-        {/* Stepper - Step 4: Confirmation */}
+
+        {/* Stepper - Step 5: Confirmation */}
         <div className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
           <div className="max-w-5xl mx-auto px-4 py-8">
-            <BookingStepper currentStep={4} />
+            <BookingStepper currentStep={5} />
           </div>
         </div>
 
@@ -348,10 +386,20 @@ function ConfirmationPageContent() {
                 <Home className="h-5 w-5 mr-2" />
                 Return to Home
               </Button>
-              
+
               <p className="text-sm text-gray-500">
                 Need help? Contact us on <a href="https://wa.me/50685962438" className="text-green-600 font-semibold hover:underline" target="_blank" rel="noopener noreferrer">WhatsApp</a>
               </p>
+            </div>
+
+            {/* Animal Love Badge */}
+            <div className="mt-16 flex justify-center animate-in fade-in duration-700 delay-1000">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-50 to-orange-50 rounded-full border border-amber-200/50 shadow-sm">
+                <PawPrint className="h-4 w-4 text-amber-600" />
+                <span className="text-xs font-medium text-amber-800">We respect & love animals</span>
+                <Heart className="h-3 w-3 text-red-400 fill-red-400" />
+                <PawPrint className="h-4 w-4 text-amber-600" />
+              </div>
             </div>
 
           </div>
@@ -366,6 +414,16 @@ export default function ConfirmationPage() {
     <Suspense fallback={
       <>
         <BookingNavbar />
+        {/* Hero Skeleton */}
+        <section className="relative h-40 sm:h-48 md:h-56 w-full overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-green-600 via-green-500 to-green-700 animate-pulse" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-center px-4">
+              <div className="h-8 w-48 bg-white/30 rounded-lg mx-auto mb-2 animate-pulse" />
+              <div className="h-5 w-56 bg-white/20 rounded mx-auto animate-pulse" />
+            </div>
+          </div>
+        </section>
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
           <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
         </div>
