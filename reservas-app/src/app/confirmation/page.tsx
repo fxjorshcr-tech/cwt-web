@@ -115,7 +115,7 @@ function ConfirmationPageContent() {
               .order('created_at', { ascending: true });
 
             if (!error && data) {
-              allTrips.push(...(data as Trip[]));
+              allTrips.push(...(data as unknown as Trip[]));
             }
           }
         }
@@ -131,7 +131,7 @@ function ConfirmationPageContent() {
               .single();
 
             if (!error && data) {
-              allTourBookings.push(data as TourBooking);
+              allTourBookings.push(data as unknown as TourBooking);
             }
           }
         }
@@ -154,7 +154,7 @@ function ConfirmationPageContent() {
         if (error) throw error;
         if (!data) throw new Error('Tour booking not found');
 
-        setTourBooking(data as TourBooking);
+        setTourBooking(data as unknown as TourBooking);
         setLoading(false);
       } else {
         // Load shuttle trips
@@ -167,7 +167,7 @@ function ConfirmationPageContent() {
         if (error) throw error;
         if (!data || data.length === 0) throw new Error('No trips found');
 
-        setTrips(data as Trip[]);
+        setTrips(data as unknown as Trip[]);
         setLoading(false);
       }
     } catch (error) {
