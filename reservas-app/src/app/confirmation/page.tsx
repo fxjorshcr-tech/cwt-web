@@ -166,6 +166,10 @@ function ConfirmationPageContent() {
         if (error) throw error;
         if (!data || data.length === 0) throw new Error('No trips found');
 
+        // Debug: Log voucher data
+        console.log('[Confirmation] Loaded trips:', data);
+        console.log('[Confirmation] First trip voucher_number:', data[0]?.voucher_number);
+
         setTrips(data as unknown as Trip[]);
         setLoading(false);
       }
