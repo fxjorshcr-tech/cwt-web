@@ -166,9 +166,10 @@ function ConfirmationPageContent() {
         if (error) throw error;
         if (!data || data.length === 0) throw new Error('No trips found');
 
-        // Debug: Log voucher data
+        // Debug: Log voucher data (cast to any to bypass Supabase types)
         console.log('[Confirmation] Loaded trips:', data);
-        console.log('[Confirmation] First trip voucher_number:', data[0]?.voucher_number);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        console.log('[Confirmation] First trip voucher_number:', (data[0] as any)?.voucher_number);
 
         setTrips(data as unknown as Trip[]);
         setLoading(false);
