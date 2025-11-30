@@ -4,8 +4,7 @@
 
 import { useEffect, useState, Suspense, useCallback, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Image from 'next/image';
-import { CheckCircle, Calendar, Users, MapPin, Mail, Phone, User, Loader2, Home, Download, PartyPopper, PawPrint, Heart, Dog, Ticket } from 'lucide-react';
+import { CheckCircle, Calendar, Users, MapPin, Mail, Phone, User, Loader2, Home, Download, PawPrint, Heart, Dog, Ticket } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -126,7 +125,7 @@ function ConfirmationPageContent() {
           for (const id of tourIds) {
             const { data, error } = await supabase
               .from('tour_bookings')
-              .select('id, booking_id, tour_slug, tour_name, date, adults, children, base_price, price_per_extra_person, total_price, hotel, special_requests, status, customer_first_name, customer_last_name, customer_email, customer_phone, booking_number, voucher_number')
+              .select('id, booking_id, tour_slug, tour_name, date, adults, children, base_price, price_per_extra_person, total_price, hotel, special_requests, status, customer_first_name, customer_last_name, customer_email, customer_phone, voucher_number')
               .eq('id', id)
               .single();
 
@@ -148,16 +147,16 @@ function ConfirmationPageContent() {
         // Load tour booking - explicitly select all needed columns including voucher
         const { data, error } = await supabase
           .from('tour_bookings')
-          .select('id, booking_id, tour_slug, tour_name, date, adults, children, base_price, price_per_extra_person, total_price, hotel, special_requests, status, customer_first_name, customer_last_name, customer_email, customer_phone, booking_number, voucher_number')
+          .select('id, booking_id, tour_slug, tour_name, date, adults, children, base_price, price_per_extra_person, total_price, hotel, special_requests, status, customer_first_name, customer_last_name, customer_email, customer_phone, voucher_number')
           .eq('booking_id', tourBookingId)
           .single();
 
         if (error) throw error;
         if (!data) throw new Error('Tour booking not found');
 
-        console.log('[Confirmation] Single tour booking loaded:', data);
-        console.log('[Confirmation] Tour voucher_number:', data?.voucher_number);
-        setTourBooking(data as unknown as TourBooking);
+        const tourData = data as unknown as TourBooking;
+        console.log('[Confirmation] Single tour booking loaded:', tourData);
+        setTourBooking(tourData);
         setLoading(false);
       } else {
         // Load shuttle trips - explicitly select all needed columns including voucher
@@ -301,47 +300,34 @@ function ConfirmationPageContent() {
         : trips[0]);
 
   return (
-    <>
-      {/* Hero Section - Confirmation */}
-      <section className="relative h-48 sm:h-56 md:h-64 w-full overflow-hidden">
-        <Image
-          src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/puerto-viejo-costa-rica-beach.webp"
-          alt="Booking Confirmed"
-          fill
-          className="object-cover"
-          style={{ objectPosition: '50% 65%' }}
-          priority
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center text-white px-4">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <PartyPopper className="h-5 w-5 sm:h-6 sm:w-6" />
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold drop-shadow-lg">
-                Booking Confirmed!
-              </h1>
-            </div>
-            <p className="text-sm sm:text-base md:text-lg drop-shadow-md">
-              Your Costa Rica adventure awaits
-            </p>
+    <main className="min-h-screen bg-gradient-to-b from-green-50 to-white">
+      {/* Simple Header with Home Button */}
+      <div className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
+        <div className="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+          <h1 className="text-lg font-semibold text-gray-900">Booking Confirmed</h1>
+          <Button
+            onClick={() => router.push('/')}
+            variant="outline"
+            size="sm"
+            className="min-h-[40px]"
+          >
+            <Home className="h-4 w-4 mr-2" />
+            Home
+          </Button>
+        </div>
+      </div>
+
+      {/* Stepper - Step 5: Confirmation - Only show for single shuttle booking */}
+      {!isCartBooking && !isTourBooking && (
+        <div className="bg-white border-b border-gray-200 shadow-sm">
+          <div className="max-w-5xl mx-auto px-4 py-8">
+            <BookingStepper currentStep={5} />
           </div>
         </div>
-      </section>
+      )}
 
-      <main className="min-h-screen bg-gradient-to-b from-green-50 to-white">
-
-        {/* Stepper - Step 5: Confirmation - Only show for single shuttle booking */}
-        {!isCartBooking && !isTourBooking && (
-          <div className="bg-white border-b border-gray-200 shadow-sm">
-            <div className="max-w-5xl mx-auto px-4 py-8">
-              <BookingStepper currentStep={5} />
-            </div>
-          </div>
-        )}
-
-        <div className="py-16">
-          <div className="max-w-4xl mx-auto px-4">
+      <div className="py-16">
+        <div className="max-w-4xl mx-auto px-4">
             
             {/* Success Header with Animation */}
             <div className="text-center mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -688,8 +674,7 @@ function ConfirmationPageContent() {
 
           </div>
         </div>
-      </main>
-    </>
+    </main>
   );
 }
 
