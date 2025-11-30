@@ -126,7 +126,7 @@ function ConfirmationPageContent() {
           for (const id of tourIds) {
             const { data, error } = await supabase
               .from('tour_bookings')
-              .select('id, booking_id, tour_slug, tour_name, date, adults, children, base_price, price_per_extra_person, total_price, hotel, special_requests, status, customer_first_name, customer_last_name, customer_email, customer_phone, booking_number, voucher_number')
+              .select('id, booking_id, tour_slug, tour_name, date, adults, children, base_price, price_per_extra_person, total_price, hotel, special_requests, status, customer_first_name, customer_last_name, customer_email, customer_phone, voucher_number')
               .eq('id', id)
               .single();
 
@@ -148,16 +148,16 @@ function ConfirmationPageContent() {
         // Load tour booking - explicitly select all needed columns including voucher
         const { data, error } = await supabase
           .from('tour_bookings')
-          .select('id, booking_id, tour_slug, tour_name, date, adults, children, base_price, price_per_extra_person, total_price, hotel, special_requests, status, customer_first_name, customer_last_name, customer_email, customer_phone, booking_number, voucher_number')
+          .select('id, booking_id, tour_slug, tour_name, date, adults, children, base_price, price_per_extra_person, total_price, hotel, special_requests, status, customer_first_name, customer_last_name, customer_email, customer_phone, voucher_number')
           .eq('booking_id', tourBookingId)
           .single();
 
         if (error) throw error;
         if (!data) throw new Error('Tour booking not found');
 
-        console.log('[Confirmation] Single tour booking loaded:', data);
-        console.log('[Confirmation] Tour voucher_number:', data?.voucher_number);
-        setTourBooking(data as unknown as TourBooking);
+        const tourData = data as unknown as TourBooking;
+        console.log('[Confirmation] Single tour booking loaded:', tourData);
+        setTourBooking(tourData);
         setLoading(false);
       } else {
         // Load shuttle trips - explicitly select all needed columns including voucher
