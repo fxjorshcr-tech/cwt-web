@@ -5,11 +5,10 @@
 import { useEffect, useState, Suspense, useCallback, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
-import { CheckCircle, Calendar, Users, MapPin, Mail, Phone, User, Loader2, Home, Download, PartyPopper, PawPrint, Heart, Dog } from 'lucide-react';
+import { CheckCircle, Calendar, Users, MapPin, Mail, Phone, User, Loader2, Home, Download, PartyPopper, PawPrint, Heart, Dog, Ticket } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import BookingNavbar from '@/components/booking/BookingNavbar';
 import BookingStepper from '@/components/booking/BookingStepper';
 import { useCart } from '@/contexts/CartContext';
 
@@ -32,6 +31,8 @@ interface Trip {
   customer_last_name: string | null;
   customer_email: string | null;
   customer_phone: string | null;
+  booking_number: string | null;
+  voucher_number: string | null;
 }
 
 interface TourBooking {
@@ -52,6 +53,8 @@ interface TourBooking {
   customer_last_name: string | null;
   customer_email: string | null;
   customer_phone: string | null;
+  booking_number: string | null;
+  voucher_number: string | null;
 }
 
 function ConfirmationPageContent() {
@@ -106,12 +109,13 @@ function ConfirmationPageContent() {
           for (const id of shuttleBookingIds) {
             const { data, error } = await supabase
               .from('trips')
-              .select('*')
+              .select('id, booking_id, from_location, to_location, date, pickup_time, adults, children, price, final_price, pickup_address, dropoff_address, customer_first_name, customer_last_name, customer_email, customer_phone, booking_number, voucher_number, created_at')
               .eq('booking_id', id)
               .order('created_at', { ascending: true });
 
             if (!error && data) {
-              allTrips.push(...(data as Trip[]));
+              console.log('[Confirmation] Cart shuttle trips loaded:', data);
+              allTrips.push(...(data as unknown as Trip[]));
             }
           }
         }
@@ -122,12 +126,13 @@ function ConfirmationPageContent() {
           for (const id of tourIds) {
             const { data, error } = await supabase
               .from('tour_bookings')
-              .select('*')
+              .select('id, booking_id, tour_slug, tour_name, date, adults, children, base_price, price_per_extra_person, total_price, hotel, special_requests, status, customer_first_name, customer_last_name, customer_email, customer_phone, booking_number, voucher_number')
               .eq('id', id)
               .single();
 
             if (!error && data) {
-              allTourBookings.push(data as TourBooking);
+              console.log('[Confirmation] Cart tour loaded:', data);
+              allTourBookings.push(data as unknown as TourBooking);
             }
           }
         }
@@ -140,30 +145,40 @@ function ConfirmationPageContent() {
         setTourBookings(allTourBookings);
         setLoading(false);
       } else if (isTourBooking) {
-        // Load tour booking
+        // Load tour booking - explicitly select all needed columns including voucher
         const { data, error } = await supabase
           .from('tour_bookings')
-          .select('*')
+          .select('id, booking_id, tour_slug, tour_name, date, adults, children, base_price, price_per_extra_person, total_price, hotel, special_requests, status, customer_first_name, customer_last_name, customer_email, customer_phone, booking_number, voucher_number')
           .eq('booking_id', tourBookingId)
           .single();
 
         if (error) throw error;
         if (!data) throw new Error('Tour booking not found');
 
-        setTourBooking(data as TourBooking);
+        console.log('[Confirmation] Single tour booking loaded:', data);
+        console.log('[Confirmation] Tour voucher_number:', data?.voucher_number);
+        setTourBooking(data as unknown as TourBooking);
         setLoading(false);
       } else {
-        // Load shuttle trips
+        // Load shuttle trips - explicitly select all needed columns including voucher
         const { data, error } = await supabase
           .from('trips')
-          .select('*')
+          .select('id, booking_id, from_location, to_location, date, pickup_time, adults, children, price, final_price, pickup_address, dropoff_address, customer_first_name, customer_last_name, customer_email, customer_phone, booking_number, voucher_number, created_at')
           .eq('booking_id', bookingId as string)
           .order('created_at', { ascending: true });
 
         if (error) throw error;
         if (!data || data.length === 0) throw new Error('No trips found');
 
-        setTrips(data as Trip[]);
+        // Cast data to Trip[] for proper typing
+        const tripData = data as unknown as Trip[];
+
+        // Debug: Log voucher data
+        console.log('[Confirmation] Loaded trips:', JSON.stringify(tripData, null, 2));
+        console.log('[Confirmation] First trip voucher_number:', tripData[0]?.voucher_number);
+        console.log('[Confirmation] First trip booking_number:', tripData[0]?.booking_number);
+
+        setTrips(tripData);
         setLoading(false);
       }
     } catch (error) {
@@ -178,108 +193,86 @@ function ConfirmationPageContent() {
 
   if (!effectiveBookingId) {
     return (
-      <>
-        <BookingNavbar />
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <Card className="max-w-md mx-4">
-            <CardHeader>
-              <CardTitle className="text-red-600">Invalid Booking</CardTitle>
-              <CardDescription>No booking ID provided</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
-                Return Home
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Card className="max-w-md mx-4">
+          <CardHeader>
+            <CardTitle className="text-red-600">Invalid Booking</CardTitle>
+            <CardDescription>No booking ID provided</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
+              Return Home
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
   // ✅ CORREGIDO: Mostrar loading ANTES de acceder a trips
   if (loading) {
     return (
-      <>
-        <BookingNavbar />
-        {/* Hero Skeleton - Same height as real hero (h-48 sm:h-56 md:h-64) with z-index */}
-        <section className="relative h-48 sm:h-56 md:h-64 w-full overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-green-600 via-green-500 to-green-700 animate-pulse" />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center px-4">
-              <div className="h-8 w-48 bg-white/30 rounded-lg mx-auto mb-2 animate-pulse" />
-              <div className="h-5 w-56 bg-white/20 rounded mx-auto animate-pulse" />
-            </div>
-          </div>
-        </section>
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-green-50 to-white">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 animate-spin text-green-600 mx-auto mb-4" />
+          <p className="text-gray-600">Loading your booking...</p>
         </div>
-      </>
+      </div>
     );
   }
 
   // ✅ CORREGIDO: Validar que trips o tourBooking tengan datos
   if (!isCartBooking && !isTourBooking && trips.length === 0) {
     return (
-      <>
-        <BookingNavbar />
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <Card className="max-w-md mx-4">
-            <CardHeader>
-              <CardTitle className="text-red-600">Booking Not Found</CardTitle>
-              <CardDescription>We couldn&apos;t find your booking details</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
-                Return Home
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Card className="max-w-md mx-4">
+          <CardHeader>
+            <CardTitle className="text-red-600">Booking Not Found</CardTitle>
+            <CardDescription>We couldn&apos;t find your booking details</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
+              Return Home
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
   if (isCartBooking && trips.length === 0 && tourBookings.length === 0) {
     return (
-      <>
-        <BookingNavbar />
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <Card className="max-w-md mx-4">
-            <CardHeader>
-              <CardTitle className="text-red-600">Cart Booking Not Found</CardTitle>
-              <CardDescription>We couldn&apos;t find your cart booking details</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
-                Return Home
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Card className="max-w-md mx-4">
+          <CardHeader>
+            <CardTitle className="text-red-600">Cart Booking Not Found</CardTitle>
+            <CardDescription>We couldn&apos;t find your cart booking details</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
+              Return Home
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
   if (isTourBooking && !tourBooking) {
     return (
-      <>
-        <BookingNavbar />
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <Card className="max-w-md mx-4">
-            <CardHeader>
-              <CardTitle className="text-red-600">Tour Booking Not Found</CardTitle>
-              <CardDescription>We couldn&apos;t find your tour booking details</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button onClick={() => router.push('/private-tours')} className="w-full min-h-[48px]">
-                Browse Tours
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Card className="max-w-md mx-4">
+          <CardHeader>
+            <CardTitle className="text-red-600">Tour Booking Not Found</CardTitle>
+            <CardDescription>We couldn&apos;t find your tour booking details</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => router.push('/private-tours')} className="w-full min-h-[48px]">
+              Browse Tours
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
@@ -309,8 +302,6 @@ function ConfirmationPageContent() {
 
   return (
     <>
-      <BookingNavbar />
-
       {/* Hero Section - Confirmation */}
       <section className="relative h-48 sm:h-56 md:h-64 w-full overflow-hidden">
         <Image
@@ -342,7 +333,7 @@ function ConfirmationPageContent() {
 
         {/* Stepper - Step 5: Confirmation - Only show for single shuttle booking */}
         {!isCartBooking && !isTourBooking && (
-          <div className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+          <div className="bg-white border-b border-gray-200 shadow-sm">
             <div className="max-w-5xl mx-auto px-4 py-8">
               <BookingStepper currentStep={5} />
             </div>
@@ -448,6 +439,14 @@ function ConfirmationPageContent() {
                         <h3 className="font-semibold text-xl text-gray-900 mb-1">
                           {tourBooking.tour_name}
                         </h3>
+                        {/* Voucher Number */}
+                        {tourBooking.voucher_number && (
+                          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border border-amber-200 mb-3">
+                            <Ticket className="h-4 w-4 text-amber-600" />
+                            <span className="text-xs font-medium text-amber-700">Voucher:</span>
+                            <span className="text-sm font-bold font-mono text-amber-900">{tourBooking.voucher_number}</span>
+                          </div>
+                        )}
                         <div className="grid md:grid-cols-2 gap-3 mt-3">
                           <div className="flex items-center gap-2 text-sm text-gray-600">
                             <Calendar className="h-4 w-4" />
@@ -493,6 +492,14 @@ function ConfirmationPageContent() {
                           <h3 className="font-semibold text-xl text-gray-900 mb-1">
                             {tour.tour_name}
                           </h3>
+                          {/* Voucher Number */}
+                          {tour.voucher_number && (
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border border-amber-200 mb-3">
+                              <Ticket className="h-4 w-4 text-amber-600" />
+                              <span className="text-xs font-medium text-amber-700">Voucher:</span>
+                              <span className="text-sm font-bold font-mono text-amber-900">{tour.voucher_number}</span>
+                            </div>
+                          )}
                           <div className="grid md:grid-cols-2 gap-3 mt-3">
                             <div className="flex items-center gap-2 text-sm text-gray-600">
                               <Calendar className="h-4 w-4" />
@@ -538,6 +545,14 @@ function ConfirmationPageContent() {
                         <h3 className="font-semibold text-lg text-gray-900 mb-1">
                           {trip.from_location} → {trip.to_location}
                         </h3>
+                        {/* Voucher Number */}
+                        {trip.voucher_number && (
+                          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border border-amber-200 mb-3">
+                            <Ticket className="h-4 w-4 text-amber-600" />
+                            <span className="text-xs font-medium text-amber-700">Voucher:</span>
+                            <span className="text-sm font-bold font-mono text-amber-900">{trip.voucher_number}</span>
+                          </div>
+                        )}
                         <div className="grid md:grid-cols-2 gap-3 mt-3">
                           <div className="flex items-center gap-2 text-sm text-gray-600">
                             <Calendar className="h-4 w-4" />
@@ -681,22 +696,12 @@ function ConfirmationPageContent() {
 export default function ConfirmationPage() {
   return (
     <Suspense fallback={
-      <>
-        <BookingNavbar />
-        {/* Hero Skeleton - Same height as real hero (h-48 sm:h-56 md:h-64) with z-index */}
-        <section className="relative h-48 sm:h-56 md:h-64 w-full overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-green-600 via-green-500 to-green-700 animate-pulse" />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center px-4">
-              <div className="h-8 w-48 bg-white/30 rounded-lg mx-auto mb-2 animate-pulse" />
-              <div className="h-5 w-56 bg-white/20 rounded mx-auto animate-pulse" />
-            </div>
-          </div>
-        </section>
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-green-50 to-white">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 animate-spin text-green-600 mx-auto mb-4" />
+          <p className="text-gray-600">Loading your booking...</p>
         </div>
-      </>
+      </div>
     }>
       <ConfirmationPageContent />
     </Suspense>
