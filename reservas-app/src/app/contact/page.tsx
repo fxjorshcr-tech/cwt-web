@@ -104,8 +104,8 @@ export default function ContactPage() {
     <>
       <BookingNavbar />
 
-      <main className="min-h-screen bg-white">
-        
+      <div className="min-h-screen bg-white">
+
         {/* Hero Section */}
         <section className="relative h-[50vh] min-h-[400px] max-h-[600px]">
           <div className="absolute inset-0 z-0">
@@ -415,7 +415,7 @@ export default function ContactPage() {
           </div>
         </section>
 
-      </main>
+      </div>
 
       <WhatsAppButton />
 

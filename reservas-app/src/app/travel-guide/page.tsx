@@ -26,7 +26,7 @@ export default async function TravelGuidePage() {
     <>
       <BookingNavbar />
       
-      <main className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white">
         {/* Hero Section */}
         <section className="relative h-[65vh] min-h-[450px] max-h-[700px] flex items-center justify-center">
           <div className="absolute inset-0 z-0">
@@ -96,7 +96,7 @@ export default async function TravelGuidePage() {
             </div>
           </div>
         </section>
-      </main>
+      </div>
     </>
   );
 }

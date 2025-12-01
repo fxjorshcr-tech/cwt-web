@@ -292,7 +292,7 @@ export default function CartPage() {
           </div>
         </section>
 
-        <main className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50">
           <div className="py-6 sm:py-10">
             <div className="max-w-4xl mx-auto px-4">
               <div className="grid lg:grid-cols-5 gap-6 lg:gap-8">
@@ -565,7 +565,7 @@ export default function CartPage() {
               </div>
             </div>
           </div>
-        </main>
+        </div>
       </>
     );
   }

@@ -35,7 +35,7 @@ export default function TransfersPage() {
     <>
       <BookingNavbar />
 
-      <main className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white">
 
         {/* Hero Section */}
         <section className="relative h-[50vh] min-h-[400px]">
@@ -484,7 +484,7 @@ export default function TransfersPage() {
 
         {/* Payment Methods */}
         <PaymentMethods />
-      </main>
+      </div>
     </>
   );
 }
