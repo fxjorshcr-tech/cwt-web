@@ -140,7 +140,7 @@ export default async function Home() {
         </>
       )}
 
-      <main id="main-content" className="min-h-screen overflow-x-hidden">
+      <div id="main-content" className="min-h-screen overflow-x-hidden">
         <StructuredData />
         <BookingNavbar />
 
@@ -244,7 +244,7 @@ export default async function Home() {
         <FinalCTA />
 
         <ScrollToBookingButton />
-      </main>
+      </div>
     </>
   );
 }

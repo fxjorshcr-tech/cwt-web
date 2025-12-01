@@ -100,7 +100,7 @@ export default async function ShuttleRoutePage({ params }: { params: { route: st
     <>
       <BookingNavbar />
       
-      <main className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white">
         {/* Hero Section - Simplified */}
         <section className="relative h-[50vh] min-h-[400px] max-h-[500px]">
           <div className="absolute inset-0 z-0">
@@ -344,7 +344,7 @@ export default async function ShuttleRoutePage({ params }: { params: { route: st
         </section>
 
         <WhatsAppButton />
-      </main>
+      </div>
     </>
   );
 }

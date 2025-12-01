@@ -28,7 +28,7 @@ export default function AboutPage() {
     <>
       <BookingNavbar />
 
-      <main className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white">
         
         {/* Hero Section */}
         <section className="relative h-[60vh] min-h-[500px] max-h-[700px]">
@@ -271,7 +271,7 @@ export default function AboutPage() {
           </div>
         </section>
 
-      </main>
+      </div>
 
       <WhatsAppButton />
     </>

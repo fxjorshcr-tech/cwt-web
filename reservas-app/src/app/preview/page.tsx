@@ -418,7 +418,7 @@ function PreviewPageContent() {
         </div>
 
         {/* Content Skeleton */}
-        <main className="bg-gray-50 py-8 pb-24">
+        <div className="bg-gray-50 py-8 pb-24">
           <div className="max-w-5xl mx-auto px-4">
             <div className="grid lg:grid-cols-3 gap-6">
               {/* Left Column - Trip Cards Skeleton */}
@@ -462,7 +462,7 @@ function PreviewPageContent() {
               </div>
             </div>
           </div>
-        </main>
+        </div>
       </>
     );
   }
@@ -527,7 +527,7 @@ function PreviewPageContent() {
       </div>
 
       {/* Main Content */}
-      <main className="bg-gray-50 py-8 pb-24">
+      <div className="bg-gray-50 py-8 pb-24">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid lg:grid-cols-3 gap-6">
             {/* Left Column: Trips */}
@@ -730,7 +730,7 @@ function PreviewPageContent() {
             </div>
           </div>
         </div>
-      </main>
+      </div>
     </>
   );
 }
@@ -759,7 +759,7 @@ export default function PreviewPage() {
             </div>
           </div>
           {/* Content Skeleton */}
-          <main className="bg-gray-50 py-8 min-h-screen">
+          <div className="bg-gray-50 py-8 min-h-screen">
             <div className="max-w-5xl mx-auto px-4">
               <div className="grid lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-4">
@@ -768,7 +768,7 @@ export default function PreviewPage() {
                 <div className="bg-white rounded-xl h-64 animate-pulse" />
               </div>
             </div>
-          </main>
+          </div>
         </>
       }
     >
