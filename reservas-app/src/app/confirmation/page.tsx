@@ -4,7 +4,7 @@
 
 import { useEffect, useState, Suspense, useCallback, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { CheckCircle, Calendar, Users, MapPin, Mail, Phone, User, Loader2, Home, Download, PawPrint, Heart, Dog, Ticket } from 'lucide-react';
+import { CheckCircle, Calendar, Users, MapPin, Mail, Phone, User, Loader2, Home, PawPrint, Heart, Dog, Ticket } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -199,7 +199,7 @@ function ConfirmationPageContent() {
             <CardDescription>No booking ID provided</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
+            <Button type="button" onClick={() => router.push('/')} className="w-full min-h-[48px]">
               Return Home
             </Button>
           </CardContent>
@@ -230,7 +230,7 @@ function ConfirmationPageContent() {
             <CardDescription>We couldn&apos;t find your booking details</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
+            <Button type="button" onClick={() => router.push('/')} className="w-full min-h-[48px]">
               Return Home
             </Button>
           </CardContent>
@@ -248,7 +248,7 @@ function ConfirmationPageContent() {
             <CardDescription>We couldn&apos;t find your cart booking details</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button onClick={() => router.push('/')} className="w-full min-h-[48px]">
+            <Button type="button" onClick={() => router.push('/')} className="w-full min-h-[48px]">
               Return Home
             </Button>
           </CardContent>
@@ -266,7 +266,7 @@ function ConfirmationPageContent() {
             <CardDescription>We couldn&apos;t find your tour booking details</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button onClick={() => router.push('/private-tours')} className="w-full min-h-[48px]">
+            <Button type="button" onClick={() => router.push('/private-tours')} className="w-full min-h-[48px]">
               Browse Tours
             </Button>
           </CardContent>
@@ -300,12 +300,13 @@ function ConfirmationPageContent() {
         : trips[0]);
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-green-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
       {/* Simple Header with Home Button */}
       <div className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-lg font-semibold text-gray-900">Booking Confirmed</h1>
           <Button
+            type="button"
             onClick={() => router.push('/')}
             variant="outline"
             size="sm"
@@ -356,15 +357,9 @@ function ConfirmationPageContent() {
                   <p className="text-3xl md:text-4xl font-mono font-bold text-blue-900 mb-3">
                     {formatBookingId(effectiveBookingId)}
                   </p>
-                  <p className="text-sm text-gray-600 mb-4">
+                  <p className="text-sm text-gray-600">
                     Please save this reference number for your records
                   </p>
-                  <div className="flex justify-center gap-3">
-                    <Button variant="outline" size="sm">
-                      <Download className="h-4 w-4 mr-2" />
-                      Download Receipt
-                    </Button>
-                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -646,6 +641,7 @@ function ConfirmationPageContent() {
             {/* Actions */}
             <div className="text-center space-y-4 animate-in fade-in duration-700 delay-900">
               <Button
+                type="button"
                 onClick={() => router.push('/')}
                 size="lg"
                 className="min-h-[52px] px-8"
@@ -674,7 +670,7 @@ function ConfirmationPageContent() {
 
           </div>
         </div>
-    </main>
+    </div>
   );
 }
 
