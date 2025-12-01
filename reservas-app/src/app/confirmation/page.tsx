@@ -589,52 +589,65 @@ function ConfirmationPageContent() {
             </Card>
             )}
 
-            {/* Next Steps */}
+            {/* Important Reminder */}
+            <Card className="mb-4 bg-amber-50 border-amber-200 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-750">
+              <CardContent className="py-4">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 text-2xl">⏰</div>
+                  <div>
+                    <h4 className="font-semibold text-amber-900 mb-1">Important Reminder</h4>
+                    <p className="text-sm text-amber-800">
+                      Be ready at your pickup location <strong>10 minutes before</strong> your scheduled time.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* How to Contact Us */}
             <Card className="mb-8 bg-gradient-to-r from-green-50 to-blue-50 border-green-200 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-800">
               <CardHeader>
-                <CardTitle className="text-green-900">What Happens Next?</CardTitle>
+                <CardTitle className="text-green-900">How to Contact Us</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0">
-                    <div className="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center">
-                      <CheckCircle className="h-5 w-5 text-white" />
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <a
+                    href="mailto:mybooking@cantwaittravelcr.com"
+                    className="flex items-center gap-3 p-4 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all"
+                  >
+                    <div className="flex-shrink-0">
+                      <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                        <Mail className="h-5 w-5 text-blue-600" />
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-green-900 mb-1">Confirmation Email Sent</h4>
-                    <p className="text-sm text-green-700">
-                      Check your inbox at <strong>{customerInfo?.customer_email}</strong> for your booking details and receipt.
-                    </p>
-                  </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-0.5">Email</p>
+                      <p className="text-sm font-semibold text-blue-600">mybooking@cantwaittravelcr.com</p>
+                    </div>
+                  </a>
+
+                  <a
+                    href="https://wa.me/50685962438"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 p-4 bg-white rounded-lg border border-gray-200 hover:border-green-300 hover:shadow-md transition-all"
+                  >
+                    <div className="flex-shrink-0">
+                      <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                        <Phone className="h-5 w-5 text-green-600" />
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-0.5">WhatsApp</p>
+                      <p className="text-sm font-semibold text-green-600">+506 8596 2438</p>
+                    </div>
+                  </a>
                 </div>
 
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0">
-                    <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center">
-                      <Mail className="h-5 w-5 text-white" />
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-green-900 mb-1">Need Assistance?</h4>
-                    <p className="text-sm text-green-700">
-                      Contact us anytime at <a href="mailto:mybooking@cantwaittravelcr.com" className="font-semibold underline">mybooking@cantwaittravelcr.com</a> or via <a href="https://wa.me/50685962438" className="font-semibold underline" target="_blank" rel="noopener noreferrer">WhatsApp</a>.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0">
-                    <div className="h-8 w-8 rounded-full bg-orange-500 flex items-center justify-center">
-                      <MapPin className="h-5 w-5 text-white" />
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-green-900 mb-1">Day of Travel</h4>
-                    <p className="text-sm text-green-700">
-                      Be ready at your pickup location 10 minutes before scheduled time. Have a great trip!
-                    </p>
-                  </div>
+                <div className="pt-2 border-t border-green-200">
+                  <p className="text-sm text-green-700 text-center">
+                    A confirmation email has been sent to <strong>{customerInfo?.customer_email}</strong>
+                  </p>
                 </div>
               </CardContent>
             </Card>
