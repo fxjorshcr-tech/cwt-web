@@ -199,7 +199,7 @@ function ConfirmationPageContent() {
             <CardDescription>No booking ID provided</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button type="button" onClick={() => { window.location.href = '/'; }} className="w-full min-h-[48px]">
+            <Button type="button" onClick={() => { console.log('[Confirmation] Invalid booking - Return Home clicked'); window.location.href = '/'; }} className="w-full min-h-[48px]">
               Return Home
             </Button>
           </CardContent>
@@ -230,7 +230,7 @@ function ConfirmationPageContent() {
             <CardDescription>We couldn&apos;t find your booking details</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button type="button" onClick={() => { window.location.href = '/'; }} className="w-full min-h-[48px]">
+            <Button type="button" onClick={() => { console.log('[Confirmation] Booking not found - Return Home clicked'); window.location.href = '/'; }} className="w-full min-h-[48px]">
               Return Home
             </Button>
           </CardContent>
@@ -248,7 +248,7 @@ function ConfirmationPageContent() {
             <CardDescription>We couldn&apos;t find your cart booking details</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button type="button" onClick={() => { window.location.href = '/'; }} className="w-full min-h-[48px]">
+            <Button type="button" onClick={() => { console.log('[Confirmation] Cart booking not found - Return Home clicked'); window.location.href = '/'; }} className="w-full min-h-[48px]">
               Return Home
             </Button>
           </CardContent>
@@ -266,7 +266,7 @@ function ConfirmationPageContent() {
             <CardDescription>We couldn&apos;t find your tour booking details</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button type="button" onClick={() => { window.location.href = '/private-tours'; }} className="w-full min-h-[48px]">
+            <Button type="button" onClick={() => { console.log('[Confirmation] Tour not found - Browse Tours clicked'); window.location.href = '/private-tours'; }} className="w-full min-h-[48px]">
               Browse Tours
             </Button>
           </CardContent>
@@ -307,7 +307,10 @@ function ConfirmationPageContent() {
           <h1 className="text-lg font-semibold text-gray-900">Booking Confirmed</h1>
           <Button
             type="button"
-            onClick={() => { window.location.href = '/'; }}
+            onClick={() => {
+              console.log('[Confirmation] Home button clicked - navigating to /');
+              window.location.href = '/';
+            }}
             variant="outline"
             size="sm"
             className="min-h-[40px]"
@@ -642,7 +645,10 @@ function ConfirmationPageContent() {
             <div className="text-center space-y-4 animate-in fade-in duration-700 delay-900">
               <Button
                 type="button"
-                onClick={() => { window.location.href = '/'; }}
+                onClick={() => {
+                  console.log('[Confirmation] Return to Home button clicked - navigating to /');
+                  window.location.href = '/';
+                }}
                 size="lg"
                 className="min-h-[52px] px-8"
               >
