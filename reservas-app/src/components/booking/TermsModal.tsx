@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, FileText, Loader2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { sanitizeHtml } from '@/lib/sanitize-html';
@@ -22,6 +23,12 @@ export default function TermsModal({ isOpen, onClose }: TermsModalProps) {
   const [termsContent, setTermsContent] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // Ensure we're on client side for portal
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -61,28 +68,33 @@ export default function TermsModal({ isOpen, onClose }: TermsModalProps) {
     }
   }
 
-  if (!isOpen) return null;
+  // Don't render if not open or not mounted (SSR safety)
+  if (!isOpen || !mounted) return null;
 
-  return (
-    <div className="fixed inset-0 z-[100]">
+  const modalContent = (
+    <div className="fixed inset-0 z-[9999]" style={{ isolation: 'isolate' }}>
       {/* Backdrop - Solid background to hide content behind */}
       <div
-        className="fixed inset-0 bg-black"
+        className="fixed inset-0 bg-black/95"
         onClick={onClose}
+        aria-hidden="true"
       />
 
       {/* Modal Container */}
-      <div className="fixed inset-0 flex items-end sm:items-center justify-center sm:p-4">
+      <div className="fixed inset-0 flex items-end sm:items-center justify-center sm:p-4 z-[10000]">
         {/* Modal Content */}
         <div
           className="relative bg-white w-full h-full sm:h-auto sm:max-h-[85vh] sm:max-w-4xl sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden"
           onClick={(e) => e.stopPropagation()}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="terms-modal-title"
         >
           {/* Header */}
           <div className="flex-shrink-0 flex items-center justify-between p-4 border-b border-gray-200 bg-white">
             <div className="flex items-center gap-2">
               <FileText className="h-5 w-5 text-blue-600" />
-              <h2 className="text-lg font-bold text-gray-900">Terms & Conditions</h2>
+              <h2 id="terms-modal-title" className="text-lg font-bold text-gray-900">Terms & Conditions</h2>
             </div>
             <button
               onClick={onClose}
@@ -201,4 +213,7 @@ export default function TermsModal({ isOpen, onClose }: TermsModalProps) {
       </div>
     </div>
   );
+
+  // Use portal to render modal at document.body level, escaping all stacking contexts
+  return createPortal(modalContent, document.body);
 }
