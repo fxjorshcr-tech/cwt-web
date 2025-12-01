@@ -305,19 +305,17 @@ function ConfirmationPageContent() {
       <div className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-lg font-semibold text-gray-900">Booking Confirmed</h1>
-          <Button
+          <button
             type="button"
             onClick={() => {
               console.log('[Confirmation] Home button clicked - navigating to /');
               window.location.href = '/';
             }}
-            variant="outline"
-            size="sm"
-            className="min-h-[40px]"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2 min-h-[40px] text-sm font-medium border border-gray-300 bg-white rounded-md shadow-sm hover:bg-gray-50 transition-colors"
           >
-            <Home className="h-4 w-4 mr-2" />
+            <Home className="h-4 w-4" />
             Home
-          </Button>
+          </button>
         </div>
       </div>
 
@@ -643,18 +641,17 @@ function ConfirmationPageContent() {
 
             {/* Actions */}
             <div className="text-center space-y-4 animate-in fade-in duration-700 delay-900">
-              <Button
+              <button
                 type="button"
                 onClick={() => {
                   console.log('[Confirmation] Return to Home button clicked - navigating to /');
                   window.location.href = '/';
                 }}
-                size="lg"
-                className="min-h-[52px] px-8"
+                className="inline-flex items-center justify-center gap-2 px-8 min-h-[52px] text-base font-medium text-white bg-blue-600 rounded-md shadow hover:bg-blue-700 transition-colors"
               >
-                <Home className="h-5 w-5 mr-2" />
+                <Home className="h-5 w-5" />
                 Return to Home
-              </Button>
+              </button>
 
               <p className="text-sm text-gray-500">
                 Need help? Contact us on <a href="https://wa.me/50685962438" className="text-green-600 font-semibold hover:underline" target="_blank" rel="noopener noreferrer">WhatsApp</a>
