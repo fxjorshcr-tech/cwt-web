@@ -21,10 +21,14 @@ export default function CartDropdown() {
         onClick={() => setIsOpen(!isOpen)}
         className="text-white hover:text-gray-200 transition-colors p-2 rounded-full hover:bg-white/10 relative ml-2"
         aria-label={`Shopping cart with ${itemCount} items`}
+        suppressHydrationWarning
       >
         <ShoppingCart className="h-5 w-5" />
         {itemCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+          <span
+            className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center"
+            suppressHydrationWarning
+          >
             {itemCount}
           </span>
         )}
@@ -44,7 +48,7 @@ export default function CartDropdown() {
             
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
-              <h3 className="font-bold text-gray-900 flex items-center gap-2">
+              <h3 className="font-bold text-gray-900 flex items-center gap-2" suppressHydrationWarning>
                 <ShoppingCart className="h-5 w-5" />
                 Cart ({itemCount})
               </h3>

@@ -47,6 +47,7 @@ interface CartContextType {
   clearCart: () => void;
   isInCart: (id: string) => boolean;
   isStorageAvailable: boolean;
+  isHydrated: boolean; // ✅ Exposed for hydration-safe rendering
 }
 
 // ============================================
@@ -202,7 +203,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, 0);
 
   const value: CartContextType = {
-    items,
+    items: isHydrated ? items : [], // ✅ Return empty until hydrated
     itemCount: isHydrated ? itemCount : 0, // ✅ Return 0 until hydrated to prevent mismatch
     totalAmount: isHydrated ? totalAmount : 0,
     addItem,
@@ -210,6 +211,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     clearCart,
     isInCart,
     isStorageAvailable,
+    isHydrated, // ✅ Expose hydration state
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

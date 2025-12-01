@@ -65,7 +65,7 @@ export function TripSummaryCard({ trip, tripNumber, totalTrips, addOnNames }: Tr
           <div className="bg-gray-50 rounded-lg p-2">
             <Calendar className="h-4 w-4 text-blue-600 mx-auto mb-1" />
             <p className="text-[10px] text-gray-500 uppercase">Date</p>
-            <p className="font-semibold text-xs text-gray-900">{formatDate(trip.date)}</p>
+            <p className="font-semibold text-xs text-gray-900" suppressHydrationWarning>{formatDate(trip.date)}</p>
           </div>
 
           <div className="bg-gray-50 rounded-lg p-2">

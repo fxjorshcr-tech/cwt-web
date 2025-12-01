@@ -432,7 +432,7 @@ function ConfirmationPageContent() {
                         <div className="grid md:grid-cols-2 gap-3 mt-3">
                           <div className="flex items-center gap-2 text-sm text-gray-600">
                             <Calendar className="h-4 w-4" />
-                            <span>{formatDate(tourBooking.date)}</span>
+                            <span suppressHydrationWarning>{formatDate(tourBooking.date)}</span>
                           </div>
                           <div className="flex items-center gap-2 text-sm text-gray-600">
                             <Users className="h-4 w-4" />
@@ -485,7 +485,7 @@ function ConfirmationPageContent() {
                           <div className="grid md:grid-cols-2 gap-3 mt-3">
                             <div className="flex items-center gap-2 text-sm text-gray-600">
                               <Calendar className="h-4 w-4" />
-                              <span>{formatDate(tour.date)}</span>
+                              <span suppressHydrationWarning>{formatDate(tour.date)}</span>
                             </div>
                             <div className="flex items-center gap-2 text-sm text-gray-600">
                               <Users className="h-4 w-4" />
@@ -538,7 +538,7 @@ function ConfirmationPageContent() {
                         <div className="grid md:grid-cols-2 gap-3 mt-3">
                           <div className="flex items-center gap-2 text-sm text-gray-600">
                             <Calendar className="h-4 w-4" />
-                            <span>{formatDate(trip.date)}</span>
+                            <span suppressHydrationWarning>{formatDate(trip.date)}</span>
                           </div>
                           <div className="flex items-center gap-2 text-sm text-gray-600">
                             <Users className="h-4 w-4" />
