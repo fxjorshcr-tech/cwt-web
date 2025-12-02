@@ -108,8 +108,9 @@ function CheckoutPageContent() {
   const searchParams = useSearchParams();
   const supabase = createClient();
 
-  const bookingId = searchParams.get('booking_id');
-  const tourBookingId = searchParams.get('tour_booking_id');
+  // ✅ Added null safety for searchParams
+  const bookingId = searchParams?.get('booking_id');
+  const tourBookingId = searchParams?.get('tour_booking_id');
 
   // Determine booking type
   const isTourBooking = !!tourBookingId;

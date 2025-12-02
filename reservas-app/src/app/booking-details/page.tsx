@@ -67,7 +67,8 @@ interface FormData {
 function BookingDetailsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const bookingId = searchParams.get('booking_id');
+  // ✅ Added null safety for searchParams
+  const bookingId = searchParams?.get('booking_id');
 
   const [trips, setTrips] = useState<Trip[]>([]);
   const [currentTripIndex, setCurrentTripIndex] = useState(0);
@@ -88,7 +89,7 @@ function BookingDetailsContent() {
 
   // ✅ FIXED: Only set trip index AFTER trips are loaded to avoid race condition
   useEffect(() => {
-    const tripParam = searchParams.get('trip');
+    const tripParam = searchParams?.get('trip');
     if (tripParam && trips.length > 0) {
       const tripIndex = parseInt(tripParam, 10);
       if (!isNaN(tripIndex) && tripIndex >= 0 && tripIndex < trips.length) {

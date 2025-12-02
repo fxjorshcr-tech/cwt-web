@@ -47,7 +47,8 @@ interface TripPreview {
 function PreviewPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const bookingId = searchParams.get('booking_id');
+  // ✅ Added null safety for searchParams
+  const bookingId = searchParams?.get('booking_id');
 
   const [routes, setRoutes] = useState<Route[]>([]);
   const [trips, setTrips] = useState<TripPreview[]>([]);

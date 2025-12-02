@@ -64,11 +64,12 @@ function ConfirmationPageContent() {
   // Create supabase client once with useMemo to avoid recreation on every render
   const supabase = useMemo(() => createClient(), []);
 
-  const bookingId = searchParams.get('booking_id');
-  const tourBookingId = searchParams.get('tour_booking_id');
-  const cartBookingId = searchParams.get('cart_booking_id');
-  const shuttleBookingIdsParam = searchParams.get('shuttle_booking_ids');
-  const tourIdsParam = searchParams.get('tour_ids');
+  // ✅ Added null safety for searchParams
+  const bookingId = searchParams?.get('booking_id');
+  const tourBookingId = searchParams?.get('tour_booking_id');
+  const cartBookingId = searchParams?.get('cart_booking_id');
+  const shuttleBookingIdsParam = searchParams?.get('shuttle_booking_ids');
+  const tourIdsParam = searchParams?.get('tour_ids');
 
   // Determine booking type
   const isTourBooking = !!tourBookingId;

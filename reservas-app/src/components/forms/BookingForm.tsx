@@ -55,10 +55,11 @@ export function BookingForm() {
 
   useEffect(() => {
     if (routes.length > 0) {
-      const from = searchParams.get('from');
-      const to = searchParams.get('to');
-      const origin = searchParams.get('origin');
-      const destination = searchParams.get('destination');
+      // ✅ Added null safety for searchParams
+      const from = searchParams?.get('from');
+      const to = searchParams?.get('to');
+      const origin = searchParams?.get('origin');
+      const destination = searchParams?.get('destination');
 
       const fromLocation = from || origin;
       const toLocation = to || destination;
