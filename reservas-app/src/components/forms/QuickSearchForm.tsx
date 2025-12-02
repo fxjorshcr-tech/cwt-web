@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Loader2, AlertCircle, X } from 'lucide-react';
+import { Search, Loader2, AlertCircle, X, CheckCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { LocationAutocomplete } from './LocationAutocomplete';
 import { ModernDatePicker } from './ModernDatePicker';
@@ -30,6 +30,7 @@ export function QuickSearchForm({
   const [isLoadingRoutes, setIsLoadingRoutes] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [availabilityStatus, setAvailabilityStatus] = useState<'idle' | 'checking' | 'approved'>('idle');
 
   // Form state - use initial values if provided
   const [origin, setOrigin] = useState(initialOrigin);
@@ -126,6 +127,14 @@ export function QuickSearchForm({
         return;
       }
 
+      // Show "Preparing your quote..." for 300ms
+      setAvailabilityStatus('checking');
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      // Show "Quote ready!" for 300ms
+      setAvailabilityStatus('approved');
+      await new Promise(resolve => setTimeout(resolve, 300));
+
       // Generate booking ID
       const bookingId = `booking_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
@@ -162,6 +171,7 @@ export function QuickSearchForm({
       const errorMessage = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
       setError(errorMessage);
       setIsSubmitting(false);
+      setAvailabilityStatus('idle');
     }
   }
 
@@ -308,9 +318,23 @@ export function QuickSearchForm({
           <button
             type="submit"
             disabled={isSubmitting || !origin || !destination || !date}
-            className="w-full sm:w-auto min-w-[220px] py-3.5 px-10 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl text-base"
+            className={`w-full sm:w-auto min-w-[220px] py-3.5 px-10 font-semibold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg text-base ${
+              availabilityStatus === 'approved'
+                ? 'bg-green-600 text-white'
+                : 'bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed hover:shadow-xl'
+            }`}
           >
-            {isSubmitting ? (
+            {availabilityStatus === 'checking' ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin" />
+                Preparing your quote...
+              </>
+            ) : availabilityStatus === 'approved' ? (
+              <>
+                <CheckCircle className="h-5 w-5" />
+                Quote ready!
+              </>
+            ) : isSubmitting ? (
               <>
                 <Loader2 className="h-5 w-5 animate-spin" />
                 Searching...

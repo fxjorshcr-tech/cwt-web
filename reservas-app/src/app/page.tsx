@@ -13,10 +13,6 @@ const QuickSearchForm = dynamic(() => import("@/components/forms/QuickSearchForm
   ssr: false,
 });
 
-const WhyBookDirect = dynamic(() => import("@/components/sections/WhyBookDirect"), {
-  loading: () => <ComponentSkeleton />,
-});
-
 const WhyChooseUs = dynamic(() => import("@/components/sections/WhyChooseUs"), {
   loading: () => <ComponentSkeleton />,
 });
@@ -43,10 +39,6 @@ const Guarantees = dynamic(() => import("@/components/sections/Guarantees"), {
 });
 
 const PrivateTours = dynamic(() => import("@/components/sections/PrivateTours"), {
-  loading: () => <ComponentSkeleton />,
-});
-
-const HomeFAQs = dynamic(() => import("@/components/sections/HomeFAQs"), {
   loading: () => <ComponentSkeleton />,
 });
 
@@ -230,16 +222,14 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* New Optimized Structure - Transfers First */}
-        <WhyBookDirect />
+        {/* Optimized Structure for Conversions */}
         <WhyChooseUs />
-        <HomeAddons />
-        <HowWeWork />
         <MostBookedCTAServer />
-        <ComparisonTable />
-        <Guarantees />
+        <HowWeWork />
         <PrivateTours />
-        <HomeFAQs />
+        <ComparisonTable />
+        <HomeAddons />
+        <Guarantees />
         <TravelGuide />
         <FinalCTA />
 

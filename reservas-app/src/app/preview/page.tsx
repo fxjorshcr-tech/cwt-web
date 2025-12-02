@@ -21,6 +21,8 @@ import {
   Car,
   BadgeCheck,
   Headphones,
+  CheckCircle,
+  Save,
 } from 'lucide-react';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import BookingStepper from '@/components/booking/BookingStepper';
@@ -55,6 +57,7 @@ function PreviewPageContent() {
   const [loading, setLoading] = useState(true);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [showAddTrip, setShowAddTrip] = useState(false);
+  const [availabilityStatus, setAvailabilityStatus] = useState<'idle' | 'checking' | 'approved'>('idle');
 
   // Edit form state
   const [error, setError] = useState<string | null>(null);
@@ -234,18 +237,29 @@ function PreviewPageContent() {
 
   // Save new trip
   // ✅ FIXED: Handle null date gracefully
-  function saveNewTrip() {
+  async function saveNewTrip() {
     if (!editDate) return;
 
     const route = routes.find((r) => r.origen === editOrigin && r.destino === editDestination);
     if (!route) return;
+
+    // Show "Preparing your quote..." for 300ms
+    setAvailabilityStatus('checking');
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    // Show "Quote ready!" for 300ms
+    setAvailabilityStatus('approved');
+    await new Promise(resolve => setTimeout(resolve, 300));
 
     const totalPassengers = editAdults + editChildren;
     const price = calculateTripPrice(route, totalPassengers);
     const dateStr = formatDateToString(editDate);
 
     // ✅ Don't save if date formatting failed
-    if (!dateStr) return;
+    if (!dateStr) {
+      setAvailabilityStatus('idle');
+      return;
+    }
 
     const newTrip: TripPreview = {
       from_location: editOrigin,
@@ -262,6 +276,7 @@ function PreviewPageContent() {
     setTrips(newTrips);
     saveToLocalStorage(newTrips);
     setShowAddTrip(false);
+    setAvailabilityStatus('idle');
   }
 
   // Remove trip
@@ -362,19 +377,34 @@ function PreviewPageContent() {
         <div className="flex gap-2 pt-2">
           <button
             onClick={cancelEdit}
-            className="flex-1 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50"
+            disabled={availabilityStatus !== 'idle'}
+            className="flex-1 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Cancel
           </button>
           <button
             onClick={isNewTrip ? saveNewTrip : saveEdit}
-            disabled={!editOrigin || !editDestination || !editDate}
-            className="flex-1 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 flex items-center justify-center gap-2"
+            disabled={!editOrigin || !editDestination || !editDate || availabilityStatus !== 'idle'}
+            className={`flex-1 py-2.5 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors ${
+              availabilityStatus === 'approved'
+                ? 'bg-green-600 text-white'
+                : 'bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-300'
+            }`}
           >
-            {isNewTrip ? (
+            {availabilityStatus === 'checking' ? (
               <>
-                <Plus className="h-4 w-4" />
-                Add Transfer
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Preparing your quote...
+              </>
+            ) : availabilityStatus === 'approved' ? (
+              <>
+                <CheckCircle className="h-4 w-4" />
+                Quote ready!
+              </>
+            ) : isNewTrip ? (
+              <>
+                <Save className="h-4 w-4" />
+                Save Transfer
               </>
             ) : (
               <>
