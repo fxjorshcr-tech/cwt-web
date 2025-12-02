@@ -2,7 +2,7 @@
 // Página de checkout - billing info y redirige a Tilopay para pagar
 'use client';
 
-import { useEffect, useState, useMemo, Suspense } from 'react';
+import { useEffect, useState, useMemo, Suspense, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import {
@@ -12,6 +12,7 @@ import {
   ArrowLeft,
   Lock
 } from 'lucide-react';
+import { trackShuttleCheckout, trackTourCheckout } from '@/lib/analytics';
 import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -132,6 +133,7 @@ function CheckoutPageContent() {
   });
   const [phoneNumber, setPhoneNumber] = useState('');
   const [formErrors, setFormErrors] = useState<Partial<CustomerInfo>>({});
+  const hasTrackedCheckout = useRef(false);
 
   // Get current country's phone prefix
   const currentCountry = COUNTRIES.find(c => c.code === customerInfo.country) || COUNTRIES[0];
@@ -191,6 +193,34 @@ function CheckoutPageContent() {
 
     loadBooking();
   }, [effectiveBookingId, isTourBooking, tourBookingId, bookingId, router, supabase]);
+
+  // Track begin_checkout event when data is loaded
+  useEffect(() => {
+    if (loading || hasTrackedCheckout.current) return;
+
+    if (isTourBooking && tourBooking) {
+      trackTourCheckout(
+        tourBooking.booking_id,
+        tourBooking.tour_name,
+        tourBooking.total_price,
+        tourBooking.adults + tourBooking.children
+      );
+      hasTrackedCheckout.current = true;
+    } else if (!isTourBooking && trips.length > 0) {
+      const totalValue = trips.reduce((sum, trip) => sum + (trip.final_price || trip.price), 0);
+      trackShuttleCheckout(
+        trips[0].booking_id,
+        trips.map(trip => ({
+          from: trip.from_location,
+          to: trip.to_location,
+          price: trip.final_price || trip.price,
+          passengers: trip.adults + trip.children,
+        })),
+        totalValue
+      );
+      hasTrackedCheckout.current = true;
+    }
+  }, [loading, isTourBooking, tourBooking, trips]);
 
   const grandTotal = useMemo(() => {
     if (isTourBooking && tourBooking) {
