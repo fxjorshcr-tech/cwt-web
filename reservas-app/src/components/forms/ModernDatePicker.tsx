@@ -40,12 +40,15 @@ export function ModernDatePicker({
   const [currentMonth, setCurrentMonth] = useState(value || new Date());
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Calculate if today is blocked due to 12-hour advance booking requirement
-  const isTodayBlocked = useMemo(() => {
-    if (!enforceMinimumAdvance) return false;
+  // Calculate minimum bookable date based on 12-hour advance booking requirement
+  // - Today is ALWAYS blocked (no same-day bookings)
+  // - If past noon CR time, tomorrow is ALSO blocked
+  const minimumDaysAhead = useMemo(() => {
+    if (!enforceMinimumAdvance) return 0; // No restriction
     const crNow = getNowInCostaRica();
-    // If it's past noon (12:00) in Costa Rica, today is blocked for bookings
-    return crNow.getHours() >= 12;
+    // If it's past noon (12:00) in Costa Rica, need to book 2+ days ahead
+    // Otherwise, need to book 1+ day ahead (tomorrow minimum)
+    return crNow.getHours() >= 12 ? 2 : 1;
   }, [enforceMinimumAdvance]);
 
   // Click outside to close
@@ -127,13 +130,11 @@ export function ModernDatePicker({
       day
     );
 
-    // Check if this is today and today is blocked
-    const isToday =
-      selectedDate.getDate() === today.getDate() &&
-      selectedDate.getMonth() === today.getMonth() &&
-      selectedDate.getFullYear() === today.getFullYear();
+    // Calculate minimum allowed date based on minimumDaysAhead
+    const minAllowedDate = new Date(today);
+    minAllowedDate.setDate(today.getDate() + minimumDaysAhead);
 
-    const isBlocked = (isToday && isTodayBlocked) || selectedDate < today || selectedDate > maxDate;
+    const isBlocked = selectedDate < minAllowedDate || selectedDate > maxDate;
 
     if (!isBlocked) {
       onChange(selectedDate);
@@ -160,16 +161,13 @@ export function ModernDatePicker({
         day
       );
 
-      // Check if this is today
-      const isToday =
-        date.getDate() === today.getDate() &&
-        date.getMonth() === today.getMonth() &&
-        date.getFullYear() === today.getFullYear();
+      // Calculate minimum allowed date based on minimumDaysAhead
+      const minAllowedDate = new Date(today);
+      minAllowedDate.setDate(today.getDate() + minimumDaysAhead);
 
-      const isPast = date < today;
+      const isTooSoon = date < minAllowedDate;
       const isFuture = date > maxDate;
-      const isTodayAndBlocked = isToday && isTodayBlocked;
-      const isDisabled = isPast || isFuture || isTodayAndBlocked;
+      const isDisabled = isTooSoon || isFuture;
       
       const isSelected = value && 
         date.getDate() === value.getDate() &&

@@ -30,20 +30,20 @@ export async function sendBookingConfirmationEmail(data: BookingEmailData): Prom
   // Generate trip details HTML with pickup/dropoff addresses and voucher
   const tripDetailsHtml = trips.map((trip, index) => `
     <div style="background: #f8f9fa; border-radius: 8px; padding: 16px; margin-bottom: 12px; border-left: 4px solid #3b82f6;">
-      <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
-        <h3 style="margin: 0; color: #1a365d; font-size: 16px;">
-          ${trips.length > 1 ? `Trip ${index + 1}: ` : ''}${trip.origin} → ${trip.destination}
-        </h3>
-        <span style="font-weight: 600; color: #3b82f6;">$${trip.price.toFixed(2)}</span>
+      <h3 style="margin: 0 0 8px 0; color: #1a365d; font-size: 15px;">
+        ${trips.length > 1 ? `Trip ${index + 1}: ` : ''}${trip.origin} → ${trip.destination}
+      </h3>
+      <div style="background: #dbeafe; border-radius: 6px; padding: 8px 12px; margin-bottom: 12px; display: inline-block;">
+        <span style="font-size: 14px; font-weight: 600; color: #1d4ed8;">$${trip.price.toFixed(2)} USD</span>
       </div>
       ${trip.voucherNumber ? `
-      <div style="margin-bottom: 12px;">
+      <div style="margin-bottom: 10px;">
         <span style="font-size: 11px; color: #6b7280; font-family: monospace; background: #e5e7eb; padding: 4px 8px; border-radius: 4px;">
           Voucher: ${trip.voucherNumber}
         </span>
       </div>
       ` : ''}
-      <table style="width: 100%; font-size: 14px;">
+      <table style="width: 100%; font-size: 13px;">
         <tr>
           <td style="color: #666; padding: 4px 0;">📅 Date:</td>
           <td style="text-align: right; font-weight: 500;">${trip.date}</td>
@@ -88,7 +88,7 @@ export async function sendBookingConfirmationEmail(data: BookingEmailData): Prom
   <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
     <div style="background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%); border-radius: 12px 12px 0 0; padding: 32px; text-align: center;">
       <h1 style="color: white; margin: 0; font-size: 28px;">Booking Confirmed!</h1>
-      <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0;">Thank you for choosing Can't Wait Travel CR</p>
+      <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0; white-space: nowrap; font-size: 14px;">Thank you for choosing Can't Wait Travel</p>
     </div>
 
     <div style="background: white; padding: 32px; border-radius: 0 0 12px 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
@@ -106,12 +106,12 @@ export async function sendBookingConfirmationEmail(data: BookingEmailData): Prom
 
       ${tripDetailsHtml}
 
-      <div style="background: #1a365d; color: white; border-radius: 8px; padding: 16px; margin-top: 20px;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span style="font-size: 16px;">Total Paid:</span>
-          <span style="font-size: 24px; font-weight: bold;">$${totalAmount.toFixed(2)} USD</span>
-        </div>
-      </div>
+      <table style="width: 100%; background: #1a365d; color: white; border-radius: 8px; margin-top: 20px;" cellpadding="16" cellspacing="0">
+        <tr>
+          <td style="font-size: 14px; white-space: nowrap;">Total Paid:</td>
+          <td style="font-size: 20px; font-weight: bold; text-align: right; white-space: nowrap;">$${totalAmount.toFixed(2)}</td>
+        </tr>
+      </table>
 
       ${transactionId ? `
       <div style="margin-top: 20px; padding: 16px; background: #f0fdf4; border-radius: 8px; border: 1px solid #bbf7d0;">
@@ -151,46 +151,26 @@ export async function sendBookingConfirmationEmail(data: BookingEmailData): Prom
       <!-- How to Contact Us -->
       <h2 style="color: #1a365d; font-size: 18px; margin-bottom: 16px;">How to Contact Us</h2>
 
-      <div style="background: #f0fdf4; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
-        <table style="width: 100%;">
-          <tr>
-            <td style="padding: 8px 0;">
-              <table style="width: 100%;">
-                <tr>
-                  <td style="width: 40px; vertical-align: middle;">
-                    <span style="font-size: 20px;">📧</span>
-                  </td>
-                  <td>
-                    <p style="margin: 0; font-size: 13px; color: #666;">Email</p>
-                    <a href="mailto:mybooking@cantwaittravelcr.com" style="color: #2563eb; text-decoration: none; font-weight: 600; font-size: 14px;">mybooking@cantwaittravelcr.com</a>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding: 8px 0; border-top: 1px solid #dcfce7;">
-              <table style="width: 100%;">
-                <tr>
-                  <td style="width: 40px; vertical-align: middle;">
-                    <span style="font-size: 20px;">💬</span>
-                  </td>
-                  <td>
-                    <p style="margin: 0; font-size: 13px; color: #666;">WhatsApp</p>
-                    <a href="https://wa.me/50685962438" style="color: #22c55e; text-decoration: none; font-weight: 600; font-size: 14px;">+506 8596 2438</a>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-        </table>
-      </div>
+      <table style="width: 100%; background: #f0fdf4; border-radius: 8px; margin-bottom: 16px;" cellpadding="12" cellspacing="0">
+        <tr>
+          <td style="width: 32px; vertical-align: middle;">📧</td>
+          <td>
+            <p style="margin: 0; font-size: 11px; color: #666;">Email</p>
+            <a href="mailto:mybooking@cantwaittravelcr.com" style="color: #2563eb; text-decoration: none; font-weight: 600; font-size: 12px;">mybooking@cantwaittravelcr.com</a>
+          </td>
+        </tr>
+        <tr>
+          <td style="width: 32px; vertical-align: middle; border-top: 1px solid #dcfce7;">💬</td>
+          <td style="border-top: 1px solid #dcfce7;">
+            <p style="margin: 0; font-size: 11px; color: #666;">WhatsApp</p>
+            <a href="https://wa.me/50685962438" style="color: #22c55e; text-decoration: none; font-weight: 600; font-size: 12px;">+506 8596 2438</a>
+          </td>
+        </tr>
+      </table>
 
       <!-- Animal Love Badge -->
-      <div style="text-align: center; margin-top: 24px; padding: 12px; background: linear-gradient(135deg, #fffbeb 0%, #fff7ed 100%); border-radius: 24px; border: 1px solid #fde68a;">
-        <span style="font-size: 16px;">🐕</span>
-        <span style="font-size: 12px; color: #92400e; font-weight: 500; margin: 0 4px;">🐾 We respect & love animals ❤️ 🐾</span>
-        <span style="font-size: 16px;">🐕</span>
+      <div style="text-align: center; margin-top: 24px; padding: 10px; background: linear-gradient(135deg, #fffbeb 0%, #fff7ed 100%); border-radius: 24px; border: 1px solid #fde68a; white-space: nowrap;">
+        <span style="font-size: 11px; color: #92400e; font-weight: 500;">🐾 We love animals ❤️ 🐾</span>
       </div>
     </div>
 
