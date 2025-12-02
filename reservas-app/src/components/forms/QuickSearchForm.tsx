@@ -127,13 +127,13 @@ export function QuickSearchForm({
         return;
       }
 
-      // Show "Checking availability..." for 500ms
+      // Show "Preparing your quote..." for 300ms
       setAvailabilityStatus('checking');
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 300));
 
-      // Show "Availability approved" for 500ms
+      // Show "Quote ready!" for 300ms
       setAvailabilityStatus('approved');
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 300));
 
       // Generate booking ID
       const bookingId = `booking_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -327,12 +327,12 @@ export function QuickSearchForm({
             {availabilityStatus === 'checking' ? (
               <>
                 <Loader2 className="h-5 w-5 animate-spin" />
-                Checking availability...
+                Preparing your quote...
               </>
             ) : availabilityStatus === 'approved' ? (
               <>
                 <CheckCircle className="h-5 w-5" />
-                Availability confirmed!
+                Quote ready!
               </>
             ) : isSubmitting ? (
               <>

@@ -243,13 +243,13 @@ function PreviewPageContent() {
     const route = routes.find((r) => r.origen === editOrigin && r.destino === editDestination);
     if (!route) return;
 
-    // Show "Checking availability..." for 500ms
+    // Show "Preparing your quote..." for 300ms
     setAvailabilityStatus('checking');
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 300));
 
-    // Show "Availability approved" for 500ms
+    // Show "Quote ready!" for 300ms
     setAvailabilityStatus('approved');
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 300));
 
     const totalPassengers = editAdults + editChildren;
     const price = calculateTripPrice(route, totalPassengers);
@@ -394,12 +394,12 @@ function PreviewPageContent() {
             {availabilityStatus === 'checking' ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Checking availability...
+                Preparing your quote...
               </>
             ) : availabilityStatus === 'approved' ? (
               <>
                 <CheckCircle className="h-4 w-4" />
-                Availability confirmed!
+                Quote ready!
               </>
             ) : isNewTrip ? (
               <>
