@@ -12,6 +12,7 @@ interface PickupDetailsCardProps {
   isDropoffToAirport: boolean;
   pickupAddress: string;
   pickupTime: string;
+  tripDate?: string; // YYYY-MM-DD format for 12-hour cutoff
   duration?: string | null;
   errors: ValidationErrors;
   nightSurcharge: number;
@@ -31,6 +32,7 @@ export function PickupDetailsCard({
   isDropoffToAirport,
   pickupAddress,
   pickupTime,
+  tripDate,
   duration,
   errors,
   nightSurcharge,
@@ -76,7 +78,7 @@ export function PickupDetailsCard({
           <Label htmlFor="pickup_time" className="text-sm">
             Pickup Time <span className="text-red-500">*</span>
           </Label>
-          <TimePicker value={pickupTime} onChange={onPickupTimeChange} />
+          <TimePicker value={pickupTime} onChange={onPickupTimeChange} selectedDate={tripDate} />
           {errors.pickup_time && (
             <p className="text-xs text-red-600 mt-1">{errors.pickup_time}</p>
           )}

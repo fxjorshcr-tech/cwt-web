@@ -66,7 +66,7 @@ export function TripSummaryCard({
               <Calendar className="h-4 w-4 text-blue-600" />
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</p>
             </div>
-            <p className="font-semibold text-sm md:text-base text-gray-900">{formatDate(date)}</p>
+            <p className="font-semibold text-sm md:text-base text-gray-900" suppressHydrationWarning>{formatDate(date)}</p>
           </div>
           <div className="bg-white rounded-lg p-3 border border-gray-200">
             <div className="flex items-center gap-2 mb-1">

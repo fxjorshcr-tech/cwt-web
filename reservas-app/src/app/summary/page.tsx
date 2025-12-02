@@ -101,7 +101,8 @@ function SummaryPageContent() {
   const supabase = createClient();
   const { addItem, items: cartItems, itemCount: cartItemCount, totalAmount: cartTotal } = useCart();
 
-  const bookingId = searchParams.get('booking_id');
+  // ✅ Added null safety for searchParams
+  const bookingId = searchParams?.get('booking_id');
 
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);

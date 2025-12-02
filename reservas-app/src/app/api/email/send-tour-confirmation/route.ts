@@ -164,45 +164,57 @@ export async function POST(request: NextRequest) {
 
       <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;">
 
-      <h2 style="color: #1a365d; font-size: 18px;">What Happens Next?</h2>
-
-      <div style="margin-bottom: 16px;">
-        <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
-          <div style="width: 32px; height: 32px; background: #22c55e; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-            <span style="color: white; font-size: 16px;">✓</span>
-          </div>
-          <div>
-            <p style="margin: 0; font-weight: 600; color: #166534;">Confirmation Email Sent</p>
-            <p style="margin: 4px 0 0 0; font-size: 13px; color: #15803d;">Check your inbox for your booking details and receipt.</p>
-          </div>
-        </div>
-
-        <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
-          <div style="width: 32px; height: 32px; background: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-            <span style="color: white; font-size: 14px;">✉</span>
-          </div>
-          <div>
-            <p style="margin: 0; font-weight: 600; color: #166534;">Need Assistance?</p>
-            <p style="margin: 4px 0 0 0; font-size: 13px; color: #15803d;">Contact us anytime at <a href="mailto:mybooking@cantwaittravelcr.com" style="color: #2563eb; font-weight: 600;">mybooking@cantwaittravelcr.com</a> or via <a href="https://wa.me/50685962438" style="color: #22c55e; font-weight: 600;">WhatsApp</a>.</p>
-          </div>
-        </div>
-
-        <div style="display: flex; align-items: flex-start; gap: 12px;">
-          <div style="width: 32px; height: 32px; background: #f97316; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-            <span style="color: white; font-size: 14px;">📍</span>
-          </div>
-          <div>
-            <p style="margin: 0; font-weight: 600; color: #166534;">Day of Tour</p>
-            <p style="margin: 4px 0 0 0; font-size: 13px; color: #15803d;">Be ready at your hotel lobby. We'll pick you up on time. Have an amazing adventure!</p>
-          </div>
-        </div>
+      <!-- Important Reminder -->
+      <div style="background: #fef3c7; border-radius: 8px; padding: 16px; margin-bottom: 20px; border-left: 4px solid #f59e0b;">
+        <table style="width: 100%;">
+          <tr>
+            <td style="width: 40px; vertical-align: top;">
+              <span style="font-size: 24px;">⏰</span>
+            </td>
+            <td>
+              <p style="margin: 0; font-weight: 600; color: #92400e; font-size: 15px;">Important Reminder</p>
+              <p style="margin: 4px 0 0 0; font-size: 13px; color: #a16207;">Be ready at your hotel lobby <strong>10 minutes before</strong> your scheduled pickup time.</p>
+            </td>
+          </tr>
+        </table>
       </div>
 
-      <div style="text-align: center; margin-top: 32px;">
-        <p style="color: #666; font-size: 14px;">Questions? Contact us at:</p>
-        <a href="mailto:mybooking@cantwaittravelcr.com" style="color: #2563eb; text-decoration: none; font-weight: 500;">mybooking@cantwaittravelcr.com</a>
-        <span style="color: #999; margin: 0 8px;">|</span>
-        <a href="https://wa.me/50685962438" style="color: #22c55e; text-decoration: none; font-weight: 500;">WhatsApp</a>
+      <!-- How to Contact Us -->
+      <h2 style="color: #1a365d; font-size: 18px; margin-bottom: 16px;">How to Contact Us</h2>
+
+      <div style="background: #f0fdf4; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+        <table style="width: 100%;">
+          <tr>
+            <td style="padding: 8px 0;">
+              <table style="width: 100%;">
+                <tr>
+                  <td style="width: 40px; vertical-align: middle;">
+                    <span style="font-size: 20px;">📧</span>
+                  </td>
+                  <td>
+                    <p style="margin: 0; font-size: 13px; color: #666;">Email</p>
+                    <a href="mailto:mybooking@cantwaittravelcr.com" style="color: #2563eb; text-decoration: none; font-weight: 600; font-size: 14px;">mybooking@cantwaittravelcr.com</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; border-top: 1px solid #dcfce7;">
+              <table style="width: 100%;">
+                <tr>
+                  <td style="width: 40px; vertical-align: middle;">
+                    <span style="font-size: 20px;">💬</span>
+                  </td>
+                  <td>
+                    <p style="margin: 0; font-size: 13px; color: #666;">WhatsApp</p>
+                    <a href="https://wa.me/50685962438" style="color: #22c55e; text-decoration: none; font-weight: 600; font-size: 14px;">+506 8596 2438</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
       </div>
 
       <!-- Animal Love Badge -->

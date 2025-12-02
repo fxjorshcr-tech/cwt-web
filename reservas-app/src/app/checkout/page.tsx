@@ -108,8 +108,9 @@ function CheckoutPageContent() {
   const searchParams = useSearchParams();
   const supabase = createClient();
 
-  const bookingId = searchParams.get('booking_id');
-  const tourBookingId = searchParams.get('tour_booking_id');
+  // ✅ Added null safety for searchParams
+  const bookingId = searchParams?.get('booking_id');
+  const tourBookingId = searchParams?.get('tour_booking_id');
 
   // Determine booking type
   const isTourBooking = !!tourBookingId;
@@ -668,7 +669,7 @@ function CheckoutPageContent() {
                               <p className="text-sm font-semibold text-gray-900">
                                 {tourBooking.tour_name}
                               </p>
-                              <p className="text-xs text-gray-500 mt-0.5">
+                              <p className="text-xs text-gray-500 mt-0.5" suppressHydrationWarning>
                                 {formatDate(tourBooking.date)} • {tourBooking.adults + tourBooking.children} passengers
                               </p>
                               <p className="text-xs text-gray-500 mt-0.5">
@@ -691,7 +692,7 @@ function CheckoutPageContent() {
                                 {trips.length > 1 && `Trip ${index + 1}: `}
                                 {trip.from_location} → {trip.to_location}
                               </p>
-                              <p className="text-xs text-gray-500 mt-0.5">
+                              <p className="text-xs text-gray-500 mt-0.5" suppressHydrationWarning>
                                 {formatDate(trip.date)} • {trip.adults + trip.children} passengers
                               </p>
                             </div>

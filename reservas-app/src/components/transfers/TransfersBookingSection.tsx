@@ -9,8 +9,9 @@ export default function TransfersBookingSection() {
   const bookingFormRef = useRef<HTMLDivElement>(null);
 
   // Get initial values from URL params (for indexed routes)
-  const initialOrigin = searchParams.get('from') || '';
-  const initialDestination = searchParams.get('to') || '';
+  // ✅ Added null safety for searchParams
+  const initialOrigin = searchParams?.get('from') || '';
+  const initialDestination = searchParams?.get('to') || '';
 
   // Handle hash navigation and auto-scroll when coming from indexed routes
   useEffect(() => {

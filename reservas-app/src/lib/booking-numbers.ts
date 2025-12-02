@@ -1,6 +1,6 @@
 // src/lib/booking-numbers.ts
 // Sistema de generación de Booking Numbers y Vouchers
-// Formato: CWT-2025-000100 (Booking) / CWT-2025-000100-S01 (Shuttle) / CWT-2025-000100-T01 (Tour)
+// Formato: CWT-2025-100 (Booking) / CWT-2025-100-S1 (Shuttle) / CWT-2025-100-T1 (Tour)
 
 import { createClient } from '@supabase/supabase-js';
 
@@ -11,8 +11,26 @@ const supabase = createClient(
 );
 
 /**
+ * Formatea un booking number al formato corto (sin ceros a la izquierda)
+ * CWT-2025-000100 -> CWT-2025-100
+ */
+export function formatBookingNumberShort(bookingNumber: string): string {
+  // Si ya tiene formato corto, retornarlo
+  if (!bookingNumber.includes('-')) return bookingNumber;
+
+  const parts = bookingNumber.split('-');
+  if (parts.length !== 3) return bookingNumber;
+
+  // Remover ceros a la izquierda del número secuencial
+  const sequentialNumber = parseInt(parts[2], 10);
+  if (isNaN(sequentialNumber)) return bookingNumber;
+
+  return `${parts[0]}-${parts[1]}-${sequentialNumber}`;
+}
+
+/**
  * Genera un nuevo booking number usando la secuencia de Supabase
- * Formato: CWT-2025-000100
+ * Formato: CWT-2025-100 (sin ceros a la izquierda)
  */
 export async function generateBookingNumber(): Promise<string> {
   const { data, error } = await supabase.rpc('generate_booking_number');
@@ -21,27 +39,29 @@ export async function generateBookingNumber(): Promise<string> {
     console.error('[BookingNumbers] Error generating booking number:', error);
     // Fallback to timestamp-based ID if function fails
     const year = new Date().getFullYear();
-    const timestamp = Date.now().toString().slice(-6);
-    return `CWT-${year}-${timestamp}`;
+    const timestamp = Date.now().toString().slice(-3); // Solo últimos 3 dígitos
+    const sequentialNumber = 100 + parseInt(timestamp, 10) % 900; // Entre 100 y 999
+    return `CWT-${year}-${sequentialNumber}`;
   }
 
-  return data as string;
+  // Formatear al formato corto
+  return formatBookingNumberShort(data as string);
 }
 
 /**
  * Genera un voucher para shuttle
- * Formato: CWT-2025-000100-S01
+ * Formato: CWT-2025-100-S1
  */
 export function generateShuttleVoucher(bookingNumber: string, index: number): string {
-  return `${bookingNumber}-S${String(index).padStart(2, '0')}`;
+  return `${bookingNumber}-S${index}`;
 }
 
 /**
  * Genera un voucher para tour
- * Formato: CWT-2025-000100-T01
+ * Formato: CWT-2025-100-T1
  */
 export function generateTourVoucher(bookingNumber: string, index: number): string {
-  return `${bookingNumber}-T${String(index).padStart(2, '0')}`;
+  return `${bookingNumber}-T${index}`;
 }
 
 /**

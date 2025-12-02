@@ -1,10 +1,12 @@
 // src/components/home/TimePicker.tsx
 // ✅ COMPLETE 24-HOUR TIME PICKER - NO duplicate warning
+// ✅ UPDATED: 12-hour advance booking cutoff + Costa Rica time indicator
 
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { Clock } from 'lucide-react';
+import { useState, useRef, useEffect, useMemo } from 'react';
+import { Clock, AlertCircle } from 'lucide-react';
+import { getMinimumBookableTime } from '@/utils/timeHelpers';
 
 interface TimePickerProps {
   value: string;
@@ -12,6 +14,7 @@ interface TimePickerProps {
   label?: string;
   className?: string;
   showNightSurchargeWarning?: boolean;
+  selectedDate?: string; // YYYY-MM-DD format for 12-hour cutoff calculation
 }
 
 // Generate ALL time options (every 30 minutes, 24 hours)
@@ -51,18 +54,41 @@ const isNightSurchargeTime = (time: string): boolean => {
   return hours >= 21 || hours < 4;
 };
 
-export function TimePicker({ 
-  value, 
-  onChange, 
-  label, 
+export function TimePicker({
+  value,
+  onChange,
+  label,
   className = '',
-  showNightSurchargeWarning = true 
+  showNightSurchargeWarning = true,
+  selectedDate
 }: TimePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const selectedRef = useRef<HTMLButtonElement>(null);
 
   const isNightTime = isNightSurchargeTime(value);
+
+  // Calculate minimum bookable time based on 12-hour cutoff
+  const minTime = useMemo(() => {
+    if (!selectedDate) return null;
+    return getMinimumBookableTime(selectedDate);
+  }, [selectedDate]);
+
+  // Check if a time option is disabled (before cutoff)
+  const isTimeDisabled = (timeValue: string): boolean => {
+    if (!minTime || minTime === '24:00') return minTime === '24:00';
+
+    const [minH, minM] = minTime.split(':').map(Number);
+    const [optH, optM] = timeValue.split(':').map(Number);
+
+    const minMinutes = minH * 60 + minM;
+    const optMinutes = optH * 60 + optM;
+
+    return optMinutes < minMinutes;
+  };
+
+  // Check if all times are unavailable
+  const allTimesUnavailable = minTime === '24:00';
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -110,29 +136,44 @@ export function TimePicker({
     <div ref={containerRef} className={`relative notranslate ${className}`} translate="no">
       {label && (
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          {label}
+          {label} <span className="text-gray-400 font-normal">(Costa Rica time)</span>
         </label>
+      )}
+
+      {/* All times unavailable message */}
+      {allTimesUnavailable && (
+        <div className="flex items-center gap-2 px-3 py-2 bg-red-50 border border-red-200 rounded-lg mb-2">
+          <AlertCircle className="h-4 w-4 text-red-500 flex-shrink-0" />
+          <p className="text-xs text-red-700">
+            No times available for this date. Bookings require 12 hours advance notice.
+          </p>
+        </div>
       )}
 
       {/* Button */}
       <button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => !allTimesUnavailable && setIsOpen(!isOpen)}
+        disabled={allTimesUnavailable}
         aria-label="Select pickup time"
         aria-expanded={isOpen}
         aria-haspopup="listbox"
         className={`w-full px-4 py-3 text-left bg-white border rounded-lg hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
-          isNightTime ? 'border-amber-300 bg-amber-50' : 'border-gray-300'
+          allTimesUnavailable
+            ? 'border-red-300 bg-red-50 cursor-not-allowed opacity-60'
+            : isNightTime
+            ? 'border-amber-300 bg-amber-50'
+            : 'border-gray-300'
         }`}
       >
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <Clock className={`h-5 w-5 ${isNightTime ? 'text-amber-600' : 'text-gray-400'}`} aria-hidden="true" />
+            <Clock className={`h-5 w-5 ${allTimesUnavailable ? 'text-red-400' : isNightTime ? 'text-amber-600' : 'text-gray-400'}`} aria-hidden="true" />
             <span className={value ? 'text-gray-900' : 'text-gray-400'}>
-              {getDisplayValue()}
+              {allTimesUnavailable ? 'No times available' : getDisplayValue()}
             </span>
           </div>
-          {isNightTime && (
+          {isNightTime && !allTimesUnavailable && (
             <span className="text-xs font-semibold text-amber-600 bg-amber-100 px-2 py-1 rounded">
               +$50
             </span>
@@ -166,17 +207,22 @@ export function TimePicker({
               return hour >= 0 && hour < 12;
             }).map((option) => {
               const isSelected = value === option.value;
-              
+              const disabled = isTimeDisabled(option.value);
+
               return (
                 <button
                   key={option.value}
                   ref={isSelected ? selectedRef : null}
                   type="button"
-                  onClick={() => handleSelect(option.value)}
+                  onClick={() => !disabled && handleSelect(option.value)}
+                  disabled={disabled}
                   role="option"
                   aria-selected={isSelected}
+                  aria-disabled={disabled}
                   className={`w-full px-4 py-2.5 text-left text-sm transition-colors rounded-md flex items-center justify-between ${
-                    isSelected
+                    disabled
+                      ? 'text-gray-300 cursor-not-allowed'
+                      : isSelected
                       ? 'bg-blue-500 text-white font-semibold'
                       : option.isNightTime
                       ? 'text-amber-900 bg-amber-50 hover:bg-amber-100'
@@ -184,7 +230,10 @@ export function TimePicker({
                   }`}
                 >
                   <span>{option.label}</span>
-                  {option.isNightTime && !isSelected && (
+                  {disabled && (
+                    <span className="text-xs text-gray-400">12h min</span>
+                  )}
+                  {option.isNightTime && !isSelected && !disabled && (
                     <span className="text-xs font-semibold text-amber-600 bg-amber-200 px-2 py-0.5 rounded">
                       +$50
                     </span>
@@ -204,22 +253,30 @@ export function TimePicker({
               return hour >= 12 && hour < 18;
             }).map((option) => {
               const isSelected = value === option.value;
-              
+              const disabled = isTimeDisabled(option.value);
+
               return (
                 <button
                   key={option.value}
                   ref={isSelected ? selectedRef : null}
                   type="button"
-                  onClick={() => handleSelect(option.value)}
+                  onClick={() => !disabled && handleSelect(option.value)}
+                  disabled={disabled}
                   role="option"
                   aria-selected={isSelected}
-                  className={`w-full px-4 py-2.5 text-left text-sm transition-colors rounded-md ${
-                    isSelected
+                  aria-disabled={disabled}
+                  className={`w-full px-4 py-2.5 text-left text-sm transition-colors rounded-md flex items-center justify-between ${
+                    disabled
+                      ? 'text-gray-300 cursor-not-allowed'
+                      : isSelected
                       ? 'bg-blue-500 text-white font-semibold'
                       : 'text-gray-700 hover:bg-gray-50'
                   }`}
                 >
-                  {option.label}
+                  <span>{option.label}</span>
+                  {disabled && (
+                    <span className="text-xs text-gray-400">12h min</span>
+                  )}
                 </button>
               );
             })}
@@ -235,17 +292,22 @@ export function TimePicker({
               return hour >= 18 && hour < 24;
             }).map((option) => {
               const isSelected = value === option.value;
-              
+              const disabled = isTimeDisabled(option.value);
+
               return (
                 <button
                   key={option.value}
                   ref={isSelected ? selectedRef : null}
                   type="button"
-                  onClick={() => handleSelect(option.value)}
+                  onClick={() => !disabled && handleSelect(option.value)}
+                  disabled={disabled}
                   role="option"
                   aria-selected={isSelected}
+                  aria-disabled={disabled}
                   className={`w-full px-4 py-2.5 text-left text-sm transition-colors rounded-md flex items-center justify-between ${
-                    isSelected
+                    disabled
+                      ? 'text-gray-300 cursor-not-allowed'
+                      : isSelected
                       ? 'bg-blue-500 text-white font-semibold'
                       : option.isNightTime
                       ? 'text-amber-900 bg-amber-50 hover:bg-amber-100'
@@ -253,7 +315,10 @@ export function TimePicker({
                   }`}
                 >
                   <span>{option.label}</span>
-                  {option.isNightTime && !isSelected && (
+                  {disabled && (
+                    <span className="text-xs text-gray-400">12h min</span>
+                  )}
+                  {option.isNightTime && !isSelected && !disabled && (
                     <span className="text-xs font-semibold text-amber-600 bg-amber-200 px-2 py-0.5 rounded">
                       +$50
                     </span>

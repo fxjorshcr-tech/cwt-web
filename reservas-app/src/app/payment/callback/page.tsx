@@ -17,13 +17,14 @@ function PaymentCallbackContent() {
     async function processPaymentCallback() {
       try {
         // Extract Tilopay callback parameters
-        const code = searchParams.get('code') || '';
-        const description = decodeURIComponent(searchParams.get('description') || '');
-        const authCode = searchParams.get('auth') || '';
-        const orderId = searchParams.get('order') || '';
-        const transactionId = searchParams.get('tilopay-transaction') || searchParams.get('tpt') || '';
-        const orderHash = searchParams.get('OrderHash') || '';
-        const returnDataEncoded = searchParams.get('returnData') || '';
+        // ✅ Added null safety for searchParams
+        const code = searchParams?.get('code') || '';
+        const description = decodeURIComponent(searchParams?.get('description') || '');
+        const authCode = searchParams?.get('auth') || '';
+        const orderId = searchParams?.get('order') || '';
+        const transactionId = searchParams?.get('tilopay-transaction') || searchParams?.get('tpt') || '';
+        const orderHash = searchParams?.get('OrderHash') || '';
+        const returnDataEncoded = searchParams?.get('returnData') || '';
 
         // Decode returnData to get bookingId and booking type
         let bookingId: string | null = null;

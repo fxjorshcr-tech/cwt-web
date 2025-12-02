@@ -1,18 +1,21 @@
 // src/components/home/ModernDatePicker.tsx
 // ✅ FIXED: Timezone bug corregido - Retorna fechas normalizadas
+// ✅ UPDATED: 12-hour advance booking cutoff support
 
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useRef, useEffect, useMemo } from 'react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { enUS } from 'date-fns/locale';
+import { getNowInCostaRica } from '@/utils/timeHelpers';
 
 interface ModernDatePickerProps {
   value: Date | null;
   onChange: (date: Date) => void;
   label?: string;
   className?: string;
+  enforceMinimumAdvance?: boolean; // Enable 12-hour cutoff (blocks today if past noon CR time)
 }
 
 /**
@@ -31,10 +34,19 @@ export function ModernDatePicker({
   onChange,
   label,
   className = '',
+  enforceMinimumAdvance = false,
 }: ModernDatePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(value || new Date());
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Calculate if today is blocked due to 12-hour advance booking requirement
+  const isTodayBlocked = useMemo(() => {
+    if (!enforceMinimumAdvance) return false;
+    const crNow = getNowInCostaRica();
+    // If it's past noon (12:00) in Costa Rica, today is blocked for bookings
+    return crNow.getHours() >= 12;
+  }, [enforceMinimumAdvance]);
 
   // Click outside to close
   useEffect(() => {
@@ -114,8 +126,16 @@ export function ModernDatePicker({
       currentMonth.getMonth(),
       day
     );
-    
-    if (selectedDate >= today && selectedDate <= maxDate) {
+
+    // Check if this is today and today is blocked
+    const isToday =
+      selectedDate.getDate() === today.getDate() &&
+      selectedDate.getMonth() === today.getMonth() &&
+      selectedDate.getFullYear() === today.getFullYear();
+
+    const isBlocked = (isToday && isTodayBlocked) || selectedDate < today || selectedDate > maxDate;
+
+    if (!isBlocked) {
       onChange(selectedDate);
       setIsOpen(false);
     }
@@ -139,10 +159,17 @@ export function ModernDatePicker({
         currentMonth.getMonth(),
         day
       );
-      
+
+      // Check if this is today
+      const isToday =
+        date.getDate() === today.getDate() &&
+        date.getMonth() === today.getMonth() &&
+        date.getFullYear() === today.getFullYear();
+
       const isPast = date < today;
       const isFuture = date > maxDate;
-      const isDisabled = isPast || isFuture;
+      const isTodayAndBlocked = isToday && isTodayBlocked;
+      const isDisabled = isPast || isFuture || isTodayAndBlocked;
       
       const isSelected = value && 
         date.getDate() === value.getDate() &&
