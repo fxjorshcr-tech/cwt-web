@@ -2,10 +2,11 @@
 // ✅ CONFIRMATION PAGE - Final landing page (Step 4)
 'use client';
 
-import { useEffect, useState, Suspense, useCallback, useMemo } from 'react';
+import { useEffect, useState, Suspense, useCallback, useMemo, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckCircle, Calendar, Users, MapPin, Mail, Phone, User, Loader2, Home, PawPrint, Heart, Dog, Ticket } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { trackShuttlePurchase, trackTourPurchase } from '@/lib/analytics';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import BookingStepper from '@/components/booking/BookingStepper';
@@ -80,6 +81,7 @@ function ConfirmationPageContent() {
   const [tourBooking, setTourBooking] = useState<TourBooking | null>(null);
   const [tourBookings, setTourBookings] = useState<TourBooking[]>([]); // For cart with multiple tours
   const [loading, setLoading] = useState(true);
+  const hasTrackedPurchase = useRef(false);
 
   // Clear cart when confirmation page loads successfully
   useEffect(() => {
@@ -190,6 +192,51 @@ function ConfirmationPageContent() {
   useEffect(() => {
     loadBooking();
   }, [loadBooking]);
+
+  // Track purchase event when booking data is loaded (conversion tracking)
+  useEffect(() => {
+    if (loading || hasTrackedPurchase.current) return;
+
+    // Track shuttle purchases
+    if (trips.length > 0) {
+      const totalValue = trips.reduce((sum, trip) => sum + (trip.final_price || trip.price), 0);
+      trackShuttlePurchase(
+        trips[0].booking_id,
+        trips.map(trip => ({
+          from: trip.from_location,
+          to: trip.to_location,
+          price: trip.final_price || trip.price,
+          passengers: trip.adults + trip.children,
+        })),
+        totalValue
+      );
+      hasTrackedPurchase.current = true;
+    }
+
+    // Track single tour purchase
+    if (tourBooking && !isCartBooking) {
+      trackTourPurchase(
+        tourBooking.booking_id,
+        tourBooking.tour_name,
+        tourBooking.total_price,
+        tourBooking.adults + tourBooking.children
+      );
+      hasTrackedPurchase.current = true;
+    }
+
+    // Track cart tour purchases
+    if (tourBookings.length > 0) {
+      tourBookings.forEach(tour => {
+        trackTourPurchase(
+          tour.booking_id,
+          tour.tour_name,
+          tour.total_price,
+          tour.adults + tour.children
+        );
+      });
+      hasTrackedPurchase.current = true;
+    }
+  }, [loading, trips, tourBooking, tourBookings, isCartBooking]);
 
   if (!effectiveBookingId) {
     return (
