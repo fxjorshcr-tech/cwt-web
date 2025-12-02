@@ -223,9 +223,9 @@ export default async function Home() {
         </section>
 
         {/* Optimized Structure for Conversions */}
+        <WhyChooseUs />
         <MostBookedCTAServer />
         <HowWeWork />
-        <WhyChooseUs />
         <PrivateTours />
         <ComparisonTable />
         <HomeAddons />

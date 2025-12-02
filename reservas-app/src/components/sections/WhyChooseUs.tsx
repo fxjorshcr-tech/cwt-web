@@ -1,17 +1,15 @@
-// src/components/home/WhyChooseUs.tsx
+// src/components/sections/WhyChooseUs.tsx
 'use client';
 
 import Link from 'next/link';
 import {
+  MapPin,
+  Clock,
   Users,
-  Car,
   Baby,
-  HeadphonesIcon,
   CreditCard,
   Shield,
-  MapPin,
   Award,
-  Heart,
   CheckCircle2
 } from 'lucide-react';
 
@@ -19,127 +17,110 @@ export default function WhyChooseUs() {
   return (
     <section className="py-12 sm:py-16 md:py-20 bg-gradient-to-b from-white via-blue-50 to-white overflow-x-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-        
-        <div className="text-center mb-12 md:mb-16">
-          <div className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 bg-blue-100 rounded-full mb-4 sm:mb-6 border border-blue-200">
-            <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
-            <span className="text-blue-700 font-bold text-xs sm:text-sm uppercase tracking-wide">
-              Your Trusted Transportation Partner
-            </span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl md:text-4xl font-bold text-gray-900 mb-4 sm:mb-6 px-4">
-            The Best Way to Travel Between Destinations in Costa Rica
-          </h2>
-          <p className="text-base sm:text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed px-4 mb-6">
-            When it comes to moving from point A to point B in Costa Rica, <strong>private transfers with a trusted company like Can't Wait Travel CR</strong> are the best option for travelers who value <em>peace of mind and security</em>.
-            Our team of local experts offers direct, private transportation as <strong>experienced professionals</strong> in Costa Rican tourism.
-            We know every curve of these roads and combine the warmth of <em className="text-blue-600">Pura Vida</em> hospitality with the strict professionalism
-            of a licensed transport operator, ensuring you arrive safely and comfortably every time.
-          </p>
 
-          {/* Routes SEO Content */}
-          <div className="max-w-3xl mx-auto px-4">
-            <p className="text-base sm:text-lg text-gray-700 leading-relaxed mb-4">
-              Whether you're traveling from <strong>Tamarindo to La Fortuna</strong>, <strong>San José to Manuel Antonio</strong>, or <strong>Guanacaste to anywhere in Costa Rica</strong>, we've got you covered.
-              With <strong className="text-blue-600">over 400+ routes</strong> connecting all major destinations, we make getting around Costa Rica simple and stress-free.
-            </p>
-            <div className="text-center">
-              <Link
-                href="/transfers"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition-all hover:shadow-xl hover:scale-105"
-              >
-                Check Your Route & Get a Quote
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
-            </div>
+        <div className="text-center mb-12 md:mb-16">
+          <h2 className="text-3xl sm:text-4xl md:text-4xl font-bold text-gray-900 mb-4 sm:mb-6 px-4">
+            Why Private Transfers Make Sense in Costa Rica
+          </h2>
+          <p className="text-base sm:text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed px-4 mb-4">
+            Getting around Costa Rica doesn't have to be complicated. A private transfer means one vehicle, one destination, on your schedule—no shared stops, no fixed departure times, and no navigating mountain roads yourself.
+          </p>
+          <p className="text-base sm:text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed px-4 mb-6">
+            We're based in La Fortuna, but we keep vehicles ready in <strong>SJO, Manuel Antonio, Guanacaste, and Monteverde</strong>. So wherever you're headed, there's a van nearby.
+          </p>
+          <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto px-4 mb-6">
+            Over <strong className="text-blue-600">400+ routes</strong> connecting every major destination.
+          </p>
+          <div className="text-center">
+            <Link
+              href="/transfers"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition-all hover:shadow-xl hover:scale-105"
+            >
+              Check Your Route & Get a Quote
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
           </div>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-start mb-12 md:mb-16">
-          
+
           <div className="space-y-4 sm:space-y-6">
-            {/* 1. Expert Local Drivers */}
+            {/* 1. Direct, Door-to-Door */}
             <div className="flex items-start gap-3 sm:gap-4 group">
               <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 bg-blue-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Users className="h-6 w-6 sm:h-7 sm:w-7 text-blue-600" />
+                <MapPin className="h-6 w-6 sm:h-7 sm:w-7 text-blue-600" />
               </div>
               <div>
-                <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-1 sm:mb-2">Expert Local Drivers</h3>
+                <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-1 sm:mb-2">Direct, Door-to-Door</h3>
                 <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-                  Our drivers are more than just chauffeurs; they are local experts. Fluent in English and 
-                  respectful, they know the safest routes and the hidden gems along the way.
+                  We pick you up at your hotel, Airbnb, or the airport—and drop you off exactly where you need to be.
                 </p>
               </div>
             </div>
 
-            {/* 2. Private & Spacious */}
+            {/* 2. You Pick the Time */}
             <div className="flex items-start gap-3 sm:gap-4 group">
               <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 bg-orange-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Car className="h-6 w-6 sm:h-7 sm:w-7 text-orange-600" />
+                <Clock className="h-6 w-6 sm:h-7 sm:w-7 text-orange-600" />
               </div>
               <div>
-                <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-1 sm:mb-2">Private & Spacious</h3>
+                <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-1 sm:mb-2">You Pick the Time</h3>
                 <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-                  Travel without squeezing in. Our modern vans comfortably accommodate up to <strong>12 passengers 
-                  with luggage</strong>. It's your private space—clean, cool, and exclusively yours.
+                  Need to leave at 5am for an early flight? Or maybe after lunch? You tell us when.
                 </p>
               </div>
             </div>
 
-            {/* 3. Family Safety First */}
+            {/* 3. Space for the Whole Group */}
             <div className="flex items-start gap-3 sm:gap-4 group">
               <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 bg-green-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Baby className="h-6 w-6 sm:h-7 sm:w-7 text-green-600" />
+                <Users className="h-6 w-6 sm:h-7 sm:w-7 text-green-600" />
               </div>
               <div>
-                <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-1 sm:mb-2">Family Safety First</h3>
+                <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-1 sm:mb-2">Space for the Whole Group</h3>
                 <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-                  We provide <strong>complimentary, high-quality safety seats</strong> for 
-                  all ages. Simply request them when booking, and we'll have everything installed.
+                  Our vans fit up to <strong>12 passengers</strong> with all their luggage. Families, friends, big groups—plenty of room.
                 </p>
               </div>
             </div>
 
-            {/* 4. Real Human Support */}
+            {/* 4. Car Seats at No Extra Cost */}
             <div className="flex items-start gap-3 sm:gap-4 group">
-              <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 bg-orange-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <HeadphonesIcon className="h-6 w-6 sm:h-7 sm:w-7 text-orange-600" />
+              <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 bg-pink-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Baby className="h-6 w-6 sm:h-7 sm:w-7 text-pink-600" />
               </div>
               <div>
-                <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-1 sm:mb-2">Real Human Support</h3>
+                <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-1 sm:mb-2">Car Seats at No Extra Cost</h3>
                 <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-                  Our bilingual team is ready to help <strong>via WhatsApp, phone,
-                  or email</strong> to assist you with any changes or questions.
+                  Traveling with little ones? Just let us know and we'll have the seats ready.
                 </p>
               </div>
             </div>
 
-            {/* 5. Bank-Level Security */}
+            {/* 5. What You See is What You Pay */}
             <div className="flex items-start gap-3 sm:gap-4 group">
               <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 bg-cyan-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                 <CreditCard className="h-6 w-6 sm:h-7 sm:w-7 text-cyan-600" />
               </div>
               <div>
-                <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-1 sm:mb-2">Bank-Level Security</h3>
+                <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-1 sm:mb-2">What You See is What You Pay</h3>
                 <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-                  Book with confidence. We use <strong>secure online payment</strong>, guaranteeing that your
-                  data is protected by bank-level security standards.
+                  No surprise fees at the end. The booking price is the final price.
                 </p>
               </div>
             </div>
 
-            {/* 6. Fully Licensed & Insured */}
+            {/* 6. Licensed & Fully Insured */}
             <div className="flex items-start gap-3 sm:gap-4 group">
               <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 bg-blue-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                 <Shield className="h-6 w-6 sm:h-7 sm:w-7 text-blue-600" />
               </div>
               <div>
-                <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-1 sm:mb-2">Fully Licensed & Insured</h3>
+                <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-1 sm:mb-2">Licensed & Fully Insured</h3>
                 <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-                  We operate strictly by the book. Holding official <strong>ICT License #4121-2025</strong>, 
-                  every vehicle carries full commercial liability coverage for your total peace of mind.
+                  ICT certified (<strong>#4121-2025</strong>). Every trip is covered.
                 </p>
               </div>
             </div>
@@ -151,36 +132,38 @@ export default function WhyChooseUs() {
                 <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
                   <Award className="h-6 w-6 text-orange-600" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900">Direct Operation</h3>
+                <h3 className="text-xl font-bold text-gray-900">What's Included</h3>
               </div>
-              <p className="text-sm text-gray-700 leading-relaxed mb-4">
-                We personally operate every service—no third-party reselling.
-              </p>
-              
-              <div className="space-y-2">
+
+              <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0" />
-                  <p className="text-sm text-gray-700">Flight monitoring included</p>
+                  <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0" />
+                  <p className="text-sm sm:text-base text-gray-700">Flight monitoring—we track your arrival</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0" />
-                  <p className="text-sm text-gray-700">Meet & greet service</p>
+                  <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0" />
+                  <p className="text-sm sm:text-base text-gray-700">Meet & greet at the airport</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0" />
-                  <p className="text-sm text-gray-700">Clean, air-conditioned vehicles</p>
+                  <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0" />
+                  <p className="text-sm sm:text-base text-gray-700">Clean, air-conditioned vehicles</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0" />
+                  <p className="text-sm sm:text-base text-gray-700">Bilingual driver</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0" />
+                  <p className="text-sm sm:text-base text-gray-700">WhatsApp support before and during your trip</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border-2 border-green-200">
-              <div className="flex items-center gap-3">
-                <Heart className="h-8 w-8 text-green-600" />
-                <div>
-                  <p className="font-bold text-gray-900 text-base">100% Costa Rican</p>
-                  <p className="text-sm text-gray-700">Nationwide coverage across Costa Rica</p>
-                </div>
-              </div>
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border-2 border-blue-200">
+              <p className="font-bold text-gray-900 text-lg mb-2">30+ Years Combined Experience</p>
+              <p className="text-sm sm:text-base text-gray-700">
+                Our team has been driving these roads for decades. We know every shortcut, every viewpoint, and every road condition.
+              </p>
             </div>
           </div>
         </div>
