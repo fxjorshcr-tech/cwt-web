@@ -10,26 +10,79 @@ declare global {
 }
 
 /**
- * Check if GA4 is available
+ * Initialize dataLayer if it doesn't exist
  */
-export function isGA4Available(): boolean {
-  return typeof window !== 'undefined' && typeof window.gtag === 'function';
+function ensureDataLayer(): void {
+  if (typeof window !== 'undefined') {
+    window.dataLayer = window.dataLayer || [];
+  }
+}
+
+/**
+ * Check if we're in browser environment
+ */
+function isBrowser(): boolean {
+  return typeof window !== 'undefined';
 }
 
 /**
  * Track a custom event in GA4
+ * Uses dataLayer.push which queues events until gtag.js loads
  */
 export function trackEvent(
   eventName: string,
   params?: Record<string, unknown>
 ): void {
-  if (!isGA4Available()) {
-    console.log('[Analytics] GA4 not available, skipping event:', eventName);
+  if (!isBrowser()) {
     return;
   }
 
-  window.gtag!('event', eventName, params);
-  console.log('[Analytics] Event tracked:', eventName, params);
+  ensureDataLayer();
+
+  // Use dataLayer.push - this queues the event and gtag will process it when ready
+  window.dataLayer!.push({
+    event: eventName,
+    ...params,
+  });
+
+  console.log('[Analytics] Event queued:', eventName, params);
+}
+
+/**
+ * Track event using gtag directly (waits for gtag to be available)
+ * Fallback to dataLayer if gtag isn't ready within timeout
+ */
+export function trackEventWithGtag(
+  eventName: string,
+  params?: Record<string, unknown>,
+  maxRetries: number = 10,
+  retryDelay: number = 200
+): void {
+  if (!isBrowser()) {
+    return;
+  }
+
+  let retries = 0;
+
+  const tryTrack = () => {
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', eventName, params);
+      console.log('[Analytics] Event tracked via gtag:', eventName, params);
+    } else if (retries < maxRetries) {
+      retries++;
+      setTimeout(tryTrack, retryDelay);
+    } else {
+      // Fallback to dataLayer after max retries
+      ensureDataLayer();
+      window.dataLayer!.push({
+        event: eventName,
+        ...params,
+      });
+      console.log('[Analytics] Event queued via dataLayer (gtag timeout):', eventName, params);
+    }
+  };
+
+  tryTrack();
 }
 
 // ========================================
@@ -53,7 +106,7 @@ export function trackBeginCheckout(
   totalValue: number,
   currency: string = 'USD'
 ): void {
-  trackEvent('begin_checkout', {
+  trackEventWithGtag('begin_checkout', {
     currency,
     value: totalValue,
     items,
@@ -70,7 +123,7 @@ export function trackPurchase(
   totalValue: number,
   currency: string = 'USD'
 ): void {
-  trackEvent('purchase', {
+  trackEventWithGtag('purchase', {
     transaction_id: transactionId,
     currency,
     value: totalValue,
@@ -86,7 +139,7 @@ export function trackAddToCart(
   item: EcommerceItem,
   currency: string = 'USD'
 ): void {
-  trackEvent('add_to_cart', {
+  trackEventWithGtag('add_to_cart', {
     currency,
     value: item.price * item.quantity,
     items: [item],
@@ -100,7 +153,7 @@ export function trackPageView(
   pagePath: string,
   pageTitle?: string
 ): void {
-  trackEvent('page_view', {
+  trackEventWithGtag('page_view', {
     page_path: pagePath,
     page_title: pageTitle,
   });
