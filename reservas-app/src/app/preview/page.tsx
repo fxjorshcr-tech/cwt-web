@@ -31,7 +31,7 @@ import { PassengerSelector } from '@/components/forms/PassengerSelector';
 import { createClient } from '@/lib/supabase/client';
 import { loadRoutesFromSupabase, type Route, calculateTripPrice } from '@/utils/bookingFormHelpers';
 import { loadBookingFromLocalStorage } from '@/utils/localStorageHelpers';
-import { formatDateToString, parseDateFromString } from '@/utils/timeHelpers';
+import { formatDateToString, parseDateFromString, getAvailabilityCount } from '@/utils/timeHelpers';
 
 interface TripPreview {
   from_location: string;
@@ -598,6 +598,14 @@ function PreviewPageContent() {
                             <p className="text-sm font-semibold text-gray-900 leading-tight">{trip.to_location}</p>
                           </div>
                         </div>
+                      </div>
+
+                      {/* Availability Urgency Message */}
+                      <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg mb-4">
+                        <Car className="h-4 w-4 text-amber-600 flex-shrink-0" />
+                        <p className="text-xs text-amber-800">
+                          <span className="font-semibold">Only {getAvailabilityCount(trip.from_location, trip.to_location, trip.date)} {getAvailabilityCount(trip.from_location, trip.to_location, trip.date) === 1 ? 'van' : 'vans'} with driver available</span> for this route
+                        </p>
                       </div>
 
                       {/* Trip Details - 2x2 grid on mobile */}

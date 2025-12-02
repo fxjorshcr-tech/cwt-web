@@ -50,6 +50,7 @@ export function TourDatePassengerForm({
             value={selectedDate || null}
             onChange={onDateChange}
             label="Travel Date"
+            enforceMinimumAdvance={true}
             className={errors.date ? 'border-red-300 bg-red-50' : ''}
           />
           {errors.date && (

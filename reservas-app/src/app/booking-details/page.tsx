@@ -594,7 +594,7 @@ function BookingDetailsContent() {
                 <Label htmlFor="pickup_time" className="text-sm">
                   Pickup Time <span className="text-red-500">*</span>
                 </Label>
-                <TimePicker value={formData.pickup_time} onChange={(v) => setFormData({ ...formData, pickup_time: v })} />
+                <TimePicker value={formData.pickup_time} onChange={(v) => setFormData({ ...formData, pickup_time: v })} selectedDate={currentTrip?.date} />
                 {errors.pickup_time && (
                   <p className="text-xs text-red-600 mt-1">{errors.pickup_time}</p>
                 )}

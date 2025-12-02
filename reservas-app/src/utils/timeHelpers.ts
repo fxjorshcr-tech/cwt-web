@@ -344,3 +344,186 @@ export function generateTimeSlots(
   
   return slots;
 }
+
+// ==========================================
+// COSTA RICA TIMEZONE HELPERS
+// ==========================================
+
+/**
+ * Costa Rica timezone offset: UTC-6 (no daylight saving time)
+ */
+const COSTA_RICA_OFFSET = -6;
+
+/**
+ * Get current date/time in Costa Rica timezone
+ *
+ * @returns Date object representing current time in Costa Rica
+ */
+export function getNowInCostaRica(): Date {
+  const now = new Date();
+  const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+  return new Date(utc + (COSTA_RICA_OFFSET * 3600000));
+}
+
+/**
+ * Check if a booking date/time is at least X hours from now (in Costa Rica time)
+ *
+ * @param bookingDate - The date of the booking (YYYY-MM-DD)
+ * @param bookingTime - The time of the booking (HH:mm) - optional for date-only check
+ * @param minimumHours - Minimum hours required (default: 12)
+ * @returns true if booking is at least minimumHours away
+ */
+export function isBookingTimeValid(
+  bookingDate: string,
+  bookingTime?: string,
+  minimumHours: number = 12
+): boolean {
+  const crNow = getNowInCostaRica();
+
+  // Parse booking date
+  const parsedDate = parseDateFromString(bookingDate);
+  if (isNaN(parsedDate.getTime())) return false;
+
+  // If no time provided, assume midnight
+  const time = bookingTime || '00:00';
+  const [hours, minutes] = time.split(':').map(Number);
+
+  // Create booking datetime in Costa Rica time
+  const bookingDateTime = new Date(
+    parsedDate.getFullYear(),
+    parsedDate.getMonth(),
+    parsedDate.getDate(),
+    hours,
+    minutes,
+    0,
+    0
+  );
+
+  // Calculate difference in hours
+  const diffMs = bookingDateTime.getTime() - crNow.getTime();
+  const diffHours = diffMs / (1000 * 60 * 60);
+
+  return diffHours >= minimumHours;
+}
+
+/**
+ * Get minimum bookable date considering 12-hour cutoff
+ *
+ * @returns Date object for minimum bookable date
+ */
+export function getMinimumBookableDate(): Date {
+  const crNow = getNowInCostaRica();
+
+  // If it's after 12:00 (noon) in Costa Rica, tomorrow is minimum for noon pickups
+  // But we need to allow booking for today if there are still 12+ hours
+  // So we just return today's date - validation will handle the time
+  return new Date(crNow.getFullYear(), crNow.getMonth(), crNow.getDate());
+}
+
+/**
+ * Get minimum bookable time for a specific date considering 12-hour cutoff
+ *
+ * @param bookingDate - The selected booking date
+ * @returns Minimum time in HH:mm format, or null if all times are available
+ */
+export function getMinimumBookableTime(bookingDate: string): string | null {
+  const crNow = getNowInCostaRica();
+  const parsedDate = parseDateFromString(bookingDate);
+
+  if (isNaN(parsedDate.getTime())) return null;
+
+  const today = new Date(crNow.getFullYear(), crNow.getMonth(), crNow.getDate());
+  const bookingDay = new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate());
+
+  // If booking is for a future day (not today or tomorrow), no minimum
+  const diffDays = (bookingDay.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
+
+  if (diffDays > 1) {
+    return null; // No restriction for bookings 2+ days out
+  }
+
+  // For today or tomorrow, calculate minimum time based on 12-hour window
+  const minBookingTime = new Date(crNow.getTime() + (12 * 60 * 60 * 1000));
+
+  // If min time is on the same day as booking date, return that time
+  const minBookingDay = new Date(minBookingTime.getFullYear(), minBookingTime.getMonth(), minBookingTime.getDate());
+
+  if (minBookingDay.getTime() === bookingDay.getTime()) {
+    const h = minBookingTime.getHours();
+    const m = minBookingTime.getMinutes();
+    // Round up to next 30-minute slot
+    const roundedMinutes = m < 30 ? 30 : 0;
+    const roundedHours = m < 30 ? h : h + 1;
+
+    if (roundedHours >= 24) {
+      return null; // No times available today
+    }
+
+    return `${roundedHours.toString().padStart(2, '0')}:${roundedMinutes.toString().padStart(2, '0')}`;
+  }
+
+  // If booking is before the minimum day, no times available
+  if (bookingDay.getTime() < minBookingDay.getTime()) {
+    return '24:00'; // Special value meaning "no times available"
+  }
+
+  return null;
+}
+
+/**
+ * Check if a specific date has any valid booking times (12-hour rule)
+ *
+ * @param bookingDate - The date to check
+ * @returns true if at least one time slot is available
+ */
+export function hasAvailableTimesForDate(bookingDate: string): boolean {
+  const minTime = getMinimumBookableTime(bookingDate);
+  return minTime !== '24:00';
+}
+
+// ==========================================
+// URGENCY / AVAILABILITY HELPERS
+// ==========================================
+
+/**
+ * Generate a consistent "availability" number (1-4) based on route and date
+ * Uses a simple hash to ensure the same route+date always returns the same number
+ *
+ * ✅ UPDATED: For bookings within 7 days, shows only 1-2 vans (more urgency)
+ *
+ * @param origin - Origin location
+ * @param destination - Destination location
+ * @param date - Date string (YYYY-MM-DD)
+ * @returns Number between 1-4 (or 1-2 for bookings within 7 days)
+ */
+export function getAvailabilityCount(origin: string, destination: string, date: string): number {
+  // Create a string to hash
+  const key = `${origin}-${destination}-${date}`;
+
+  // Simple hash function
+  let hash = 0;
+  for (let i = 0; i < key.length; i++) {
+    const char = key.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+
+  // Calculate days until booking
+  const bookingDate = parseDateFromString(date);
+  const today = getNowInCostaRica();
+  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+  let daysUntilBooking = 999; // Default to large number if date parsing fails
+  if (!isNaN(bookingDate.getTime())) {
+    const diffMs = bookingDate.getTime() - todayStart.getTime();
+    daysUntilBooking = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  }
+
+  // For bookings within 7 days: only show 1-2 vans (more urgency)
+  if (daysUntilBooking <= 7) {
+    return Math.abs(hash % 2) + 1; // Returns 1 or 2
+  }
+
+  // For bookings more than 7 days out: show 1-4 vans
+  return Math.abs(hash % 4) + 1;
+}
