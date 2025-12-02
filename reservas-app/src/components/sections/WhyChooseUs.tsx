@@ -31,6 +31,9 @@ export default function WhyChooseUs() {
           <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto px-4 mb-6">
             Over <strong className="text-blue-600">400+ routes</strong> connecting every major destination.
           </p>
+          <p className="text-base sm:text-lg text-gray-700 max-w-3xl mx-auto px-4 mb-8 bg-blue-50 py-4 rounded-xl border border-blue-100">
+            We believe great service starts with personal accountability. That's why we only accept bookings we can handle ourselves. Your trip isn't passed off to a third party—it stays with our team.
+          </p>
           <div className="text-center">
             <Link
               href="/transfers"
