@@ -179,23 +179,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       // Track add_to_cart event in GA4
       if (item.type === 'shuttle') {
-        const passengers = item.adults + item.children;
         const price = item.finalPrice || item.price;
         trackAddToCart({
           item_id: `shuttle_${item.bookingId}`,
           item_name: `${item.fromLocation} → ${item.toLocation}`,
           item_category: 'Shuttle',
-          price: passengers > 0 ? price / passengers : price,
-          quantity: passengers,
+          price: price,
+          quantity: 1, // One shuttle service
         });
       } else if (item.type === 'tour') {
-        const passengers = item.adults + item.children;
         trackAddToCart({
           item_id: `tour_${item.id}`,
           item_name: item.tourName,
           item_category: 'Private Tour',
-          price: passengers > 0 ? item.price / passengers : item.price,
-          quantity: passengers,
+          price: item.price,
+          quantity: 1, // One tour service
         });
       }
 

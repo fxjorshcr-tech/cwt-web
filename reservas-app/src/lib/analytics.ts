@@ -196,15 +196,12 @@ export function trackTourCheckout(
   totalValue: number,
   passengers: number
 ): void {
-  // Price per person to avoid GA4 multiplying price × quantity
-  const pricePerPerson = passengers > 0 ? totalValue / passengers : totalValue;
-
   const items: EcommerceItem[] = [{
     item_id: `tour_${bookingId}`,
     item_name: tourName,
     item_category: 'Private Tour',
-    price: pricePerPerson,
-    quantity: passengers,
+    price: totalValue,
+    quantity: 1, // One tour service, not per passenger
   }];
 
   trackBeginCheckout(items, totalValue);
@@ -243,15 +240,12 @@ export function trackTourPurchase(
   totalValue: number,
   passengers: number
 ): void {
-  // Price per person to avoid GA4 multiplying price × quantity
-  const pricePerPerson = passengers > 0 ? totalValue / passengers : totalValue;
-
   const items: EcommerceItem[] = [{
     item_id: `tour_${bookingId}`,
     item_name: tourName,
     item_category: 'Private Tour',
-    price: pricePerPerson,
-    quantity: passengers,
+    price: totalValue,
+    quantity: 1, // One tour service, not per passenger
   }];
 
   trackPurchase(bookingId, items, totalValue);
