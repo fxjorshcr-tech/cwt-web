@@ -44,8 +44,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" translate="no">
       <head>
+        {/* ✅ Disable Google Translate - prevents translation errors */}
+        <meta name="google" content="notranslate" />
+
         {/* ✅ DNS Prefetch - Resolve DNS lo antes posible */}
         <link rel="dns-prefetch" href="https://mmlbslwljvmscbgsqkkq.supabase.co" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
