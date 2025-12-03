@@ -3,6 +3,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { trackAddToCart } from '@/lib/analytics';
 
 // ============================================
 // TYPES
@@ -175,6 +176,27 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (exists) {
         return prev;
       }
+
+      // Track add_to_cart event in GA4
+      if (item.type === 'shuttle') {
+        const price = item.finalPrice || item.price;
+        trackAddToCart({
+          item_id: `shuttle_${item.bookingId}`,
+          item_name: `${item.fromLocation} → ${item.toLocation}`,
+          item_category: 'Shuttle',
+          price: price,
+          quantity: 1, // One shuttle service
+        });
+      } else if (item.type === 'tour') {
+        trackAddToCart({
+          item_id: `tour_${item.id}`,
+          item_name: item.tourName,
+          item_category: 'Private Tour',
+          price: item.price,
+          quantity: 1, // One tour service
+        });
+      }
+
       return [...prev, item];
     });
   };
