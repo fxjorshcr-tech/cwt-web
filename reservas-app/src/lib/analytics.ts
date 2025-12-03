@@ -181,7 +181,7 @@ export function trackShuttleCheckout(
     item_name: `${trip.from} → ${trip.to}`,
     item_category: 'Shuttle',
     price: trip.price,
-    quantity: trip.passengers,
+    quantity: 1, // One shuttle service per trip
   }));
 
   trackBeginCheckout(items, totalValue);
@@ -225,7 +225,7 @@ export function trackShuttlePurchase(
     item_name: `${trip.from} → ${trip.to}`,
     item_category: 'Shuttle',
     price: trip.price,
-    quantity: trip.passengers,
+    quantity: 1, // One shuttle service per trip
   }));
 
   trackPurchase(bookingId, items, totalValue);
