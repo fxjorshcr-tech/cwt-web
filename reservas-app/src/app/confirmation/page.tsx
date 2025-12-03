@@ -6,7 +6,7 @@ import { useEffect, useState, Suspense, useCallback, useMemo, useRef } from 'rea
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckCircle, Calendar, Users, MapPin, Mail, Phone, User, Loader2, Home, PawPrint, Heart, Dog, Ticket } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import { trackShuttlePurchase, trackTourPurchase } from '@/lib/analytics';
+import { trackPurchase } from '@/lib/analytics';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import BookingStepper from '@/components/booking/BookingStepper';
@@ -194,46 +194,68 @@ function ConfirmationPageContent() {
   }, [loadBooking]);
 
   // Track purchase event when booking data is loaded (conversion tracking)
+  // Single purchase event with all items combined
   useEffect(() => {
     if (loading || hasTrackedPurchase.current) return;
 
-    // Track shuttle purchases
+    // Collect all items for a single purchase event
+    const allItems: Array<{
+      item_id: string;
+      item_name: string;
+      item_category: string;
+      price: number;
+      quantity: number;
+    }> = [];
+    let totalValue = 0;
+    let transactionId = '';
+
+    // Add shuttle items
     if (trips.length > 0) {
-      const totalValue = trips.reduce((sum, trip) => sum + (trip.final_price || trip.price), 0);
-      trackShuttlePurchase(
-        trips[0].booking_id,
-        trips.map(trip => ({
-          from: trip.from_location,
-          to: trip.to_location,
-          price: trip.final_price || trip.price,
-          passengers: trip.adults + trip.children,
-        })),
-        totalValue
-      );
-      hasTrackedPurchase.current = true;
+      transactionId = trips[0].booking_id;
+      trips.forEach((trip, index) => {
+        const price = trip.final_price || trip.price;
+        allItems.push({
+          item_id: `shuttle_${trip.booking_id}_${index}`,
+          item_name: `${trip.from_location} → ${trip.to_location}`,
+          item_category: 'Shuttle',
+          price: price,
+          quantity: 1,
+        });
+        totalValue += price;
+      });
     }
 
-    // Track single tour purchase
+    // Add single tour item
     if (tourBooking && !isCartBooking) {
-      trackTourPurchase(
-        tourBooking.booking_id,
-        tourBooking.tour_name,
-        tourBooking.total_price,
-        tourBooking.adults + tourBooking.children
-      );
-      hasTrackedPurchase.current = true;
+      if (!transactionId) transactionId = tourBooking.booking_id;
+      allItems.push({
+        item_id: `tour_${tourBooking.booking_id}`,
+        item_name: tourBooking.tour_name,
+        item_category: 'Private Tour',
+        price: tourBooking.total_price,
+        quantity: 1,
+      });
+      totalValue += tourBooking.total_price;
     }
 
-    // Track cart tour purchases
+    // Add cart tour items
     if (tourBookings.length > 0) {
       tourBookings.forEach(tour => {
-        trackTourPurchase(
-          tour.booking_id,
-          tour.tour_name,
-          tour.total_price,
-          tour.adults + tour.children
-        );
+        if (!transactionId) transactionId = tour.booking_id;
+        allItems.push({
+          item_id: `tour_${tour.booking_id}`,
+          item_name: tour.tour_name,
+          item_category: 'Private Tour',
+          price: tour.total_price,
+          quantity: 1,
+        });
+        totalValue += tour.total_price;
       });
+    }
+
+    // Track single purchase event with all items
+    if (allItems.length > 0 && transactionId) {
+      trackPurchase(transactionId, allItems, totalValue);
       hasTrackedPurchase.current = true;
     }
   }, [loading, trips, tourBooking, tourBookings, isCartBooking]);
