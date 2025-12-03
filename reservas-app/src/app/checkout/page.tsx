@@ -12,7 +12,7 @@ import {
   ArrowLeft,
   Lock
 } from 'lucide-react';
-import { trackShuttleCheckout, trackTourCheckout } from '@/lib/analytics';
+import { trackBeginCheckout } from '@/lib/analytics';
 import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -195,29 +195,49 @@ function CheckoutPageContent() {
   }, [effectiveBookingId, isTourBooking, tourBookingId, bookingId, router, supabase]);
 
   // Track begin_checkout event when data is loaded
+  // Single checkout event with all items combined
   useEffect(() => {
     if (loading || hasTrackedCheckout.current) return;
 
+    const allItems: Array<{
+      item_id: string;
+      item_name: string;
+      item_category: string;
+      price: number;
+      quantity: number;
+    }> = [];
+    let totalValue = 0;
+
+    // Add tour item
     if (isTourBooking && tourBooking) {
-      trackTourCheckout(
-        tourBooking.booking_id,
-        tourBooking.tour_name,
-        tourBooking.total_price,
-        tourBooking.adults + tourBooking.children
-      );
-      hasTrackedCheckout.current = true;
-    } else if (!isTourBooking && trips.length > 0) {
-      const totalValue = trips.reduce((sum, trip) => sum + (trip.final_price || trip.price), 0);
-      trackShuttleCheckout(
-        trips[0].booking_id,
-        trips.map(trip => ({
-          from: trip.from_location,
-          to: trip.to_location,
-          price: trip.final_price || trip.price,
-          passengers: trip.adults + trip.children,
-        })),
-        totalValue
-      );
+      allItems.push({
+        item_id: `tour_${tourBooking.booking_id}`,
+        item_name: tourBooking.tour_name,
+        item_category: 'Private Tour',
+        price: tourBooking.total_price,
+        quantity: 1,
+      });
+      totalValue += tourBooking.total_price;
+    }
+
+    // Add shuttle items
+    if (!isTourBooking && trips.length > 0) {
+      trips.forEach((trip, index) => {
+        const price = trip.final_price || trip.price;
+        allItems.push({
+          item_id: `shuttle_${trip.booking_id}_${index}`,
+          item_name: `${trip.from_location} → ${trip.to_location}`,
+          item_category: 'Shuttle',
+          price: price,
+          quantity: 1,
+        });
+        totalValue += price;
+      });
+    }
+
+    // Track single checkout event with all items
+    if (allItems.length > 0) {
+      trackBeginCheckout(allItems, totalValue);
       hasTrackedCheckout.current = true;
     }
   }, [loading, isTourBooking, tourBooking, trips]);

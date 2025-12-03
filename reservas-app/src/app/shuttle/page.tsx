@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import WhatsAppButton from '@/components/WhatsAppButton';
-import { TrendingUp, Clock, DollarSign, MapPin, Flame, ArrowRight, Shield, CheckCircle2 } from 'lucide-react';
+import { TrendingUp, Clock, DollarSign, MapPin, Flame, ArrowRight, Shield, CheckCircle2, Car, User, Luggage, MessageCircle, XCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
@@ -162,6 +162,67 @@ export default async function MostBookedPage() {
                     <CheckCircle2 className="h-4 w-4" />
                   </div>
                   <span className="text-sm font-semibold">100% Private</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Intro Section */}
+        <section className="py-16 bg-white">
+          <div className="container mx-auto px-6 max-w-5xl">
+            {/* Title & Description */}
+            <div className="text-center mb-12">
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+                Our Most Popular Routes
+              </h2>
+              <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+                These are the private transfer routes we operate most frequently across Costa Rica.
+                Find yours below, or use our booking form to search any destination.
+              </p>
+            </div>
+
+            {/* What's Included Grid */}
+            <div className="bg-gray-50 rounded-2xl p-8">
+              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-6 text-center">
+                Every Private Transfer Includes
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+                <div className="flex items-center gap-3 bg-white rounded-xl p-4 shadow-sm">
+                  <div className="bg-green-100 p-2 rounded-lg">
+                    <Car className="h-5 w-5 text-green-600" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700">Door-to-door service</span>
+                </div>
+                <div className="flex items-center gap-3 bg-white rounded-xl p-4 shadow-sm">
+                  <div className="bg-green-100 p-2 rounded-lg">
+                    <DollarSign className="h-5 w-5 text-green-600" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700">Fixed price, no surprises</span>
+                </div>
+                <div className="flex items-center gap-3 bg-white rounded-xl p-4 shadow-sm">
+                  <div className="bg-green-100 p-2 rounded-lg">
+                    <User className="h-5 w-5 text-green-600" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700">Bilingual driver</span>
+                </div>
+                <div className="flex items-center gap-3 bg-white rounded-xl p-4 shadow-sm">
+                  <div className="bg-green-100 p-2 rounded-lg">
+                    <Luggage className="h-5 w-5 text-green-600" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700">1 large bag + 1 carry-on pp</span>
+                </div>
+                <div className="flex items-center gap-3 bg-white rounded-xl p-4 shadow-sm">
+                  <div className="bg-green-100 p-2 rounded-lg">
+                    <MessageCircle className="h-5 w-5 text-green-600" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700">WhatsApp & email support</span>
+                </div>
+                <div className="flex items-center gap-3 bg-white rounded-xl p-4 shadow-sm">
+                  <div className="bg-green-100 p-2 rounded-lg">
+                    <XCircle className="h-5 w-5 text-green-600" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700">Free cancellation (48h)</span>
                 </div>
               </div>
             </div>
