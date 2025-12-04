@@ -705,7 +705,7 @@ function PreviewPageContent() {
                           <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg">
                             <AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0" />
                             <p className="text-xs text-amber-800">
-                              <span className="font-semibold">High Season</span> — Book now to guarantee your spot
+                              <span className="font-semibold">High Season</span> — Peak travel period, limited availability
                             </p>
                           </div>
                         )}
