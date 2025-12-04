@@ -35,7 +35,8 @@ import { ModernDatePicker } from '@/components/forms/ModernDatePicker';
 import { PassengerSelector } from '@/components/forms/PassengerSelector';
 import { createClient } from '@/lib/supabase/client';
 import { loadRoutesFromSupabase, type Route, calculateTripPrice } from '@/utils/bookingFormHelpers';
-import { loadBookingFromLocalStorage } from '@/utils/localStorageHelpers';
+import { loadBookingFromLocalStorage, saveBookingToLocalStorage } from '@/utils/localStorageHelpers';
+import { checkExistingTrips, loadTripsFromSupabase } from '@/utils/bookingDbHelpers';
 import { formatDateToString, parseDateFromString, getAvailabilityCount, getNowInCostaRica } from '@/utils/timeHelpers';
 
 // Popular routes that get special badge
@@ -150,24 +151,82 @@ function PreviewPageContent() {
           setRoutes(loadedRoutes);
         }
 
-        // Load booking from localStorage
+        // Load booking from localStorage first
         const localData = loadBookingFromLocalStorage(bookingId);
-        if (!localData) {
+        let loadedTrips: TripPreview[] = [];
+
+        if (localData && localData.trips.length > 0) {
+          // Load from localStorage
+          loadedTrips = localData.trips.map((trip) => ({
+            from_location: trip.from_location,
+            to_location: trip.to_location,
+            date: trip.date,
+            adults: trip.adults,
+            children: trip.children || 0,
+            price: trip.price,
+            duration: trip.duration || '',
+            routeId: trip.routeId || 0,
+          }));
+        } else {
+          // Fallback: Load from Supabase if localStorage is empty
+          console.log('localStorage empty, loading from Supabase...');
+          const existingTripIds = await checkExistingTrips(supabase, bookingId);
+
+          if (existingTripIds.length === 0) {
+            setError('Booking not found. It may have expired.');
+            setLoading(false);
+            return;
+          }
+
+          const supabaseTrips = await loadTripsFromSupabase(supabase, bookingId);
+
+          if (!supabaseTrips || supabaseTrips.length === 0) {
+            setError('Failed to load booking details.');
+            setLoading(false);
+            return;
+          }
+
+          // Convert Supabase trips to TripPreview format and restore to localStorage
+          const tripsForStorage = supabaseTrips.map((trip) => ({
+            from_location: trip.from_location || '',
+            to_location: trip.to_location || '',
+            date: trip.date || '',
+            adults: trip.adults || 1,
+            children: trip.children || 0,
+            price: trip.price || 0,
+            duration: trip.duration || '',
+            routeId: trip.routeId || 0,
+            calculatedPrice: trip.price || 0,
+          }));
+
+          const tripDetailsForStorage = supabaseTrips.map((trip) => ({
+            pickupTime: trip.pickup_time || '',
+            pickupAddress: trip.pickup_address || '',
+            dropoffAddress: trip.dropoff_address || '',
+            flightNumber: trip.flight_number || '',
+            specialRequests: trip.special_requests || '',
+          }));
+
+          // Save to localStorage for subsequent page loads
+          saveBookingToLocalStorage(bookingId, tripsForStorage, tripDetailsForStorage);
+
+          loadedTrips = supabaseTrips.map((trip) => ({
+            from_location: trip.from_location || '',
+            to_location: trip.to_location || '',
+            date: trip.date || '',
+            adults: trip.adults || 1,
+            children: trip.children || 0,
+            price: trip.price || 0,
+            duration: trip.duration || '',
+            routeId: trip.routeId || 0,
+          }));
+        }
+
+        if (loadedTrips.length === 0) {
           setError('Booking not found. It may have expired.');
           setLoading(false);
           return;
         }
-
-        const loadedTrips: TripPreview[] = localData.trips.map((trip) => ({
-          from_location: trip.from_location,
-          to_location: trip.to_location,
-          date: trip.date,
-          adults: trip.adults,
-          children: trip.children || 0,
-          price: trip.price,
-          duration: trip.duration || '',
-          routeId: trip.routeId || 0,
-        }));
 
         setTrips(loadedTrips);
         setLoading(false);
