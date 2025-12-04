@@ -200,15 +200,25 @@ function PreviewPageContent() {
           }));
 
           const tripDetailsForStorage = supabaseTrips.map((trip) => ({
-            pickupTime: trip.pickup_time || '',
-            pickupAddress: trip.pickup_address || '',
-            dropoffAddress: trip.dropoff_address || '',
-            flightNumber: trip.flight_number || '',
-            specialRequests: trip.special_requests || '',
+            pickup_time: trip.pickup_time || '',
+            pickup_address: trip.pickup_address || '',
+            dropoff_address: trip.dropoff_address || '',
+            flight_number: trip.flight_number || '',
+            airline: trip.airline || '',
+            special_requests: trip.special_requests || '',
+            children_ages: trip.children_ages || [],
+            add_ons: trip.add_ons || [],
+            night_surcharge: trip.night_surcharge ?? 0,
+            add_ons_price: trip.add_ons_price ?? 0,
+            final_price: trip.final_price ?? trip.price ?? 0,
           }));
 
           // Save to localStorage for subsequent page loads
-          saveBookingToLocalStorage(bookingId, tripsForStorage, tripDetailsForStorage);
+          saveBookingToLocalStorage(bookingId, {
+            trips: tripsForStorage,
+            tripDetails: tripDetailsForStorage,
+            createdAt: new Date().toISOString(),
+          });
 
           loadedTrips = supabaseTrips.map((trip) => ({
             from_location: trip.from_location || '',

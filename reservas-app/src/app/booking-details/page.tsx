@@ -239,8 +239,9 @@ function BookingDetailsContent() {
             adults: trip.adults,
             children: trip.children,
             price: trip.price,
-            duration: trip.duration,
+            duration: trip.duration || '',
             routeId: trip.routeId,
+            calculatedPrice: trip.price,
           }));
 
           const tripDetailsForStorage = loadedTrips.map(trip => ({
@@ -257,7 +258,11 @@ function BookingDetailsContent() {
             final_price: trip.final_price ?? trip.price ?? 0,
           }));
 
-          saveBookingToLocalStorage(bookingId, tripsForStorage, tripDetailsForStorage);
+          saveBookingToLocalStorage(bookingId, {
+            trips: tripsForStorage,
+            tripDetails: tripDetailsForStorage,
+            createdAt: new Date().toISOString(),
+          });
         }
 
         if (loadedTrips.length === 0) {
