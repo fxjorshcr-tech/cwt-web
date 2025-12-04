@@ -46,6 +46,11 @@ const SeasonalBanner = dynamic(() => import("@/components/sections/SeasonalBanne
   ssr: false, // Client-side only to get correct date
 });
 
+const InteractiveMap = dynamic(() => import("@/components/sections/InteractiveMap"), {
+  loading: () => <ComponentSkeleton />,
+  ssr: false, // Client-side only for interactivity
+});
+
 const PrivateTours = dynamic(() => import("@/components/sections/PrivateTours"), {
   loading: () => <ComponentSkeleton />,
 });
@@ -225,7 +230,7 @@ export default async function Home() {
         </section>
 
         {/* Booking Form */}
-        <section className="relative bg-gray-50 pt-6 pb-10 sm:pt-8 sm:pb-14">
+        <section className="relative bg-gray-50 pt-6 pb-10 sm:pt-8 sm:pb-14 booking-form-section">
           <div className="container mx-auto px-4 sm:px-6 max-w-4xl">
             <QuickSearchForm />
           </div>
@@ -235,6 +240,7 @@ export default async function Home() {
         <WhyChooseUs />
         <TrustedBy />
         <MostBookedCTAServer />
+        <InteractiveMap />
         <HowWeWork />
         <PrivateTours />
         <ComparisonTable />
