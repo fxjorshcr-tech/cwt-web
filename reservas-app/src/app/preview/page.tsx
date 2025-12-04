@@ -36,7 +36,7 @@ import { PassengerSelector } from '@/components/forms/PassengerSelector';
 import { createClient } from '@/lib/supabase/client';
 import { loadRoutesFromSupabase, type Route, calculateTripPrice } from '@/utils/bookingFormHelpers';
 import { loadBookingFromLocalStorage, saveBookingToLocalStorage } from '@/utils/localStorageHelpers';
-import { checkExistingTrips, loadTripsFromSupabase } from '@/utils/bookingDbHelpers';
+import { checkExistingTrips, loadTripsFromSupabase } from '@/utils/supabaseHelpers';
 import { formatDateToString, parseDateFromString, getAvailabilityCount, getNowInCostaRica } from '@/utils/timeHelpers';
 
 // Popular routes that get special badge

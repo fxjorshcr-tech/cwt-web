@@ -30,7 +30,7 @@ import {
   filterChildrenAges,
 } from '@/utils/localStorageHelpers';
 import { createClient } from '@/lib/supabase/client';
-import { checkExistingTrips, loadTripsFromSupabase } from '@/utils/bookingDbHelpers';
+import { checkExistingTrips, loadTripsFromSupabase } from '@/utils/supabaseHelpers';
 import { formatDate } from '@/lib/formatters';
 
 interface Trip {
