@@ -4,7 +4,7 @@
 'use client';
 
 import React from 'react';
-import { Clock, Gift, Sparkles } from 'lucide-react';
+import { Clock, Gift, Sparkles, Users } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export interface AddOn {
@@ -21,11 +21,11 @@ export interface AddOn {
 export const AVAILABLE_ADDONS: AddOn[] = [
   {
     id: 'flex_protection',
-    name: 'Flex Protection',
-    description: 'Perfect for travelers who want peace of mind',
+    name: 'Travel Flex',
+    description: '',
     details: [
-      '🕐 **Flex Time Pickup:** Change your pickup time up to 2 hours later, even 1 hour before scheduled pickup',
-      '✈️ **Free Reschedule:** Date/time if flight is delayed or cancelled (for airport pickups)',
+      '**Pickup time change:** Adjust up to 2 hours later, even last minute',
+      '**Free reschedule** for flight delays/cancellations (only airport pickups apply)',
     ],
     price: 59,
     icon: Clock,
@@ -102,6 +102,14 @@ export function TripAddOns({ selectedAddOns, onAddOnsChange }: TripAddOnsProps) 
       </CardHeader>
       
       <CardContent className="space-y-3 pt-0">
+        {/* Social Proof Banner */}
+        <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+          <Users className="h-4 w-4 text-green-600 flex-shrink-0" />
+          <p className="text-xs md:text-sm text-green-800 font-medium">
+            <span className="font-bold">95% of travelers</span> add Travel Flex for peace of mind
+          </p>
+        </div>
+
         {AVAILABLE_ADDONS.map((addon) => {
           const isExplorerSelected = selectedAddOns.includes('explorer_upgrade');
           const isSelected = selectedAddOns.includes(addon.id) || 
@@ -173,11 +181,6 @@ export function TripAddOns({ selectedAddOns, onAddOnsChange }: TripAddOnsProps) 
                       +${addon.price}
                     </div>
                   </div>
-                  
-                  {/* Description */}
-                  <p className="text-xs md:text-sm text-gray-700 font-medium mb-2">
-                    {addon.description}
-                  </p>
 
                   {/* Details con emojis y títulos en negrita */}
                   <ul className="space-y-1">

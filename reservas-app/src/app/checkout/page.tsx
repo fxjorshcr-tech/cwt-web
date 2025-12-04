@@ -825,15 +825,41 @@ function CheckoutPageContent() {
                     </CardContent>
                   </Card>
 
-                  {/* Trust Badges */}
-                  <div className="flex items-center justify-center gap-4 text-xs text-gray-500">
-                    <div className="flex items-center gap-1">
-                      <Shield className="h-4 w-4 text-green-600" />
-                      <span>SSL Secured</span>
+                  {/* ICT License Badge */}
+                  <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+                    <div className="flex items-center gap-3">
+                      <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Shield className="h-6 w-6 text-blue-600" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-gray-900">ICT Licensed #4121-2025</p>
+                        <p className="text-xs text-gray-600">Costa Rica Tourism Board Authorized</p>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <CreditCard className="h-4 w-4 text-blue-600" />
-                      <span>Safe Payment</span>
+                  </div>
+
+                  {/* Trust Badges Grid */}
+                  <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3 text-center">
+                      Secure Payment
+                    </p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="flex items-center gap-2 text-xs text-gray-600">
+                        <Lock className="h-4 w-4 text-green-600 flex-shrink-0" />
+                        <span>256-bit SSL</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-gray-600">
+                        <Shield className="h-4 w-4 text-green-600 flex-shrink-0" />
+                        <span>PCI Compliant</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-gray-600">
+                        <CreditCard className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                        <span>Visa/Mastercard</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-gray-600">
+                        <Shield className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                        <span>3D Secure</span>
+                      </div>
                     </div>
                   </div>
                 </div>

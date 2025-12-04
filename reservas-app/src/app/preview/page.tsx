@@ -23,6 +23,9 @@ import {
   Headphones,
   CheckCircle,
   Save,
+  AlertTriangle,
+  Flame,
+  Sparkles,
 } from 'lucide-react';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import BookingStepper from '@/components/booking/BookingStepper';
@@ -32,8 +35,63 @@ import { ModernDatePicker } from '@/components/forms/ModernDatePicker';
 import { PassengerSelector } from '@/components/forms/PassengerSelector';
 import { createClient } from '@/lib/supabase/client';
 import { loadRoutesFromSupabase, type Route, calculateTripPrice } from '@/utils/bookingFormHelpers';
-import { loadBookingFromLocalStorage } from '@/utils/localStorageHelpers';
-import { formatDateToString, parseDateFromString, getAvailabilityCount } from '@/utils/timeHelpers';
+import { loadBookingFromLocalStorage, saveBookingToLocalStorage } from '@/utils/localStorageHelpers';
+import { checkExistingTrips, loadTripsFromSupabase } from '@/utils/supabaseHelpers';
+import { formatDateToString, parseDateFromString, getAvailabilityCount, getNowInCostaRica } from '@/utils/timeHelpers';
+
+// Popular routes that get special badge
+const POPULAR_ROUTES = [
+  'SJO Airport - La Fortuna',
+  'SJO Airport - Manuel Antonio',
+  'SJO Airport - Tamarindo',
+  'SJO Airport - Monteverde',
+  'LIR Airport - Tamarindo',
+  'LIR Airport - La Fortuna',
+  'La Fortuna - Monteverde',
+  'La Fortuna - Manuel Antonio',
+];
+
+// Check if a route is popular
+function isPopularRoute(from: string, to: string): boolean {
+  const routeKey = `${from} - ${to}`;
+  return POPULAR_ROUTES.some(r =>
+    routeKey.toLowerCase().includes(r.toLowerCase().split(' - ')[0]) &&
+    routeKey.toLowerCase().includes(r.toLowerCase().split(' - ')[1])
+  );
+}
+
+// Check if date is in high season (Dec-Apr, Easter week)
+function isHighSeason(dateString: string): boolean {
+  const date = parseDateFromString(dateString);
+  if (isNaN(date.getTime())) return false;
+
+  const month = date.getMonth(); // 0-11
+  // High season: December (11), January (0), February (1), March (2), April (3)
+  return month === 11 || month <= 3;
+}
+
+// Check if booking is last-minute (within 48 hours)
+function isLastMinuteBooking(dateString: string): boolean {
+  const bookingDate = parseDateFromString(dateString);
+  if (isNaN(bookingDate.getTime())) return false;
+
+  const now = getNowInCostaRica();
+  const diffMs = bookingDate.getTime() - now.getTime();
+  const diffHours = diffMs / (1000 * 60 * 60);
+
+  return diffHours > 0 && diffHours <= 48;
+}
+
+// Get days until booking
+function getDaysUntilBooking(dateString: string): number {
+  const bookingDate = parseDateFromString(dateString);
+  if (isNaN(bookingDate.getTime())) return 999;
+
+  const now = getNowInCostaRica();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const diffMs = bookingDate.getTime() - todayStart.getTime();
+  return Math.floor(diffMs / (1000 * 60 * 60 * 24));
+}
 
 interface TripPreview {
   from_location: string;
@@ -93,24 +151,92 @@ function PreviewPageContent() {
           setRoutes(loadedRoutes);
         }
 
-        // Load booking from localStorage
+        // Load booking from localStorage first
         const localData = loadBookingFromLocalStorage(bookingId);
-        if (!localData) {
+        let loadedTrips: TripPreview[] = [];
+
+        if (localData && localData.trips.length > 0) {
+          // Load from localStorage
+          loadedTrips = localData.trips.map((trip) => ({
+            from_location: trip.from_location,
+            to_location: trip.to_location,
+            date: trip.date,
+            adults: trip.adults,
+            children: trip.children || 0,
+            price: trip.price,
+            duration: trip.duration || '',
+            routeId: trip.routeId || 0,
+          }));
+        } else {
+          // Fallback: Load from Supabase if localStorage is empty
+          console.log('localStorage empty, loading from Supabase...');
+          const existingTripIds = await checkExistingTrips(supabase, bookingId);
+
+          if (existingTripIds.length === 0) {
+            setError('Booking not found. It may have expired.');
+            setLoading(false);
+            return;
+          }
+
+          const supabaseTrips = await loadTripsFromSupabase(supabase, bookingId);
+
+          if (!supabaseTrips || supabaseTrips.length === 0) {
+            setError('Failed to load booking details.');
+            setLoading(false);
+            return;
+          }
+
+          // Convert Supabase trips to TripPreview format and restore to localStorage
+          const tripsForStorage = supabaseTrips.map((trip) => ({
+            from_location: trip.from_location || '',
+            to_location: trip.to_location || '',
+            date: trip.date || '',
+            adults: trip.adults || 1,
+            children: trip.children || 0,
+            price: trip.price || 0,
+            duration: trip.duration || '',
+            routeId: trip.routeId || 0,
+            calculatedPrice: trip.price || 0,
+          }));
+
+          const tripDetailsForStorage = supabaseTrips.map((trip) => ({
+            pickup_time: trip.pickup_time || '',
+            pickup_address: trip.pickup_address || '',
+            dropoff_address: trip.dropoff_address || '',
+            flight_number: trip.flight_number || '',
+            airline: trip.airline || '',
+            special_requests: trip.special_requests || '',
+            children_ages: trip.children_ages || [],
+            add_ons: trip.add_ons || [],
+            night_surcharge: trip.night_surcharge ?? 0,
+            add_ons_price: trip.add_ons_price ?? 0,
+            final_price: trip.final_price ?? trip.price ?? 0,
+          }));
+
+          // Save to localStorage for subsequent page loads
+          saveBookingToLocalStorage(bookingId, {
+            trips: tripsForStorage,
+            tripDetails: tripDetailsForStorage,
+            createdAt: new Date().toISOString(),
+          });
+
+          loadedTrips = supabaseTrips.map((trip) => ({
+            from_location: trip.from_location || '',
+            to_location: trip.to_location || '',
+            date: trip.date || '',
+            adults: trip.adults || 1,
+            children: trip.children || 0,
+            price: trip.price || 0,
+            duration: trip.duration || '',
+            routeId: trip.routeId || 0,
+          }));
+        }
+
+        if (loadedTrips.length === 0) {
           setError('Booking not found. It may have expired.');
           setLoading(false);
           return;
         }
-
-        const loadedTrips: TripPreview[] = localData.trips.map((trip) => ({
-          from_location: trip.from_location,
-          to_location: trip.to_location,
-          date: trip.date,
-          adults: trip.adults,
-          children: trip.children || 0,
-          price: trip.price,
-          duration: trip.duration || '',
-          routeId: trip.routeId || 0,
-        }));
 
         setTrips(loadedTrips);
         setLoading(false);
@@ -359,6 +485,7 @@ function PreviewPageContent() {
               label="Travel Date"
               value={editDate}
               onChange={setEditDate}
+              enforceMinimumAdvance={true}
             />
           </div>
 
@@ -630,12 +757,56 @@ function PreviewPageContent() {
                         </div>
                       </div>
 
-                      {/* Availability Confirmation Message */}
-                      <div className="flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg mb-4">
-                        <Car className="h-4 w-4 text-green-600 flex-shrink-0" />
-                        <p className="text-xs text-green-800">
-                          <span className="font-semibold">Van and driver available</span> — limited slots for this date
-                        </p>
+                      {/* Status Badges & Alerts */}
+                      <div className="space-y-2 mb-4">
+                        {/* Popular Route Badge */}
+                        {isPopularRoute(trip.from_location, trip.to_location) && (
+                          <div className="flex items-center gap-2 px-3 py-2 bg-orange-50 border border-orange-200 rounded-lg">
+                            <Flame className="h-4 w-4 text-orange-500 flex-shrink-0" />
+                            <p className="text-xs text-orange-800">
+                              <span className="font-semibold">Popular Route</span> — One of our most requested connections
+                            </p>
+                          </div>
+                        )}
+
+                        {/* High Season Alert */}
+                        {isHighSeason(trip.date) && (
+                          <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg">
+                            <AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0" />
+                            <p className="text-xs text-amber-800">
+                              <span className="font-semibold">High Season</span> — Peak travel period, limited availability
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Dynamic Availability */}
+                        {(() => {
+                          const availableVans = getAvailabilityCount(trip.from_location, trip.to_location, trip.date);
+                          const totalVans = 8;
+                          return (
+                            <div className="flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg">
+                              <Car className="h-4 w-4 text-green-600 flex-shrink-0" />
+                              <div className="flex-1">
+                                <p className="text-xs text-green-800">
+                                  <span className="font-semibold">
+                                    {availableVans === 1 ? 'Only 1 van' : `${availableVans} vans`} available
+                                  </span>
+                                </p>
+                                {/* Visual indicator */}
+                                <div className="flex gap-1 mt-1">
+                                  {Array.from({ length: totalVans }).map((_, i) => (
+                                    <div
+                                      key={i}
+                                      className={`h-1.5 w-3 rounded-full ${
+                                        i < availableVans ? 'bg-green-500' : 'bg-gray-300'
+                                      }`}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </div>
 
                       {/* Trip Details - 2x2 grid on mobile */}

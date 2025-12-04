@@ -38,6 +38,10 @@ const Guarantees = dynamic(() => import("@/components/sections/Guarantees"), {
   loading: () => <ComponentSkeleton />,
 });
 
+const TrustedBy = dynamic(() => import("@/components/sections/TrustedBy"), {
+  loading: () => <ComponentSkeleton />,
+});
+
 const PrivateTours = dynamic(() => import("@/components/sections/PrivateTours"), {
   loading: () => <ComponentSkeleton />,
 });
@@ -216,7 +220,7 @@ export default async function Home() {
         </section>
 
         {/* Booking Form */}
-        <section className="relative bg-gray-50 pt-6 pb-10 sm:pt-8 sm:pb-14">
+        <section className="relative bg-gray-50 pt-6 pb-10 sm:pt-8 sm:pb-14 booking-form-section">
           <div className="container mx-auto px-4 sm:px-6 max-w-4xl">
             <QuickSearchForm />
           </div>
@@ -224,6 +228,7 @@ export default async function Home() {
 
         {/* Optimized Structure for Conversions */}
         <WhyChooseUs />
+        <TrustedBy />
         <MostBookedCTAServer />
         <HowWeWork />
         <PrivateTours />

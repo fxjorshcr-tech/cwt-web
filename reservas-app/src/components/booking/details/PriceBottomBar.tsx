@@ -1,6 +1,6 @@
 ﻿// src/components/booking/details/PriceBottomBar.tsx
-// ✅ CORREGIDO: Sin menciones de fees
-import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
+// ✅ UPDATED: More persuasive CTAs and price locked badge
+import { ArrowLeft, ArrowRight, Loader2, Shield, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface PriceCalculation {
@@ -58,11 +58,17 @@ export function PriceBottomBar({
               </div>
             )}
             <div className="pt-1.5 border-t border-gray-200 flex justify-between items-center">
-              <span className="text-sm font-bold text-gray-900">Total</span>
+              <div className="flex items-center gap-1.5">
+                <Lock className="h-3.5 w-3.5 text-green-600" />
+                <span className="text-sm font-bold text-gray-900">Total</span>
+              </div>
               <span className="text-2xl font-bold text-blue-600">
                 ${priceCalculation.subtotal.toFixed(2)}
               </span>
             </div>
+            <p className="text-[10px] text-green-700 font-medium mt-1 text-center">
+              Price locked - no hidden fees
+            </p>
           </div>
 
           <div className="flex gap-2">
@@ -79,7 +85,7 @@ export function PriceBottomBar({
             <Button
               onClick={onNext}
               disabled={saving}
-              className="flex-[2] min-h-[48px] bg-blue-600 hover:bg-blue-700 text-sm font-bold"
+              className="flex-[2] min-h-[48px] bg-green-600 hover:bg-green-700 text-sm font-bold"
             >
               {saving ? (
                 <>
@@ -88,7 +94,8 @@ export function PriceBottomBar({
                 </>
               ) : (
                 <>
-                  {currentTripIndex < totalTrips - 1 ? 'Next Trip' : 'Continue to Summary'}
+                  <Shield className="h-4 w-4 mr-1" />
+                  {currentTripIndex < totalTrips - 1 ? 'Save & Continue' : 'Secure My Spot'}
                   <ArrowRight className="h-4 w-4 ml-1" />
                 </>
               )}
@@ -100,9 +107,15 @@ export function PriceBottomBar({
         <div className="hidden md:flex items-center justify-between gap-6">
           <div className="flex items-center gap-6">
             <div>
-              <p className="text-xs text-gray-500 mb-1">
-                Trip {currentTripIndex + 1} of {totalTrips}
-              </p>
+              <div className="flex items-center gap-2 mb-1">
+                <p className="text-xs text-gray-500">
+                  Trip {currentTripIndex + 1} of {totalTrips}
+                </p>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-semibold rounded-full">
+                  <Lock className="h-2.5 w-2.5" />
+                  Price Locked
+                </span>
+              </div>
               <div className="flex items-baseline gap-2">
                 <span className="text-3xl font-bold text-gray-900">
                   ${priceCalculation.subtotal.toFixed(2)}
@@ -148,7 +161,7 @@ export function PriceBottomBar({
             <Button
               onClick={onNext}
               disabled={saving}
-              className="min-h-[50px] px-8 bg-blue-600 hover:bg-blue-700 font-bold"
+              className="min-h-[50px] px-8 bg-green-600 hover:bg-green-700 font-bold"
             >
               {saving ? (
                 <>
@@ -157,9 +170,10 @@ export function PriceBottomBar({
                 </>
               ) : (
                 <>
+                  <Shield className="h-4 w-4 mr-2" />
                   {currentTripIndex < totalTrips - 1
-                    ? 'Save & Next Trip'
-                    : 'Continue to Summary'}
+                    ? 'Save & Continue'
+                    : 'Secure My Spot'}
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </>
               )}
