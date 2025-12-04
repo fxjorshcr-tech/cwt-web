@@ -722,7 +722,6 @@ function PreviewPageContent() {
                                   <span className="font-semibold">
                                     {availableVans === 1 ? 'Only 1 van' : `${availableVans} vans`} available
                                   </span>
-                                  {availableVans <= 2 && ' — Book now to secure your spot'}
                                 </p>
                                 {/* Visual indicator */}
                                 <div className="flex gap-1 mt-1">
