@@ -4,7 +4,7 @@
 'use client';
 
 import React from 'react';
-import { Clock, Gift, Sparkles, Users } from 'lucide-react';
+import { Clock, Gift, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export interface AddOn {
@@ -102,14 +102,6 @@ export function TripAddOns({ selectedAddOns, onAddOnsChange }: TripAddOnsProps) 
       </CardHeader>
       
       <CardContent className="space-y-3 pt-0">
-        {/* Social Proof Banner */}
-        <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
-          <Users className="h-4 w-4 text-green-600 flex-shrink-0" />
-          <p className="text-xs md:text-sm text-green-800 font-medium">
-            <span className="font-bold">95% of travelers</span> add Flex Protection for peace of mind
-          </p>
-        </div>
-
         {AVAILABLE_ADDONS.map((addon) => {
           const isExplorerSelected = selectedAddOns.includes('explorer_upgrade');
           const isSelected = selectedAddOns.includes(addon.id) || 
