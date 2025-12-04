@@ -181,11 +181,6 @@ export function TripAddOns({ selectedAddOns, onAddOnsChange }: TripAddOnsProps) 
                       +${addon.price}
                     </div>
                   </div>
-                  
-                  {/* Description */}
-                  <p className="text-xs md:text-sm text-gray-700 font-medium mb-2">
-                    {addon.description}
-                  </p>
 
                   {/* Details con emojis y títulos en negrita */}
                   <ul className="space-y-1">

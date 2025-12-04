@@ -486,19 +486,19 @@ export function hasAvailableTimesForDate(bookingDate: string): boolean {
 // ==========================================
 
 /**
- * Generate a consistent "availability" number (1-4) based on route and date
+ * Generate a consistent "availability" number (1-8) based on route and date
  * Uses a simple hash to ensure the same route+date always returns the same number
  *
- * ✅ UPDATED: Realistic availability based on days until booking
- * - Very close (<7 days): 1-2 vans (high urgency)
- * - Close (7-14 days): 2-3 vans (moderate urgency)
- * - Medium (15-30 days): 3-4 vans (normal availability)
- * - Far (31+ days): 4 vans (90%) or 3 vans (10%) - almost always full
+ * ✅ UPDATED: Fleet of 8 vans with realistic availability
+ * - Very close (<7 days): 2-4 vans (high urgency)
+ * - Close (7-14 days): 4-6 vans (moderate urgency)
+ * - Medium (15-30 days): 6-7 vans (normal availability)
+ * - Far (31+ days): 8 vans (90%) or 7 vans (10%) - almost always full
  *
  * @param origin - Origin location
  * @param destination - Destination location
  * @param date - Date string (YYYY-MM-DD)
- * @returns Number between 1-4
+ * @returns Number between 1-8
  */
 export function getAvailabilityCount(origin: string, destination: string, date: string): number {
   // Create a string to hash
@@ -523,23 +523,23 @@ export function getAvailabilityCount(origin: string, destination: string, date: 
     daysUntilBooking = Math.floor(diffMs / (1000 * 60 * 60 * 24));
   }
 
-  // Very close bookings (<7 days): 1-2 vans (high urgency)
+  // Very close bookings (<7 days): 2-4 vans (high urgency)
   if (daysUntilBooking < 7) {
-    return Math.abs(hash % 2) + 1; // Returns 1 or 2
+    return Math.abs(hash % 3) + 2; // Returns 2, 3, or 4
   }
 
-  // Close bookings (7-14 days): 2-3 vans (moderate urgency)
+  // Close bookings (7-14 days): 4-6 vans (moderate urgency)
   if (daysUntilBooking <= 14) {
-    return Math.abs(hash % 2) + 2; // Returns 2 or 3
+    return Math.abs(hash % 3) + 4; // Returns 4, 5, or 6
   }
 
-  // Medium bookings (15-30 days): 3-4 vans (normal availability)
+  // Medium bookings (15-30 days): 6-7 vans (normal availability)
   if (daysUntilBooking <= 30) {
-    return Math.abs(hash % 2) + 3; // Returns 3 or 4
+    return Math.abs(hash % 2) + 6; // Returns 6 or 7
   }
 
-  // Far bookings (31+ days): 4 vans (90%) or 3 vans (10%)
+  // Far bookings (31+ days): 8 vans (90%) or 7 vans (10%)
   // Use hash to determine if it's the rare 10% case
   const rareCase = Math.abs(hash % 10) === 0; // 10% chance
-  return rareCase ? 3 : 4;
+  return rareCase ? 7 : 8;
 }

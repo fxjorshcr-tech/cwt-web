@@ -46,11 +46,6 @@ const SeasonalBanner = dynamic(() => import("@/components/sections/SeasonalBanne
   ssr: false, // Client-side only to get correct date
 });
 
-const InteractiveMap = dynamic(() => import("@/components/sections/InteractiveMap"), {
-  loading: () => <ComponentSkeleton />,
-  ssr: false, // Client-side only for interactivity
-});
-
 const PrivateTours = dynamic(() => import("@/components/sections/PrivateTours"), {
   loading: () => <ComponentSkeleton />,
 });
@@ -240,7 +235,6 @@ export default async function Home() {
         <WhyChooseUs />
         <TrustedBy />
         <MostBookedCTAServer />
-        <InteractiveMap />
         <HowWeWork />
         <PrivateTours />
         <ComparisonTable />

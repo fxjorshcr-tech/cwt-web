@@ -710,20 +710,10 @@ function PreviewPageContent() {
                           </div>
                         )}
 
-                        {/* Last-Minute Warning */}
-                        {isLastMinuteBooking(trip.date) && (
-                          <div className="flex items-center gap-2 px-3 py-2 bg-red-50 border border-red-200 rounded-lg">
-                            <Clock className="h-4 w-4 text-red-500 flex-shrink-0" />
-                            <p className="text-xs text-red-800">
-                              <span className="font-semibold">Last-Minute Booking</span> — Subject to driver availability. We'll confirm via WhatsApp.
-                            </p>
-                          </div>
-                        )}
-
-                        {/* Dynamic Availability - Only show if not last-minute */}
-                        {!isLastMinuteBooking(trip.date) && (() => {
+                        {/* Dynamic Availability */}
+                        {(() => {
                           const availableVans = getAvailabilityCount(trip.from_location, trip.to_location, trip.date);
-                          const totalVans = 4;
+                          const totalVans = 8;
                           return (
                             <div className="flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg">
                               <Car className="h-4 w-4 text-green-600 flex-shrink-0" />
@@ -739,7 +729,7 @@ function PreviewPageContent() {
                                   {Array.from({ length: totalVans }).map((_, i) => (
                                     <div
                                       key={i}
-                                      className={`h-1.5 w-4 rounded-full ${
+                                      className={`h-1.5 w-3 rounded-full ${
                                         i < availableVans ? 'bg-green-500' : 'bg-gray-300'
                                       }`}
                                     />

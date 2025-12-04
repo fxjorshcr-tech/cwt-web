@@ -45,20 +45,6 @@ export function QuickSearchForm({
     if (initialDestination) setDestination(initialDestination);
   }, [initialOrigin, initialDestination]);
 
-  // Listen for route selections from InteractiveMap
-  useEffect(() => {
-    const handleRouteSelect = (event: CustomEvent<{ origin: string; destination: string }>) => {
-      const { origin: newOrigin, destination: newDestination } = event.detail;
-      setOrigin(newOrigin);
-      setDestination(newDestination);
-    };
-
-    window.addEventListener('mapRouteSelect', handleRouteSelect as EventListener);
-    return () => {
-      window.removeEventListener('mapRouteSelect', handleRouteSelect as EventListener);
-    };
-  }, []);
-
   // Load routes with error handling
   useEffect(() => {
     async function loadRoutes() {
