@@ -38,6 +38,14 @@ const Guarantees = dynamic(() => import("@/components/sections/Guarantees"), {
   loading: () => <ComponentSkeleton />,
 });
 
+const TrustedBy = dynamic(() => import("@/components/sections/TrustedBy"), {
+  loading: () => <ComponentSkeleton />,
+});
+
+const SeasonalBanner = dynamic(() => import("@/components/sections/SeasonalBanner"), {
+  ssr: false, // Client-side only to get correct date
+});
+
 const PrivateTours = dynamic(() => import("@/components/sections/PrivateTours"), {
   loading: () => <ComponentSkeleton />,
 });
@@ -135,6 +143,7 @@ export default async function Home() {
       <div id="main-content" className="min-h-screen overflow-x-hidden">
         <StructuredData />
         <BookingNavbar />
+        <SeasonalBanner />
 
         {/* Hero Section - Transfer-Focused */}
         <section className="relative h-[70vh] min-h-[550px] max-h-[700px] overflow-hidden">
@@ -224,6 +233,7 @@ export default async function Home() {
 
         {/* Optimized Structure for Conversions */}
         <WhyChooseUs />
+        <TrustedBy />
         <MostBookedCTAServer />
         <HowWeWork />
         <PrivateTours />
