@@ -489,12 +489,16 @@ export function hasAvailableTimesForDate(bookingDate: string): boolean {
  * Generate a consistent "availability" number (1-4) based on route and date
  * Uses a simple hash to ensure the same route+date always returns the same number
  *
- * ✅ UPDATED: For bookings within 7 days, shows only 1-2 vans (more urgency)
+ * ✅ UPDATED: Realistic availability based on days until booking
+ * - Very close (<7 days): 1-2 vans (high urgency)
+ * - Close (7-14 days): 2-3 vans (moderate urgency)
+ * - Medium (15-30 days): 3-4 vans (normal availability)
+ * - Far (31+ days): 4 vans (90%) or 3 vans (10%) - almost always full
  *
  * @param origin - Origin location
  * @param destination - Destination location
  * @param date - Date string (YYYY-MM-DD)
- * @returns Number between 1-4 (or 1-2 for bookings within 7 days)
+ * @returns Number between 1-4
  */
 export function getAvailabilityCount(origin: string, destination: string, date: string): number {
   // Create a string to hash
@@ -519,11 +523,23 @@ export function getAvailabilityCount(origin: string, destination: string, date: 
     daysUntilBooking = Math.floor(diffMs / (1000 * 60 * 60 * 24));
   }
 
-  // For bookings within 7 days: only show 1-2 vans (more urgency)
-  if (daysUntilBooking <= 7) {
+  // Very close bookings (<7 days): 1-2 vans (high urgency)
+  if (daysUntilBooking < 7) {
     return Math.abs(hash % 2) + 1; // Returns 1 or 2
   }
 
-  // For bookings more than 7 days out: show 1-4 vans
-  return Math.abs(hash % 4) + 1;
+  // Close bookings (7-14 days): 2-3 vans (moderate urgency)
+  if (daysUntilBooking <= 14) {
+    return Math.abs(hash % 2) + 2; // Returns 2 or 3
+  }
+
+  // Medium bookings (15-30 days): 3-4 vans (normal availability)
+  if (daysUntilBooking <= 30) {
+    return Math.abs(hash % 2) + 3; // Returns 3 or 4
+  }
+
+  // Far bookings (31+ days): 4 vans (90%) or 3 vans (10%)
+  // Use hash to determine if it's the rare 10% case
+  const rareCase = Math.abs(hash % 10) === 0; // 10% chance
+  return rareCase ? 3 : 4;
 }

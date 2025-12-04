@@ -416,6 +416,7 @@ function PreviewPageContent() {
               label="Travel Date"
               value={editDate}
               onChange={setEditDate}
+              enforceMinimumAdvance={true}
             />
           </div>
 

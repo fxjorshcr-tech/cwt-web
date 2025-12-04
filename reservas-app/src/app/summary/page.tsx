@@ -130,64 +130,103 @@ function SummaryPageContent() {
     );
   }
 
-  // LOAD FROM LOCALSTORAGE
+  // LOAD FROM LOCALSTORAGE OR SUPABASE (fallback)
   useEffect(() => {
     async function loadTrips() {
       try {
         setLoading(true);
 
-        // Load booking from localStorage using helper
+        // First try to load from localStorage
         const localData = loadBookingFromLocalStorage(bookingId as string);
 
-        if (!localData) {
+        if (localData) {
+          // Convert localStorage data to Trip format, filtering out incomplete trips
+          const loadedTrips: Trip[] = localData.trips
+            .map((trip, index) => {
+              const details = localData.tripDetails?.[index];
+
+              // Skip trips without details instead of throwing
+              if (!details) {
+                console.warn(`Trip ${index} missing details, skipping`);
+                return null;
+              }
+
+              const filteredChildrenAges = filterChildrenAges(details.children_ages);
+
+              const tripData: Trip = {
+                id: `temp_${localData.bookingId}_${index}`,
+                booking_id: localData.bookingId,
+                from_location: trip.from_location || '',
+                to_location: trip.to_location || '',
+                date: trip.date || '',
+                adults: trip.adults || 0,
+                children: trip.children || 0,
+                price: trip.price || 0,
+                duration: trip.duration,
+                routeId: trip.routeId,
+                pickup_address: details.pickup_address || '',
+                dropoff_address: details.dropoff_address || '',
+                pickup_time: details.pickup_time || '',
+                flight_number: details.flight_number || null,
+                airline: details.airline || null,
+                special_requests: details.special_requests || null,
+                children_ages: filteredChildrenAges,
+                add_ons: details.add_ons && details.add_ons.length > 0 ? details.add_ons : null,
+                night_surcharge: details.night_surcharge ?? 0,
+                add_ons_price: details.add_ons_price ?? 0,
+                final_price: details.final_price ?? trip.price ?? 0,
+              };
+
+              return tripData;
+            })
+            .filter((trip): trip is Trip => trip !== null);
+
+          // Check if any valid trips were loaded
+          if (loadedTrips.length > 0) {
+            setTrips(loadedTrips);
+            setLoading(false);
+            return;
+          }
+        }
+
+        // Fallback: Try to load from Supabase (for when user comes back from checkout)
+        console.log('localStorage not found, trying Supabase...');
+        const existingTripIds = await checkExistingTrips(supabase, bookingId as string);
+
+        if (existingTripIds.length === 0) {
           throw new Error('Booking not found. Please start a new search.');
         }
 
-        // Convert localStorage data to Trip format, filtering out incomplete trips
-        const loadedTrips: Trip[] = localData.trips
-          .map((trip, index) => {
-            const details = localData.tripDetails?.[index];
+        const supabaseTrips = await loadTripsFromSupabase(supabase, bookingId as string);
 
-            // Skip trips without details instead of throwing
-            if (!details) {
-              console.warn(`Trip ${index} missing details, skipping`);
-              return null;
-            }
-
-            const filteredChildrenAges = filterChildrenAges(details.children_ages);
-
-            const tripData: Trip = {
-              id: `temp_${localData.bookingId}_${index}`,
-              booking_id: localData.bookingId,
-              from_location: trip.from_location || '',
-              to_location: trip.to_location || '',
-              date: trip.date || '',
-              adults: trip.adults || 0,
-              children: trip.children || 0,
-              price: trip.price || 0,
-              duration: trip.duration,
-              routeId: trip.routeId,
-              pickup_address: details.pickup_address || '',
-              dropoff_address: details.dropoff_address || '',
-              pickup_time: details.pickup_time || '',
-              flight_number: details.flight_number || null,
-              airline: details.airline || null,
-              special_requests: details.special_requests || null,
-              children_ages: filteredChildrenAges,
-              add_ons: details.add_ons && details.add_ons.length > 0 ? details.add_ons : null,
-              night_surcharge: details.night_surcharge ?? 0,
-              add_ons_price: details.add_ons_price ?? 0,
-              final_price: details.final_price ?? trip.price ?? 0,
-            };
-
-            return tripData;
-          })
-          .filter((trip): trip is Trip => trip !== null);
-
-        // Check if any valid trips were loaded
-        if (loadedTrips.length === 0) {
-          throw new Error('No complete booking details found. Please complete all steps.');
+        if (!supabaseTrips || supabaseTrips.length === 0) {
+          throw new Error('Failed to load booking from database.');
         }
+
+        // Convert Supabase data to Trip format
+        const loadedTrips: Trip[] = supabaseTrips.map((trip) => ({
+          id: trip.id,
+          booking_id: trip.booking_id,
+          from_location: trip.from_location || '',
+          to_location: trip.to_location || '',
+          date: trip.date || '',
+          adults: trip.adults || 0,
+          children: trip.children || 0,
+          price: trip.price || 0,
+          duration: trip.duration,
+          routeId: trip.routeId,
+          pickup_address: trip.pickup_address || '',
+          dropoff_address: trip.dropoff_address || '',
+          pickup_time: trip.pickup_time || '',
+          flight_number: trip.flight_number || null,
+          airline: trip.airline || null,
+          special_requests: trip.special_requests || null,
+          children_ages: trip.children_ages || null,
+          add_ons: trip.add_ons || null,
+          night_surcharge: trip.night_surcharge ?? 0,
+          add_ons_price: trip.add_ons_price ?? 0,
+          final_price: trip.final_price ?? trip.price ?? 0,
+        }));
 
         setTrips(loadedTrips);
         setLoading(false);
@@ -199,7 +238,7 @@ function SummaryPageContent() {
     }
 
     loadTrips();
-  }, [bookingId, router]);
+  }, [bookingId, router, supabase]);
 
   const grandTotal = useMemo(
     () => trips.reduce((sum, trip) => sum + (trip.final_price || trip.price), 0),

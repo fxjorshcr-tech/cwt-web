@@ -113,6 +113,7 @@ export function TripCard({
             value={trip.date ? parseDateFromString(trip.date) : null}
             onChange={(date) => onUpdate('date', formatDateToString(date))}
             label="Travel Date"
+            enforceMinimumAdvance={true}
           />
 
           <PassengerSelector

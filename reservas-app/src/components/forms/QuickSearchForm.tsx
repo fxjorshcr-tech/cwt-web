@@ -299,7 +299,12 @@ export function QuickSearchForm({
               label="Travel Date"
               value={date}
               onChange={setDate}
+              enforceMinimumAdvance={true}
             />
+            <p className="text-xs text-gray-500 mt-1.5 flex items-center gap-1">
+              <span className="text-amber-600">*</span>
+              Last-minute booking? <a href="https://wa.me/50685962438" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-medium">Contact us via WhatsApp</a>
+            </p>
           </div>
 
           {/* Passengers */}
