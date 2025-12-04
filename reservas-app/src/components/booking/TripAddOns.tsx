@@ -21,11 +21,11 @@ export interface AddOn {
 export const AVAILABLE_ADDONS: AddOn[] = [
   {
     id: 'flex_protection',
-    name: 'Flex Protection',
-    description: 'Perfect for travelers who want peace of mind',
+    name: 'Travel Flex',
+    description: '',
     details: [
-      '🕐 **Flex Time Pickup:** Change your pickup time up to 2 hours later, even 1 hour before scheduled pickup',
-      '✈️ **Free Reschedule:** Date/time if flight is delayed or cancelled (for airport pickups)',
+      '**Pickup time change:** Adjust up to 2 hours later, even last minute',
+      '**Free reschedule** for flight delays/cancellations (only airport pickups apply)',
     ],
     price: 59,
     icon: Clock,
