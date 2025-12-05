@@ -187,13 +187,14 @@ export default function FAQsPage() {
                 <div key={category}>
                   <div className="h-8 w-48 bg-gray-200 rounded-lg mb-4 animate-pulse" />
                   <div className="space-y-3">
-                    {[1, 2, 3, 4].map((item) => (
+                    {/* Use deterministic widths to avoid hydration mismatch */}
+                    {[75, 85, 65, 90].map((width, index) => (
                       <div
-                        key={item}
+                        key={index}
                         className="bg-white rounded-xl border border-gray-200 overflow-hidden"
                       >
                         <div className="px-6 py-4 flex items-center justify-between">
-                          <div className="h-5 bg-gray-200 rounded animate-pulse" style={{ width: `${60 + Math.random() * 30}%` }} />
+                          <div className="h-5 bg-gray-200 rounded animate-pulse" style={{ width: `${width}%` }} />
                           <div className="h-5 w-5 bg-gray-200 rounded animate-pulse" />
                         </div>
                       </div>
