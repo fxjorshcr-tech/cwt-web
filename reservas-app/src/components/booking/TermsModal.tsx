@@ -68,8 +68,11 @@ export default function TermsModal({ isOpen, onClose }: TermsModalProps) {
     }
   }
 
-  // Don't render if not open or not mounted (SSR safety)
+  // Don't render if not open or not mounted (SSR safety for hydration)
   if (!isOpen || !mounted) return null;
+
+  // Extra safety: ensure document.body exists before creating portal
+  if (typeof document === 'undefined') return null;
 
   const modalContent = (
     <div className="fixed inset-0 z-[9999]" style={{ isolation: 'isolate' }}>

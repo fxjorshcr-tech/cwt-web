@@ -101,43 +101,62 @@ function ConfirmationPageContent() {
       setLoading(true);
 
       if (isCartBooking) {
-        // Load all cart items
-        const allTrips: Trip[] = [];
-        const allTourBookings: TourBooking[] = [];
+        // Load all cart items in PARALLEL for faster LCP
+        const shuttlePromises: Promise<Trip[]>[] = [];
+        const tourPromises: Promise<TourBooking | null>[] = [];
 
-        // Load shuttle trips from comma-separated booking IDs
+        // Create parallel promises for shuttle trips
         if (shuttleBookingIdsParam) {
           const shuttleBookingIds = shuttleBookingIdsParam.split(',');
           for (const id of shuttleBookingIds) {
-            const { data, error } = await supabase
-              .from('trips')
-              .select('id, booking_id, from_location, to_location, date, pickup_time, adults, children, price, final_price, pickup_address, dropoff_address, customer_first_name, customer_last_name, customer_email, customer_phone, booking_number, voucher_number, created_at')
-              .eq('booking_id', id)
-              .order('created_at', { ascending: true });
-
-            if (!error && data) {
-              console.log('[Confirmation] Cart shuttle trips loaded:', data);
-              allTrips.push(...(data as unknown as Trip[]));
-            }
+            // Wrap in Promise.resolve to convert PromiseLike to Promise
+            const promise = Promise.resolve(
+              supabase
+                .from('trips')
+                .select('id, booking_id, from_location, to_location, date, pickup_time, adults, children, price, final_price, pickup_address, dropoff_address, customer_first_name, customer_last_name, customer_email, customer_phone, booking_number, voucher_number, created_at')
+                .eq('booking_id', id)
+                .order('created_at', { ascending: true })
+            ).then(({ data, error }) => {
+              if (!error && data) {
+                return data as unknown as Trip[];
+              }
+              return [];
+            });
+            shuttlePromises.push(promise);
           }
         }
 
-        // Load tour bookings from comma-separated tour IDs
+        // Create parallel promises for tour bookings
         if (tourIdsParam) {
           const tourIds = tourIdsParam.split(',');
           for (const id of tourIds) {
-            const { data, error } = await supabase
-              .from('tour_bookings')
-              .select('id, booking_id, tour_slug, tour_name, date, adults, children, base_price, price_per_extra_person, total_price, hotel, special_requests, status, customer_first_name, customer_last_name, customer_email, customer_phone, voucher_number')
-              .eq('id', id)
-              .single();
-
-            if (!error && data) {
-              console.log('[Confirmation] Cart tour loaded:', data);
-              allTourBookings.push(data as unknown as TourBooking);
-            }
+            // Wrap in Promise.resolve to convert PromiseLike to Promise
+            const promise = Promise.resolve(
+              supabase
+                .from('tour_bookings')
+                .select('id, booking_id, tour_slug, tour_name, date, adults, children, base_price, price_per_extra_person, total_price, hotel, special_requests, status, customer_first_name, customer_last_name, customer_email, customer_phone, voucher_number')
+                .eq('id', id)
+                .single()
+            ).then(({ data, error }) => {
+              if (!error && data) {
+                return data as unknown as TourBooking;
+              }
+              return null;
+            });
+            tourPromises.push(promise);
           }
         }
+
+        // Execute all queries in parallel
+        const [shuttleResults, tourResults] = await Promise.all([
+          Promise.all(shuttlePromises),
+          Promise.all(tourPromises)
+        ]);
+
+        const allTrips = shuttleResults.flat();
+        const allTourBookings = tourResults.filter((t): t is TourBooking => t !== null);
+
+        console.log('[Confirmation] Cart loaded in parallel - trips:', allTrips.length, 'tours:', allTourBookings.length);
 
         if (allTrips.length === 0 && allTourBookings.length === 0) {
           throw new Error('No bookings found');
