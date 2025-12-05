@@ -109,19 +109,20 @@ function ConfirmationPageContent() {
         if (shuttleBookingIdsParam) {
           const shuttleBookingIds = shuttleBookingIdsParam.split(',');
           for (const id of shuttleBookingIds) {
-            shuttlePromises.push(
+            // Wrap in Promise.resolve to convert PromiseLike to Promise
+            const promise = Promise.resolve(
               supabase
                 .from('trips')
                 .select('id, booking_id, from_location, to_location, date, pickup_time, adults, children, price, final_price, pickup_address, dropoff_address, customer_first_name, customer_last_name, customer_email, customer_phone, booking_number, voucher_number, created_at')
                 .eq('booking_id', id)
                 .order('created_at', { ascending: true })
-                .then(({ data, error }) => {
-                  if (!error && data) {
-                    return data as unknown as Trip[];
-                  }
-                  return [];
-                })
-            );
+            ).then(({ data, error }) => {
+              if (!error && data) {
+                return data as unknown as Trip[];
+              }
+              return [];
+            });
+            shuttlePromises.push(promise);
           }
         }
 
@@ -129,19 +130,20 @@ function ConfirmationPageContent() {
         if (tourIdsParam) {
           const tourIds = tourIdsParam.split(',');
           for (const id of tourIds) {
-            tourPromises.push(
+            // Wrap in Promise.resolve to convert PromiseLike to Promise
+            const promise = Promise.resolve(
               supabase
                 .from('tour_bookings')
                 .select('id, booking_id, tour_slug, tour_name, date, adults, children, base_price, price_per_extra_person, total_price, hotel, special_requests, status, customer_first_name, customer_last_name, customer_email, customer_phone, voucher_number')
                 .eq('id', id)
                 .single()
-                .then(({ data, error }) => {
-                  if (!error && data) {
-                    return data as unknown as TourBooking;
-                  }
-                  return null;
-                })
-            );
+            ).then(({ data, error }) => {
+              if (!error && data) {
+                return data as unknown as TourBooking;
+              }
+              return null;
+            });
+            tourPromises.push(promise);
           }
         }
 
