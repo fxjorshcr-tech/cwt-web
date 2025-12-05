@@ -180,44 +180,23 @@ function PaymentCallbackContent() {
               console.error('Failed to update payment status:', err);
             }
 
-            // Send confirmation email for single bookings
+            // Send confirmation email for single bookings (fire and forget - don't block redirect)
             if (approved) {
-              try {
-                console.log('[Callback] Sending confirmation email for:', bookingId, 'type:', bookingType);
-
-                if (isTourBooking) {
-                  await fetch('/api/email/send-tour-confirmation', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      bookingId,
-                      transactionId,
-                      authCode,
-                    }),
-                  });
-                } else {
-                  await fetch('/api/email/send-confirmation', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      bookingId,
-                      transactionId,
-                      authCode,
-                    }),
-                  });
-                }
-                console.log('[Callback] Email sent');
-              } catch (err) {
-                console.error('Failed to send confirmation email:', err);
-              }
+              console.log('[Callback] Sending confirmation email for:', bookingId, 'type:', bookingType);
+              const emailEndpoint = isTourBooking ? '/api/email/send-tour-confirmation' : '/api/email/send-confirmation';
+              fetch(emailEndpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ bookingId, transactionId, authCode }),
+              }).catch(err => console.error('Failed to send confirmation email:', err));
             }
           }
         }
 
-        // Si el pago fue exitoso, redirigir a confirmación
+        // Si el pago fue exitoso, redirigir a confirmación inmediatamente
         if (approved && bookingId) {
           setStatus('redirecting');
-          // Pequeño delay para mostrar el mensaje
+          // Redirect quickly - email is sent in background
           setTimeout(() => {
             if (isCartBooking && cartItems) {
               // Build query params with all cart item IDs
@@ -236,7 +215,7 @@ function PaymentCallbackContent() {
             } else {
               router.push(`/confirmation?booking_id=${bookingId}`);
             }
-          }, 500);
+          }, 100); // Reduced from 500ms for faster LCP
         } else {
           // Pago fallido - mostrar error
           setErrorMessage(description || 'Payment was not approved. Please try again.');
