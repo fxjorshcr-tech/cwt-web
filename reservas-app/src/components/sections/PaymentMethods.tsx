@@ -3,14 +3,11 @@
 
 'use client';
 
-import { 
+import {
   Shield,
   Lock,
   CheckCircle2,
-  CreditCard,
-  Smartphone,
-  Link2,
-  Building2
+  CreditCard
 } from 'lucide-react';
 
 export default function PaymentMethods() {
@@ -18,10 +15,6 @@ export default function PaymentMethods() {
     { name: 'Visa', icon: CreditCard, color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200' },
     { name: 'Mastercard', icon: CreditCard, color: 'text-orange-600', bg: 'bg-orange-50', border: 'border-orange-200' },
     { name: 'American Express', icon: CreditCard, color: 'text-blue-700', bg: 'bg-blue-50', border: 'border-blue-200' },
-    { name: 'Discover', icon: CreditCard, color: 'text-orange-500', bg: 'bg-orange-50', border: 'border-orange-200' },
-    { name: 'Google Pay', icon: Smartphone, color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-200' },
-    { name: 'Link', icon: Link2, color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-200' },
-    { name: 'ACH Direct Debit', icon: Building2, color: 'text-gray-600', bg: 'bg-gray-50', border: 'border-gray-200' },
   ];
 
   const securityFeatures = [
