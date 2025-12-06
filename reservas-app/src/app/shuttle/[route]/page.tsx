@@ -16,7 +16,7 @@ const POPULAR_ROUTES = [
   { from: 'SJO - Juan Santamaria Int. Airport (or Alajuela City & Downtown San Jose)', to: 'Manuel Antonio (National Park Area) Quepos', slug: 'sjo-to-manuel-antonio' },
   { from: 'SJO - Juan Santamaria Int. Airport (or Alajuela City & Downtown San Jose)', to: 'Tamarindo / Flamingo / Conchal (Guanacaste Beaches)', slug: 'sjo-to-tamarindo' },
   { from: 'SJO - Juan Santamaria Int. Airport (or Alajuela City & Downtown San Jose)', to: 'Monteverde (Cloud Forest)', slug: 'sjo-to-monteverde' },
-  { from: 'SJO - Juan Santamaria Int. Airport (or Alajuela City & Downtown San Jose)', to: 'Puerto Viejo de Talamanca (Caribbean Coast)', slug: 'sjo-to-puerto-viejo' },
+  { from: 'SJO - Juan Santamaria Int. Airport (or Alajuela City & Downtown San Jose)', to: 'Puerto Viejo (Caribbean Coast)', slug: 'sjo-to-puerto-viejo' },
   // La Fortuna routes
   { from: 'La Fortuna, Arenal Volcano & El Castillo', to: 'SJO - Juan Santamaria Int. Airport (or Alajuela City & Downtown San Jose)', slug: 'la-fortuna-to-sjo' },
   { from: 'La Fortuna, Arenal Volcano & El Castillo', to: 'LIR - Liberia International Airport', slug: 'la-fortuna-to-lir' },
@@ -25,9 +25,9 @@ const POPULAR_ROUTES = [
   { from: 'La Fortuna, Arenal Volcano & El Castillo', to: 'Tamarindo / Flamingo / Conchal (Guanacaste Beaches)', slug: 'la-fortuna-to-tamarindo' },
   { from: 'La Fortuna, Arenal Volcano & El Castillo', to: 'Manuel Antonio (National Park Area) Quepos', slug: 'la-fortuna-to-manuel-antonio' },
   { from: 'La Fortuna, Arenal Volcano & El Castillo', to: 'Jaco / Playa Hermosa (Central Pacific)', slug: 'la-fortuna-to-jaco' },
-  { from: 'La Fortuna, Arenal Volcano & El Castillo', to: 'Samara (Playa Samara Beach)', slug: 'la-fortuna-to-samara' },
+  { from: 'La Fortuna, Arenal Volcano & El Castillo', to: 'Samara / Playa Carrillo (Guanacaste)', slug: 'la-fortuna-to-samara' },
   { from: 'La Fortuna, Arenal Volcano & El Castillo', to: 'Nosara (Playa Guiones Area)', slug: 'la-fortuna-to-nosara' },
-  { from: 'La Fortuna, Arenal Volcano & El Castillo', to: 'Puerto Viejo de Talamanca (Caribbean Coast)', slug: 'la-fortuna-to-puerto-viejo' },
+  { from: 'La Fortuna, Arenal Volcano & El Castillo', to: 'Puerto Viejo (Caribbean Coast)', slug: 'la-fortuna-to-puerto-viejo' },
   // LIR Airport routes
   { from: 'LIR - Liberia International Airport', to: 'Tamarindo / Flamingo / Conchal (Guanacaste Beaches)', slug: 'lir-to-tamarindo' },
   { from: 'LIR - Liberia International Airport', to: 'Papagayo Peninsula, Guanacaste', slug: 'lir-to-papagayo' },
