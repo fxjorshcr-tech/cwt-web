@@ -7,7 +7,7 @@ import Link from 'next/link';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import WhatsAppButton from '@/components/WhatsAppButton';
 import { createClient } from '@/lib/supabase/server';
-import { CheckCircle2, Clock, MapPin, Shield, Users, ArrowRight, Sparkles } from 'lucide-react';
+import { CheckCircle2, Clock, MapPin, Shield, Users, ArrowRight, Sparkles, Route, Lightbulb } from 'lucide-react';
 
 // Definir las rutas populares - NOMBRES EXACTOS de la base de datos
 const POPULAR_ROUTES = [
@@ -69,7 +69,25 @@ export async function generateMetadata({ params }: { params: { route: string } }
   };
 }
 
-async function getRouteData(from: string, to: string) {
+// Extended route type with new description fields
+interface RouteData {
+  id: number;
+  origen: string | null;
+  destino: string | null;
+  duracion: string | null;
+  kilometros: number | null;
+  precio1a6: number | null;
+  precio7a9: number | null;
+  precio10a12: number | null;
+  // New fields for route descriptions
+  slug?: string | null;
+  journey_description?: string | null;
+  points_of_interest?: string[] | null;
+  road_type?: string | null;
+  traveler_tip?: string | null;
+}
+
+async function getRouteData(from: string, to: string): Promise<RouteData | null> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('routes')
@@ -79,7 +97,7 @@ async function getRouteData(from: string, to: string) {
     .single();
 
   if (error || !data) return null;
-  return data;
+  return data as RouteData;
 }
 
 export default async function ShuttleRoutePage({ params }: { params: { route: string } }) {
@@ -213,17 +231,57 @@ export default async function ShuttleRoutePage({ params }: { params: { route: st
                 <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">
                   The Journey
                 </h2>
-                <p className="text-base text-gray-700 mb-4 leading-relaxed">
-                  This {routeData.duracion} journey is more than just a transfer—it's your first immersion into Costa Rica's natural beauty.
-                  Expect winding mountain roads, lush rainforest canopies, and stunning coastal views that'll have you reaching for your camera.
-                </p>
-                <p className="text-base text-gray-700 mb-4 leading-relaxed">
-                  <strong className="text-blue-600">We drive this route daily.</strong> Our drivers know every curve, every scenic pullout, and the perfect spots for a coffee break or quick photo opportunity.
-                  This is a <strong>100% private service</strong>—your vehicle, your schedule. Want to stop at a roadside fruit stand? Need a bathroom break? Just ask.
-                </p>
-                <p className="text-base text-gray-700 mb-8 leading-relaxed">
-                  Unlike shared shuttles with rigid schedules, you control the experience. We're here to get you there safely and comfortably while making the journey itself memorable.
-                </p>
+
+                {/* Dynamic description from database */}
+                {routeData.journey_description && (
+                  <p className="text-base text-gray-700 mb-4 leading-relaxed">
+                    {routeData.journey_description}
+                  </p>
+                )}
+
+                {/* Road type info */}
+                {routeData.road_type && (
+                  <div className="flex items-start gap-3 mb-4 p-4 bg-gray-50 rounded-xl">
+                    <Route className="h-5 w-5 text-gray-500 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm font-semibold text-gray-700">Road conditions</p>
+                      <p className="text-sm text-gray-600">{routeData.road_type}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Points of interest */}
+                {routeData.points_of_interest && routeData.points_of_interest.length > 0 && (
+                  <div className="mb-4">
+                    <p className="text-sm font-semibold text-gray-700 mb-2">Along the way</p>
+                    <div className="flex flex-wrap gap-2">
+                      {routeData.points_of_interest.map((point: string, index: number) => (
+                        <span key={index} className="inline-flex items-center px-3 py-1 bg-blue-50 text-blue-700 text-sm rounded-full">
+                          {point}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Traveler tip */}
+                {routeData.traveler_tip && (
+                  <div className="flex items-start gap-3 mb-8 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                    <Lightbulb className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm font-semibold text-amber-800">Tip</p>
+                      <p className="text-sm text-amber-700">{routeData.traveler_tip}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Fallback if no dynamic content */}
+                {!routeData.journey_description && (
+                  <p className="text-base text-gray-700 mb-8 leading-relaxed">
+                    This {routeData.duracion} private transfer takes you comfortably from {routeInfo.from} to {routeInfo.to}.
+                    Our experienced drivers know the roads well and will ensure a safe, enjoyable journey.
+                  </p>
+                )}
 
                 <div className="bg-blue-50 border-2 border-blue-200 p-6 rounded-xl mb-6">
                   <h3 className="font-bold text-blue-900 mb-2 flex items-center gap-2">
