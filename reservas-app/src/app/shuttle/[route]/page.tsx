@@ -69,7 +69,25 @@ export async function generateMetadata({ params }: { params: { route: string } }
   };
 }
 
-async function getRouteData(from: string, to: string) {
+// Extended route type with new description fields
+interface RouteData {
+  id: number;
+  origen: string | null;
+  destino: string | null;
+  duracion: string | null;
+  kilometros: number | null;
+  precio1a6: number | null;
+  precio7a9: number | null;
+  precio10a12: number | null;
+  // New fields for route descriptions
+  slug?: string | null;
+  journey_description?: string | null;
+  points_of_interest?: string[] | null;
+  road_type?: string | null;
+  traveler_tip?: string | null;
+}
+
+async function getRouteData(from: string, to: string): Promise<RouteData | null> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('routes')
@@ -79,7 +97,7 @@ async function getRouteData(from: string, to: string) {
     .single();
 
   if (error || !data) return null;
-  return data;
+  return data as RouteData;
 }
 
 export default async function ShuttleRoutePage({ params }: { params: { route: string } }) {
