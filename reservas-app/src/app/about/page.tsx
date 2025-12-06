@@ -14,7 +14,10 @@ import {
   Eye,
   CheckCircle2,
   ArrowRight,
-  Sparkles
+  Sparkles,
+  Truck,
+  Calendar,
+  BadgeCheck
 } from 'lucide-react';
 
 // ✅ SEO Metadata works perfectly now (Server Component)
@@ -237,6 +240,131 @@ export default function AboutPage() {
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Our Network & Commitment */}
+        <section className="py-16 sm:py-24 bg-gray-50">
+          <div className="container mx-auto px-6 max-w-6xl">
+
+            {/* Strategic Coverage */}
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-full mb-6 border border-blue-100">
+                <Truck className="h-4 w-4 text-blue-600" />
+                <span className="text-blue-700 font-bold text-xs uppercase tracking-wider">
+                  Strategic Coverage
+                </span>
+              </div>
+
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                Vehicles Where You Need Them
+              </h2>
+              <p className="text-gray-600 max-w-2xl mx-auto mb-12">
+                We strategically position our fleet across Costa Rica's main tourist hubs for faster response times and local expertise.
+              </p>
+
+              {/* Location Cards */}
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 max-w-4xl mx-auto">
+                {[
+                  { name: 'San José', sub: 'SJO Airport', icon: '✈️' },
+                  { name: 'Guanacaste', sub: 'LIR & Beaches', icon: '🏖️' },
+                  { name: 'La Fortuna', sub: 'Arenal Volcano', icon: '🌋' },
+                  { name: 'Monteverde', sub: 'Cloud Forest', icon: '🌿' },
+                  { name: 'Manuel Antonio', sub: 'Pacific Coast', icon: '🐒' },
+                ].map((location) => (
+                  <div
+                    key={location.name}
+                    className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md hover:border-blue-200 transition-all"
+                  >
+                    <span className="text-2xl mb-2 block">{location.icon}</span>
+                    <p className="font-bold text-gray-900 text-sm">{location.name}</p>
+                    <p className="text-xs text-gray-500">{location.sub}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Commitment Section */}
+            <div className="bg-white rounded-3xl p-8 md:p-12 shadow-lg border border-gray-100 mt-16">
+              <div className="grid md:grid-cols-2 gap-10 items-center">
+                <div>
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 rounded-full mb-6 border border-green-100">
+                    <Calendar className="h-4 w-4 text-green-600" />
+                    <span className="text-green-700 font-bold text-xs uppercase tracking-wider">
+                      Our Commitment
+                    </span>
+                  </div>
+
+                  <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+                    Quality Over Quantity
+                  </h3>
+                  <p className="text-gray-600 mb-6 leading-relaxed">
+                    We intentionally limit our daily bookings to guarantee every reservation. While others overbook and scramble to find drivers, <strong>we keep our word</strong>.
+                  </p>
+                  <p className="text-gray-600 leading-relaxed">
+                    When you book with us, you get peace of mind — not excuses. That's the Can't Wait Travel difference.
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  {[
+                    { text: 'Confirmed means confirmed', desc: 'Your booking is guaranteed' },
+                    { text: 'No overbooking', desc: 'We never accept more than we can handle' },
+                    { text: 'No last-minute cancellations', desc: 'We honor every commitment' },
+                  ].map((item) => (
+                    <div key={item.text} className="flex items-start gap-4 bg-gray-50 p-4 rounded-xl">
+                      <div className="bg-green-100 p-2 rounded-lg flex-shrink-0">
+                        <BadgeCheck className="h-5 w-5 text-green-600" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-gray-900">{item.text}</p>
+                        <p className="text-sm text-gray-500">{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Trusted By */}
+            <div className="mt-16 text-center">
+              <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-8">
+                Trusted by Local Businesses
+              </p>
+              <div className="flex items-center justify-center gap-8 sm:gap-12 md:gap-16">
+                <Link
+                  href="https://www.arenalecoglide.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-center justify-center grayscale hover:grayscale-0 opacity-70 hover:opacity-100 transition-all duration-300"
+                  title="Arenal EcoGlide"
+                >
+                  <Image
+                    src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/logo-ecoglide.webp"
+                    alt="Arenal EcoGlide"
+                    width={140}
+                    height={60}
+                    className="h-12 sm:h-14 md:h-16 w-auto object-contain group-hover:scale-105 transition-transform"
+                  />
+                </Link>
+                <Link
+                  href="https://www.skylinecanopytour.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-center justify-center grayscale hover:grayscale-0 opacity-70 hover:opacity-100 transition-all duration-300"
+                  title="Skyline Canopy Tour"
+                >
+                  <Image
+                    src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/logo-skyline.webp"
+                    alt="Skyline Canopy Tour"
+                    width={140}
+                    height={60}
+                    className="h-12 sm:h-14 md:h-16 w-auto object-contain group-hover:scale-105 transition-transform"
+                  />
+                </Link>
+              </div>
+            </div>
+
           </div>
         </section>
 
