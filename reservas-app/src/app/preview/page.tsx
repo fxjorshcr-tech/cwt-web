@@ -852,15 +852,15 @@ function PreviewPageContent() {
       </div>
 
       {/* Main Content */}
-      <div className="bg-gray-50 py-8 pb-24">
-        <div className="max-w-5xl mx-auto px-4">
+      <div className="bg-gray-50 py-6 sm:py-8 pb-24 overflow-x-hidden">
+        <div className="max-w-5xl mx-auto px-3 sm:px-4">
           <div className="grid lg:grid-cols-3 gap-6">
             {/* Left Column: Trips */}
             <div className="lg:col-span-2 space-y-4">
               {trips.map((trip, index) => (
                 <div
                   key={index}
-                  className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-visible"
+                  className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
                 >
                   {/* Trip Header */}
                   <div className="bg-gradient-to-r from-blue-50 to-blue-100 px-5 py-3 border-b border-blue-200 flex items-center justify-between">
@@ -901,21 +901,21 @@ function PreviewPageContent() {
                     renderEditForm(false)
                   ) : (
                     // View Mode
-                    <div className="p-4 sm:p-5">
+                    <div className="p-3 sm:p-5">
                       {/* Availability & Alerts - TOP */}
-                      <div className="flex flex-wrap gap-2 mb-4">
+                      <div className="flex flex-wrap gap-1.5 mb-3">
                         {/* Dynamic Availability - PROMINENT */}
                         {(() => {
                           const availableVans = getAvailabilityCount(trip.from_location, trip.to_location, trip.date);
                           return (
-                            <div className={`flex items-center gap-2 px-3 py-2 rounded-lg ${
+                            <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs ${
                               availableVans <= 2
                                 ? 'bg-red-100 border border-red-300'
                                 : 'bg-green-100 border border-green-300'
                             }`}>
-                              <Car className={`h-4 w-4 ${availableVans <= 2 ? 'text-red-600' : 'text-green-600'}`} />
-                              <span className={`text-sm font-bold ${availableVans <= 2 ? 'text-red-700' : 'text-green-700'}`}>
-                                {availableVans === 1 ? 'Only 1 van left!' : `${availableVans} vans available`}
+                              <Car className={`h-3.5 w-3.5 ${availableVans <= 2 ? 'text-red-600' : 'text-green-600'}`} />
+                              <span className={`font-bold ${availableVans <= 2 ? 'text-red-700' : 'text-green-700'}`}>
+                                {availableVans === 1 ? '1 left!' : `${availableVans} vans`}
                               </span>
                             </div>
                           );
@@ -923,17 +923,17 @@ function PreviewPageContent() {
 
                         {/* High Season Alert */}
                         {isHighSeason(trip.date) && (
-                          <div className="flex items-center gap-2 px-3 py-2 bg-amber-100 border border-amber-300 rounded-lg">
-                            <AlertTriangle className="h-4 w-4 text-amber-600" />
-                            <span className="text-sm font-bold text-amber-700">High Season</span>
+                          <div className="flex items-center gap-1.5 px-2 py-1 bg-amber-100 border border-amber-300 rounded-lg text-xs">
+                            <AlertTriangle className="h-3.5 w-3.5 text-amber-600" />
+                            <span className="font-bold text-amber-700">High Season</span>
                           </div>
                         )}
 
                         {/* Popular Route Badge */}
                         {isPopularRoute(trip.from_location, trip.to_location) && (
-                          <div className="flex items-center gap-2 px-3 py-2 bg-orange-100 border border-orange-300 rounded-lg">
-                            <Flame className="h-4 w-4 text-orange-500" />
-                            <span className="text-sm font-bold text-orange-700">Popular Route</span>
+                          <div className="flex items-center gap-1.5 px-2 py-1 bg-orange-100 border border-orange-300 rounded-lg text-xs">
+                            <Flame className="h-3.5 w-3.5 text-orange-500" />
+                            <span className="font-bold text-orange-700">Popular</span>
                           </div>
                         )}
                       </div>
@@ -942,50 +942,45 @@ function PreviewPageContent() {
                       <div className="space-y-4 mb-4">
                         {/* FROM section with pickup address and time */}
                         <div className="space-y-2">
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                            <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2 min-w-0 flex-1">
                               <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
                                 <MapPin className="h-3 w-3 text-blue-600" />
                               </div>
-                              <div className="min-w-0 flex-1">
+                              <div className="min-w-0">
                                 <p className="text-[10px] text-gray-500 uppercase">From</p>
                                 <p className="text-sm font-semibold text-gray-900 leading-tight truncate">{trip.from_location}</p>
                               </div>
                             </div>
-                            {/* Pickup Time - stacks on mobile */}
-                            <div className="flex items-center gap-2 ml-8 sm:ml-0">
-                              <span className="text-[10px] text-gray-500 uppercase whitespace-nowrap">Pickup *</span>
-                              <div className={`flex items-center gap-1 px-3 py-1.5 rounded-lg ${
-                                trip.pickup_time
-                                  ? 'bg-blue-600 text-white'
-                                  : 'bg-orange-500 text-white animate-pulse'
-                              }`}>
-                                <Clock className="h-4 w-4" />
-                                <select
-                                  value={trip.pickup_time}
-                                  onChange={(e) => updateTripField(index, 'pickup_time', e.target.value)}
-                                  className="bg-transparent text-white text-sm font-semibold focus:outline-none cursor-pointer"
-                                >
-                                  <option value="" className="text-gray-900">Select</option>
-                                  {Array.from({ length: 48 }, (_, i) => {
-                                    const hour = Math.floor(i / 2);
-                                    const minute = i % 2 === 0 ? '00' : '30';
-                                    const value = `${hour.toString().padStart(2, '0')}:${minute}`;
-                                    const label = `${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour}:${minute} ${hour < 12 ? 'AM' : 'PM'}`;
-                                    return <option key={value} value={value} className="text-gray-900">{label}</option>;
-                                  })}
-                                </select>
-                              </div>
+                            {/* Pickup Time */}
+                            <div className={`flex items-center gap-1 px-2 py-1.5 rounded-lg flex-shrink-0 ${
+                              trip.pickup_time
+                                ? 'bg-blue-600 text-white'
+                                : 'bg-orange-500 text-white animate-pulse'
+                            }`}>
+                              <Clock className="h-3.5 w-3.5" />
+                              <select
+                                value={trip.pickup_time}
+                                onChange={(e) => updateTripField(index, 'pickup_time', e.target.value)}
+                                className="bg-transparent text-white text-xs font-semibold focus:outline-none cursor-pointer"
+                              >
+                                <option value="" className="text-gray-900">Time</option>
+                                {Array.from({ length: 48 }, (_, i) => {
+                                  const hour = Math.floor(i / 2);
+                                  const minute = i % 2 === 0 ? '00' : '30';
+                                  const value = `${hour.toString().padStart(2, '0')}:${minute}`;
+                                  const label = `${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour}:${minute} ${hour < 12 ? 'AM' : 'PM'}`;
+                                  return <option key={value} value={value} className="text-gray-900">{label}</option>;
+                                })}
+                              </select>
                             </div>
                           </div>
-                          <div className="ml-8">
-                            <Input
-                              placeholder="Exact pickup address (hotel name, address...)"
-                              value={trip.pickup_address}
-                              onChange={(e) => updateTripField(index, 'pickup_address', e.target.value)}
-                              className="text-sm h-10"
-                            />
-                          </div>
+                          <Input
+                            placeholder="Pickup address (hotel, Airbnb...)"
+                            value={trip.pickup_address}
+                            onChange={(e) => updateTripField(index, 'pickup_address', e.target.value)}
+                            className="text-sm h-9"
+                          />
                         </div>
 
                         {/* TO section with dropoff address */}
@@ -994,19 +989,17 @@ function PreviewPageContent() {
                             <div className="h-6 w-6 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
                               <MapPin className="h-3 w-3 text-orange-500" />
                             </div>
-                            <div className="min-w-0 flex-1">
+                            <div className="min-w-0">
                               <p className="text-[10px] text-gray-500 uppercase">To</p>
-                              <p className="text-sm font-semibold text-gray-900 leading-tight">{trip.to_location}</p>
+                              <p className="text-sm font-semibold text-gray-900 leading-tight truncate">{trip.to_location}</p>
                             </div>
                           </div>
-                          <div className="ml-8">
-                            <Input
-                              placeholder="Exact drop-off address (hotel name, address...)"
-                              value={trip.dropoff_address}
-                              onChange={(e) => updateTripField(index, 'dropoff_address', e.target.value)}
-                              className="text-sm h-10"
-                            />
-                          </div>
+                          <Input
+                            placeholder="Drop-off address (hotel, Airbnb...)"
+                            value={trip.dropoff_address}
+                            onChange={(e) => updateTripField(index, 'dropoff_address', e.target.value)}
+                            className="text-sm h-9"
+                          />
                         </div>
 
                         {/* Flight Information - only for airport routes */}
@@ -1049,48 +1042,48 @@ function PreviewPageContent() {
                             <Users className="h-3 w-3 inline mr-1" />
                             Passengers
                           </p>
-                          <div className="flex items-center gap-4">
+                          <div className="grid grid-cols-2 gap-3">
                             {/* Adults */}
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm text-gray-600">Adults:</span>
-                              <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-gray-600">Adults</span>
+                              <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white">
                                 <button
                                   type="button"
                                   onClick={() => updateTripPassengers(index, Math.max(1, trip.adults - 1), trip.children)}
                                   disabled={trip.adults <= 1}
-                                  className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                  className="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-sm"
                                 >
                                   -
                                 </button>
-                                <span className="px-3 py-1.5 text-sm font-medium min-w-[2rem] text-center">{trip.adults}</span>
+                                <span className="px-2.5 py-1 text-sm font-medium">{trip.adults}</span>
                                 <button
                                   type="button"
                                   onClick={() => updateTripPassengers(index, Math.min(12, trip.adults + 1), trip.children)}
                                   disabled={trip.adults + trip.children >= 12}
-                                  className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                  className="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-sm"
                                 >
                                   +
                                 </button>
                               </div>
                             </div>
                             {/* Children */}
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm text-gray-600">Children:</span>
-                              <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-gray-600">Children</span>
+                              <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white">
                                 <button
                                   type="button"
                                   onClick={() => updateTripPassengers(index, trip.adults, Math.max(0, trip.children - 1))}
                                   disabled={trip.children <= 0}
-                                  className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                  className="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-sm"
                                 >
                                   -
                                 </button>
-                                <span className="px-3 py-1.5 text-sm font-medium min-w-[2rem] text-center">{trip.children}</span>
+                                <span className="px-2.5 py-1 text-sm font-medium">{trip.children}</span>
                                 <button
                                   type="button"
                                   onClick={() => updateTripPassengers(index, trip.adults, Math.min(11, trip.children + 1))}
                                   disabled={trip.adults + trip.children >= 12}
-                                  className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                  className="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-sm"
                                 >
                                   +
                                 </button>
