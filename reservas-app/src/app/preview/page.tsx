@@ -983,18 +983,8 @@ function PreviewPageContent() {
                 </div>
               ))}
 
-              {/* Add Transfer Form */}
-              {showAddTrip && (
-                <div className="bg-white rounded-xl shadow-sm border border-dashed border-blue-300 overflow-visible">
-                  <div className="bg-blue-50 px-5 py-3 border-b border-blue-200">
-                    <span className="font-semibold text-gray-900">Add Another Transfer</span>
-                  </div>
-                  {renderEditForm(true)}
-                </div>
-              )}
-
               {/* Add Transfer Button - Only show for multi-destination */}
-              {tripType === 'multi' && !showAddTrip && editingIndex === null && (
+              {tripType === 'multi' && editingIndex === null && (
                 <button
                   onClick={startAddTrip}
                   className="w-full py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 font-medium hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
@@ -1002,6 +992,121 @@ function PreviewPageContent() {
                   <Plus className="h-5 w-5" />
                   Add Another Transfer
                 </button>
+              )}
+
+              {/* Add Transfer Modal */}
+              {showAddTrip && (
+                <div className="fixed inset-0 z-50 overflow-y-auto">
+                  {/* Backdrop */}
+                  <div
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+                    onClick={cancelEdit}
+                  />
+
+                  {/* Modal */}
+                  <div className="flex min-h-full items-center justify-center p-4">
+                    <div className="relative w-full max-w-2xl bg-[#0a1628] rounded-2xl shadow-2xl overflow-visible">
+                      {/* Header */}
+                      <div className="flex items-center justify-between p-4 border-b border-white/10">
+                        <h3 className="text-lg font-semibold text-white">Add Another Transfer</h3>
+                        <button
+                          onClick={cancelEdit}
+                          className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
+                        >
+                          <X className="h-5 w-5" />
+                        </button>
+                      </div>
+
+                      {/* Form Content */}
+                      <div className="p-4 space-y-4">
+                        {/* Origin & Destination Row */}
+                        <div className="flex flex-wrap gap-3">
+                          <div className="flex-1 min-w-[200px]">
+                            <LocationAutocomplete
+                              placeholder="Where from?"
+                              value={editOrigin}
+                              onChange={(val) => {
+                                setEditOrigin(val);
+                                if (val !== editOrigin) setEditDestination('');
+                              }}
+                              routes={routes}
+                              filterByDestination={editDestination}
+                              type="origin"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-[200px]">
+                            <LocationAutocomplete
+                              placeholder={editOrigin ? "Where to?" : "Select origin first"}
+                              value={editDestination}
+                              onChange={setEditDestination}
+                              routes={routes}
+                              filterByOrigin={editOrigin}
+                              disabled={!editOrigin}
+                              type="destination"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Date/Time & Passengers Row */}
+                        <div className="flex flex-wrap gap-3">
+                          <div className="flex-1 min-w-[200px]">
+                            <ModernDatePicker
+                              value={editDate}
+                              onChange={setEditDate}
+                              enforceMinimumAdvance={true}
+                              showTimePicker={true}
+                              selectedTime={editPickupTime}
+                              onTimeChange={setEditPickupTime}
+                            />
+                          </div>
+                          <div className="flex-1 min-w-[200px]">
+                            <PassengerSelector
+                              adults={editAdults}
+                              children={editChildren}
+                              onPassengersChange={handleEditPassengersChange}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex gap-3 pt-2">
+                          <button
+                            onClick={cancelEdit}
+                            className="flex-1 py-3 border border-white/20 rounded-xl text-white font-medium hover:bg-white/10 transition-colors"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            onClick={saveNewTrip}
+                            disabled={!editOrigin || !editDestination || !editDate || availabilityStatus !== 'idle'}
+                            className={`flex-1 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors ${
+                              availabilityStatus === 'approved'
+                                ? 'bg-green-600 text-white'
+                                : 'bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed'
+                            }`}
+                          >
+                            {availabilityStatus === 'checking' ? (
+                              <>
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                Preparing quote...
+                              </>
+                            ) : availabilityStatus === 'approved' ? (
+                              <>
+                                <CheckCircle className="h-4 w-4" />
+                                Quote ready!
+                              </>
+                            ) : (
+                              <>
+                                <Plus className="h-4 w-4" />
+                                Add Transfer
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
 
