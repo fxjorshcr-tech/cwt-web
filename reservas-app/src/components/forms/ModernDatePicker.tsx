@@ -20,6 +20,7 @@ interface ModernDatePickerProps {
   showTimePicker?: boolean;
   selectedTime?: string; // Format: "HH:mm" (e.g., "09:00")
   onTimeChange?: (time: string) => void;
+  darkMode?: boolean; // Dark background styling for horizontal form
 }
 
 /**
@@ -53,6 +54,7 @@ export function ModernDatePicker({
   showTimePicker = false,
   selectedTime = '09:00',
   onTimeChange,
+  darkMode = false,
 }: ModernDatePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(value || new Date());
@@ -229,7 +231,7 @@ export function ModernDatePicker({
   return (
     <div ref={containerRef} className={`relative notranslate ${className}`} translate="no">
       {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
           {label}
         </label>
       )}
@@ -240,11 +242,18 @@ export function ModernDatePicker({
         aria-label="Select travel date"
         aria-expanded={isOpen}
         aria-haspopup="dialog"
-        className="w-full px-4 py-3 text-left bg-white border border-gray-300 rounded-lg hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+        className={`w-full px-4 py-3 text-left rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+          darkMode
+            ? 'bg-white/10 border border-white/20 hover:border-white/40'
+            : 'bg-white border border-gray-300 hover:border-gray-400'
+        }`}
       >
         <div className="flex items-center gap-2">
-          <CalendarIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
-          <span className={value ? 'text-gray-900' : 'text-gray-400'}>
+          <CalendarIcon className={`h-5 w-5 ${darkMode ? 'text-gray-400' : 'text-gray-400'}`} aria-hidden="true" />
+          <span className={value
+            ? (darkMode ? 'text-white' : 'text-gray-900')
+            : (darkMode ? 'text-gray-400' : 'text-gray-400')
+          }>
             {value
               ? showTimePicker
                 ? `${format(value, 'EEE, MMM d', { locale: enUS })} / ${TIME_OPTIONS.find(t => t.value === selectedTime)?.label || selectedTime}`
@@ -252,7 +261,7 @@ export function ModernDatePicker({
               : showTimePicker ? 'Select date & time' : 'Select a date'
             }
           </span>
-          {showTimePicker && <Clock className="h-4 w-4 text-gray-400 ml-auto" />}
+          {showTimePicker && <Clock className={`h-4 w-4 ml-auto ${darkMode ? 'text-gray-400' : 'text-gray-400'}`} />}
         </div>
       </button>
 

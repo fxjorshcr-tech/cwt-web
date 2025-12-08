@@ -12,7 +12,7 @@ interface Route {
 }
 
 interface LocationAutocompleteProps {
-  label: string;
+  label?: string;
   placeholder: string;
   value: string;
   onChange: (value: string) => void;
@@ -21,6 +21,7 @@ interface LocationAutocompleteProps {
   filterByDestination?: string;
   disabled?: boolean;
   type: 'origin' | 'destination';
+  darkMode?: boolean;
 }
 
 export function LocationAutocomplete({
@@ -33,6 +34,7 @@ export function LocationAutocomplete({
   filterByDestination,
   disabled = false,
   type,
+  darkMode = false,
 }: LocationAutocompleteProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState(value);
@@ -125,13 +127,17 @@ export function LocationAutocomplete({
 
   return (
     <div className="space-y-1.5 relative notranslate" translate="no">
-      <label className="flex items-center gap-1.5 text-xs font-medium text-gray-700">
-        <MapPin className={`h-3.5 w-3.5 ${type === 'origin' ? 'text-blue-600' : 'text-orange-600'}`} />
-        {label}
-      </label>
+      {label && (
+        <label className={`flex items-center gap-1.5 text-xs font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+          <MapPin className={`h-3.5 w-3.5 ${type === 'origin' ? 'text-blue-500' : 'text-orange-500'}`} />
+          {label}
+        </label>
+      )}
 
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none z-10" />
+        <MapPin className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none z-10 ${
+          type === 'origin' ? 'text-blue-500' : 'text-orange-500'
+        }`} />
         <input
           ref={inputRef}
           type="text"
@@ -140,20 +146,26 @@ export function LocationAutocomplete({
           onFocus={() => setIsOpen(true)}
           disabled={disabled}
           placeholder={placeholder}
-          className="w-full pl-9 pr-9 py-2.5 text-base sm:text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+          className={`w-full pl-9 pr-9 py-3 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all disabled:cursor-not-allowed ${
+            darkMode
+              ? 'bg-white/10 border border-white/20 text-white placeholder-gray-400 disabled:bg-white/5 disabled:text-gray-500'
+              : 'bg-white border border-gray-300 text-gray-900 placeholder-gray-400 disabled:bg-gray-100 disabled:text-gray-400'
+          }`}
           autoComplete="off"
         />
         {inputValue && !disabled && (
           <button
             type="button"
             onClick={handleClear}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors z-10"
+            className={`absolute right-3 top-1/2 -translate-y-1/2 transition-colors z-10 ${
+              darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-400 hover:text-gray-600'
+            }`}
           >
             <X className="h-4 w-4" />
           </button>
         )}
 
-        {/* Dropdown */}
+        {/* Dropdown - always light background for readability */}
         {isOpen && !disabled && (
           <div
             ref={dropdownRef}

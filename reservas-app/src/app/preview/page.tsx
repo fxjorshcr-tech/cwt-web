@@ -122,6 +122,7 @@ function PreviewPageContent() {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [showAddTrip, setShowAddTrip] = useState(false);
   const [availabilityStatus, setAvailabilityStatus] = useState<'idle' | 'checking' | 'approved'>('idle');
+  const [tripType, setTripType] = useState<'one-way' | 'multi'>('one-way');
 
   // Edit form state
   const [error, setError] = useState<string | null>(null);
@@ -180,6 +181,11 @@ function PreviewPageContent() {
               children_ages: details?.children_ages || Array(trip.children || 0).fill(null),
             };
           });
+
+          // Load tripType from localStorage
+          if (localData.tripType) {
+            setTripType(localData.tripType);
+          }
         } else {
           // Fallback: Load from Supabase if localStorage is empty
           console.log('localStorage empty, loading from Supabase...');
@@ -481,8 +487,10 @@ function PreviewPageContent() {
     localStorage.setItem(`booking_${bookingId}`, JSON.stringify(bookingData));
   }
 
-  // Continue directly to checkout (skip booking-details and summary)
+  // Continue directly to checkout (only save to localStorage, NOT Supabase)
   function handleContinue() {
+    if (!bookingId) return;
+
     // Validate that all required inline fields are filled
     const incompleteTrips = trips.filter(trip => !trip.pickup_address || !trip.dropoff_address);
     if (incompleteTrips.length > 0) {
@@ -499,6 +507,7 @@ function PreviewPageContent() {
       return;
     }
 
+    // Save to localStorage and navigate
     saveToLocalStorage(trips);
     router.push(`/checkout?booking_id=${bookingId}`);
   }
@@ -976,8 +985,8 @@ function PreviewPageContent() {
                 </div>
               )}
 
-              {/* Add Transfer Button */}
-              {!showAddTrip && editingIndex === null && (
+              {/* Add Transfer Button - Only show for multi-destination */}
+              {tripType === 'multi' && !showAddTrip && editingIndex === null && (
                 <button
                   onClick={startAddTrip}
                   className="w-full py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 font-medium hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-all flex items-center justify-center gap-2"

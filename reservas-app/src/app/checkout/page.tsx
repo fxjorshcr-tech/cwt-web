@@ -27,7 +27,10 @@ import { PRICING_CONFIG } from '@/lib/pricing-config';
 import {
   checkExistingTrips,
   loadTripsFromSupabase,
+  insertTripsWithRetry,
+  type TripForSupabase,
 } from '@/utils/supabaseHelpers';
+import { loadBookingFromLocalStorage } from '@/utils/localStorageHelpers';
 
 // Country codes with phone prefixes
 const COUNTRIES = [
@@ -138,7 +141,7 @@ function CheckoutPageContent() {
   // Get current country's phone prefix
   const currentCountry = COUNTRIES.find(c => c.code === customerInfo.country) || COUNTRIES[0];
 
-  // Cargar trips o tour booking desde Supabase
+  // Cargar trips desde localStorage primero, luego Supabase como fallback
   useEffect(() => {
     async function loadBooking() {
       if (!effectiveBookingId) return;
@@ -164,7 +167,50 @@ function CheckoutPageContent() {
           setTourBooking(tourData as TourBooking);
           setLoading(false);
         } else {
-          // Load shuttle trips from trips table
+          // First try to load from localStorage
+          const localData = loadBookingFromLocalStorage(bookingId as string);
+
+          if (localData && localData.trips && localData.trips.length > 0) {
+            // Convert localStorage format to Trip format
+            const localTrips: Trip[] = localData.trips.map((trip, index) => {
+              const details = localData.tripDetails?.[index];
+              const basePrice = trip.price || trip.calculatedPrice || 0;
+              const fees = basePrice * PRICING_CONFIG.FEES_PERCENTAGE;
+              const finalPrice = basePrice + fees;
+
+              // Filter out null children ages
+              const validChildrenAges = (details?.children_ages || []).filter((age: number | null): age is number => age !== null);
+
+              return {
+                id: `local_${index}`,
+                booking_id: bookingId as string,
+                from_location: trip.from_location,
+                to_location: trip.to_location,
+                date: trip.date,
+                pickup_time: details?.pickup_time || '09:00',
+                adults: trip.adults,
+                children: trip.children || 0,
+                price: basePrice,
+                final_price: Math.round(finalPrice * 100) / 100,
+                night_surcharge: details?.night_surcharge || 0,
+                add_ons: details?.add_ons || null,
+                add_ons_price: details?.add_ons_price || 0,
+                pickup_address: details?.pickup_address || null,
+                dropoff_address: details?.dropoff_address || null,
+                flight_number: details?.flight_number || null,
+                airline: details?.airline || null,
+                special_requests: details?.special_requests || null,
+                children_ages: validChildrenAges.length > 0 ? validChildrenAges : null,
+                duration: trip.duration || null,
+              };
+            });
+
+            setTrips(localTrips);
+            setLoading(false);
+            return;
+          }
+
+          // Fallback: Load from Supabase if localStorage is empty
           const existingTripIds = await checkExistingTrips(supabase, bookingId as string);
 
           if (existingTripIds.length === 0) {
