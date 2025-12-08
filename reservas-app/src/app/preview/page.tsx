@@ -907,34 +907,26 @@ function PreviewPageContent() {
                               <p className="text-sm font-semibold text-gray-900 leading-tight">{trip.from_location}</p>
                             </div>
                           </div>
-                          <div className="ml-8 flex gap-2">
-                            <div className="flex-1">
-                              <Input
-                                placeholder="Exact pickup address (hotel name, address...)"
-                                value={trip.pickup_address}
-                                onChange={(e) => updateTripField(index, 'pickup_address', e.target.value)}
-                                className="text-sm h-10"
-                              />
-                            </div>
-                            <div className="w-28">
-                              <label className="block text-[10px] text-blue-600 font-semibold uppercase mb-1">
-                                <Clock className="h-3 w-3 inline mr-0.5" />
-                                Pickup Time
-                              </label>
-                              <select
-                                value={trip.pickup_time}
-                                onChange={(e) => updateTripField(index, 'pickup_time', e.target.value)}
-                                className="w-full h-10 px-2 border border-blue-300 rounded-lg text-sm bg-blue-50 text-blue-800 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              >
-                                {Array.from({ length: 48 }, (_, i) => {
-                                  const hour = Math.floor(i / 2);
-                                  const minute = i % 2 === 0 ? '00' : '30';
-                                  const value = `${hour.toString().padStart(2, '0')}:${minute}`;
-                                  const label = `${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour}:${minute} ${hour < 12 ? 'AM' : 'PM'}`;
-                                  return <option key={value} value={value}>{label}</option>;
-                                })}
-                              </select>
-                            </div>
+                          <div className="ml-8 flex items-center gap-2">
+                            <Input
+                              placeholder="Exact pickup address (hotel name, address...)"
+                              value={trip.pickup_address}
+                              onChange={(e) => updateTripField(index, 'pickup_address', e.target.value)}
+                              className="text-sm h-10 flex-1"
+                            />
+                            <select
+                              value={trip.pickup_time}
+                              onChange={(e) => updateTripField(index, 'pickup_time', e.target.value)}
+                              className="h-10 px-2 border border-blue-300 rounded-lg text-sm bg-blue-50 text-blue-800 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                              {Array.from({ length: 48 }, (_, i) => {
+                                const hour = Math.floor(i / 2);
+                                const minute = i % 2 === 0 ? '00' : '30';
+                                const value = `${hour.toString().padStart(2, '0')}:${minute}`;
+                                const label = `${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour}:${minute} ${hour < 12 ? 'AM' : 'PM'}`;
+                                return <option key={value} value={value}>{label}</option>;
+                              })}
+                            </select>
                           </div>
                         </div>
 
