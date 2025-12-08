@@ -257,10 +257,10 @@ export function QuickSearchForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className={`bg-white rounded-2xl shadow-xl border border-gray-200 overflow-visible notranslate ${className}`}
+      className={`bg-white rounded-2xl shadow-xl border border-gray-200 overflow-visible notranslate w-full max-w-full ${className}`}
       translate="no"
     >
-      <div className="p-4 md:p-6">
+      <div className="p-3 sm:p-4 md:p-6 w-full">
         {/* Trip Type Toggle */}
         <div className="flex items-center gap-4 mb-4">
           <div className="flex items-center gap-1">

@@ -126,7 +126,7 @@ export function LocationAutocomplete({
   };
 
   return (
-    <div className="space-y-1.5 relative notranslate" translate="no">
+    <div className="space-y-1.5 relative notranslate w-full overflow-visible" translate="no">
       {label && (
         <label className={`flex items-center gap-1.5 text-xs font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
           <MapPin className={`h-3.5 w-3.5 ${type === 'origin' ? 'text-blue-500' : 'text-orange-500'}`} />
@@ -134,7 +134,7 @@ export function LocationAutocomplete({
         </label>
       )}
 
-      <div className="relative">
+      <div className="relative w-full">
         <MapPin className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none z-10 ${
           type === 'origin' ? 'text-blue-500' : 'text-orange-500'
         }`} />
