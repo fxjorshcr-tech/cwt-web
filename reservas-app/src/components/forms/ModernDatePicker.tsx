@@ -244,7 +244,7 @@ export function ModernDatePicker({
         aria-label="Select travel date"
         aria-expanded={isOpen}
         aria-haspopup="dialog"
-        className={`w-full px-4 py-3 text-left rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+        className={`w-full px-4 py-3 text-[16px] text-left rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
           darkMode
             ? 'bg-white/10 border border-white/20 hover:border-white/40'
             : 'bg-white border border-gray-300 hover:border-gray-400'

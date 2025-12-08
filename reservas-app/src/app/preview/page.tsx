@@ -980,7 +980,7 @@ function PreviewPageContent() {
                             placeholder="Pickup address (hotel, Airbnb...)"
                             value={trip.pickup_address}
                             onChange={(e) => updateTripField(index, 'pickup_address', e.target.value)}
-                            className="text-sm h-9"
+                            className="h-10"
                           />
                         </div>
 
@@ -999,7 +999,7 @@ function PreviewPageContent() {
                             placeholder="Drop-off address (hotel, Airbnb...)"
                             value={trip.dropoff_address}
                             onChange={(e) => updateTripField(index, 'dropoff_address', e.target.value)}
-                            className="text-sm h-9"
+                            className="h-10"
                           />
                         </div>
 
@@ -1020,7 +1020,7 @@ function PreviewPageContent() {
                                 placeholder="e.g. AA1234"
                                 value={trip.flight_number}
                                 onChange={(e) => updateTripField(index, 'flight_number', e.target.value)}
-                                className="text-sm h-10"
+                                className="h-10"
                               />
                             </div>
                             <div>
@@ -1031,7 +1031,7 @@ function PreviewPageContent() {
                                 placeholder="e.g. American Airlines"
                                 value={trip.airline}
                                 onChange={(e) => updateTripField(index, 'airline', e.target.value)}
-                                className="text-sm h-10"
+                                className="h-10"
                               />
                             </div>
                           </div>

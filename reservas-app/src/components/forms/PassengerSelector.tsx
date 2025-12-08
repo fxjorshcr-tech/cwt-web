@@ -90,7 +90,7 @@ export function PassengerSelector({
         aria-label="Select number of passengers"
         aria-expanded={isOpen}
         aria-haspopup="dialog"
-        className="w-full px-4 py-3 text-left bg-white border border-gray-300 rounded-lg hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+        className="w-full px-4 py-3 text-[16px] text-left bg-white border border-gray-300 rounded-lg hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
       >
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
