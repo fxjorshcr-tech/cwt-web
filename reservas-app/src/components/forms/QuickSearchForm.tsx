@@ -393,80 +393,61 @@ export function QuickSearchForm({
         {/* Trip rows */}
         <div className="space-y-3">
           {trips.map((trip, index) => (
-            <div key={index} className="flex flex-wrap items-end gap-2">
-              {/* Origin */}
-              <div className="flex-1 min-w-[180px]">
-                <LocationAutocomplete
-                  placeholder="Where from?"
-                  value={trip.origin}
-                  onChange={(val) => updateTrip(index, 'origin', val)}
-                  routes={routes}
-                  filterByDestination={trip.destination}
-                  type="origin"
-                  darkMode
-                />
+            <div key={index} className="bg-white/5 rounded-xl p-3 border border-white/10">
+              <div className="flex flex-wrap items-center gap-3">
+                {/* Origin */}
+                <div className="flex-1 min-w-[200px]">
+                  <LocationAutocomplete
+                    placeholder="Where from?"
+                    value={trip.origin}
+                    onChange={(val) => updateTrip(index, 'origin', val)}
+                    routes={routes}
+                    filterByDestination={trip.destination}
+                    type="origin"
+                  />
+                </div>
+
+                {/* Destination */}
+                <div className="flex-1 min-w-[200px]">
+                  <LocationAutocomplete
+                    placeholder={trip.origin ? "Where to?" : "Select origin first"}
+                    value={trip.destination}
+                    onChange={(val) => updateTrip(index, 'destination', val)}
+                    routes={routes}
+                    filterByOrigin={trip.origin}
+                    disabled={!trip.origin}
+                    type="destination"
+                  />
+                </div>
+
+                {/* Date & Time */}
+                <div className="w-56">
+                  <ModernDatePicker
+                    value={trip.date}
+                    onChange={(date) => updateTrip(index, 'date', date)}
+                    enforceMinimumAdvance={true}
+                    showTimePicker={true}
+                    selectedTime={trip.pickupTime}
+                    onTimeChange={(time) => updateTrip(index, 'pickupTime', time)}
+                  />
+                </div>
+
+                {/* Remove button (only for multi with more than 1 trip) */}
+                {tripType === 'multi' && trips.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeTrip(index)}
+                    className="h-11 w-11 flex items-center justify-center text-gray-400 hover:text-red-400 hover:bg-red-500/20 rounded-lg transition-colors"
+                  >
+                    <Trash2 className="h-5 w-5" />
+                  </button>
+                )}
               </div>
-
-              {/* Destination */}
-              <div className="flex-1 min-w-[180px]">
-                <LocationAutocomplete
-                  placeholder={trip.origin ? "Where to?" : "Select origin first"}
-                  value={trip.destination}
-                  onChange={(val) => updateTrip(index, 'destination', val)}
-                  routes={routes}
-                  filterByOrigin={trip.origin}
-                  disabled={!trip.origin}
-                  type="destination"
-                  darkMode
-                />
-              </div>
-
-              {/* Date & Time */}
-              <div className="w-48">
-                <ModernDatePicker
-                  value={trip.date}
-                  onChange={(date) => updateTrip(index, 'date', date)}
-                  enforceMinimumAdvance={true}
-                  showTimePicker={true}
-                  selectedTime={trip.pickupTime}
-                  onTimeChange={(time) => updateTrip(index, 'pickupTime', time)}
-                  darkMode
-                />
-              </div>
-
-              {/* Remove button (only for multi with more than 1 trip) */}
-              {tripType === 'multi' && trips.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => removeTrip(index)}
-                  className="h-12 w-12 flex items-center justify-center text-gray-400 hover:text-red-400 hover:bg-red-500/20 rounded-lg transition-colors"
-                >
-                  <Trash2 className="h-5 w-5" />
-                </button>
-              )}
-
-              {/* Search button - only on last row */}
-              {index === trips.length - 1 && (
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="h-12 px-6 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
-                >
-                  {availabilityStatus === 'checking' ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                  ) : availabilityStatus === 'approved' ? (
-                    <CheckCircle className="h-5 w-5" />
-                  ) : (
-                    <Search className="h-5 w-5" />
-                  )}
-                  <span className="hidden sm:inline">Find a ride</span>
-                </button>
-              )}
             </div>
           ))}
         </div>
 
-        {/* Add destination button (only for multi-city) */}
+        {/* Add destination button (only for multi-city) - before search */}
         {tripType === 'multi' && (
           <button
             type="button"
@@ -477,6 +458,22 @@ export function QuickSearchForm({
             Add destination
           </button>
         )}
+
+        {/* Search Button - Full width below trips */}
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="mt-4 w-full h-12 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+        >
+          {availabilityStatus === 'checking' ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : availabilityStatus === 'approved' ? (
+            <CheckCircle className="h-5 w-5" />
+          ) : (
+            <Search className="h-5 w-5" />
+          )}
+          <span>Find a ride</span>
+        </button>
 
         {/* Info Pills */}
         <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-gray-400">

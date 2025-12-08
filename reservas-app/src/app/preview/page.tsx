@@ -131,6 +131,7 @@ function PreviewPageContent() {
   const [editOrigin, setEditOrigin] = useState('');
   const [editDestination, setEditDestination] = useState('');
   const [editDate, setEditDate] = useState<Date | null>(null);
+  const [editPickupTime, setEditPickupTime] = useState('09:00');
   const [editAdults, setEditAdults] = useState(2);
   const [editChildren, setEditChildren] = useState(0);
 
@@ -308,6 +309,7 @@ function PreviewPageContent() {
     setEditOrigin(trip.from_location || '');
     setEditDestination(trip.to_location || '');
     setEditDate(trip.date ? parseDateFromString(trip.date) : null);
+    setEditPickupTime(trip.pickup_time || '09:00');
     setEditAdults(trip.adults || 1);
     setEditChildren(trip.children || 0);
     setEditingIndex(index);
@@ -358,7 +360,7 @@ function PreviewPageContent() {
       routeId: route.id,
       pickup_address: existingTrip.pickup_address || '',
       dropoff_address: existingTrip.dropoff_address || '',
-      pickup_time: existingTrip.pickup_time || '09:00',
+      pickup_time: editPickupTime,
       children_ages: childrenAges,
     };
 
@@ -381,6 +383,7 @@ function PreviewPageContent() {
       setEditOrigin('');
       setEditDestination('');
       setEditDate(null);
+      setEditPickupTime('09:00');
       setEditAdults(2);
       setEditChildren(0);
       setShowAddTrip(true);
@@ -391,7 +394,8 @@ function PreviewPageContent() {
     const lastTrip = trips[trips.length - 1];
     setEditOrigin(lastTrip?.to_location || '');
     setEditDestination('');
-    setEditDate(lastTrip?.date ? parseDateFromString(lastTrip.date) : null);
+    setEditDate(null); // New trip should have empty date
+    setEditPickupTime('09:00');
     setEditAdults(lastTrip?.adults || 2);
     setEditChildren(lastTrip?.children || 0);
     setShowAddTrip(true);
@@ -435,7 +439,7 @@ function PreviewPageContent() {
       routeId: route.id,
       pickup_address: '',
       dropoff_address: '',
-      pickup_time: '09:00',
+      pickup_time: editPickupTime,
       children_ages: Array(editChildren).fill(null),
     };
 
@@ -572,13 +576,16 @@ function PreviewPageContent() {
         </div>
 
         <div className="grid sm:grid-cols-2 gap-4 relative z-20">
-          {/* Date */}
+          {/* Date & Time */}
           <div className="relative z-20">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Travel Date & Time</label>
             <ModernDatePicker
-              label="Travel Date"
               value={editDate}
               onChange={setEditDate}
               enforceMinimumAdvance={true}
+              showTimePicker={true}
+              selectedTime={editPickupTime}
+              onTimeChange={setEditPickupTime}
             />
           </div>
 
