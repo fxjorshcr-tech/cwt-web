@@ -93,15 +93,15 @@ export function TripAddOns({ selectedAddOns, onAddOnsChange }: TripAddOnsProps) 
   };
 
   return (
-    <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200 notranslate" translate="no">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base md:text-lg flex items-center gap-2 text-blue-900">
-          <Sparkles className="h-5 w-5" />
+    <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200 notranslate overflow-hidden" translate="no">
+      <CardHeader className="pb-3 px-3 sm:px-6">
+        <CardTitle className="text-sm sm:text-base md:text-lg flex items-center gap-2 text-blue-900">
+          <Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />
           Enhance Your Experience
         </CardTitle>
       </CardHeader>
-      
-      <CardContent className="space-y-3 pt-0">
+
+      <CardContent className="space-y-3 pt-0 px-3 sm:px-6">
         {/* Social Proof Banner */}
         <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
           <Users className="h-4 w-4 text-green-600 flex-shrink-0" />
@@ -143,7 +143,7 @@ export function TripAddOns({ selectedAddOns, onAddOnsChange }: TripAddOnsProps) 
                 </div>
               )}
 
-              <div className="flex items-start gap-2 md:gap-3">
+              <div className="flex items-start gap-2">
                 {/* Checkbox */}
                 <div className="flex-shrink-0 mt-0.5">
                   <input

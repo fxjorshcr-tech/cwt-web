@@ -852,18 +852,18 @@ function PreviewPageContent() {
       </div>
 
       {/* Main Content */}
-      <div className="bg-gray-50 py-6 sm:py-8 pb-24 overflow-x-hidden">
-        <div className="max-w-5xl mx-auto px-3 sm:px-4">
-          <div className="grid lg:grid-cols-3 gap-6">
+      <div className="bg-gray-50 py-6 sm:py-8 pb-24 overflow-x-hidden w-full max-w-[100vw]">
+        <div className="max-w-5xl mx-auto px-3 sm:px-4 w-full overflow-hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 w-full">
             {/* Left Column: Trips */}
-            <div className="lg:col-span-2 space-y-4">
+            <div className="lg:col-span-2 space-y-4 w-full min-w-0">
               {trips.map((trip, index) => (
                 <div
                   key={index}
-                  className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
+                  className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden w-full"
                 >
                   {/* Trip Header */}
-                  <div className="bg-gradient-to-r from-blue-50 to-blue-100 px-5 py-3 border-b border-blue-200 flex items-center justify-between">
+                  <div className="bg-gradient-to-r from-blue-50 to-blue-100 px-3 sm:px-5 py-3 border-b border-blue-200 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="h-7 w-7 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-semibold">
                         {index + 1}
@@ -939,21 +939,22 @@ function PreviewPageContent() {
                       </div>
 
                       {/* Route Display with inline inputs */}
-                      <div className="space-y-4 mb-4">
-                        {/* FROM section with pickup address and time */}
+                      <div className="space-y-3 mb-4">
+                        {/* FROM section */}
                         <div className="space-y-2">
-                          <div className="flex items-center justify-between gap-2">
-                            <div className="flex items-center gap-2 min-w-0 flex-1">
-                              <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                                <MapPin className="h-3 w-3 text-blue-600" />
-                              </div>
-                              <div className="min-w-0">
-                                <p className="text-[10px] text-gray-500 uppercase">From</p>
-                                <p className="text-sm font-semibold text-gray-900 leading-tight truncate">{trip.from_location}</p>
-                              </div>
+                          <div className="flex items-center gap-2">
+                            <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                              <MapPin className="h-3 w-3 text-blue-600" />
                             </div>
-                            {/* Pickup Time */}
-                            <div className={`flex items-center gap-1 px-2 py-1.5 rounded-lg flex-shrink-0 ${
+                            <div className="min-w-0 flex-1">
+                              <p className="text-[10px] text-gray-500 uppercase">From</p>
+                              <p className="text-sm font-semibold text-gray-900 leading-tight truncate">{trip.from_location}</p>
+                            </div>
+                          </div>
+                          {/* Pickup Time - own row */}
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-600">Pickup Time:</span>
+                            <div className={`flex items-center gap-1 px-3 py-1.5 rounded-lg ${
                               trip.pickup_time
                                 ? 'bg-blue-600 text-white'
                                 : 'bg-orange-500 text-white animate-pulse'
@@ -962,9 +963,9 @@ function PreviewPageContent() {
                               <select
                                 value={trip.pickup_time}
                                 onChange={(e) => updateTripField(index, 'pickup_time', e.target.value)}
-                                className="bg-transparent text-white text-xs font-semibold focus:outline-none cursor-pointer"
+                                className="bg-transparent text-white text-sm font-semibold focus:outline-none cursor-pointer"
                               >
-                                <option value="" className="text-gray-900">Time</option>
+                                <option value="" className="text-gray-900">Select time</option>
                                 {Array.from({ length: 48 }, (_, i) => {
                                   const hour = Math.floor(i / 2);
                                   const minute = i % 2 === 0 ? '00' : '30';
@@ -989,7 +990,7 @@ function PreviewPageContent() {
                             <div className="h-6 w-6 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
                               <MapPin className="h-3 w-3 text-orange-500" />
                             </div>
-                            <div className="min-w-0">
+                            <div className="min-w-0 flex-1">
                               <p className="text-[10px] text-gray-500 uppercase">To</p>
                               <p className="text-sm font-semibold text-gray-900 leading-tight truncate">{trip.to_location}</p>
                             </div>
