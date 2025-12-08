@@ -894,6 +894,42 @@ function PreviewPageContent() {
                   ) : (
                     // View Mode
                     <div className="p-4 sm:p-5">
+                      {/* Availability & Alerts - TOP */}
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {/* Dynamic Availability - PROMINENT */}
+                        {(() => {
+                          const availableVans = getAvailabilityCount(trip.from_location, trip.to_location, trip.date);
+                          return (
+                            <div className={`flex items-center gap-2 px-3 py-2 rounded-lg ${
+                              availableVans <= 2
+                                ? 'bg-red-100 border border-red-300'
+                                : 'bg-green-100 border border-green-300'
+                            }`}>
+                              <Car className={`h-4 w-4 ${availableVans <= 2 ? 'text-red-600' : 'text-green-600'}`} />
+                              <span className={`text-sm font-bold ${availableVans <= 2 ? 'text-red-700' : 'text-green-700'}`}>
+                                {availableVans === 1 ? 'Only 1 van left!' : `${availableVans} vans available`}
+                              </span>
+                            </div>
+                          );
+                        })()}
+
+                        {/* High Season Alert */}
+                        {isHighSeason(trip.date) && (
+                          <div className="flex items-center gap-2 px-3 py-2 bg-amber-100 border border-amber-300 rounded-lg">
+                            <AlertTriangle className="h-4 w-4 text-amber-600" />
+                            <span className="text-sm font-bold text-amber-700">High Season</span>
+                          </div>
+                        )}
+
+                        {/* Popular Route Badge */}
+                        {isPopularRoute(trip.from_location, trip.to_location) && (
+                          <div className="flex items-center gap-2 px-3 py-2 bg-orange-100 border border-orange-300 rounded-lg">
+                            <Flame className="h-4 w-4 text-orange-500" />
+                            <span className="text-sm font-bold text-orange-700">Popular Route</span>
+                          </div>
+                        )}
+                      </div>
+
                       {/* Route Display with inline inputs */}
                       <div className="space-y-4 mb-4">
                         {/* FROM section with pickup address and time */}
@@ -1003,8 +1039,8 @@ function PreviewPageContent() {
                                 <span className="px-3 py-1.5 text-sm font-medium min-w-[2rem] text-center">{trip.adults}</span>
                                 <button
                                   type="button"
-                                  onClick={() => updateTripPassengers(index, Math.min(8, trip.adults + 1), trip.children)}
-                                  disabled={trip.adults + trip.children >= 8}
+                                  onClick={() => updateTripPassengers(index, Math.min(12, trip.adults + 1), trip.children)}
+                                  disabled={trip.adults + trip.children >= 12}
                                   className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                   +
@@ -1026,8 +1062,8 @@ function PreviewPageContent() {
                                 <span className="px-3 py-1.5 text-sm font-medium min-w-[2rem] text-center">{trip.children}</span>
                                 <button
                                   type="button"
-                                  onClick={() => updateTripPassengers(index, trip.adults, Math.min(7, trip.children + 1))}
-                                  disabled={trip.adults + trip.children >= 8}
+                                  onClick={() => updateTripPassengers(index, trip.adults, Math.min(11, trip.children + 1))}
+                                  disabled={trip.adults + trip.children >= 12}
                                   className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                   +
@@ -1066,58 +1102,6 @@ function PreviewPageContent() {
                           selectedAddOns={trip.add_ons || []}
                           onAddOnsChange={(addOns) => updateTripAddOns(index, addOns)}
                         />
-                      </div>
-
-                      {/* Status Badges & Alerts */}
-                      <div className="space-y-2 mb-4">
-                        {/* Popular Route Badge */}
-                        {isPopularRoute(trip.from_location, trip.to_location) && (
-                          <div className="flex items-center gap-2 px-3 py-2 bg-orange-50 border border-orange-200 rounded-lg">
-                            <Flame className="h-4 w-4 text-orange-500 flex-shrink-0" />
-                            <p className="text-xs text-orange-800">
-                              <span className="font-semibold">Popular Route</span> — One of our most requested connections
-                            </p>
-                          </div>
-                        )}
-
-                        {/* High Season Alert */}
-                        {isHighSeason(trip.date) && (
-                          <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg">
-                            <AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0" />
-                            <p className="text-xs text-amber-800">
-                              <span className="font-semibold">High Season</span> — Peak travel period, limited availability
-                            </p>
-                          </div>
-                        )}
-
-                        {/* Dynamic Availability */}
-                        {(() => {
-                          const availableVans = getAvailabilityCount(trip.from_location, trip.to_location, trip.date);
-                          const totalVans = 8;
-                          return (
-                            <div className="flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg">
-                              <Car className="h-4 w-4 text-green-600 flex-shrink-0" />
-                              <div className="flex-1">
-                                <p className="text-xs text-green-800">
-                                  <span className="font-semibold">
-                                    {availableVans === 1 ? 'Only 1 van' : `${availableVans} vans`} available
-                                  </span>
-                                </p>
-                                {/* Visual indicator */}
-                                <div className="flex gap-1 mt-1">
-                                  {Array.from({ length: totalVans }).map((_, i) => (
-                                    <div
-                                      key={i}
-                                      className={`h-1.5 w-3 rounded-full ${
-                                        i < availableVans ? 'bg-green-500' : 'bg-gray-300'
-                                      }`}
-                                    />
-                                  ))}
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })()}
                       </div>
 
                       {/* Trip Details - 2x2 grid on mobile */}
