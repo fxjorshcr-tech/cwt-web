@@ -173,7 +173,7 @@ export function ModernDatePicker({
 
     // Empty cells for days before month starts
     for (let i = 0; i < firstDay; i++) {
-      days.push(<div key={`empty-${i}`} className="h-10" />);
+      days.push(<div key={`empty-${i}`} className="h-8 sm:h-10" />);
     }
 
     // Render each day
@@ -198,7 +198,7 @@ export function ModernDatePicker({
         date.getMonth() === value.getMonth() &&
         date.getFullYear() === value.getFullYear();
 
-      let buttonClass = 'h-10 w-full rounded-lg text-sm font-medium transition-colors ';
+      let buttonClass = 'h-8 sm:h-10 w-full rounded-lg text-xs sm:text-sm font-medium transition-colors ';
       if (isDisabled) {
         buttonClass += 'text-gray-300 cursor-not-allowed';
       } else if (isSelected) {
@@ -259,8 +259,8 @@ export function ModernDatePicker({
       </button>
 
       {isOpen && (
-        <div 
-          className="absolute z-50 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 p-4 w-80"
+        <div
+          className="absolute z-50 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 p-3 sm:p-4 left-0 right-0 sm:left-auto sm:right-auto sm:w-80"
           role="dialog"
           aria-label="Date picker"
         >
@@ -294,10 +294,10 @@ export function ModernDatePicker({
             {weekDays.map((day) => (
               <div
                 key={day}
-                className="h-10 flex items-center justify-center text-xs font-medium text-gray-500"
+                className="h-6 sm:h-10 flex items-center justify-center text-[10px] sm:text-xs font-medium text-gray-500"
                 aria-label={day}
               >
-                {day}
+                {day.slice(0, 2)}
               </div>
             ))}
           </div>

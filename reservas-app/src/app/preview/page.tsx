@@ -821,7 +821,7 @@ function PreviewPageContent() {
   }
 
   return (
-    <>
+    <div className="min-h-screen overflow-x-hidden">
       <BookingNavbar />
 
       {/* Hero */}
@@ -845,8 +845,8 @@ function PreviewPageContent() {
       </section>
 
       {/* Stepper */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
-        <div className="max-w-5xl mx-auto px-4 py-6">
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm overflow-hidden">
+        <div className="max-w-5xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
           <BookingStepper currentStep={1} />
         </div>
       </div>
@@ -1387,7 +1387,7 @@ function PreviewPageContent() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
