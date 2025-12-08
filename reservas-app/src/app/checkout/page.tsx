@@ -608,366 +608,355 @@ function CheckoutPageContent() {
         )}
 
         <div className="py-6 sm:py-10">
-          <div className="max-w-4xl mx-auto px-4">
-            <div className="grid lg:grid-cols-5 gap-6 lg:gap-8">
+          <div className="max-w-4xl mx-auto px-4 space-y-6">
 
-              {/* LEFT COLUMN - Billing Form (wider) */}
-              <div className="lg:col-span-3 space-y-6">
+            {/* ============================================ */}
+            {/* SECTION 1: ORDER SUMMARY - Full Width */}
+            {/* ============================================ */}
+            <Card className="shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+                <CardTitle className="text-white text-xl">Order Summary</CardTitle>
+                <CardDescription className="text-blue-100">
+                  Review your {isTourBooking ? 'tour' : trips.length > 1 ? 'transfers' : 'transfer'} details
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-0">
 
-                {/* Billing Information Card */}
-                <Card className="shadow-lg">
-                  <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
-                    <div className="flex items-center gap-3">
-                      <CreditCard className="h-6 w-6" />
+                {/* Tour Booking */}
+                {isTourBooking && tourBooking && (
+                  <div className="p-6">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <p className="text-lg font-bold text-gray-900">{tourBooking.tour_name}</p>
+                        <p className="text-sm text-gray-500 mt-1" suppressHydrationWarning>
+                          {formatDate(tourBooking.date)} • {tourBooking.adults + tourBooking.children} passengers
+                        </p>
+                        <p className="text-sm text-gray-500">Pickup: {tourBooking.hotel}</p>
+                      </div>
+                      <p className="text-xl font-bold text-blue-600">{formatCurrency(tourBooking.total_price)}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Shuttle Trips - Beautiful Cards */}
+                {!isTourBooking && trips.map((trip, index) => (
+                  <div key={trip.id} className={`p-6 ${index > 0 ? 'border-t border-gray-200' : ''}`}>
+                    {/* Trip Header */}
+                    <div className="flex items-start justify-between mb-4">
                       <div>
-                        <CardTitle className="text-white text-xl">Billing Information</CardTitle>
-                        <CardDescription className="text-blue-100">
-                          Enter your details to complete the payment
-                        </CardDescription>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-6 space-y-5">
-                    {/* Name fields */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="firstName" className="text-sm font-medium">First Name *</Label>
-                        <Input
-                          id="firstName"
-                          value={customerInfo.firstName}
-                          onChange={(e) => handleCustomerInfoChange('firstName', e.target.value)}
-                          placeholder="John"
-                          disabled={isProcessingPayment}
-                          className={`h-11 mt-1.5 ${formErrors.firstName ? 'border-red-500' : ''}`}
-                        />
-                        {formErrors.firstName && (
-                          <p className="text-red-500 text-xs mt-1">{formErrors.firstName}</p>
-                        )}
-                      </div>
-                      <div>
-                        <Label htmlFor="lastName" className="text-sm font-medium">Last Name *</Label>
-                        <Input
-                          id="lastName"
-                          value={customerInfo.lastName}
-                          onChange={(e) => handleCustomerInfoChange('lastName', e.target.value)}
-                          placeholder="Doe"
-                          disabled={isProcessingPayment}
-                          className={`h-11 mt-1.5 ${formErrors.lastName ? 'border-red-500' : ''}`}
-                        />
-                        {formErrors.lastName && (
-                          <p className="text-red-500 text-xs mt-1">{formErrors.lastName}</p>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Email */}
-                    <div>
-                      <Label htmlFor="email" className="text-sm font-medium">Email Address *</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={customerInfo.email}
-                        onChange={(e) => handleCustomerInfoChange('email', e.target.value)}
-                        placeholder="john@example.com"
-                        disabled={isProcessingPayment}
-                        className={`h-11 mt-1.5 ${formErrors.email ? 'border-red-500' : ''}`}
-                      />
-                      {formErrors.email && (
-                        <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>
-                      )}
-                      <p className="text-xs text-gray-500 mt-1">We'll send your confirmation to this email</p>
-                    </div>
-
-                    {/* Country */}
-                    <div>
-                      <Label htmlFor="country" className="text-sm font-medium">Country *</Label>
-                      <select
-                        id="country"
-                        value={customerInfo.country}
-                        onChange={(e) => handleCustomerInfoChange('country', e.target.value)}
-                        disabled={isProcessingPayment}
-                        className="w-full h-11 mt-1.5 px-3 rounded-md border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        {COUNTRIES.map((country) => (
-                          <option key={country.code} value={country.code}>
-                            {country.name} ({country.phonePrefix})
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Phone with country code */}
-                    <div>
-                      <Label htmlFor="phone" className="text-sm font-medium">Phone Number *</Label>
-                      <div className="flex gap-2 mt-1.5">
-                        <div className="flex items-center justify-center px-4 h-11 bg-gray-100 border border-gray-300 rounded-md text-sm font-medium min-w-[70px]">
-                          {currentCountry.phonePrefix}
-                        </div>
-                        <Input
-                          id="phone"
-                          type="tel"
-                          value={phoneNumber}
-                          onChange={(e) => handlePhoneChange(e.target.value)}
-                          placeholder="8888 8888"
-                          disabled={isProcessingPayment}
-                          className={`flex-1 h-11 ${formErrors.phone ? 'border-red-500' : ''}`}
-                        />
-                      </div>
-                      {formErrors.phone && (
-                        <p className="text-red-500 text-xs mt-1">{formErrors.phone}</p>
-                      )}
-                    </div>
-
-                    {/* Security badge */}
-                    <div className="flex items-center gap-3 text-sm text-gray-600 bg-green-50 rounded-lg p-4 border border-green-100">
-                      <Shield className="h-6 w-6 text-green-600 flex-shrink-0" />
-                      <div>
-                        <p className="font-medium text-green-800">Secure Payment</p>
-                        <p className="text-xs text-green-700">Your data is protected with 256-bit SSL encryption</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Back button */}
-                <Button
-                  onClick={() => {
-                    if (isTourBooking) {
-                      router.push('/private-tours');
-                    } else {
-                      router.push(`/preview?booking_id=${bookingId}`);
-                    }
-                  }}
-                  variant="ghost"
-                  className="text-gray-600 hover:text-gray-900"
-                >
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  {isTourBooking ? 'Back to Tours' : 'Back to Trip Details'}
-                </Button>
-              </div>
-
-              {/* RIGHT COLUMN - Order Summary */}
-              <div className="lg:col-span-2">
-                <div className="lg:sticky lg:top-[100px] space-y-4">
-
-                  {/* Order Summary Card */}
-                  <Card className="shadow-lg">
-                    <CardHeader className="border-b border-gray-200 pb-3">
-                      <CardTitle className="text-lg">Order Summary</CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-4 space-y-4">
-
-                      {/* Tour Booking */}
-                      {isTourBooking && tourBooking && (
-                        <div>
-                          <div className="flex justify-between items-start">
-                            <div className="flex-1">
-                              <p className="text-sm font-semibold text-gray-900">
-                                {tourBooking.tour_name}
-                              </p>
-                              <p className="text-xs text-gray-500 mt-0.5" suppressHydrationWarning>
-                                {formatDate(tourBooking.date)} • {tourBooking.adults + tourBooking.children} passengers
-                              </p>
-                              <p className="text-xs text-gray-500 mt-0.5">
-                                Pickup: {tourBooking.hotel}
-                              </p>
-                            </div>
-                            <p className="text-sm font-bold text-gray-900">
-                              {formatCurrency(tourBooking.total_price)}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Shuttle Trips - Full Details */}
-                      {!isTourBooking && trips.map((trip, index) => (
-                        <div key={trip.id} className={`${index > 0 ? 'pt-4 border-t border-gray-200' : ''}`}>
-                          {/* Trip Header */}
-                          <div className="flex justify-between items-start mb-3">
-                            <div className="flex-1">
-                              <p className="text-sm font-bold text-gray-900">
-                                {trips.length > 1 ? `Transfer ${index + 1}` : 'Transfer'}
-                              </p>
-                              <p className="text-xs font-semibold text-blue-600 mt-0.5">
-                                {trip.from_location} → {trip.to_location}
-                              </p>
-                            </div>
-                            <p className="text-base font-bold text-gray-900">
-                              {formatCurrency(trip.final_price || trip.price)}
-                            </p>
-                          </div>
-
-                          {/* Trip Details Grid */}
-                          <div className="bg-gray-50 rounded-lg p-3 space-y-2 text-xs">
-                            {/* Date & Time */}
-                            <div className="flex justify-between">
-                              <span className="text-gray-500">Date & Time:</span>
-                              <span className="font-medium text-gray-900" suppressHydrationWarning>
-                                {formatDate(trip.date)} at {trip.pickup_time || 'Not set'}
-                              </span>
-                            </div>
-
-                            {/* Passengers */}
-                            <div className="flex justify-between">
-                              <span className="text-gray-500">Passengers:</span>
-                              <span className="font-medium text-gray-900">
-                                {trip.adults} adult{trip.adults !== 1 ? 's' : ''}{trip.children > 0 ? `, ${trip.children} child${trip.children !== 1 ? 'ren' : ''}` : ''}
-                              </span>
-                            </div>
-
-                            {/* Pickup Address */}
-                            <div className="flex justify-between gap-2">
-                              <span className="text-gray-500 flex-shrink-0">Pickup:</span>
-                              <span className="font-medium text-gray-900 text-right">
-                                {trip.pickup_address || 'Not specified'}
-                              </span>
-                            </div>
-
-                            {/* Dropoff Address */}
-                            <div className="flex justify-between gap-2">
-                              <span className="text-gray-500 flex-shrink-0">Drop-off:</span>
-                              <span className="font-medium text-gray-900 text-right">
-                                {trip.dropoff_address || 'Not specified'}
-                              </span>
-                            </div>
-
-                            {/* Flight Info - if available */}
-                            {trip.flight_number && (
-                              <div className="flex justify-between">
-                                <span className="text-gray-500">Flight:</span>
-                                <span className="font-medium text-gray-900">
-                                  {trip.airline ? `${trip.airline} ` : ''}{trip.flight_number}
-                                </span>
-                              </div>
-                            )}
-
-                            {/* Add-ons - if any */}
-                            {trip.add_ons && trip.add_ons.length > 0 && (
-                              <div className="flex justify-between pt-2 border-t border-gray-200">
-                                <span className="text-gray-500">Add-ons:</span>
-                                <span className="font-medium text-blue-600">
-                                  {trip.add_ons.includes('travel_flex') && 'Travel Flex'}
-                                  {trip.add_ons.includes('travel_flex') && trip.add_ons.includes('explorer_upgrade') && ', '}
-                                  {trip.add_ons.includes('explorer_upgrade') && 'Explorer Upgrade'}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-
-                      {/* Separator */}
-                      <div className="border-t border-gray-200" />
-
-                      {/* Subtotal & Fees - Only for shuttles */}
-                      {!isTourBooking && (
-                        <div className="space-y-2">
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600">Subtotal</span>
-                            <span className="text-sm font-semibold">{formatCurrency(grandTotal)}</span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600">Service Fee ({(PRICING_CONFIG.FEES_PERCENTAGE * 100).toFixed(0)}%)</span>
-                            <span className="text-sm font-medium text-gray-600">
-                              +{formatCurrency(grandTotal * PRICING_CONFIG.FEES_PERCENTAGE)}
-                            </span>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Tour pricing note */}
-                      {isTourBooking && (
-                        <div className="text-xs text-gray-500 text-center">
-                          All-inclusive price • No additional fees
-                        </div>
-                      )}
-
-                      {/* Separator */}
-                      <div className="border-t border-gray-200" />
-
-                      {/* Total */}
-                      <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4">
-                        <div className="flex justify-between items-center">
-                          <span className="text-base font-bold text-gray-900">Total</span>
-                          <span className="text-2xl font-bold text-blue-600">
-                            {formatCurrency(totalWithFees)}
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-1 rounded">
+                            {trips.length > 1 ? `Transfer ${index + 1}` : 'Transfer'}
+                          </span>
+                          <span className="text-xs text-gray-500" suppressHydrationWarning>
+                            {formatDate(trip.date)}
                           </span>
                         </div>
-                      </div>
-
-                      {/* Terms & Pay Button */}
-                      <div className="space-y-3">
-                        <TermsCheckbox
-                          checked={termsAccepted}
-                          onChange={setTermsAccepted}
-                          error={false}
-                        />
-
-                        <Button
-                          onClick={handlePayNow}
-                          disabled={!termsAccepted || isProcessingPayment}
-                          className="w-full h-12 bg-green-600 hover:bg-green-700 text-white text-base font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {isProcessingPayment ? (
-                            <>
-                              <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                              Processing...
-                            </>
-                          ) : (
-                            <>
-                              <Lock className="h-5 w-5 mr-2" />
-                              Pay {formatCurrency(totalWithFees)}
-                            </>
-                          )}
-                        </Button>
-
-                        <p className="text-xs text-center text-gray-500">
-                          You will be redirected to our secure payment provider
+                        <h3 className="text-lg font-bold text-gray-900">
+                          {trip.from_location}
+                        </h3>
+                        <p className="text-sm text-gray-500 flex items-center gap-1">
+                          <span>→</span>
+                          <span className="font-medium text-gray-700">{trip.to_location}</span>
                         </p>
                       </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* ICT License Badge */}
-                  <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-                    <div className="flex items-center gap-3">
-                      <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Shield className="h-6 w-6 text-blue-600" />
+                      <div className="text-right">
+                        <p className="text-2xl font-bold text-blue-600">
+                          {formatCurrency(trip.final_price || trip.price)}
+                        </p>
+                        {trip.add_ons && trip.add_ons.length > 0 && (
+                          <p className="text-xs text-green-600">+ Add-ons included</p>
+                        )}
                       </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-bold text-gray-900">ICT Licensed #4121-2025</p>
-                        <p className="text-xs text-gray-600">Costa Rica Tourism Board Authorized</p>
+                    </div>
+
+                    {/* Trip Details Grid - 2 columns */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 rounded-lg p-4">
+                      {/* Left Column */}
+                      <div className="space-y-3">
+                        <div className="flex items-start gap-3">
+                          <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                            <Lock className="h-4 w-4 text-blue-600" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase font-medium">Pickup Time</p>
+                            <p className="text-sm font-semibold text-gray-900">{trip.pickup_time || 'Not set'}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start gap-3">
+                          <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                            <Shield className="h-4 w-4 text-green-600" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase font-medium">Passengers</p>
+                            <p className="text-sm font-semibold text-gray-900">
+                              {trip.adults} adult{trip.adults !== 1 ? 's' : ''}
+                              {trip.children > 0 && `, ${trip.children} child${trip.children !== 1 ? 'ren' : ''}`}
+                            </p>
+                          </div>
+                        </div>
+
+                        {trip.flight_number && (
+                          <div className="flex items-start gap-3">
+                            <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
+                              <CreditCard className="h-4 w-4 text-purple-600" />
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-500 uppercase font-medium">Flight</p>
+                              <p className="text-sm font-semibold text-gray-900">
+                                {trip.airline ? `${trip.airline} ` : ''}{trip.flight_number}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Right Column */}
+                      <div className="space-y-3">
+                        <div>
+                          <p className="text-xs text-gray-500 uppercase font-medium mb-1">Pickup Location</p>
+                          <p className="text-sm text-gray-900 bg-white rounded p-2 border border-gray-200">
+                            {trip.pickup_address || 'Not specified'}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="text-xs text-gray-500 uppercase font-medium mb-1">Drop-off Location</p>
+                          <p className="text-sm text-gray-900 bg-white rounded p-2 border border-gray-200">
+                            {trip.dropoff_address || 'Not specified'}
+                          </p>
+                        </div>
+
+                        {trip.add_ons && trip.add_ons.length > 0 && (
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase font-medium mb-1">Add-ons</p>
+                            <div className="flex flex-wrap gap-1">
+                              {trip.add_ons.includes('travel_flex') && (
+                                <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded">Travel Flex +$59</span>
+                              )}
+                              {trip.add_ons.includes('explorer_upgrade') && (
+                                <span className="bg-purple-100 text-purple-700 text-xs px-2 py-1 rounded">Explorer +$195</span>
+                              )}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
+                ))}
 
-                  {/* Trust Badges Grid */}
-                  <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3 text-center">
-                      Secure Payment
-                    </p>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="flex items-center gap-2 text-xs text-gray-600">
-                        <Lock className="h-4 w-4 text-green-600 flex-shrink-0" />
-                        <span>256-bit SSL</span>
+                {/* Totals Section */}
+                <div className="bg-gray-50 border-t border-gray-200 p-6">
+                  {!isTourBooking && (
+                    <div className="space-y-2 mb-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600">Subtotal</span>
+                        <span className="font-medium">{formatCurrency(grandTotal)}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-xs text-gray-600">
-                        <Shield className="h-4 w-4 text-green-600 flex-shrink-0" />
-                        <span>PCI Compliant</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-gray-600">
-                        <CreditCard className="h-4 w-4 text-blue-600 flex-shrink-0" />
-                        <span>Visa/Mastercard</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-gray-600">
-                        <Shield className="h-4 w-4 text-blue-600 flex-shrink-0" />
-                        <span>3D Secure</span>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600">Service Fee ({(PRICING_CONFIG.FEES_PERCENTAGE * 100).toFixed(0)}%)</span>
+                        <span className="font-medium text-gray-600">+{formatCurrency(grandTotal * PRICING_CONFIG.FEES_PERCENTAGE)}</span>
                       </div>
                     </div>
+                  )}
+                  <div className="flex justify-between items-center pt-4 border-t border-gray-300">
+                    <span className="text-xl font-bold text-gray-900">Total</span>
+                    <span className="text-3xl font-bold text-blue-600">{formatCurrency(totalWithFees)}</span>
                   </div>
+                  <p className="text-xs text-gray-500 text-right mt-1">Taxes and fees included</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* ============================================ */}
+            {/* SECTION 2: BILLING & PAYMENT - Full Width */}
+            {/* ============================================ */}
+            <Card className="shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
+                <div className="flex items-center gap-3">
+                  <CreditCard className="h-6 w-6" />
+                  <div>
+                    <CardTitle className="text-white text-xl">Billing & Payment</CardTitle>
+                    <CardDescription className="text-green-100">
+                      Enter your details to complete the payment
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6 space-y-6">
+
+                {/* Name fields */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="firstName" className="text-sm font-medium">First Name *</Label>
+                    <Input
+                      id="firstName"
+                      value={customerInfo.firstName}
+                      onChange={(e) => handleCustomerInfoChange('firstName', e.target.value)}
+                      placeholder="John"
+                      disabled={isProcessingPayment}
+                      className={`h-11 mt-1.5 ${formErrors.firstName ? 'border-red-500' : ''}`}
+                    />
+                    {formErrors.firstName && (
+                      <p className="text-red-500 text-xs mt-1">{formErrors.firstName}</p>
+                    )}
+                  </div>
+                  <div>
+                    <Label htmlFor="lastName" className="text-sm font-medium">Last Name *</Label>
+                    <Input
+                      id="lastName"
+                      value={customerInfo.lastName}
+                      onChange={(e) => handleCustomerInfoChange('lastName', e.target.value)}
+                      placeholder="Doe"
+                      disabled={isProcessingPayment}
+                      className={`h-11 mt-1.5 ${formErrors.lastName ? 'border-red-500' : ''}`}
+                    />
+                    {formErrors.lastName && (
+                      <p className="text-red-500 text-xs mt-1">{formErrors.lastName}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Email */}
+                <div>
+                  <Label htmlFor="email" className="text-sm font-medium">Email Address *</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={customerInfo.email}
+                    onChange={(e) => handleCustomerInfoChange('email', e.target.value)}
+                    placeholder="john@example.com"
+                    disabled={isProcessingPayment}
+                    className={`h-11 mt-1.5 ${formErrors.email ? 'border-red-500' : ''}`}
+                  />
+                  {formErrors.email && (
+                    <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>
+                  )}
+                  <p className="text-xs text-gray-500 mt-1">We'll send your confirmation to this email</p>
+                </div>
+
+                {/* Country & Phone Row */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="country" className="text-sm font-medium">Country *</Label>
+                    <select
+                      id="country"
+                      value={customerInfo.country}
+                      onChange={(e) => handleCustomerInfoChange('country', e.target.value)}
+                      disabled={isProcessingPayment}
+                      className="w-full h-11 mt-1.5 px-3 rounded-md border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      {COUNTRIES.map((country) => (
+                        <option key={country.code} value={country.code}>
+                          {country.name} ({country.phonePrefix})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <Label htmlFor="phone" className="text-sm font-medium">Phone Number *</Label>
+                    <div className="flex gap-2 mt-1.5">
+                      <div className="flex items-center justify-center px-3 h-11 bg-gray-100 border border-gray-300 rounded-md text-sm font-medium min-w-[60px]">
+                        {currentCountry.phonePrefix}
+                      </div>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        value={phoneNumber}
+                        onChange={(e) => handlePhoneChange(e.target.value)}
+                        placeholder="8888 8888"
+                        disabled={isProcessingPayment}
+                        className={`flex-1 h-11 ${formErrors.phone ? 'border-red-500' : ''}`}
+                      />
+                    </div>
+                    {formErrors.phone && (
+                      <p className="text-red-500 text-xs mt-1">{formErrors.phone}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Divider */}
+                <div className="border-t border-gray-200 pt-6">
+                  {/* Terms Checkbox */}
+                  <TermsCheckbox
+                    checked={termsAccepted}
+                    onChange={setTermsAccepted}
+                    error={false}
+                  />
+
+                  {/* Pay Button */}
+                  <Button
+                    onClick={handlePayNow}
+                    disabled={!termsAccepted || isProcessingPayment}
+                    className="w-full h-14 mt-4 bg-green-600 hover:bg-green-700 text-white text-lg font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isProcessingPayment ? (
+                      <>
+                        <Loader2 className="h-6 w-6 mr-2 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <Lock className="h-6 w-6 mr-2" />
+                        Pay {formatCurrency(totalWithFees)}
+                      </>
+                    )}
+                  </Button>
+
+                  <p className="text-xs text-center text-gray-500 mt-3">
+                    You will be redirected to our secure payment provider
+                  </p>
+                </div>
+
+                {/* Trust Badges */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-gray-200">
+                  <div className="flex items-center gap-2 text-xs text-gray-600">
+                    <Lock className="h-4 w-4 text-green-600" />
+                    <span>256-bit SSL</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-gray-600">
+                    <Shield className="h-4 w-4 text-green-600" />
+                    <span>PCI Compliant</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-gray-600">
+                    <CreditCard className="h-4 w-4 text-blue-600" />
+                    <span>Visa/Mastercard</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-gray-600">
+                    <Shield className="h-4 w-4 text-blue-600" />
+                    <span>3D Secure</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Back Button & ICT Badge */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <Button
+                onClick={() => {
+                  if (isTourBooking) {
+                    router.push('/private-tours');
+                  } else {
+                    router.push(`/preview?booking_id=${bookingId}`);
+                  }
+                }}
+                variant="ghost"
+                className="text-gray-600 hover:text-gray-900"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                {isTourBooking ? 'Back to Tours' : 'Back to Trip Details'}
+              </Button>
+
+              <div className="flex items-center gap-3 bg-white rounded-lg border border-gray-200 px-4 py-2">
+                <Shield className="h-5 w-5 text-blue-600" />
+                <div>
+                  <p className="text-xs font-bold text-gray-900">ICT Licensed #4121-2025</p>
+                  <p className="text-[10px] text-gray-500">Costa Rica Tourism Board</p>
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       </div>
