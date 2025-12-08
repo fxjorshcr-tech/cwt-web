@@ -642,127 +642,89 @@ function CheckoutPageContent() {
                   </div>
                 )}
 
-                {/* Shuttle Trips - Beautiful Cards */}
+                {/* Shuttle Trips - Clean Cards */}
                 {!isTourBooking && trips.map((trip, index) => (
-                  <div key={trip.id} className={`p-6 ${index > 0 ? 'border-t border-gray-200' : ''}`}>
-                    {/* Trip Header */}
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-1 rounded">
-                            {trips.length > 1 ? `Transfer ${index + 1}` : 'Transfer'}
-                          </span>
-                          <span className="text-xs text-gray-500" suppressHydrationWarning>
-                            {formatDate(trip.date)}
-                          </span>
-                        </div>
-                        <h3 className="text-lg font-bold text-gray-900">
-                          {trip.from_location}
-                        </h3>
-                        <p className="text-sm text-gray-500 flex items-center gap-1">
-                          <span>→</span>
-                          <span className="font-medium text-gray-700">{trip.to_location}</span>
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-2xl font-bold text-blue-600">
-                          {formatCurrency(trip.final_price || trip.price)}
-                        </p>
-                        {trip.add_ons && trip.add_ons.length > 0 && (
-                          <p className="text-xs text-green-600">+ Add-ons included</p>
-                        )}
+                  <div key={trip.id} className={`p-4 sm:p-6 ${index > 0 ? 'border-t border-gray-200' : ''}`}>
+
+                    {/* Header: Badge + Date */}
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className="bg-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded">
+                        {trips.length > 1 ? `Transfer ${index + 1}` : 'Transfer'}
+                      </span>
+                      <span className="text-sm text-gray-600" suppressHydrationWarning>
+                        {formatDate(trip.date)}
+                      </span>
+                      <div className="flex items-center gap-1 ml-auto bg-blue-50 text-blue-700 px-2 py-1 rounded">
+                        <Clock className="h-3.5 w-3.5" />
+                        <span className="text-sm font-semibold">{trip.pickup_time || '--:--'}</span>
                       </div>
                     </div>
 
-                    {/* Trip Details Grid - 2 columns */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 rounded-lg p-4">
-                      {/* Left Column */}
-                      <div className="space-y-3">
-                        <div className="flex items-start gap-3">
-                          <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                            <Clock className="h-4 w-4 text-blue-600" />
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase font-medium">Pickup Time</p>
-                            <p className="text-sm font-semibold text-gray-900">{trip.pickup_time || 'Not set'}</p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-start gap-3">
-                          <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                            <Users className="h-4 w-4 text-green-600" />
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase font-medium">Passengers</p>
-                            <p className="text-sm font-semibold text-gray-900">
-                              {trip.adults} adult{trip.adults !== 1 ? 's' : ''}
-                              {trip.children > 0 && `, ${trip.children} child${trip.children !== 1 ? 'ren' : ''}`}
-                            </p>
-                          </div>
-                        </div>
-
-                        {trip.flight_number && (
-                          <div className="flex items-start gap-3">
-                            <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
-                              <Plane className="h-4 w-4 text-purple-600" />
-                            </div>
-                            <div>
-                              <p className="text-xs text-gray-500 uppercase font-medium">Flight</p>
-                              <p className="text-sm font-semibold text-gray-900">
-                                {trip.airline ? `${trip.airline} ` : ''}{trip.flight_number}
-                              </p>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Right Column */}
-                      <div className="space-y-3">
-                        <div className="flex items-start gap-3">
-                          <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                    {/* Route with addresses inline */}
+                    <div className="space-y-3 mb-4">
+                      {/* FROM */}
+                      <div className="flex items-start gap-3">
+                        <div className="flex flex-col items-center">
+                          <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
                             <MapPin className="h-4 w-4 text-blue-600" />
                           </div>
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase font-medium">Pickup</p>
-                            <p className="text-sm font-semibold text-gray-900">{trip.pickup_address || 'Not specified'}</p>
-                          </div>
+                          <div className="w-0.5 h-6 bg-gray-300 mt-1"></div>
                         </div>
-
-                        <div className="flex items-start gap-3">
-                          <div className="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
-                            <MapPin className="h-4 w-4 text-orange-500" />
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase font-medium">Drop-off</p>
-                            <p className="text-sm font-semibold text-gray-900">{trip.dropoff_address || 'Not specified'}</p>
-                          </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-gray-500 uppercase font-medium">Pickup</p>
+                          <p className="text-base font-bold text-gray-900">{trip.from_location}</p>
+                          <p className="text-sm text-gray-600 mt-0.5">{trip.pickup_address || 'Address not specified'}</p>
                         </div>
-
-                        {trip.add_ons && trip.add_ons.length > 0 && (
-                          <div className="flex items-start gap-3">
-                            <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                              <Shield className="h-4 w-4 text-green-600" />
-                            </div>
-                            <div>
-                              <p className="text-xs text-gray-500 uppercase font-medium">Add-ons</p>
-                              <div className="space-y-1 mt-1">
-                                {trip.add_ons.includes('travel_flex') && (
-                                  <div className="flex items-center gap-2">
-                                    <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded">Travel Flex</span>
-                                    <span className="text-xs text-gray-500">Free cancellation +$59</span>
-                                  </div>
-                                )}
-                                {trip.add_ons.includes('explorer_upgrade') && (
-                                  <div className="flex items-center gap-2">
-                                    <span className="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-1 rounded">Explorer</span>
-                                    <span className="text-xs text-gray-500">Private vehicle +$195</span>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        )}
                       </div>
+
+                      {/* TO */}
+                      <div className="flex items-start gap-3">
+                        <div className="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center">
+                          <MapPin className="h-4 w-4 text-orange-500" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-gray-500 uppercase font-medium">Drop-off</p>
+                          <p className="text-base font-bold text-gray-900">{trip.to_location}</p>
+                          <p className="text-sm text-gray-600 mt-0.5">{trip.dropoff_address || 'Address not specified'}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Details Row: Passengers, Flight, Add-ons */}
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      <div className="flex items-center gap-1.5 bg-gray-100 text-gray-700 px-3 py-1.5 rounded-full text-sm">
+                        <Users className="h-4 w-4" />
+                        <span>{trip.adults + trip.children} passenger{trip.adults + trip.children !== 1 ? 's' : ''}</span>
+                      </div>
+
+                      {trip.flight_number && (
+                        <div className="flex items-center gap-1.5 bg-purple-100 text-purple-700 px-3 py-1.5 rounded-full text-sm">
+                          <Plane className="h-4 w-4" />
+                          <span>{trip.airline ? `${trip.airline} ` : ''}{trip.flight_number}</span>
+                        </div>
+                      )}
+
+                      {trip.add_ons?.includes('travel_flex') && (
+                        <div className="flex items-center gap-1.5 bg-green-100 text-green-700 px-3 py-1.5 rounded-full text-sm font-medium">
+                          <Shield className="h-4 w-4" />
+                          <span>Travel Flex +$59</span>
+                        </div>
+                      )}
+
+                      {trip.add_ons?.includes('explorer_upgrade') && (
+                        <div className="flex items-center gap-1.5 bg-amber-100 text-amber-700 px-3 py-1.5 rounded-full text-sm font-medium">
+                          <Shield className="h-4 w-4" />
+                          <span>Explorer +$195</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Price Plate */}
+                    <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-3 flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-700">Transfer Price</span>
+                      <span className="text-2xl font-bold text-blue-600">
+                        {formatCurrency(trip.final_price || trip.price)}
+                      </span>
                     </div>
                   </div>
                 ))}
