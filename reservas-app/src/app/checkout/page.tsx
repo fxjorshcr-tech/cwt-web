@@ -698,21 +698,29 @@ function CheckoutPageContent() {
                           <p className="text-sm text-gray-600 mt-0.5">{trip.dropoff_address || 'Address not specified'}</p>
                         </div>
                       </div>
+
+                      {/* Flight Info - if exists */}
+                      {trip.flight_number && (
+                        <div className="flex items-start gap-3 mt-2 pt-2 border-t border-dashed border-gray-200">
+                          <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
+                            <Plane className="h-4 w-4 text-purple-600" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs text-gray-500 uppercase font-medium">Flight Information</p>
+                            <p className="text-base font-bold text-gray-900">
+                              {trip.airline ? `${trip.airline} - ` : ''}{trip.flight_number}
+                            </p>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
-                    {/* Details Row: Passengers, Flight, Add-ons */}
+                    {/* Details Row: Passengers, Add-ons */}
                     <div className="flex flex-wrap gap-2 mb-4">
                       <div className="flex items-center gap-1.5 bg-gray-100 text-gray-700 px-3 py-1.5 rounded-full text-sm">
                         <Users className="h-4 w-4" />
                         <span>{trip.adults + trip.children} passenger{trip.adults + trip.children !== 1 ? 's' : ''}</span>
                       </div>
-
-                      {trip.flight_number && (
-                        <div className="flex items-center gap-1.5 bg-purple-100 text-purple-700 px-3 py-1.5 rounded-full text-sm">
-                          <Plane className="h-4 w-4" />
-                          <span>{trip.airline ? `${trip.airline} ` : ''}{trip.flight_number}</span>
-                        </div>
-                      )}
 
                       {trip.add_ons?.includes('flex_protection') && !trip.add_ons?.includes('explorer_upgrade') && (
                         <div className="flex items-center gap-1.5 bg-green-100 text-green-700 px-3 py-1.5 rounded-full text-sm font-medium">
