@@ -654,10 +654,6 @@ function CheckoutPageContent() {
                       <span className="text-sm text-gray-600" suppressHydrationWarning>
                         {formatDate(trip.date)}
                       </span>
-                      <div className="flex items-center gap-1 ml-auto bg-blue-50 text-blue-700 px-2 py-1 rounded">
-                        <Clock className="h-3.5 w-3.5" />
-                        <span className="text-sm font-semibold">{trip.pickup_time || '--:--'}</span>
-                      </div>
                     </div>
 
                     {/* Route with addresses inline */}
@@ -671,7 +667,21 @@ function CheckoutPageContent() {
                           <div className="w-0.5 h-6 bg-gray-300 mt-1"></div>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs text-gray-500 uppercase font-medium">Pickup</p>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="text-xs text-gray-500 uppercase font-medium">Pickup</p>
+                            <div className="flex items-center gap-1 bg-blue-600 text-white px-2 py-0.5 rounded text-xs font-semibold">
+                              <Clock className="h-3 w-3" />
+                              <span>
+                                {trip.pickup_time ? (() => {
+                                  const [h, m] = trip.pickup_time.split(':');
+                                  const hour = parseInt(h);
+                                  const ampm = hour < 12 ? 'AM' : 'PM';
+                                  const hour12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+                                  return `${hour12}:${m} ${ampm}`;
+                                })() : '--:--'}
+                              </span>
+                            </div>
+                          </div>
                           <p className="text-base font-bold text-gray-900">{trip.from_location}</p>
                           <p className="text-sm text-gray-600 mt-0.5">{trip.pickup_address || 'Address not specified'}</p>
                         </div>
