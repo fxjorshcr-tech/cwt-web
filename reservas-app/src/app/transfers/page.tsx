@@ -32,10 +32,10 @@ export const metadata: Metadata = {
 
 export default function TransfersPage() {
   return (
-    <>
+    <div className="overflow-x-hidden max-w-[100vw]">
       <BookingNavbar />
 
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white overflow-x-hidden">
 
         {/* Hero Section */}
         <section className="relative h-[50vh] min-h-[400px]">
@@ -485,6 +485,6 @@ export default function TransfersPage() {
         {/* Payment Methods */}
         <PaymentMethods />
       </div>
-    </>
+    </div>
   );
 }
