@@ -714,7 +714,7 @@ function CheckoutPageContent() {
                         </div>
                       )}
 
-                      {trip.add_ons?.includes('travel_flex') && (
+                      {trip.add_ons?.includes('flex_protection') && !trip.add_ons?.includes('explorer_upgrade') && (
                         <div className="flex items-center gap-1.5 bg-green-100 text-green-700 px-3 py-1.5 rounded-full text-sm font-medium">
                           <Shield className="h-4 w-4" />
                           <span>Travel Flex +$59</span>
@@ -724,7 +724,7 @@ function CheckoutPageContent() {
                       {trip.add_ons?.includes('explorer_upgrade') && (
                         <div className="flex items-center gap-1.5 bg-amber-100 text-amber-700 px-3 py-1.5 rounded-full text-sm font-medium">
                           <Shield className="h-4 w-4" />
-                          <span>Explorer +$195</span>
+                          <span>Explorer Upgrade +$195</span>
                         </div>
                       )}
                     </div>
