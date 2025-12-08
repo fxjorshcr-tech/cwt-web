@@ -131,8 +131,9 @@ function PreviewPageContent() {
   const [availabilityStatus, setAvailabilityStatus] = useState<'idle' | 'checking' | 'approved'>('idle');
   const [tripType, setTripType] = useState<'one-way' | 'multi'>('one-way');
 
-  // Edit form state
-  const [error, setError] = useState<string | null>(null);
+  // Error states
+  const [error, setError] = useState<string | null>(null); // Fatal errors (booking not found)
+  const [validationError, setValidationError] = useState<string | null>(null); // Inline validation errors
 
   // Edit form state
   const [editOrigin, setEditOrigin] = useState('');
@@ -518,10 +519,13 @@ function PreviewPageContent() {
   function handleContinue() {
     if (!bookingId) return;
 
+    // Clear any previous validation error
+    setValidationError(null);
+
     // Validate that all required inline fields are filled
     const incompleteTrips = trips.filter(trip => !trip.pickup_address || !trip.dropoff_address);
     if (incompleteTrips.length > 0) {
-      setError('Please fill in pickup and drop-off addresses for all transfers');
+      setValidationError('Please fill in pickup and drop-off addresses for all transfers');
       return;
     }
 
@@ -530,7 +534,7 @@ function PreviewPageContent() {
       trip.children > 0 && trip.children_ages.filter(age => age !== null).length < trip.children
     );
     if (missingChildrenAges.length > 0) {
-      setError('Please provide ages for all children');
+      setValidationError('Please provide ages for all children');
       return;
     }
 
@@ -940,21 +944,24 @@ function PreviewPageContent() {
                               <p className="text-sm font-semibold text-gray-900 leading-tight">{trip.from_location}</p>
                             </div>
                             {/* Pickup Time - same row as FROM title */}
-                            <div className="flex items-center gap-1 bg-blue-600 text-white px-3 py-2 rounded-lg">
-                              <Clock className="h-4 w-4" />
-                              <select
-                                value={trip.pickup_time}
-                                onChange={(e) => updateTripField(index, 'pickup_time', e.target.value)}
-                                className="bg-transparent text-white text-sm font-semibold focus:outline-none cursor-pointer"
-                              >
-                                {Array.from({ length: 48 }, (_, i) => {
-                                  const hour = Math.floor(i / 2);
-                                  const minute = i % 2 === 0 ? '00' : '30';
-                                  const value = `${hour.toString().padStart(2, '0')}:${minute}`;
-                                  const label = `${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour}:${minute} ${hour < 12 ? 'AM' : 'PM'}`;
-                                  return <option key={value} value={value} className="text-gray-900">{label}</option>;
-                                })}
-                              </select>
+                            <div className="flex flex-col items-end">
+                              <span className="text-[10px] text-gray-500 uppercase mb-1">Pickup Time</span>
+                              <div className="flex items-center gap-1 bg-blue-600 text-white px-3 py-2 rounded-lg">
+                                <Clock className="h-4 w-4" />
+                                <select
+                                  value={trip.pickup_time}
+                                  onChange={(e) => updateTripField(index, 'pickup_time', e.target.value)}
+                                  className="bg-transparent text-white text-sm font-semibold focus:outline-none cursor-pointer"
+                                >
+                                  {Array.from({ length: 48 }, (_, i) => {
+                                    const hour = Math.floor(i / 2);
+                                    const minute = i % 2 === 0 ? '00' : '30';
+                                    const value = `${hour.toString().padStart(2, '0')}:${minute}`;
+                                    const label = `${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour}:${minute} ${hour < 12 ? 'AM' : 'PM'}`;
+                                    return <option key={value} value={value} className="text-gray-900">{label}</option>;
+                                  })}
+                                </select>
+                              </div>
                             </div>
                           </div>
                           <div className="ml-8">
@@ -1310,6 +1317,14 @@ function PreviewPageContent() {
                     </div>
                   </div>
                 </div>
+
+                {/* Validation Error */}
+                {validationError && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2">
+                    <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
+                    <p className="text-sm text-red-700">{validationError}</p>
+                  </div>
+                )}
 
                 {/* Continue Button */}
                 <button
