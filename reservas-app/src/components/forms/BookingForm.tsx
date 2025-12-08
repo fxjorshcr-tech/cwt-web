@@ -213,8 +213,8 @@ export function BookingForm() {
       // Check if still mounted before continuing
       if (!isMountedRef.current) return;
 
-      // Redirect to booking-details
-      router.push(`/booking-details?booking_id=${bookingId}&trip=0`);
+      // Redirect to preview
+      router.push(`/preview?booking_id=${bookingId}`);
 
     } catch (error) {
       console.error('Booking error:', error);

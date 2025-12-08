@@ -26,10 +26,13 @@ import {
   AlertTriangle,
   Flame,
   Sparkles,
+  Plane,
 } from 'lucide-react';
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import BookingStepper from '@/components/booking/BookingStepper';
 import { IncludedFeatures, ImportantInfo } from '@/components/summary';
+import { TripAddOns, calculateAddOnsPrice } from '@/components/booking/TripAddOns';
+import { Input } from '@/components/ui/input';
 import { LocationAutocomplete } from '@/components/forms/LocationAutocomplete';
 import { ModernDatePicker } from '@/components/forms/ModernDatePicker';
 import { PassengerSelector } from '@/components/forms/PassengerSelector';
@@ -102,6 +105,16 @@ interface TripPreview {
   price: number;
   duration: string;
   routeId: number;
+  // Inline details
+  pickup_address: string;
+  dropoff_address: string;
+  pickup_time: string;
+  children_ages: (number | null)[];
+  // Airport/Flight info
+  flight_number: string;
+  airline: string;
+  // Add-ons
+  add_ons: string[];
 }
 
 function PreviewPageContent() {
@@ -116,14 +129,17 @@ function PreviewPageContent() {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [showAddTrip, setShowAddTrip] = useState(false);
   const [availabilityStatus, setAvailabilityStatus] = useState<'idle' | 'checking' | 'approved'>('idle');
+  const [tripType, setTripType] = useState<'one-way' | 'multi'>('one-way');
 
-  // Edit form state
-  const [error, setError] = useState<string | null>(null);
+  // Error states
+  const [error, setError] = useState<string | null>(null); // Fatal errors (booking not found)
+  const [validationError, setValidationError] = useState<string | null>(null); // Inline validation errors
 
   // Edit form state
   const [editOrigin, setEditOrigin] = useState('');
   const [editDestination, setEditDestination] = useState('');
   const [editDate, setEditDate] = useState<Date | null>(null);
+  const [editPickupTime, setEditPickupTime] = useState('09:00');
   const [editAdults, setEditAdults] = useState(2);
   const [editChildren, setEditChildren] = useState(0);
 
@@ -157,16 +173,31 @@ function PreviewPageContent() {
 
         if (localData && localData.trips.length > 0) {
           // Load from localStorage
-          loadedTrips = localData.trips.map((trip) => ({
-            from_location: trip.from_location,
-            to_location: trip.to_location,
-            date: trip.date,
-            adults: trip.adults,
-            children: trip.children || 0,
-            price: trip.price,
-            duration: trip.duration || '',
-            routeId: trip.routeId || 0,
-          }));
+          loadedTrips = localData.trips.map((trip, index) => {
+            const details = localData.tripDetails?.[index];
+            return {
+              from_location: trip.from_location,
+              to_location: trip.to_location,
+              date: trip.date,
+              adults: trip.adults,
+              children: trip.children || 0,
+              price: trip.price,
+              duration: trip.duration || '',
+              routeId: trip.routeId || 0,
+              pickup_address: details?.pickup_address || '',
+              dropoff_address: details?.dropoff_address || '',
+              pickup_time: details?.pickup_time || '', // Empty by default - must be selected
+              children_ages: details?.children_ages || Array(trip.children || 0).fill(null),
+              flight_number: details?.flight_number || '',
+              airline: details?.airline || '',
+              add_ons: details?.add_ons || [],
+            };
+          });
+
+          // Load tripType from localStorage
+          if (localData.tripType) {
+            setTripType(localData.tripType);
+          }
         } else {
           // Fallback: Load from Supabase if localStorage is empty
           console.log('localStorage empty, loading from Supabase...');
@@ -229,6 +260,13 @@ function PreviewPageContent() {
             price: trip.price || 0,
             duration: trip.duration || '',
             routeId: trip.routeId || 0,
+            pickup_address: trip.pickup_address || '',
+            dropoff_address: trip.dropoff_address || '',
+            pickup_time: trip.pickup_time || '', // Must be selected
+            children_ages: trip.children_ages || Array(trip.children || 0).fill(null),
+            flight_number: trip.flight_number || '',
+            airline: trip.airline || '',
+            add_ons: trip.add_ons || [],
           }));
         }
 
@@ -249,9 +287,12 @@ function PreviewPageContent() {
     load();
   }, [bookingId, router]);
 
-  // Total price
+  // Total price (including add-ons)
   const totalPrice = useMemo(() => {
-    return trips.reduce((sum, trip) => sum + trip.price, 0);
+    return trips.reduce((sum, trip) => {
+      const addOnsPrice = calculateAddOnsPrice(trip.add_ons || []);
+      return sum + trip.price + addOnsPrice;
+    }, 0);
   }, [trips]);
 
   // Format date for display
@@ -285,6 +326,7 @@ function PreviewPageContent() {
     setEditOrigin(trip.from_location || '');
     setEditDestination(trip.to_location || '');
     setEditDate(trip.date ? parseDateFromString(trip.date) : null);
+    setEditPickupTime(trip.pickup_time || '09:00');
     setEditAdults(trip.adults || 1);
     setEditChildren(trip.children || 0);
     setEditingIndex(index);
@@ -313,7 +355,17 @@ function PreviewPageContent() {
     // ✅ Don't save if date formatting failed
     if (!dateStr) return;
 
+    const existingTrip = trips[editingIndex];
     const newTrips = [...trips];
+
+    // Adjust children_ages array if children count changed
+    let childrenAges = existingTrip.children_ages || [];
+    if (editChildren > childrenAges.length) {
+      childrenAges = [...childrenAges, ...Array(editChildren - childrenAges.length).fill(null)];
+    } else if (editChildren < childrenAges.length) {
+      childrenAges = childrenAges.slice(0, editChildren);
+    }
+
     newTrips[editingIndex] = {
       from_location: editOrigin,
       to_location: editDestination,
@@ -323,6 +375,13 @@ function PreviewPageContent() {
       price,
       duration: route.duracion || '',
       routeId: route.id,
+      pickup_address: existingTrip.pickup_address || '',
+      dropoff_address: existingTrip.dropoff_address || '',
+      pickup_time: editPickupTime,
+      children_ages: childrenAges,
+      flight_number: existingTrip.flight_number || '',
+      airline: existingTrip.airline || '',
+      add_ons: existingTrip.add_ons || [],
     };
 
     setTrips(newTrips);
@@ -344,6 +403,7 @@ function PreviewPageContent() {
       setEditOrigin('');
       setEditDestination('');
       setEditDate(null);
+      setEditPickupTime('09:00');
       setEditAdults(2);
       setEditChildren(0);
       setShowAddTrip(true);
@@ -354,7 +414,8 @@ function PreviewPageContent() {
     const lastTrip = trips[trips.length - 1];
     setEditOrigin(lastTrip?.to_location || '');
     setEditDestination('');
-    setEditDate(lastTrip?.date ? parseDateFromString(lastTrip.date) : null);
+    setEditDate(null); // New trip should have empty date
+    setEditPickupTime('09:00');
     setEditAdults(lastTrip?.adults || 2);
     setEditChildren(lastTrip?.children || 0);
     setShowAddTrip(true);
@@ -396,6 +457,13 @@ function PreviewPageContent() {
       price,
       duration: route.duracion || '',
       routeId: route.id,
+      pickup_address: '',
+      dropoff_address: '',
+      pickup_time: editPickupTime,
+      children_ages: Array(editChildren).fill(null),
+      flight_number: '',
+      airline: '',
+      add_ons: [],
     };
 
     const newTrips = [...trips, newTrip];
@@ -428,15 +496,114 @@ function PreviewPageContent() {
         routeId: trip.routeId,
         calculatedPrice: trip.price,
       })),
+      tripDetails: tripsToSave.map((trip) => ({
+        pickup_address: trip.pickup_address || '',
+        dropoff_address: trip.dropoff_address || '',
+        pickup_time: trip.pickup_time || '09:00',
+        flight_number: trip.flight_number || '',
+        airline: trip.airline || '',
+        special_requests: '',
+        children_ages: trip.children_ages || [],
+        add_ons: trip.add_ons || [],
+        night_surcharge: 0,
+        add_ons_price: calculateAddOnsPrice(trip.add_ons || []),
+        final_price: trip.price + calculateAddOnsPrice(trip.add_ons || []),
+      })),
+      tripType, // Save trip type (one-way or multi)
       createdAt: new Date().toISOString(),
     };
     localStorage.setItem(`booking_${bookingId}`, JSON.stringify(bookingData));
   }
 
-  // Continue to details
+  // Continue directly to checkout (only save to localStorage, NOT Supabase)
   function handleContinue() {
+    if (!bookingId) return;
+
+    // Clear any previous validation error
+    setValidationError(null);
+
+    // Validate pickup time is selected
+    const missingPickupTime = trips.filter(trip => !trip.pickup_time);
+    if (missingPickupTime.length > 0) {
+      setValidationError('Please select a pickup time for all transfers');
+      return;
+    }
+
+    // Validate that all required inline fields are filled
+    const incompleteTrips = trips.filter(trip => !trip.pickup_address || !trip.dropoff_address);
+    if (incompleteTrips.length > 0) {
+      setValidationError('Please fill in pickup and drop-off addresses for all transfers');
+      return;
+    }
+
+    // Validate children ages if there are children
+    const missingChildrenAges = trips.filter(trip =>
+      trip.children > 0 && trip.children_ages.filter(age => age !== null).length < trip.children
+    );
+    if (missingChildrenAges.length > 0) {
+      setValidationError('Please provide ages for all children');
+      return;
+    }
+
+    // Save to localStorage and navigate
     saveToLocalStorage(trips);
-    router.push(`/booking-details?booking_id=${bookingId}&trip=0`);
+    router.push(`/checkout?booking_id=${bookingId}`);
+  }
+
+  // Update trip inline field
+  function updateTripField(index: number, field: keyof TripPreview, value: any) {
+    const newTrips = [...trips];
+    newTrips[index] = { ...newTrips[index], [field]: value };
+    setTrips(newTrips);
+    // Auto-save to localStorage
+    saveToLocalStorage(newTrips);
+  }
+
+  // Update child age
+  function updateChildAge(tripIndex: number, childIndex: number, age: number | null) {
+    const newTrips = [...trips];
+    const newAges = [...(newTrips[tripIndex].children_ages || [])];
+    newAges[childIndex] = age;
+    newTrips[tripIndex] = { ...newTrips[tripIndex], children_ages: newAges };
+    setTrips(newTrips);
+    saveToLocalStorage(newTrips);
+  }
+
+  // Update add-ons for a trip
+  function updateTripAddOns(tripIndex: number, addOns: string[]) {
+    const newTrips = [...trips];
+    newTrips[tripIndex] = { ...newTrips[tripIndex], add_ons: addOns };
+    setTrips(newTrips);
+    saveToLocalStorage(newTrips);
+  }
+
+  // Update passengers for a trip (recalculates price)
+  function updateTripPassengers(tripIndex: number, adults: number, children: number) {
+    const trip = trips[tripIndex];
+    const route = routes.find(r => r.id === trip.routeId);
+    if (!route) return;
+
+    const totalPassengers = adults + children;
+    const newPrice = calculateTripPrice(route, totalPassengers);
+
+    // Adjust children_ages array
+    let childrenAges = trip.children_ages || [];
+    if (children > childrenAges.length) {
+      childrenAges = [...childrenAges, ...Array(children - childrenAges.length).fill(null)];
+    } else if (children < childrenAges.length) {
+      childrenAges = childrenAges.slice(0, children);
+    }
+
+    const newTrips = [...trips];
+    newTrips[tripIndex] = {
+      ...trip,
+      adults,
+      children,
+      price: newPrice,
+      children_ages: childrenAges,
+    };
+    setTrips(newTrips);
+    saveToLocalStorage(newTrips);
   }
 
   // Render edit/add form
@@ -481,8 +648,8 @@ function PreviewPageContent() {
         <div className="grid sm:grid-cols-2 gap-4 relative z-20">
           {/* Date */}
           <div className="relative z-20">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Travel Date</label>
             <ModernDatePicker
-              label="Travel Date"
               value={editDate}
               onChange={setEditDate}
               enforceMinimumAdvance={true}
@@ -735,78 +902,230 @@ function PreviewPageContent() {
                   ) : (
                     // View Mode
                     <div className="p-4 sm:p-5">
-                      {/* Route Display - Vertical on mobile */}
-                      <div className="space-y-2 mb-4">
-                        <div className="flex items-center gap-2">
-                          <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                            <MapPin className="h-3 w-3 text-blue-600" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-[10px] text-gray-500 uppercase">From</p>
-                            <p className="text-sm font-semibold text-gray-900 leading-tight">{trip.from_location}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="h-6 w-6 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
-                            <MapPin className="h-3 w-3 text-orange-500" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-[10px] text-gray-500 uppercase">To</p>
-                            <p className="text-sm font-semibold text-gray-900 leading-tight">{trip.to_location}</p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Status Badges & Alerts */}
-                      <div className="space-y-2 mb-4">
-                        {/* Popular Route Badge */}
-                        {isPopularRoute(trip.from_location, trip.to_location) && (
-                          <div className="flex items-center gap-2 px-3 py-2 bg-orange-50 border border-orange-200 rounded-lg">
-                            <Flame className="h-4 w-4 text-orange-500 flex-shrink-0" />
-                            <p className="text-xs text-orange-800">
-                              <span className="font-semibold">Popular Route</span> — One of our most requested connections
-                            </p>
-                          </div>
-                        )}
-
-                        {/* High Season Alert */}
-                        {isHighSeason(trip.date) && (
-                          <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg">
-                            <AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0" />
-                            <p className="text-xs text-amber-800">
-                              <span className="font-semibold">High Season</span> — Peak travel period, limited availability
-                            </p>
-                          </div>
-                        )}
-
-                        {/* Dynamic Availability */}
+                      {/* Availability & Alerts - TOP */}
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {/* Dynamic Availability - PROMINENT */}
                         {(() => {
                           const availableVans = getAvailabilityCount(trip.from_location, trip.to_location, trip.date);
-                          const totalVans = 8;
                           return (
-                            <div className="flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg">
-                              <Car className="h-4 w-4 text-green-600 flex-shrink-0" />
-                              <div className="flex-1">
-                                <p className="text-xs text-green-800">
-                                  <span className="font-semibold">
-                                    {availableVans === 1 ? 'Only 1 van' : `${availableVans} vans`} available
-                                  </span>
-                                </p>
-                                {/* Visual indicator */}
-                                <div className="flex gap-1 mt-1">
-                                  {Array.from({ length: totalVans }).map((_, i) => (
-                                    <div
-                                      key={i}
-                                      className={`h-1.5 w-3 rounded-full ${
-                                        i < availableVans ? 'bg-green-500' : 'bg-gray-300'
-                                      }`}
-                                    />
-                                  ))}
-                                </div>
-                              </div>
+                            <div className={`flex items-center gap-2 px-3 py-2 rounded-lg ${
+                              availableVans <= 2
+                                ? 'bg-red-100 border border-red-300'
+                                : 'bg-green-100 border border-green-300'
+                            }`}>
+                              <Car className={`h-4 w-4 ${availableVans <= 2 ? 'text-red-600' : 'text-green-600'}`} />
+                              <span className={`text-sm font-bold ${availableVans <= 2 ? 'text-red-700' : 'text-green-700'}`}>
+                                {availableVans === 1 ? 'Only 1 van left!' : `${availableVans} vans available`}
+                              </span>
                             </div>
                           );
                         })()}
+
+                        {/* High Season Alert */}
+                        {isHighSeason(trip.date) && (
+                          <div className="flex items-center gap-2 px-3 py-2 bg-amber-100 border border-amber-300 rounded-lg">
+                            <AlertTriangle className="h-4 w-4 text-amber-600" />
+                            <span className="text-sm font-bold text-amber-700">High Season</span>
+                          </div>
+                        )}
+
+                        {/* Popular Route Badge */}
+                        {isPopularRoute(trip.from_location, trip.to_location) && (
+                          <div className="flex items-center gap-2 px-3 py-2 bg-orange-100 border border-orange-300 rounded-lg">
+                            <Flame className="h-4 w-4 text-orange-500" />
+                            <span className="text-sm font-bold text-orange-700">Popular Route</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Route Display with inline inputs */}
+                      <div className="space-y-4 mb-4">
+                        {/* FROM section with pickup address and time */}
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                              <MapPin className="h-3 w-3 text-blue-600" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-[10px] text-gray-500 uppercase">From</p>
+                              <p className="text-sm font-semibold text-gray-900 leading-tight">{trip.from_location}</p>
+                            </div>
+                            {/* Pickup Time - same row as FROM title */}
+                            <div className="flex flex-col items-end">
+                              <span className="text-[10px] text-gray-500 uppercase mb-1">Pickup Time *</span>
+                              <div className={`flex items-center gap-1 px-3 py-2 rounded-lg ${
+                                trip.pickup_time
+                                  ? 'bg-blue-600 text-white'
+                                  : 'bg-orange-500 text-white animate-pulse'
+                              }`}>
+                                <Clock className="h-4 w-4" />
+                                <select
+                                  value={trip.pickup_time}
+                                  onChange={(e) => updateTripField(index, 'pickup_time', e.target.value)}
+                                  className="bg-transparent text-white text-sm font-semibold focus:outline-none cursor-pointer"
+                                >
+                                  <option value="" className="text-gray-900">Select time</option>
+                                  {Array.from({ length: 48 }, (_, i) => {
+                                    const hour = Math.floor(i / 2);
+                                    const minute = i % 2 === 0 ? '00' : '30';
+                                    const value = `${hour.toString().padStart(2, '0')}:${minute}`;
+                                    const label = `${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour}:${minute} ${hour < 12 ? 'AM' : 'PM'}`;
+                                    return <option key={value} value={value} className="text-gray-900">{label}</option>;
+                                  })}
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="ml-8">
+                            <Input
+                              placeholder="Exact pickup address (hotel name, address...)"
+                              value={trip.pickup_address}
+                              onChange={(e) => updateTripField(index, 'pickup_address', e.target.value)}
+                              className="text-sm h-10"
+                            />
+                          </div>
+                        </div>
+
+                        {/* TO section with dropoff address */}
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <div className="h-6 w-6 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
+                              <MapPin className="h-3 w-3 text-orange-500" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-[10px] text-gray-500 uppercase">To</p>
+                              <p className="text-sm font-semibold text-gray-900 leading-tight">{trip.to_location}</p>
+                            </div>
+                          </div>
+                          <div className="ml-8">
+                            <Input
+                              placeholder="Exact drop-off address (hotel name, address...)"
+                              value={trip.dropoff_address}
+                              onChange={(e) => updateTripField(index, 'dropoff_address', e.target.value)}
+                              className="text-sm h-10"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Flight Information - only for airport routes */}
+                        {(trip.from_location.toLowerCase().includes('airport') ||
+                          trip.from_location.includes('SJO') ||
+                          trip.from_location.includes('LIR') ||
+                          trip.to_location.toLowerCase().includes('airport') ||
+                          trip.to_location.includes('SJO') ||
+                          trip.to_location.includes('LIR')) && (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                              <label className="block text-xs font-medium text-gray-600 mb-1">
+                                <Plane className="h-3 w-3 inline mr-1" />
+                                Flight Number (optional)
+                              </label>
+                              <Input
+                                placeholder="e.g. AA1234"
+                                value={trip.flight_number}
+                                onChange={(e) => updateTripField(index, 'flight_number', e.target.value)}
+                                className="text-sm h-10"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-gray-600 mb-1">
+                                Airline (optional)
+                              </label>
+                              <Input
+                                placeholder="e.g. American Airlines"
+                                value={trip.airline}
+                                onChange={(e) => updateTripField(index, 'airline', e.target.value)}
+                                className="text-sm h-10"
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Passengers Selector */}
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                          <p className="text-xs font-medium text-gray-700 mb-2">
+                            <Users className="h-3 w-3 inline mr-1" />
+                            Passengers
+                          </p>
+                          <div className="flex items-center gap-4">
+                            {/* Adults */}
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm text-gray-600">Adults:</span>
+                              <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                                <button
+                                  type="button"
+                                  onClick={() => updateTripPassengers(index, Math.max(1, trip.adults - 1), trip.children)}
+                                  disabled={trip.adults <= 1}
+                                  className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  -
+                                </button>
+                                <span className="px-3 py-1.5 text-sm font-medium min-w-[2rem] text-center">{trip.adults}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => updateTripPassengers(index, Math.min(12, trip.adults + 1), trip.children)}
+                                  disabled={trip.adults + trip.children >= 12}
+                                  className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  +
+                                </button>
+                              </div>
+                            </div>
+                            {/* Children */}
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm text-gray-600">Children:</span>
+                              <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                                <button
+                                  type="button"
+                                  onClick={() => updateTripPassengers(index, trip.adults, Math.max(0, trip.children - 1))}
+                                  disabled={trip.children <= 0}
+                                  className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  -
+                                </button>
+                                <span className="px-3 py-1.5 text-sm font-medium min-w-[2rem] text-center">{trip.children}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => updateTripPassengers(index, trip.adults, Math.min(11, trip.children + 1))}
+                                  disabled={trip.adults + trip.children >= 12}
+                                  className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  +
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Children Ages - only if there are children */}
+                        {trip.children > 0 && (
+                          <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                            <p className="text-xs font-medium text-orange-800 mb-2">
+                              Children&apos;s Ages (required for car seats)
+                            </p>
+                            <div className="flex flex-wrap gap-2">
+                              {Array.from({ length: trip.children }, (_, childIdx) => (
+                                <select
+                                  key={childIdx}
+                                  value={trip.children_ages?.[childIdx] ?? ''}
+                                  onChange={(e) => updateChildAge(index, childIdx, e.target.value ? parseInt(e.target.value) : null)}
+                                  className="w-20 h-9 px-2 rounded-md border border-orange-300 bg-white text-sm"
+                                >
+                                  <option value="">Age</option>
+                                  {Array.from({ length: 13 }, (_, age) => (
+                                    <option key={age} value={age}>{age}</option>
+                                  ))}
+                                </select>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Add-ons */}
+                        <TripAddOns
+                          selectedAddOns={trip.add_ons || []}
+                          onAddOnsChange={(addOns) => updateTripAddOns(index, addOns)}
+                        />
                       </div>
 
                       {/* Trip Details - 2x2 grid on mobile */}
@@ -828,7 +1147,14 @@ function PreviewPageContent() {
                         </div>
                         <div className="bg-blue-50 rounded-lg p-2 text-center">
                           <p className="text-[10px] text-blue-600 uppercase font-medium">Price</p>
-                          <p className="text-lg font-bold text-blue-600">${trip.price}</p>
+                          <p className="text-lg font-bold text-blue-600">
+                            ${trip.price + calculateAddOnsPrice(trip.add_ons || [])}
+                          </p>
+                          {calculateAddOnsPrice(trip.add_ons || []) > 0 && (
+                            <p className="text-[10px] text-blue-500">
+                              (${trip.price} + ${calculateAddOnsPrice(trip.add_ons || [])} add-ons)
+                            </p>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -836,18 +1162,8 @@ function PreviewPageContent() {
                 </div>
               ))}
 
-              {/* Add Transfer Form */}
-              {showAddTrip && (
-                <div className="bg-white rounded-xl shadow-sm border border-dashed border-blue-300 overflow-visible">
-                  <div className="bg-blue-50 px-5 py-3 border-b border-blue-200">
-                    <span className="font-semibold text-gray-900">Add Another Transfer</span>
-                  </div>
-                  {renderEditForm(true)}
-                </div>
-              )}
-
-              {/* Add Transfer Button */}
-              {!showAddTrip && editingIndex === null && (
+              {/* Add Transfer Button - Only show for multi-destination */}
+              {tripType === 'multi' && editingIndex === null && (
                 <button
                   onClick={startAddTrip}
                   className="w-full py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 font-medium hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
@@ -855,6 +1171,122 @@ function PreviewPageContent() {
                   <Plus className="h-5 w-5" />
                   Add Another Transfer
                 </button>
+              )}
+
+              {/* Add Transfer Modal */}
+              {showAddTrip && (
+                <div className="fixed inset-0 z-50 overflow-y-auto">
+                  {/* Backdrop */}
+                  <div
+                    className="fixed inset-0 bg-black/50"
+                    onClick={cancelEdit}
+                  />
+
+                  {/* Modal */}
+                  <div className="flex min-h-full items-center justify-center p-4">
+                    <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-visible">
+                      {/* Header */}
+                      <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                        <h3 className="text-lg font-semibold text-gray-900">Add Another Transfer</h3>
+                        <button
+                          onClick={cancelEdit}
+                          className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
+                        >
+                          <X className="h-5 w-5" />
+                        </button>
+                      </div>
+
+                      {/* Form Content */}
+                      <div className="p-4 space-y-4">
+                        {/* Origin & Destination Row */}
+                        <div className="flex flex-wrap gap-3">
+                          <div className="flex-1 min-w-[200px]">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">From</label>
+                            <LocationAutocomplete
+                              placeholder="Where from?"
+                              value={editOrigin}
+                              onChange={(val) => {
+                                setEditOrigin(val);
+                                if (val !== editOrigin) setEditDestination('');
+                              }}
+                              routes={routes}
+                              filterByDestination={editDestination}
+                              type="origin"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-[200px]">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">To</label>
+                            <LocationAutocomplete
+                              placeholder={editOrigin ? "Where to?" : "Select origin first"}
+                              value={editDestination}
+                              onChange={setEditDestination}
+                              routes={routes}
+                              filterByOrigin={editOrigin}
+                              disabled={!editOrigin}
+                              type="destination"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Date/Time & Passengers Row */}
+                        <div className="flex flex-wrap gap-3">
+                          <div className="flex-1 min-w-[200px]">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Travel Date</label>
+                            <ModernDatePicker
+                              value={editDate}
+                              onChange={setEditDate}
+                              enforceMinimumAdvance={true}
+                            />
+                          </div>
+                          <div className="flex-1 min-w-[200px]">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Passengers</label>
+                            <PassengerSelector
+                              adults={editAdults}
+                              children={editChildren}
+                              onPassengersChange={handleEditPassengersChange}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex gap-3 pt-2">
+                          <button
+                            onClick={cancelEdit}
+                            className="flex-1 py-3 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            onClick={saveNewTrip}
+                            disabled={!editOrigin || !editDestination || !editDate || availabilityStatus !== 'idle'}
+                            className={`flex-1 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors ${
+                              availabilityStatus === 'approved'
+                                ? 'bg-green-600 text-white'
+                                : 'bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed'
+                            }`}
+                          >
+                            {availabilityStatus === 'checking' ? (
+                              <>
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                Preparing quote...
+                              </>
+                            ) : availabilityStatus === 'approved' ? (
+                              <>
+                                <CheckCircle className="h-4 w-4" />
+                                Quote ready!
+                              </>
+                            ) : (
+                              <>
+                                <Plus className="h-4 w-4" />
+                                Add Transfer
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
 
@@ -867,14 +1299,25 @@ function PreviewPageContent() {
                     <h2 className="text-white font-bold text-lg">Order Summary</h2>
                   </div>
                   <div className="p-5 space-y-3">
-                    {trips.map((trip, index) => (
-                      <div key={index} className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-gray-700">
-                          {trips.length > 1 ? `Transfer ${index + 1}` : 'Transfer'}
-                        </span>
-                        <span className="font-bold text-gray-900">${trip.price}</span>
-                      </div>
-                    ))}
+                    {trips.map((trip, index) => {
+                      const addOnsPrice = calculateAddOnsPrice(trip.add_ons || []);
+                      return (
+                        <div key={index} className="space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium text-gray-700">
+                              {trips.length > 1 ? `Transfer ${index + 1}` : 'Transfer'}
+                            </span>
+                            <span className="font-bold text-gray-900">${trip.price}</span>
+                          </div>
+                          {addOnsPrice > 0 && (
+                            <div className="flex items-center justify-between text-blue-600">
+                              <span className="text-xs pl-2">+ Add-ons</span>
+                              <span className="text-sm font-medium">+${addOnsPrice}</span>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
 
                     {/* Total */}
                     <div className="pt-3 border-t-2 border-gray-200">
@@ -887,13 +1330,21 @@ function PreviewPageContent() {
                   </div>
                 </div>
 
+                {/* Validation Error */}
+                {validationError && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2">
+                    <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
+                    <p className="text-sm text-red-700">{validationError}</p>
+                  </div>
+                )}
+
                 {/* Continue Button */}
                 <button
                   onClick={handleContinue}
                   disabled={editingIndex !== null || showAddTrip}
                   className="w-full py-4 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 shadow-lg"
                 >
-                  Continue to Details
+                  Continue to Checkout
                   <ArrowRight className="h-5 w-5" />
                 </button>
 

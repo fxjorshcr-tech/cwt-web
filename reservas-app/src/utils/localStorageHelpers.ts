@@ -33,6 +33,7 @@ export interface LocalStorageBooking {
   trips: LocalStorageTrip[];
   createdAt: string;
   tripDetails?: LocalStorageTripDetails[];
+  tripType?: 'one-way' | 'multi'; // One Way or Multi-destination
 }
 
 // ============================================

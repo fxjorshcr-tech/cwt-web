@@ -8,8 +8,8 @@ export default function ConditionalFooter() {
   const pathname = usePathname();
   
   // ✅ Ocultar footer en páginas del flujo de booking
-  const hideFooter = pathname === '/booking-details' || 
-                     pathname === '/summary' || 
+  const hideFooter = pathname === '/preview' ||
+                     pathname === '/checkout' ||
                      pathname === '/payment';
 
   if (hideFooter) return null;

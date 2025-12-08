@@ -1,17 +1,23 @@
 // src/components/forms/QuickSearchForm.tsx
-// ✅ CORREGIDO: Manejo robusto de localStorage y errores
+// ✅ REDESIGNED: Horizontal layout + Multi-destination support
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Loader2, AlertCircle, X, CheckCircle } from 'lucide-react';
+import { Search, Loader2, AlertCircle, X, CheckCircle, Plus, Trash2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { LocationAutocomplete } from './LocationAutocomplete';
 import { ModernDatePicker } from './ModernDatePicker';
-import { PassengerSelector } from './PassengerSelector';
 import { loadRoutesFromSupabase, calculateTripPrice, type Route } from '@/utils/bookingFormHelpers';
 import { formatDateToString } from '@/utils/timeHelpers';
 import { isLocalStorageAvailable, saveBookingToLocalStorage } from '@/utils/localStorageHelpers';
+
+interface TripInput {
+  origin: string;
+  destination: string;
+  date: Date | null;
+  pickupTime: string;
+}
 
 interface QuickSearchFormProps {
   className?: string;
@@ -32,65 +38,82 @@ export function QuickSearchForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [availabilityStatus, setAvailabilityStatus] = useState<'idle' | 'checking' | 'approved'>('idle');
 
-  // Form state - use initial values if provided
-  const [origin, setOrigin] = useState(initialOrigin);
-  const [destination, setDestination] = useState(initialDestination);
-  const [date, setDate] = useState<Date | null>(null);
-  const [adults, setAdults] = useState(2);
-  const [children, setChildren] = useState(0);
+  // Trip type toggle
+  const [tripType, setTripType] = useState<'one-way' | 'multi'>('one-way');
 
-  // Update origin/destination when initial values change (from URL params)
+  // Multi-trip state
+  const [trips, setTrips] = useState<TripInput[]>([
+    { origin: initialOrigin, destination: initialDestination, date: null, pickupTime: '09:00' }
+  ]);
+
+  // Default passengers (will be edited in preview)
+  const adults = 2;
+  const children = 0;
+
+  // Update first trip when initial values change
   useEffect(() => {
-    if (initialOrigin) setOrigin(initialOrigin);
-    if (initialDestination) setDestination(initialDestination);
+    if (initialOrigin || initialDestination) {
+      setTrips(prev => [{
+        ...prev[0],
+        origin: initialOrigin || prev[0].origin,
+        destination: initialDestination || prev[0].destination,
+      }]);
+    }
   }, [initialOrigin, initialDestination]);
 
-  // Load routes with error handling
+  // Load routes
   useEffect(() => {
     async function loadRoutes() {
       setIsLoadingRoutes(true);
       setError(null);
-
       try {
         const supabase = createClient();
         const { routes: loadedRoutes, error: loadError } = await loadRoutesFromSupabase(supabase);
-
         if (loadError) {
           setError(loadError);
         } else if (loadedRoutes) {
           setRoutes(loadedRoutes);
         }
       } catch (err) {
-        // ✅ Catch any unexpected errors during Supabase client creation or query
         console.error('Error loading routes:', err);
-        setError('Unable to connect to our servers. Please check your internet connection and try again.');
+        setError('Unable to connect to our servers. Please try again.');
       }
-
       setIsLoadingRoutes(false);
     }
     loadRoutes();
   }, []);
 
-  // Reset destination when origin changes (but NOT when values come from URL params)
-  useEffect(() => {
-    // Skip validation if origin/destination came from URL params (initialOrigin/initialDestination)
-    // This prevents resetting the destination when routes are loaded
-    if (initialOrigin && initialDestination) {
-      return; // Don't reset - values came from indexed route page
-    }
+  // Update trip field
+  const updateTrip = (index: number, field: keyof TripInput, value: any) => {
+    setTrips(prev => {
+      const newTrips = [...prev];
+      newTrips[index] = { ...newTrips[index], [field]: value };
 
-    if (origin && destination) {
-      const validRoute = routes.find(r => r.origen === origin && r.destino === destination);
-      if (!validRoute) {
-        setDestination('');
+      // Reset destination if origin changes and they're now the same
+      if (field === 'origin' && newTrips[index].destination === value) {
+        newTrips[index].destination = '';
       }
-    }
-  }, [origin, destination, routes, initialOrigin, initialDestination]);
 
-  // Handle passengers change
-  const handlePassengersChange = (newAdults: number, newChildren: number) => {
-    setAdults(newAdults);
-    setChildren(newChildren);
+      return newTrips;
+    });
+  };
+
+  // Add new trip (for multi-destination)
+  const addTrip = () => {
+    const lastTrip = trips[trips.length - 1];
+    setTrips(prev => [...prev, {
+      origin: lastTrip.destination, // Next trip starts from last destination
+      destination: '',
+      date: null,
+      pickupTime: '09:00',
+    }]);
+  };
+
+  // Remove trip
+  const removeTrip = (index: number) => {
+    if (trips.length > 1) {
+      setTrips(prev => prev.filter((_, i) => i !== index));
+    }
   };
 
   // Handle submit
@@ -99,9 +122,13 @@ export function QuickSearchForm({
 
     const totalPassengers = adults + children;
 
-    if (!origin || !destination || !date) {
-      setError('Please fill in all fields');
-      return;
+    // Validate all trips
+    for (let i = 0; i < trips.length; i++) {
+      const trip = trips[i];
+      if (!trip.origin || !trip.destination || !trip.date) {
+        setError(`Please complete all fields for ${trips.length > 1 ? `Transfer ${i + 1}` : 'your transfer'}`);
+        return;
+      }
     }
 
     if (totalPassengers > 12) {
@@ -109,9 +136,8 @@ export function QuickSearchForm({
       return;
     }
 
-    // ✅ Check localStorage availability before proceeding
     if (!isLocalStorageAvailable()) {
-      setError('Your browser settings are blocking this feature. Please enable cookies/localStorage or try a different browser.');
+      setError('Your browser settings are blocking this feature. Please enable cookies/localStorage.');
       return;
     }
 
@@ -119,115 +145,106 @@ export function QuickSearchForm({
     setError(null);
 
     try {
-      // Find the route
-      const route = routes.find(r => r.origen === origin && r.destino === destination);
-      if (!route) {
-        setError('Route not available');
-        setIsSubmitting(false);
-        return;
-      }
+      // Validate all routes exist
+      const tripData = [];
+      const tripDetails = [];
 
-      // Show "Preparing your quote..." for 300ms
-      setAvailabilityStatus('checking');
-      await new Promise(resolve => setTimeout(resolve, 300));
+      for (const trip of trips) {
+        const route = routes.find(r => r.origen === trip.origin && r.destino === trip.destination);
+        if (!route) {
+          setError(`Route not available: ${trip.origin} → ${trip.destination}`);
+          setIsSubmitting(false);
+          return;
+        }
 
-      // Show "Quote ready!" for 300ms
-      setAvailabilityStatus('approved');
-      await new Promise(resolve => setTimeout(resolve, 300));
+        const price = calculateTripPrice(route, totalPassengers);
+        const dateStr = formatDateToString(trip.date!);
 
-      // Generate booking ID
-      const bookingId = `booking_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-      // Calculate price
-      const price = calculateTripPrice(route, totalPassengers);
-
-      // Create booking data
-      const bookingData = {
-        trips: [{
-          from_location: origin,
-          to_location: destination,
-          date: formatDateToString(date),
+        tripData.push({
+          from_location: trip.origin,
+          to_location: trip.destination,
+          date: dateStr,
           adults,
           children,
           price,
           duration: route.duracion,
           routeId: route.id,
           calculatedPrice: price,
-        }],
+        });
+
+        tripDetails.push({
+          pickup_time: trip.pickupTime,
+          pickup_address: '',
+          dropoff_address: '',
+          flight_number: '',
+          airline: '',
+          special_requests: '',
+          children_ages: [],
+          add_ons: [],
+          night_surcharge: 0,
+          add_ons_price: 0,
+          final_price: price,
+        });
+      }
+
+      setAvailabilityStatus('checking');
+      await new Promise(resolve => setTimeout(resolve, 300));
+      setAvailabilityStatus('approved');
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      const bookingId = `booking_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+      const bookingData = {
+        trips: tripData,
+        tripDetails,
+        tripType, // Save trip type to know if it's one-way or multi
         createdAt: new Date().toISOString(),
       };
 
-      // ✅ Save to localStorage using safe function
       const saved = saveBookingToLocalStorage(bookingId, bookingData);
-
       if (!saved) {
-        throw new Error('Failed to save booking data. Please check your browser settings.');
+        throw new Error('Failed to save booking data.');
       }
 
-      // Navigate to preview - keep isSubmitting true to prevent double clicks
       router.push(`/preview?booking_id=${bookingId}`);
     } catch (err) {
       console.error('Search error:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
-      setError(errorMessage);
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
       setIsSubmitting(false);
       setAvailabilityStatus('idle');
     }
   }
 
-  // Retry loading routes
-  const retryLoadRoutes = async () => {
-    setError(null);
-    setIsLoadingRoutes(true);
-    const supabase = createClient();
-    const { routes: loadedRoutes, error: loadError } = await loadRoutesFromSupabase(supabase);
-
-    if (loadError) {
-      setError(loadError);
-    } else if (loadedRoutes) {
-      setRoutes(loadedRoutes);
-    }
-    setIsLoadingRoutes(false);
-  };
-
+  // Loading state
   if (isLoadingRoutes) {
     return (
-      <div className={`bg-white rounded-2xl shadow-xl overflow-visible notranslate ${className}`} translate="no">
-        {/* Same header as the form */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-5 py-4 rounded-t-2xl">
-          <h2 className="text-white font-bold text-lg text-center">Get an Instant Quote</h2>
-        </div>
-        {/* Same height as the form content */}
-        <div className="p-5 md:p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Skeleton placeholders matching form fields */}
-            <div className="h-[72px] bg-gray-100 rounded-lg animate-pulse" />
-            <div className="h-[72px] bg-gray-100 rounded-lg animate-pulse" />
-            <div className="h-[72px] bg-gray-100 rounded-lg animate-pulse" />
-            <div className="h-[72px] bg-gray-100 rounded-lg animate-pulse" />
+      <div className={`bg-[#0a1628] rounded-2xl shadow-xl overflow-visible notranslate ${className}`} translate="no">
+        <div className="p-6">
+          <div className="flex gap-2 mb-4">
+            <div className="h-8 w-20 bg-gray-700 rounded-full animate-pulse" />
+            <div className="h-8 w-32 bg-gray-700 rounded-full animate-pulse" />
           </div>
-          <div className="mt-6 flex justify-center">
-            <div className="w-full sm:w-auto min-w-[220px] h-[52px] bg-gray-200 rounded-xl animate-pulse" />
-          </div>
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-            <div className="h-6 w-32 bg-gray-100 rounded-full animate-pulse" />
-            <div className="h-6 w-36 bg-gray-100 rounded-full animate-pulse" />
-            <div className="h-6 w-40 bg-gray-100 rounded-full animate-pulse" />
+          <div className="flex flex-wrap gap-2">
+            <div className="h-14 flex-1 min-w-[200px] bg-gray-700 rounded-lg animate-pulse" />
+            <div className="h-14 flex-1 min-w-[200px] bg-gray-700 rounded-lg animate-pulse" />
+            <div className="h-14 w-48 bg-gray-700 rounded-lg animate-pulse" />
+            <div className="h-14 w-32 bg-gray-700 rounded-lg animate-pulse" />
+            <div className="h-14 w-32 bg-blue-600 rounded-lg animate-pulse" />
           </div>
         </div>
       </div>
     );
   }
 
-  // Show error state if routes failed to load
+  // Error state (no routes)
   if (routes.length === 0 && error) {
     return (
-      <div className={`bg-white rounded-2xl shadow-xl p-6 notranslate ${className}`} translate="no">
+      <div className={`bg-[#0a1628] rounded-2xl shadow-xl p-6 notranslate ${className}`} translate="no">
         <div className="flex flex-col items-center justify-center gap-4 py-8">
-          <AlertCircle className="h-10 w-10 text-red-500" />
-          <p className="text-gray-600 text-center">{error}</p>
+          <AlertCircle className="h-10 w-10 text-red-400" />
+          <p className="text-gray-300 text-center">{error}</p>
           <button
-            onClick={retryLoadRoutes}
+            onClick={() => window.location.reload()}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             Try Again
@@ -240,17 +257,55 @@ export function QuickSearchForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className={`bg-white rounded-2xl shadow-xl overflow-visible notranslate ${className}`}
+      className={`bg-white rounded-2xl shadow-xl border border-gray-200 overflow-visible notranslate ${className}`}
       translate="no"
     >
-      {/* Title */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-5 py-4 rounded-t-2xl">
-        <h2 className="text-white font-bold text-lg text-center">Get an Instant Quote</h2>
-      </div>
+      <div className="p-4 md:p-6">
+        {/* Trip Type Toggle */}
+        <div className="flex items-center gap-4 mb-4">
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => {
+                setTripType('one-way');
+                setTrips([trips[0]]); // Keep only first trip
+              }}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm transition-all ${
+                tripType === 'one-way'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                tripType === 'one-way' ? 'border-white' : 'border-gray-400'
+              }`}>
+                {tripType === 'one-way' && <div className="w-2 h-2 rounded-full bg-white" />}
+              </div>
+              One way
+            </button>
+            <button
+              type="button"
+              onClick={() => setTripType('multi')}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm transition-all ${
+                tripType === 'multi'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                tripType === 'multi' ? 'border-white' : 'border-gray-400'
+              }`}>
+                {tripType === 'multi' && <div className="w-2 h-2 rounded-full bg-white" />}
+              </div>
+              Multi-city
+              <span className="text-[10px] bg-green-500 text-white px-1.5 py-0.5 rounded font-bold">New</span>
+            </button>
+          </div>
+        </div>
 
-      {error && (
-        <div className="px-5 pt-5">
-          <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 flex items-center justify-between">
+        {/* Error message */}
+        {error && (
+          <div className="mb-4 bg-red-50 border border-red-200 rounded-lg px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <AlertCircle className="h-4 w-4 text-red-500 flex-shrink-0" />
               <span className="text-sm text-red-700">{error}</span>
@@ -259,111 +314,99 @@ export function QuickSearchForm({
               <X className="h-4 w-4 text-red-500 hover:text-red-700" />
             </button>
           </div>
-        </div>
-      )}
+        )}
 
-      <div className="p-5 md:p-6">
-        {/* Grid layout - responsive */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Trip rows */}
+        <div className="space-y-3">
+          {trips.map((trip, index) => (
+            <div key={index} className="bg-gray-50 rounded-xl p-3 border border-gray-200">
+              <div className="flex flex-wrap items-center gap-3">
+                {/* Origin */}
+                <div className="flex-1 min-w-[200px]">
+                  <LocationAutocomplete
+                    placeholder="Where from?"
+                    value={trip.origin}
+                    onChange={(val) => updateTrip(index, 'origin', val)}
+                    routes={routes}
+                    filterByDestination={trip.destination}
+                    type="origin"
+                  />
+                </div>
 
-          {/* Origin */}
-          <div>
-            <LocationAutocomplete
-              label="Pick-up Location"
-              placeholder="Where from?"
-              value={origin}
-              onChange={setOrigin}
-              routes={routes}
-              filterByDestination={destination}
-              type="origin"
-            />
-          </div>
+                {/* Destination */}
+                <div className="flex-1 min-w-[200px]">
+                  <LocationAutocomplete
+                    placeholder={trip.origin ? "Where to?" : "Select origin first"}
+                    value={trip.destination}
+                    onChange={(val) => updateTrip(index, 'destination', val)}
+                    routes={routes}
+                    filterByOrigin={trip.origin}
+                    disabled={!trip.origin}
+                    type="destination"
+                  />
+                </div>
 
-          {/* Destination */}
-          <div>
-            <LocationAutocomplete
-              label="Drop-off Location"
-              placeholder={origin ? "Where to?" : "Select origin first"}
-              value={destination}
-              onChange={setDestination}
-              routes={routes}
-              filterByOrigin={origin}
-              disabled={!origin}
-              type="destination"
-            />
-          </div>
+                {/* Date */}
+                <div className="flex-1 min-w-[180px]">
+                  <ModernDatePicker
+                    value={trip.date}
+                    onChange={(date) => updateTrip(index, 'date', date)}
+                    enforceMinimumAdvance={true}
+                  />
+                </div>
 
-          {/* Date */}
-          <div>
-            <ModernDatePicker
-              label="Travel Date"
-              value={date}
-              onChange={setDate}
-              enforceMinimumAdvance={true}
-            />
-            <p className="text-xs text-gray-500 mt-1.5 flex items-center gap-1">
-              <span className="text-amber-600">*</span>
-              Last-minute booking? <a href="https://wa.me/50685962438" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-medium">Contact us via WhatsApp</a>
-            </p>
-          </div>
-
-          {/* Passengers */}
-          <div>
-            <PassengerSelector
-              label="Passengers"
-              adults={adults}
-              children={children}
-              onPassengersChange={handlePassengersChange}
-            />
-          </div>
+                {/* Remove button (only for multi with more than 1 trip) */}
+                {tripType === 'multi' && trips.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeTrip(index)}
+                    className="h-11 w-11 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                  >
+                    <Trash2 className="h-5 w-5" />
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
 
-        {/* Search Button */}
-        <div className="mt-6 flex justify-center">
+        {/* Add destination button (only for multi-city) - before search */}
+        {tripType === 'multi' && (
           <button
-            type="submit"
-            disabled={isSubmitting || !origin || !destination || !date}
-            className={`w-full sm:w-auto min-w-[220px] py-3.5 px-10 font-semibold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg text-base ${
-              availabilityStatus === 'approved'
-                ? 'bg-green-600 text-white'
-                : 'bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed hover:shadow-xl'
-            }`}
+            type="button"
+            onClick={addTrip}
+            className="mt-3 flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors"
           >
-            {availabilityStatus === 'checking' ? (
-              <>
-                <Loader2 className="h-5 w-5 animate-spin" />
-                Preparing your quote...
-              </>
-            ) : availabilityStatus === 'approved' ? (
-              <>
-                <CheckCircle className="h-5 w-5" />
-                Quote ready!
-              </>
-            ) : isSubmitting ? (
-              <>
-                <Loader2 className="h-5 w-5 animate-spin" />
-                Searching...
-              </>
-            ) : (
-              <>
-                <Search className="h-5 w-5" />
-                Search Transfers
-              </>
-            )}
+            <Plus className="h-4 w-4" />
+            Add destination
           </button>
-        </div>
+        )}
+
+        {/* Search Button - Full width below trips */}
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="mt-4 w-full h-12 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+        >
+          {availabilityStatus === 'checking' ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : availabilityStatus === 'approved' ? (
+            <CheckCircle className="h-5 w-5" />
+          ) : (
+            <Search className="h-5 w-5" />
+          )}
+          <span>Find a ride</span>
+        </button>
 
         {/* Info Pills */}
-        <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-          <span className="text-xs text-gray-800 font-semibold bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
-            Max 12 per van with luggage
-          </span>
-          <span className="text-xs text-gray-800 font-semibold bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
-            Custom routes available
-          </span>
-          <span className="text-xs text-gray-800 font-semibold bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
-            Multidestination booking
-          </span>
+        <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-gray-500">
+          <span>Max 12 per van with luggage</span>
+          <span>•</span>
+          <span>Custom routes available *</span>
+          <span>•</span>
+          <a href="https://wa.me/50685962438" target="_blank" rel="noopener noreferrer" className="text-green-600 hover:text-green-700">
+            Last-minute? WhatsApp us
+          </a>
         </div>
       </div>
     </form>

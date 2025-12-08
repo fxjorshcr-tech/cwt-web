@@ -13,8 +13,8 @@ export function PrefetchWrapper() {
     // para no interferir con la carga inicial
     const timer = setTimeout(() => {
       // Prefetch de las rutas críticas del flujo de booking
-      router.prefetch('/booking-details');
-      router.prefetch('/summary');
+      router.prefetch('/preview');
+      router.prefetch('/checkout');
       router.prefetch('/confirmation');
       
       // Prefetch de tours (menos crítico)

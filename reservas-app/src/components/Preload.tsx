@@ -13,8 +13,8 @@ export function Preload() {
       <link rel="preconnect" href="https://mmlbslwljvmscbgsqkkq.supabase.co" crossOrigin="anonymous" />
       
       {/* Prefetch de rutas críticas */}
-      <link rel="prefetch" href="/booking-details" />
-      <link rel="prefetch" href="/summary" />
+      <link rel="prefetch" href="/preview" />
+      <link rel="prefetch" href="/checkout" />
       <link rel="prefetch" href="/confirmation" />
       
       {/* Preload de imagen hero (crítica para LCP) */}
