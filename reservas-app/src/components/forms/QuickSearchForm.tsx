@@ -400,15 +400,21 @@ export function QuickSearchForm({
           <span>Find a ride</span>
         </button>
 
-        {/* Info Pills */}
-        <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-gray-500">
-          <span>Max 12 per van with luggage</span>
-          <span>•</span>
-          <span>Custom routes available *</span>
-          <span>•</span>
-          <a href="https://wa.me/50685962438" target="_blank" rel="noopener noreferrer" className="text-green-600 hover:text-green-700">
-            Last-minute? WhatsApp us
-          </a>
+        {/* Info Pills - Centered, stacked on mobile */}
+        <div className="mt-4 text-center text-xs text-gray-500">
+          <p className="hidden sm:block">
+            Max 12 per van with luggage • Custom routes available * •{' '}
+            <a href="https://wa.me/50685962438" target="_blank" rel="noopener noreferrer" className="text-green-600 hover:text-green-700 font-medium">
+              Last-minute? WhatsApp us
+            </a>
+          </p>
+          {/* Mobile: stacked layout */}
+          <div className="sm:hidden space-y-1">
+            <p>Max 12 per van • Custom routes *</p>
+            <a href="https://wa.me/50685962438" target="_blank" rel="noopener noreferrer" className="text-green-600 hover:text-green-700 font-medium inline-block">
+              Last-minute? WhatsApp us
+            </a>
+          </div>
         </div>
       </div>
     </form>
