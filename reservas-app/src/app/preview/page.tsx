@@ -902,9 +902,33 @@ function PreviewPageContent() {
                   ) : (
                     // View Mode
                     <div className="p-3 sm:p-5">
-                      {/* Availability & Alerts - TOP */}
-                      <div className="flex flex-wrap gap-1.5 mb-3">
-                        {/* Dynamic Availability - PROMINENT */}
+                      {/* 1. Trip Info Summary - FIRST (Date, Pax, Duration, Price) */}
+                      <div className="grid grid-cols-4 gap-2 mb-3">
+                        <div className="bg-gray-50 rounded-lg p-2 text-center">
+                          <Calendar className="h-4 w-4 text-blue-500 mx-auto mb-0.5" />
+                          <p className="text-[9px] text-gray-500 uppercase">Date</p>
+                          <p className="text-[11px] font-semibold text-gray-900">{formatDisplayDate(trip.date)}</p>
+                        </div>
+                        <div className="bg-gray-50 rounded-lg p-2 text-center">
+                          <Users className="h-4 w-4 text-blue-500 mx-auto mb-0.5" />
+                          <p className="text-[9px] text-gray-500 uppercase">Pax</p>
+                          <p className="text-[11px] font-semibold text-gray-900">{trip.adults + trip.children}</p>
+                        </div>
+                        <div className="bg-gray-50 rounded-lg p-2 text-center">
+                          <Clock className="h-4 w-4 text-blue-500 mx-auto mb-0.5" />
+                          <p className="text-[9px] text-gray-500 uppercase">Duration</p>
+                          <p className="text-[11px] font-semibold text-gray-900">{trip.duration || 'N/A'}</p>
+                        </div>
+                        <div className="bg-blue-50 rounded-lg p-2 text-center">
+                          <p className="text-[9px] text-blue-600 uppercase font-medium">Price</p>
+                          <p className="text-base font-bold text-blue-600">
+                            ${trip.price + calculateAddOnsPrice(trip.add_ons || [])}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* 2. Availability & Alerts Badges */}
+                      <div className="flex flex-wrap gap-1.5 mb-4">
                         {(() => {
                           const availableVans = getAvailabilityCount(trip.from_location, trip.to_location, trip.date);
                           return (
@@ -920,16 +944,12 @@ function PreviewPageContent() {
                             </div>
                           );
                         })()}
-
-                        {/* High Season Alert */}
                         {isHighSeason(trip.date) && (
                           <div className="flex items-center gap-1.5 px-2 py-1 bg-amber-100 border border-amber-300 rounded-lg text-xs">
                             <AlertTriangle className="h-3.5 w-3.5 text-amber-600" />
                             <span className="font-bold text-amber-700">High Season</span>
                           </div>
                         )}
-
-                        {/* Popular Route Badge */}
                         {isPopularRoute(trip.from_location, trip.to_location) && (
                           <div className="flex items-center gap-1.5 px-2 py-1 bg-orange-100 border border-orange-300 rounded-lg text-xs">
                             <Flame className="h-3.5 w-3.5 text-orange-500" />
@@ -938,7 +958,7 @@ function PreviewPageContent() {
                         )}
                       </div>
 
-                      {/* Route Display with inline inputs */}
+                      {/* 3. Route Details with inputs */}
                       <div className="space-y-3 mb-4">
                         {/* FROM section */}
                         <div className="space-y-2">
@@ -1122,36 +1142,6 @@ function PreviewPageContent() {
                           selectedAddOns={trip.add_ons || []}
                           onAddOnsChange={(addOns) => updateTripAddOns(index, addOns)}
                         />
-                      </div>
-
-                      {/* Trip Details - 2x2 grid on mobile */}
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-gray-100">
-                        <div className="bg-gray-50 rounded-lg p-2 text-center">
-                          <Calendar className="h-4 w-4 text-blue-500 mx-auto mb-1" />
-                          <p className="text-[10px] text-gray-500 uppercase">Date</p>
-                          <p className="text-xs font-semibold text-gray-900">{formatDisplayDate(trip.date)}</p>
-                        </div>
-                        <div className="bg-gray-50 rounded-lg p-2 text-center">
-                          <Users className="h-4 w-4 text-blue-500 mx-auto mb-1" />
-                          <p className="text-[10px] text-gray-500 uppercase">Guests</p>
-                          <p className="text-xs font-semibold text-gray-900">{trip.adults + trip.children} pax</p>
-                        </div>
-                        <div className="bg-gray-50 rounded-lg p-2 text-center">
-                          <Clock className="h-4 w-4 text-blue-500 mx-auto mb-1" />
-                          <p className="text-[10px] text-gray-500 uppercase">Duration</p>
-                          <p className="text-xs font-semibold text-gray-900">{trip.duration || 'N/A'}</p>
-                        </div>
-                        <div className="bg-blue-50 rounded-lg p-2 text-center">
-                          <p className="text-[10px] text-blue-600 uppercase font-medium">Price</p>
-                          <p className="text-lg font-bold text-blue-600">
-                            ${trip.price + calculateAddOnsPrice(trip.add_ons || [])}
-                          </p>
-                          {calculateAddOnsPrice(trip.add_ons || []) > 0 && (
-                            <p className="text-[10px] text-blue-500">
-                              (${trip.price} + ${calculateAddOnsPrice(trip.add_ons || [])} add-ons)
-                            </p>
-                          )}
-                        </div>
                       </div>
                     </div>
                   )}
