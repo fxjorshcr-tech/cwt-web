@@ -482,6 +482,7 @@ function PreviewPageContent() {
         add_ons_price: 0,
         final_price: trip.price,
       })),
+      tripType, // Save trip type (one-way or multi)
       createdAt: new Date().toISOString(),
     };
     localStorage.setItem(`booking_${bookingId}`, JSON.stringify(bookingData));
