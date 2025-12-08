@@ -635,16 +635,13 @@ function PreviewPageContent() {
         </div>
 
         <div className="grid sm:grid-cols-2 gap-4 relative z-20">
-          {/* Date & Time */}
+          {/* Date */}
           <div className="relative z-20">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Travel Date & Time</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Travel Date</label>
             <ModernDatePicker
               value={editDate}
               onChange={setEditDate}
               enforceMinimumAdvance={true}
-              showTimePicker={true}
-              selectedTime={editPickupTime}
-              onTimeChange={setEditPickupTime}
             />
           </div>
 
@@ -942,35 +939,31 @@ function PreviewPageContent() {
                               <p className="text-[10px] text-gray-500 uppercase">From</p>
                               <p className="text-sm font-semibold text-gray-900 leading-tight">{trip.from_location}</p>
                             </div>
+                            {/* Pickup Time - same row as FROM title */}
+                            <div className="flex items-center gap-1 bg-blue-600 text-white px-3 py-2 rounded-lg">
+                              <Clock className="h-4 w-4" />
+                              <select
+                                value={trip.pickup_time}
+                                onChange={(e) => updateTripField(index, 'pickup_time', e.target.value)}
+                                className="bg-transparent text-white text-sm font-semibold focus:outline-none cursor-pointer"
+                              >
+                                {Array.from({ length: 48 }, (_, i) => {
+                                  const hour = Math.floor(i / 2);
+                                  const minute = i % 2 === 0 ? '00' : '30';
+                                  const value = `${hour.toString().padStart(2, '0')}:${minute}`;
+                                  const label = `${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour}:${minute} ${hour < 12 ? 'AM' : 'PM'}`;
+                                  return <option key={value} value={value} className="text-gray-900">{label}</option>;
+                                })}
+                              </select>
+                            </div>
                           </div>
-                          <div className="ml-8 flex items-center gap-2">
-                            <div className="flex-1">
-                              <Input
-                                placeholder="Exact pickup address (hotel name, address...)"
-                                value={trip.pickup_address}
-                                onChange={(e) => updateTripField(index, 'pickup_address', e.target.value)}
-                                className="text-sm h-10"
-                              />
-                            </div>
-                            <div className="flex flex-col items-center">
-                              <span className="text-[10px] text-gray-500 uppercase mb-1">Pickup Time</span>
-                              <div className="flex items-center gap-1 bg-blue-600 text-white px-3 h-10 rounded-lg">
-                                <Clock className="h-4 w-4" />
-                                <select
-                                  value={trip.pickup_time}
-                                  onChange={(e) => updateTripField(index, 'pickup_time', e.target.value)}
-                                  className="bg-transparent text-white text-sm font-semibold focus:outline-none cursor-pointer"
-                                >
-                                  {Array.from({ length: 48 }, (_, i) => {
-                                    const hour = Math.floor(i / 2);
-                                    const minute = i % 2 === 0 ? '00' : '30';
-                                    const value = `${hour.toString().padStart(2, '0')}:${minute}`;
-                                    const label = `${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour}:${minute} ${hour < 12 ? 'AM' : 'PM'}`;
-                                    return <option key={value} value={value} className="text-gray-900">{label}</option>;
-                                  })}
-                                </select>
-                              </div>
-                            </div>
+                          <div className="ml-8">
+                            <Input
+                              placeholder="Exact pickup address (hotel name, address...)"
+                              value={trip.pickup_address}
+                              onChange={(e) => updateTripField(index, 'pickup_address', e.target.value)}
+                              className="text-sm h-10"
+                            />
                           </div>
                         </div>
 
@@ -1219,14 +1212,11 @@ function PreviewPageContent() {
                         {/* Date/Time & Passengers Row */}
                         <div className="flex flex-wrap gap-3">
                           <div className="flex-1 min-w-[200px]">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Date & Pickup Time</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Travel Date</label>
                             <ModernDatePicker
                               value={editDate}
                               onChange={setEditDate}
                               enforceMinimumAdvance={true}
-                              showTimePicker={true}
-                              selectedTime={editPickupTime}
-                              onTimeChange={setEditPickupTime}
                             />
                           </div>
                           <div className="flex-1 min-w-[200px]">
