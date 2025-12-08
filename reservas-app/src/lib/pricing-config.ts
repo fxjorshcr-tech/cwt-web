@@ -13,10 +13,10 @@ import type { Route } from '@/types/supabase';
 // ========================================
 
 export const PRICING_CONFIG = {
-  // Recargo nocturno (9 PM - 4 AM)
+  // Recargo nocturno DESHABILITADO (ya no se cobra)
   NIGHT_SURCHARGE: {
     TYPE: 'FIXED' as 'FIXED' | 'PERCENTAGE',
-    AMOUNT: 50,
+    AMOUNT: 0, // ✅ Disabled - no night surcharge
     START_HOUR: 21,
     END_HOUR: 4,
   },

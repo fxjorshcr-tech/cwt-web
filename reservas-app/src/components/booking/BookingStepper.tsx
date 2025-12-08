@@ -1,5 +1,5 @@
 // src/components/booking/BookingStepper.tsx
-// ✅ UPDATED - 6 steps with Checkout
+// ✅ SIMPLIFIED - 4 steps (Search → Trip Details → Checkout → Done)
 
 'use client';
 
@@ -11,27 +11,23 @@ function cn(...classes: (string | boolean | undefined)[]) {
 }
 
 interface BookingStepperProps {
-  currentStep: number; // 0: Search, 1: Preview, 2: Details, 3: Summary, 4: Checkout, 5: Confirmation
+  currentStep: number; // 0: Search, 1: Trip Details, 2: Checkout, 3: Confirmation
 }
 
 const steps = [
   { id: 0, label: 'Search' },
-  { id: 1, label: 'Preview' },
-  { id: 2, label: 'Details' },
-  { id: 3, label: 'Summary' },
-  { id: 4, label: 'Checkout' },
-  { id: 5, label: 'Confirmation' },
+  { id: 1, label: 'Trip Details' },
+  { id: 2, label: 'Checkout' },
+  { id: 3, label: 'Done' },
 ];
 
 // Get motivational message based on progress
 function getProgressMessage(step: number): string {
   switch (step) {
     case 0: return 'Start your journey';
-    case 1: return 'Great choice!';
-    case 2: return 'Almost there...';
-    case 3: return 'Final review';
-    case 4: return 'Last step!';
-    case 5: return 'Complete!';
+    case 1: return 'Almost there!';
+    case 2: return 'Final step!';
+    case 3: return 'Complete!';
     default: return '';
   }
 }

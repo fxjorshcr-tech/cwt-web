@@ -1,11 +1,11 @@
-// src/components/home/ModernDatePicker.tsx
+// src/components/forms/ModernDatePicker.tsx
+// ✅ UPDATED: Now includes integrated time picker
 // ✅ FIXED: Timezone bug corregido - Retorna fechas normalizadas
-// ✅ UPDATED: 12-hour advance booking cutoff support
 
 'use client';
 
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, AlertCircle } from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Clock, ChevronDown } from 'lucide-react';
 import { format } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import { getNowInCostaRica } from '@/utils/timeHelpers';
@@ -16,6 +16,10 @@ interface ModernDatePickerProps {
   label?: string;
   className?: string;
   enforceMinimumAdvance?: boolean; // Enable 12-hour cutoff (blocks today if past noon CR time)
+  // New: Time picker props
+  showTimePicker?: boolean;
+  selectedTime?: string; // Format: "HH:mm" (e.g., "09:00")
+  onTimeChange?: (time: string) => void;
 }
 
 /**
@@ -29,16 +33,32 @@ interface ModernDatePickerProps {
  * ✅ Escape key para cerrar
  * ✅ Accesibilidad completa
  */
+// Generate time options (every 30 minutes)
+const TIME_OPTIONS = Array.from({ length: 48 }, (_, i) => {
+  const hours = Math.floor(i / 2);
+  const minutes = i % 2 === 0 ? '00' : '30';
+  const time24 = `${hours.toString().padStart(2, '0')}:${minutes}`;
+  const period = hours >= 12 ? 'PM' : 'AM';
+  const hours12 = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+  const time12 = `${hours12}:${minutes} ${period}`;
+  return { value: time24, label: time12 };
+});
+
 export function ModernDatePicker({
   value,
   onChange,
   label,
   className = '',
   enforceMinimumAdvance = false,
+  showTimePicker = false,
+  selectedTime = '09:00',
+  onTimeChange,
 }: ModernDatePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(value || new Date());
+  const [showTimeDropdown, setShowTimeDropdown] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const timeDropdownRef = useRef<HTMLDivElement>(null);
 
   // Calculate minimum bookable date based on 12-hour advance booking requirement
   // - Today is ALWAYS blocked (no same-day bookings)
@@ -225,11 +245,14 @@ export function ModernDatePicker({
         <div className="flex items-center gap-2">
           <CalendarIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
           <span className={value ? 'text-gray-900' : 'text-gray-400'}>
-            {value 
-              ? format(value, 'EEEE, MMMM d, yyyy', { locale: enUS })
-              : 'Select a date'
+            {value
+              ? showTimePicker
+                ? `${format(value, 'EEE, MMM d', { locale: enUS })} / ${TIME_OPTIONS.find(t => t.value === selectedTime)?.label || selectedTime}`
+                : format(value, 'EEEE, MMMM d, yyyy', { locale: enUS })
+              : showTimePicker ? 'Select date & time' : 'Select a date'
             }
           </span>
+          {showTimePicker && <Clock className="h-4 w-4 text-gray-400 ml-auto" />}
         </div>
       </button>
 
@@ -281,11 +304,54 @@ export function ModernDatePicker({
             {renderCalendarDays()}
           </div>
 
-          <div className="mt-4 pt-4 border-t">
-            <p className="text-xs text-gray-500 text-center">
-              You can book up to one year in advance
-            </p>
-          </div>
+          {/* Time Picker Section */}
+          {showTimePicker && (
+            <div className="mt-4 pt-4 border-t">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-blue-500" />
+                  Pickup Time
+                </label>
+                <div className="relative" ref={timeDropdownRef}>
+                  <button
+                    type="button"
+                    onClick={() => setShowTimeDropdown(!showTimeDropdown)}
+                    className="flex items-center gap-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg text-sm font-medium text-blue-700 hover:bg-blue-100 transition-colors"
+                  >
+                    {TIME_OPTIONS.find(t => t.value === selectedTime)?.label || selectedTime}
+                    <ChevronDown className="h-4 w-4" />
+                  </button>
+                  {showTimeDropdown && (
+                    <div className="absolute right-0 mt-1 w-32 max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                      {TIME_OPTIONS.map((time) => (
+                        <button
+                          key={time.value}
+                          type="button"
+                          onClick={() => {
+                            onTimeChange?.(time.value);
+                            setShowTimeDropdown(false);
+                          }}
+                          className={`w-full px-3 py-2 text-left text-sm hover:bg-blue-50 transition-colors ${
+                            selectedTime === time.value ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-700'
+                          }`}
+                        >
+                          {time.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {!showTimePicker && (
+            <div className="mt-4 pt-4 border-t">
+              <p className="text-xs text-gray-500 text-center">
+                You can book up to one year in advance
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>

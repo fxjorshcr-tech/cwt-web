@@ -32,10 +32,14 @@ export function QuickSearchForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [availabilityStatus, setAvailabilityStatus] = useState<'idle' | 'checking' | 'approved'>('idle');
 
+  // Trip type toggle
+  const [tripType, setTripType] = useState<'one-way' | 'multi'>('one-way');
+
   // Form state - use initial values if provided
   const [origin, setOrigin] = useState(initialOrigin);
   const [destination, setDestination] = useState(initialDestination);
   const [date, setDate] = useState<Date | null>(null);
+  const [pickupTime, setPickupTime] = useState('09:00');
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
 
@@ -154,6 +158,19 @@ export function QuickSearchForm({
           routeId: route.id,
           calculatedPrice: price,
         }],
+        tripDetails: [{
+          pickup_time: pickupTime,
+          pickup_address: '',
+          dropoff_address: '',
+          flight_number: '',
+          airline: '',
+          special_requests: '',
+          children_ages: [],
+          add_ons: [],
+          night_surcharge: 0,
+          add_ons_price: 0,
+          final_price: price,
+        }],
         createdAt: new Date().toISOString(),
       };
 
@@ -164,8 +181,14 @@ export function QuickSearchForm({
         throw new Error('Failed to save booking data. Please check your browser settings.');
       }
 
-      // Navigate to preview - keep isSubmitting true to prevent double clicks
-      router.push(`/preview?booking_id=${bookingId}`);
+      // Navigate based on trip type
+      if (tripType === 'multi') {
+        // For multi-destination, go to transfers page to add more trips
+        router.push(`/transfers?booking_id=${bookingId}&mode=multi`);
+      } else {
+        // For one-way, go directly to preview
+        router.push(`/preview?booking_id=${bookingId}`);
+      }
     } catch (err) {
       console.error('Search error:', err);
       const errorMessage = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
@@ -248,6 +271,35 @@ export function QuickSearchForm({
         <h2 className="text-white font-bold text-lg text-center">Get an Instant Quote</h2>
       </div>
 
+      {/* Trip Type Toggle */}
+      <div className="px-5 pt-5">
+        <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-lg w-fit">
+          <button
+            type="button"
+            onClick={() => setTripType('one-way')}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+              tripType === 'one-way'
+                ? 'bg-white text-blue-600 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            One Way
+          </button>
+          <button
+            type="button"
+            onClick={() => setTripType('multi')}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-1.5 ${
+              tripType === 'multi'
+                ? 'bg-white text-blue-600 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            Multi-destination
+            <span className="text-[10px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-full font-bold">NEW</span>
+          </button>
+        </div>
+      </div>
+
       {error && (
         <div className="px-5 pt-5">
           <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 flex items-center justify-between">
@@ -293,13 +345,16 @@ export function QuickSearchForm({
             />
           </div>
 
-          {/* Date */}
+          {/* Date & Time */}
           <div>
             <ModernDatePicker
-              label="Travel Date"
+              label="Date & Time"
               value={date}
               onChange={setDate}
               enforceMinimumAdvance={true}
+              showTimePicker={true}
+              selectedTime={pickupTime}
+              onTimeChange={setPickupTime}
             />
             <p className="text-xs text-gray-500 mt-1.5 flex items-center gap-1">
               <span className="text-amber-600">*</span>
@@ -359,10 +414,7 @@ export function QuickSearchForm({
             Max 12 per van with luggage
           </span>
           <span className="text-xs text-gray-800 font-semibold bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
-            Custom routes available
-          </span>
-          <span className="text-xs text-gray-800 font-semibold bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
-            Multidestination booking
+            Custom routes available *
           </span>
         </div>
       </div>

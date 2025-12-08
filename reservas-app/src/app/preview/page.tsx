@@ -30,6 +30,7 @@ import {
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import BookingStepper from '@/components/booking/BookingStepper';
 import { IncludedFeatures, ImportantInfo } from '@/components/summary';
+import { Input } from '@/components/ui/input';
 import { LocationAutocomplete } from '@/components/forms/LocationAutocomplete';
 import { ModernDatePicker } from '@/components/forms/ModernDatePicker';
 import { PassengerSelector } from '@/components/forms/PassengerSelector';
@@ -102,6 +103,11 @@ interface TripPreview {
   price: number;
   duration: string;
   routeId: number;
+  // Inline details
+  pickup_address: string;
+  dropoff_address: string;
+  pickup_time: string;
+  children_ages: (number | null)[];
 }
 
 function PreviewPageContent() {
@@ -157,16 +163,23 @@ function PreviewPageContent() {
 
         if (localData && localData.trips.length > 0) {
           // Load from localStorage
-          loadedTrips = localData.trips.map((trip) => ({
-            from_location: trip.from_location,
-            to_location: trip.to_location,
-            date: trip.date,
-            adults: trip.adults,
-            children: trip.children || 0,
-            price: trip.price,
-            duration: trip.duration || '',
-            routeId: trip.routeId || 0,
-          }));
+          loadedTrips = localData.trips.map((trip, index) => {
+            const details = localData.tripDetails?.[index];
+            return {
+              from_location: trip.from_location,
+              to_location: trip.to_location,
+              date: trip.date,
+              adults: trip.adults,
+              children: trip.children || 0,
+              price: trip.price,
+              duration: trip.duration || '',
+              routeId: trip.routeId || 0,
+              pickup_address: details?.pickup_address || '',
+              dropoff_address: details?.dropoff_address || '',
+              pickup_time: details?.pickup_time || '09:00',
+              children_ages: details?.children_ages || Array(trip.children || 0).fill(null),
+            };
+          });
         } else {
           // Fallback: Load from Supabase if localStorage is empty
           console.log('localStorage empty, loading from Supabase...');
@@ -229,6 +242,10 @@ function PreviewPageContent() {
             price: trip.price || 0,
             duration: trip.duration || '',
             routeId: trip.routeId || 0,
+            pickup_address: trip.pickup_address || '',
+            dropoff_address: trip.dropoff_address || '',
+            pickup_time: trip.pickup_time || '09:00',
+            children_ages: trip.children_ages || Array(trip.children || 0).fill(null),
           }));
         }
 
@@ -313,7 +330,17 @@ function PreviewPageContent() {
     // ✅ Don't save if date formatting failed
     if (!dateStr) return;
 
+    const existingTrip = trips[editingIndex];
     const newTrips = [...trips];
+
+    // Adjust children_ages array if children count changed
+    let childrenAges = existingTrip.children_ages || [];
+    if (editChildren > childrenAges.length) {
+      childrenAges = [...childrenAges, ...Array(editChildren - childrenAges.length).fill(null)];
+    } else if (editChildren < childrenAges.length) {
+      childrenAges = childrenAges.slice(0, editChildren);
+    }
+
     newTrips[editingIndex] = {
       from_location: editOrigin,
       to_location: editDestination,
@@ -323,6 +350,10 @@ function PreviewPageContent() {
       price,
       duration: route.duracion || '',
       routeId: route.id,
+      pickup_address: existingTrip.pickup_address || '',
+      dropoff_address: existingTrip.dropoff_address || '',
+      pickup_time: existingTrip.pickup_time || '09:00',
+      children_ages: childrenAges,
     };
 
     setTrips(newTrips);
@@ -396,6 +427,10 @@ function PreviewPageContent() {
       price,
       duration: route.duracion || '',
       routeId: route.id,
+      pickup_address: '',
+      dropoff_address: '',
+      pickup_time: '09:00',
+      children_ages: Array(editChildren).fill(null),
     };
 
     const newTrips = [...trips, newTrip];
@@ -428,15 +463,63 @@ function PreviewPageContent() {
         routeId: trip.routeId,
         calculatedPrice: trip.price,
       })),
+      tripDetails: tripsToSave.map((trip) => ({
+        pickup_address: trip.pickup_address || '',
+        dropoff_address: trip.dropoff_address || '',
+        pickup_time: trip.pickup_time || '09:00',
+        flight_number: '',
+        airline: '',
+        special_requests: '',
+        children_ages: trip.children_ages || [],
+        add_ons: [],
+        night_surcharge: 0,
+        add_ons_price: 0,
+        final_price: trip.price,
+      })),
       createdAt: new Date().toISOString(),
     };
     localStorage.setItem(`booking_${bookingId}`, JSON.stringify(bookingData));
   }
 
-  // Continue to details
+  // Continue directly to checkout (skip booking-details and summary)
   function handleContinue() {
+    // Validate that all required inline fields are filled
+    const incompleteTrips = trips.filter(trip => !trip.pickup_address || !trip.dropoff_address);
+    if (incompleteTrips.length > 0) {
+      setError('Please fill in pickup and drop-off addresses for all transfers');
+      return;
+    }
+
+    // Validate children ages if there are children
+    const missingChildrenAges = trips.filter(trip =>
+      trip.children > 0 && trip.children_ages.filter(age => age !== null).length < trip.children
+    );
+    if (missingChildrenAges.length > 0) {
+      setError('Please provide ages for all children');
+      return;
+    }
+
     saveToLocalStorage(trips);
-    router.push(`/booking-details?booking_id=${bookingId}&trip=0`);
+    router.push(`/checkout?booking_id=${bookingId}`);
+  }
+
+  // Update trip inline field
+  function updateTripField(index: number, field: keyof TripPreview, value: any) {
+    const newTrips = [...trips];
+    newTrips[index] = { ...newTrips[index], [field]: value };
+    setTrips(newTrips);
+    // Auto-save to localStorage
+    saveToLocalStorage(newTrips);
+  }
+
+  // Update child age
+  function updateChildAge(tripIndex: number, childIndex: number, age: number | null) {
+    const newTrips = [...trips];
+    const newAges = [...(newTrips[tripIndex].children_ages || [])];
+    newAges[childIndex] = age;
+    newTrips[tripIndex] = { ...newTrips[tripIndex], children_ages: newAges };
+    setTrips(newTrips);
+    saveToLocalStorage(newTrips);
   }
 
   // Render edit/add form
@@ -735,26 +818,73 @@ function PreviewPageContent() {
                   ) : (
                     // View Mode
                     <div className="p-4 sm:p-5">
-                      {/* Route Display - Vertical on mobile */}
-                      <div className="space-y-2 mb-4">
-                        <div className="flex items-center gap-2">
-                          <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                            <MapPin className="h-3 w-3 text-blue-600" />
+                      {/* Route Display with inline inputs */}
+                      <div className="space-y-4 mb-4">
+                        {/* FROM section with pickup address */}
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                              <MapPin className="h-3 w-3 text-blue-600" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-[10px] text-gray-500 uppercase">From</p>
+                              <p className="text-sm font-semibold text-gray-900 leading-tight">{trip.from_location}</p>
+                            </div>
                           </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-[10px] text-gray-500 uppercase">From</p>
-                            <p className="text-sm font-semibold text-gray-900 leading-tight">{trip.from_location}</p>
+                          <div className="ml-8">
+                            <Input
+                              placeholder="Exact pickup address (hotel name, address...)"
+                              value={trip.pickup_address}
+                              onChange={(e) => updateTripField(index, 'pickup_address', e.target.value)}
+                              className="text-sm h-10"
+                            />
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <div className="h-6 w-6 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
-                            <MapPin className="h-3 w-3 text-orange-500" />
+
+                        {/* TO section with dropoff address */}
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <div className="h-6 w-6 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
+                              <MapPin className="h-3 w-3 text-orange-500" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-[10px] text-gray-500 uppercase">To</p>
+                              <p className="text-sm font-semibold text-gray-900 leading-tight">{trip.to_location}</p>
+                            </div>
                           </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-[10px] text-gray-500 uppercase">To</p>
-                            <p className="text-sm font-semibold text-gray-900 leading-tight">{trip.to_location}</p>
+                          <div className="ml-8">
+                            <Input
+                              placeholder="Exact drop-off address (hotel name, address...)"
+                              value={trip.dropoff_address}
+                              onChange={(e) => updateTripField(index, 'dropoff_address', e.target.value)}
+                              className="text-sm h-10"
+                            />
                           </div>
                         </div>
+
+                        {/* Children Ages - only if there are children */}
+                        {trip.children > 0 && (
+                          <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                            <p className="text-xs font-medium text-orange-800 mb-2">
+                              Children&apos;s Ages (required for car seats)
+                            </p>
+                            <div className="flex flex-wrap gap-2">
+                              {Array.from({ length: trip.children }, (_, childIdx) => (
+                                <select
+                                  key={childIdx}
+                                  value={trip.children_ages?.[childIdx] ?? ''}
+                                  onChange={(e) => updateChildAge(index, childIdx, e.target.value ? parseInt(e.target.value) : null)}
+                                  className="w-20 h-9 px-2 rounded-md border border-orange-300 bg-white text-sm"
+                                >
+                                  <option value="">Age</option>
+                                  {Array.from({ length: 13 }, (_, age) => (
+                                    <option key={age} value={age}>{age}</option>
+                                  ))}
+                                </select>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
 
                       {/* Status Badges & Alerts */}
@@ -893,7 +1023,7 @@ function PreviewPageContent() {
                   disabled={editingIndex !== null || showAddTrip}
                   className="w-full py-4 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 shadow-lg"
                 >
-                  Continue to Details
+                  Continue to Checkout
                   <ArrowRight className="h-5 w-5" />
                 </button>
 

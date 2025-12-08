@@ -408,11 +408,11 @@ function ConfirmationPageContent() {
         </div>
       </div>
 
-      {/* Stepper - Step 5: Confirmation - Only show for single shuttle booking */}
+      {/* Stepper - Step 3: Done - Only show for single shuttle booking */}
       {!isCartBooking && !isTourBooking && (
         <div className="bg-white border-b border-gray-200 shadow-sm">
           <div className="max-w-5xl mx-auto px-4 py-8">
-            <BookingStepper currentStep={5} />
+            <BookingStepper currentStep={3} />
           </div>
         </div>
       )}
