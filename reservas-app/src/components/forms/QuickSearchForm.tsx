@@ -320,9 +320,9 @@ export function QuickSearchForm({
         <div className="space-y-3">
           {trips.map((trip, index) => (
             <div key={index} className="bg-gray-50 rounded-xl p-3 border border-gray-200">
-              <div className="flex flex-wrap items-center gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_auto] gap-3">
                 {/* Origin */}
-                <div className="flex-1 min-w-[200px]">
+                <div className="w-full">
                   <LocationAutocomplete
                     placeholder="Where from?"
                     value={trip.origin}
@@ -334,7 +334,7 @@ export function QuickSearchForm({
                 </div>
 
                 {/* Destination */}
-                <div className="flex-1 min-w-[200px]">
+                <div className="w-full">
                   <LocationAutocomplete
                     placeholder={trip.origin ? "Where to?" : "Select origin first"}
                     value={trip.destination}
@@ -346,25 +346,27 @@ export function QuickSearchForm({
                   />
                 </div>
 
-                {/* Date */}
-                <div className="flex-1 min-w-[180px]">
-                  <ModernDatePicker
-                    value={trip.date}
-                    onChange={(date) => updateTrip(index, 'date', date)}
-                    enforceMinimumAdvance={true}
-                  />
-                </div>
+                {/* Date + Remove button row */}
+                <div className="flex items-center gap-2 sm:col-span-2 lg:col-span-1">
+                  <div className="flex-1">
+                    <ModernDatePicker
+                      value={trip.date}
+                      onChange={(date) => updateTrip(index, 'date', date)}
+                      enforceMinimumAdvance={true}
+                    />
+                  </div>
 
-                {/* Remove button (only for multi with more than 1 trip) */}
-                {tripType === 'multi' && trips.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => removeTrip(index)}
-                    className="h-11 w-11 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                  >
-                    <Trash2 className="h-5 w-5" />
-                  </button>
-                )}
+                  {/* Remove button (only for multi with more than 1 trip) */}
+                  {tripType === 'multi' && trips.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeTrip(index)}
+                      className="h-11 w-11 flex-shrink-0 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                      <Trash2 className="h-5 w-5" />
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           ))}

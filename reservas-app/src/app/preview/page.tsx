@@ -942,18 +942,20 @@ function PreviewPageContent() {
                       <div className="space-y-4 mb-4">
                         {/* FROM section with pickup address and time */}
                         <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                              <MapPin className="h-3 w-3 text-blue-600" />
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                            <div className="flex items-center gap-2 flex-1 min-w-0">
+                              <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                                <MapPin className="h-3 w-3 text-blue-600" />
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className="text-[10px] text-gray-500 uppercase">From</p>
+                                <p className="text-sm font-semibold text-gray-900 leading-tight truncate">{trip.from_location}</p>
+                              </div>
                             </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-[10px] text-gray-500 uppercase">From</p>
-                              <p className="text-sm font-semibold text-gray-900 leading-tight">{trip.from_location}</p>
-                            </div>
-                            {/* Pickup Time - same row as FROM title */}
-                            <div className="flex flex-col items-end">
-                              <span className="text-[10px] text-gray-500 uppercase mb-1">Pickup Time *</span>
-                              <div className={`flex items-center gap-1 px-3 py-2 rounded-lg ${
+                            {/* Pickup Time - stacks on mobile */}
+                            <div className="flex items-center gap-2 ml-8 sm:ml-0">
+                              <span className="text-[10px] text-gray-500 uppercase whitespace-nowrap">Pickup *</span>
+                              <div className={`flex items-center gap-1 px-3 py-1.5 rounded-lg ${
                                 trip.pickup_time
                                   ? 'bg-blue-600 text-white'
                                   : 'bg-orange-500 text-white animate-pulse'
@@ -964,7 +966,7 @@ function PreviewPageContent() {
                                   onChange={(e) => updateTripField(index, 'pickup_time', e.target.value)}
                                   className="bg-transparent text-white text-sm font-semibold focus:outline-none cursor-pointer"
                                 >
-                                  <option value="" className="text-gray-900">Select time</option>
+                                  <option value="" className="text-gray-900">Select</option>
                                   {Array.from({ length: 48 }, (_, i) => {
                                     const hour = Math.floor(i / 2);
                                     const minute = i % 2 === 0 ? '00' : '30';
@@ -1199,8 +1201,8 @@ function PreviewPageContent() {
                       {/* Form Content */}
                       <div className="p-4 space-y-4">
                         {/* Origin & Destination Row */}
-                        <div className="flex flex-wrap gap-3">
-                          <div className="flex-1 min-w-[200px]">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">From</label>
                             <LocationAutocomplete
                               placeholder="Where from?"
@@ -1214,7 +1216,7 @@ function PreviewPageContent() {
                               type="origin"
                             />
                           </div>
-                          <div className="flex-1 min-w-[200px]">
+                          <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">To</label>
                             <LocationAutocomplete
                               placeholder={editOrigin ? "Where to?" : "Select origin first"}
@@ -1229,8 +1231,8 @@ function PreviewPageContent() {
                         </div>
 
                         {/* Date/Time & Passengers Row */}
-                        <div className="flex flex-wrap gap-3">
-                          <div className="flex-1 min-w-[200px]">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Travel Date</label>
                             <ModernDatePicker
                               value={editDate}
@@ -1238,7 +1240,7 @@ function PreviewPageContent() {
                               enforceMinimumAdvance={true}
                             />
                           </div>
-                          <div className="flex-1 min-w-[200px]">
+                          <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Passengers</label>
                             <PassengerSelector
                               adults={editAdults}
