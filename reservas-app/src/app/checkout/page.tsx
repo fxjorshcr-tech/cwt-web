@@ -779,22 +779,79 @@ function CheckoutPageContent() {
                         </div>
                       )}
 
-                      {/* Shuttle Trips */}
+                      {/* Shuttle Trips - Full Details */}
                       {!isTourBooking && trips.map((trip, index) => (
-                        <div key={trip.id} className={`${index > 0 ? 'pt-3 border-t border-gray-100' : ''}`}>
-                          <div className="flex justify-between items-start">
+                        <div key={trip.id} className={`${index > 0 ? 'pt-4 border-t border-gray-200' : ''}`}>
+                          {/* Trip Header */}
+                          <div className="flex justify-between items-start mb-3">
                             <div className="flex-1">
-                              <p className="text-sm font-semibold text-gray-900">
-                                {trips.length > 1 && `Trip ${index + 1}: `}
+                              <p className="text-sm font-bold text-gray-900">
+                                {trips.length > 1 ? `Transfer ${index + 1}` : 'Transfer'}
+                              </p>
+                              <p className="text-xs font-semibold text-blue-600 mt-0.5">
                                 {trip.from_location} → {trip.to_location}
                               </p>
-                              <p className="text-xs text-gray-500 mt-0.5" suppressHydrationWarning>
-                                {formatDate(trip.date)} • {trip.adults + trip.children} passengers
-                              </p>
                             </div>
-                            <p className="text-sm font-bold text-gray-900">
+                            <p className="text-base font-bold text-gray-900">
                               {formatCurrency(trip.final_price || trip.price)}
                             </p>
+                          </div>
+
+                          {/* Trip Details Grid */}
+                          <div className="bg-gray-50 rounded-lg p-3 space-y-2 text-xs">
+                            {/* Date & Time */}
+                            <div className="flex justify-between">
+                              <span className="text-gray-500">Date & Time:</span>
+                              <span className="font-medium text-gray-900" suppressHydrationWarning>
+                                {formatDate(trip.date)} at {trip.pickup_time || 'Not set'}
+                              </span>
+                            </div>
+
+                            {/* Passengers */}
+                            <div className="flex justify-between">
+                              <span className="text-gray-500">Passengers:</span>
+                              <span className="font-medium text-gray-900">
+                                {trip.adults} adult{trip.adults !== 1 ? 's' : ''}{trip.children > 0 ? `, ${trip.children} child${trip.children !== 1 ? 'ren' : ''}` : ''}
+                              </span>
+                            </div>
+
+                            {/* Pickup Address */}
+                            <div className="flex justify-between gap-2">
+                              <span className="text-gray-500 flex-shrink-0">Pickup:</span>
+                              <span className="font-medium text-gray-900 text-right">
+                                {trip.pickup_address || 'Not specified'}
+                              </span>
+                            </div>
+
+                            {/* Dropoff Address */}
+                            <div className="flex justify-between gap-2">
+                              <span className="text-gray-500 flex-shrink-0">Drop-off:</span>
+                              <span className="font-medium text-gray-900 text-right">
+                                {trip.dropoff_address || 'Not specified'}
+                              </span>
+                            </div>
+
+                            {/* Flight Info - if available */}
+                            {trip.flight_number && (
+                              <div className="flex justify-between">
+                                <span className="text-gray-500">Flight:</span>
+                                <span className="font-medium text-gray-900">
+                                  {trip.airline ? `${trip.airline} ` : ''}{trip.flight_number}
+                                </span>
+                              </div>
+                            )}
+
+                            {/* Add-ons - if any */}
+                            {trip.add_ons && trip.add_ons.length > 0 && (
+                              <div className="flex justify-between pt-2 border-t border-gray-200">
+                                <span className="text-gray-500">Add-ons:</span>
+                                <span className="font-medium text-blue-600">
+                                  {trip.add_ons.includes('travel_flex') && 'Travel Flex'}
+                                  {trip.add_ons.includes('travel_flex') && trip.add_ons.includes('explorer_upgrade') && ', '}
+                                  {trip.add_ons.includes('explorer_upgrade') && 'Explorer Upgrade'}
+                                </span>
+                              </div>
+                            )}
                           </div>
                         </div>
                       ))}

@@ -186,7 +186,7 @@ function PreviewPageContent() {
               routeId: trip.routeId || 0,
               pickup_address: details?.pickup_address || '',
               dropoff_address: details?.dropoff_address || '',
-              pickup_time: details?.pickup_time || '09:00',
+              pickup_time: details?.pickup_time || '', // Empty by default - must be selected
               children_ages: details?.children_ages || Array(trip.children || 0).fill(null),
               flight_number: details?.flight_number || '',
               airline: details?.airline || '',
@@ -262,7 +262,7 @@ function PreviewPageContent() {
             routeId: trip.routeId || 0,
             pickup_address: trip.pickup_address || '',
             dropoff_address: trip.dropoff_address || '',
-            pickup_time: trip.pickup_time || '09:00',
+            pickup_time: trip.pickup_time || '', // Must be selected
             children_ages: trip.children_ages || Array(trip.children || 0).fill(null),
             flight_number: trip.flight_number || '',
             airline: trip.airline || '',
@@ -521,6 +521,13 @@ function PreviewPageContent() {
 
     // Clear any previous validation error
     setValidationError(null);
+
+    // Validate pickup time is selected
+    const missingPickupTime = trips.filter(trip => !trip.pickup_time);
+    if (missingPickupTime.length > 0) {
+      setValidationError('Please select a pickup time for all transfers');
+      return;
+    }
 
     // Validate that all required inline fields are filled
     const incompleteTrips = trips.filter(trip => !trip.pickup_address || !trip.dropoff_address);
@@ -945,14 +952,19 @@ function PreviewPageContent() {
                             </div>
                             {/* Pickup Time - same row as FROM title */}
                             <div className="flex flex-col items-end">
-                              <span className="text-[10px] text-gray-500 uppercase mb-1">Pickup Time</span>
-                              <div className="flex items-center gap-1 bg-blue-600 text-white px-3 py-2 rounded-lg">
+                              <span className="text-[10px] text-gray-500 uppercase mb-1">Pickup Time *</span>
+                              <div className={`flex items-center gap-1 px-3 py-2 rounded-lg ${
+                                trip.pickup_time
+                                  ? 'bg-blue-600 text-white'
+                                  : 'bg-orange-500 text-white animate-pulse'
+                              }`}>
                                 <Clock className="h-4 w-4" />
                                 <select
                                   value={trip.pickup_time}
                                   onChange={(e) => updateTripField(index, 'pickup_time', e.target.value)}
                                   className="bg-transparent text-white text-sm font-semibold focus:outline-none cursor-pointer"
                                 >
+                                  <option value="" className="text-gray-900">Select time</option>
                                   {Array.from({ length: 48 }, (_, i) => {
                                     const hour = Math.floor(i / 2);
                                     const minute = i % 2 === 0 ? '00' : '30';
