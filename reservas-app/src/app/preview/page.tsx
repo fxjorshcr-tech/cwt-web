@@ -914,19 +914,22 @@ function PreviewPageContent() {
                               onChange={(e) => updateTripField(index, 'pickup_address', e.target.value)}
                               className="text-sm h-10 flex-1"
                             />
-                            <select
-                              value={trip.pickup_time}
-                              onChange={(e) => updateTripField(index, 'pickup_time', e.target.value)}
-                              className="h-10 px-2 border border-blue-300 rounded-lg text-sm bg-blue-50 text-blue-800 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            >
-                              {Array.from({ length: 48 }, (_, i) => {
-                                const hour = Math.floor(i / 2);
-                                const minute = i % 2 === 0 ? '00' : '30';
-                                const value = `${hour.toString().padStart(2, '0')}:${minute}`;
-                                const label = `${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour}:${minute} ${hour < 12 ? 'AM' : 'PM'}`;
-                                return <option key={value} value={value}>{label}</option>;
-                              })}
-                            </select>
+                            <div className="flex items-center gap-1 bg-blue-600 text-white px-3 h-10 rounded-lg">
+                              <Clock className="h-4 w-4" />
+                              <select
+                                value={trip.pickup_time}
+                                onChange={(e) => updateTripField(index, 'pickup_time', e.target.value)}
+                                className="bg-transparent text-white text-sm font-semibold focus:outline-none cursor-pointer"
+                              >
+                                {Array.from({ length: 48 }, (_, i) => {
+                                  const hour = Math.floor(i / 2);
+                                  const minute = i % 2 === 0 ? '00' : '30';
+                                  const value = `${hour.toString().padStart(2, '0')}:${minute}`;
+                                  const label = `${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour}:${minute} ${hour < 12 ? 'AM' : 'PM'}`;
+                                  return <option key={value} value={value} className="text-gray-900">{label}</option>;
+                                })}
+                              </select>
+                            </div>
                           </div>
                         </div>
 
