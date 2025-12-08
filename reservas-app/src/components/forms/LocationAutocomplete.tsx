@@ -146,7 +146,7 @@ export function LocationAutocomplete({
           onFocus={() => setIsOpen(true)}
           disabled={disabled}
           placeholder={placeholder}
-          className={`w-full pl-9 pr-9 py-3 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all disabled:cursor-not-allowed ${
+          className={`w-full pl-9 pr-9 py-3 text-[16px] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors disabled:cursor-not-allowed ${
             darkMode
               ? 'bg-white/10 border border-white/20 text-white placeholder-gray-400 disabled:bg-white/5 disabled:text-gray-500'
               : 'bg-white border border-gray-300 text-gray-900 placeholder-gray-400 disabled:bg-gray-100 disabled:text-gray-400'
