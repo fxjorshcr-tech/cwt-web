@@ -260,7 +260,7 @@ export function QuickSearchForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className={`bg-[#0a1628] rounded-2xl shadow-xl overflow-visible notranslate ${className}`}
+      className={`bg-white rounded-2xl shadow-xl border border-gray-200 overflow-visible notranslate ${className}`}
       translate="no"
     >
       <div className="p-4 md:p-6">
@@ -276,11 +276,11 @@ export function QuickSearchForm({
               className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm transition-all ${
                 tripType === 'one-way'
                   ? 'bg-blue-600 text-white'
-                  : 'text-gray-400 hover:text-white'
+                  : 'text-gray-500 hover:text-gray-700'
               }`}
             >
               <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                tripType === 'one-way' ? 'border-white' : 'border-gray-500'
+                tripType === 'one-way' ? 'border-white' : 'border-gray-400'
               }`}>
                 {tripType === 'one-way' && <div className="w-2 h-2 rounded-full bg-white" />}
               </div>
@@ -292,11 +292,11 @@ export function QuickSearchForm({
               className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm transition-all ${
                 tripType === 'multi'
                   ? 'bg-blue-600 text-white'
-                  : 'text-gray-400 hover:text-white'
+                  : 'text-gray-500 hover:text-gray-700'
               }`}
             >
               <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                tripType === 'multi' ? 'border-white' : 'border-gray-500'
+                tripType === 'multi' ? 'border-white' : 'border-gray-400'
               }`}>
                 {tripType === 'multi' && <div className="w-2 h-2 rounded-full bg-white" />}
               </div>
@@ -310,7 +310,7 @@ export function QuickSearchForm({
             <button
               type="button"
               onClick={() => setShowPassengerDropdown(!showPassengerDropdown)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 text-white text-sm hover:bg-white/20 transition-colors"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-300 text-gray-700 text-sm hover:bg-gray-50 transition-colors"
             >
               <Users className="h-4 w-4" />
               {totalPassengers}
@@ -379,13 +379,13 @@ export function QuickSearchForm({
 
         {/* Error message */}
         {error && (
-          <div className="mb-4 bg-red-500/20 border border-red-500/50 rounded-lg px-4 py-3 flex items-center justify-between">
+          <div className="mb-4 bg-red-50 border border-red-200 rounded-lg px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <AlertCircle className="h-4 w-4 text-red-400 flex-shrink-0" />
-              <span className="text-sm text-red-200">{error}</span>
+              <AlertCircle className="h-4 w-4 text-red-500 flex-shrink-0" />
+              <span className="text-sm text-red-700">{error}</span>
             </div>
             <button type="button" onClick={() => setError(null)}>
-              <X className="h-4 w-4 text-red-400 hover:text-red-300" />
+              <X className="h-4 w-4 text-red-500 hover:text-red-700" />
             </button>
           </div>
         )}
@@ -393,7 +393,7 @@ export function QuickSearchForm({
         {/* Trip rows */}
         <div className="space-y-3">
           {trips.map((trip, index) => (
-            <div key={index} className="bg-white/5 rounded-xl p-3 border border-white/10">
+            <div key={index} className="bg-gray-50 rounded-xl p-3 border border-gray-200">
               <div className="flex flex-wrap items-center gap-3">
                 {/* Origin */}
                 <div className="flex-1 min-w-[200px]">
@@ -437,7 +437,7 @@ export function QuickSearchForm({
                   <button
                     type="button"
                     onClick={() => removeTrip(index)}
-                    className="h-11 w-11 flex items-center justify-center text-gray-400 hover:text-red-400 hover:bg-red-500/20 rounded-lg transition-colors"
+                    className="h-11 w-11 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                   >
                     <Trash2 className="h-5 w-5" />
                   </button>
@@ -452,7 +452,7 @@ export function QuickSearchForm({
           <button
             type="button"
             onClick={addTrip}
-            className="mt-3 flex items-center gap-2 text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors"
+            className="mt-3 flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors"
           >
             <Plus className="h-4 w-4" />
             Add destination
@@ -463,7 +463,7 @@ export function QuickSearchForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="mt-4 w-full h-12 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+          className="mt-4 w-full h-12 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
         >
           {availabilityStatus === 'checking' ? (
             <Loader2 className="h-5 w-5 animate-spin" />
@@ -476,12 +476,12 @@ export function QuickSearchForm({
         </button>
 
         {/* Info Pills */}
-        <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-gray-400">
+        <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-gray-500">
           <span>Max 12 per van with luggage</span>
           <span>•</span>
           <span>Custom routes available *</span>
           <span>•</span>
-          <a href="https://wa.me/50685962438" target="_blank" rel="noopener noreferrer" className="text-green-400 hover:text-green-300">
+          <a href="https://wa.me/50685962438" target="_blank" rel="noopener noreferrer" className="text-green-600 hover:text-green-700">
             Last-minute? WhatsApp us
           </a>
         </div>

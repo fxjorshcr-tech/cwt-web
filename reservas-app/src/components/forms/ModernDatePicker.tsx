@@ -315,36 +315,28 @@ export function ModernDatePicker({
             {renderCalendarDays()}
           </div>
 
-          {/* Time Picker Section - Highlighted when date is selected */}
+          {/* Time Picker Section - Simple dropdown */}
           {showTimePicker && (
             <div className={`mt-4 pt-4 border-t ${value ? 'bg-blue-50 -mx-4 px-4 pb-4 rounded-b-xl' : ''}`}>
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between">
                 <label className={`text-sm font-medium flex items-center gap-2 ${value ? 'text-blue-800' : 'text-gray-700'}`}>
                   <Clock className={`h-4 w-4 ${value ? 'text-blue-600' : 'text-blue-500'}`} />
-                  {value ? 'Now select pickup time:' : 'Pickup Time'}
+                  {value ? 'Select pickup time:' : 'Pickup Time'}
                 </label>
-              </div>
-
-              {/* Time grid - always visible for easier selection */}
-              <div className="grid grid-cols-4 gap-1 max-h-40 overflow-y-auto">
-                {TIME_OPTIONS.map((time) => (
-                  <button
-                    key={time.value}
-                    type="button"
-                    onClick={() => {
-                      onTimeChange?.(time.value);
-                      // Close the entire date picker after selecting time
-                      setIsOpen(false);
-                    }}
-                    className={`px-2 py-1.5 text-xs rounded transition-colors ${
-                      selectedTime === time.value
-                        ? 'bg-blue-600 text-white font-medium'
-                        : 'bg-white border border-gray-200 text-gray-700 hover:bg-blue-100 hover:border-blue-300'
-                    }`}
-                  >
-                    {time.label}
-                  </button>
-                ))}
+                <select
+                  value={selectedTime}
+                  onChange={(e) => {
+                    onTimeChange?.(e.target.value);
+                    setIsOpen(false);
+                  }}
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                >
+                  {TIME_OPTIONS.map((time) => (
+                    <option key={time.value} value={time.value}>
+                      {time.label}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
           )}
