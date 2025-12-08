@@ -10,7 +10,11 @@ import {
   CreditCard,
   Shield,
   ArrowLeft,
-  Lock
+  Lock,
+  Clock,
+  Users,
+  MapPin,
+  Plane
 } from 'lucide-react';
 import { trackBeginCheckout } from '@/lib/analytics';
 import { createClient } from '@/lib/supabase/client';
@@ -676,7 +680,7 @@ function CheckoutPageContent() {
                       <div className="space-y-3">
                         <div className="flex items-start gap-3">
                           <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                            <Lock className="h-4 w-4 text-blue-600" />
+                            <Clock className="h-4 w-4 text-blue-600" />
                           </div>
                           <div>
                             <p className="text-xs text-gray-500 uppercase font-medium">Pickup Time</p>
@@ -686,7 +690,7 @@ function CheckoutPageContent() {
 
                         <div className="flex items-start gap-3">
                           <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                            <Shield className="h-4 w-4 text-green-600" />
+                            <Users className="h-4 w-4 text-green-600" />
                           </div>
                           <div>
                             <p className="text-xs text-gray-500 uppercase font-medium">Passengers</p>
@@ -700,7 +704,7 @@ function CheckoutPageContent() {
                         {trip.flight_number && (
                           <div className="flex items-start gap-3">
                             <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
-                              <CreditCard className="h-4 w-4 text-purple-600" />
+                              <Plane className="h-4 w-4 text-purple-600" />
                             </div>
                             <div>
                               <p className="text-xs text-gray-500 uppercase font-medium">Flight</p>
@@ -714,30 +718,47 @@ function CheckoutPageContent() {
 
                       {/* Right Column */}
                       <div className="space-y-3">
-                        <div>
-                          <p className="text-xs text-gray-500 uppercase font-medium mb-1">Pickup Location</p>
-                          <p className="text-sm text-gray-900 bg-white rounded p-2 border border-gray-200">
-                            {trip.pickup_address || 'Not specified'}
-                          </p>
+                        <div className="flex items-start gap-3">
+                          <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                            <MapPin className="h-4 w-4 text-blue-600" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase font-medium">Pickup</p>
+                            <p className="text-sm font-semibold text-gray-900">{trip.pickup_address || 'Not specified'}</p>
+                          </div>
                         </div>
 
-                        <div>
-                          <p className="text-xs text-gray-500 uppercase font-medium mb-1">Drop-off Location</p>
-                          <p className="text-sm text-gray-900 bg-white rounded p-2 border border-gray-200">
-                            {trip.dropoff_address || 'Not specified'}
-                          </p>
+                        <div className="flex items-start gap-3">
+                          <div className="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
+                            <MapPin className="h-4 w-4 text-orange-500" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase font-medium">Drop-off</p>
+                            <p className="text-sm font-semibold text-gray-900">{trip.dropoff_address || 'Not specified'}</p>
+                          </div>
                         </div>
 
                         {trip.add_ons && trip.add_ons.length > 0 && (
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase font-medium mb-1">Add-ons</p>
-                            <div className="flex flex-wrap gap-1">
-                              {trip.add_ons.includes('travel_flex') && (
-                                <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded">Travel Flex +$59</span>
-                              )}
-                              {trip.add_ons.includes('explorer_upgrade') && (
-                                <span className="bg-purple-100 text-purple-700 text-xs px-2 py-1 rounded">Explorer +$195</span>
-                              )}
+                          <div className="flex items-start gap-3">
+                            <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                              <Shield className="h-4 w-4 text-green-600" />
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-500 uppercase font-medium">Add-ons</p>
+                              <div className="space-y-1 mt-1">
+                                {trip.add_ons.includes('travel_flex') && (
+                                  <div className="flex items-center gap-2">
+                                    <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded">Travel Flex</span>
+                                    <span className="text-xs text-gray-500">Free cancellation +$59</span>
+                                  </div>
+                                )}
+                                {trip.add_ons.includes('explorer_upgrade') && (
+                                  <div className="flex items-center gap-2">
+                                    <span className="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-1 rounded">Explorer</span>
+                                    <span className="text-xs text-gray-500">Private vehicle +$195</span>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
                         )}
