@@ -31,6 +31,7 @@ import {
 import BookingNavbar from '@/components/booking/BookingNavbar';
 import BookingStepper from '@/components/booking/BookingStepper';
 import { IncludedFeatures, ImportantInfo } from '@/components/summary';
+import { TripAddOns, calculateAddOnsPrice } from '@/components/booking/TripAddOns';
 import { Input } from '@/components/ui/input';
 import { LocationAutocomplete } from '@/components/forms/LocationAutocomplete';
 import { ModernDatePicker } from '@/components/forms/ModernDatePicker';
@@ -112,6 +113,8 @@ interface TripPreview {
   // Airport/Flight info
   flight_number: string;
   airline: string;
+  // Add-ons
+  add_ons: string[];
 }
 
 function PreviewPageContent() {
@@ -186,6 +189,7 @@ function PreviewPageContent() {
               children_ages: details?.children_ages || Array(trip.children || 0).fill(null),
               flight_number: details?.flight_number || '',
               airline: details?.airline || '',
+              add_ons: details?.add_ons || [],
             };
           });
 
@@ -261,6 +265,7 @@ function PreviewPageContent() {
             children_ages: trip.children_ages || Array(trip.children || 0).fill(null),
             flight_number: trip.flight_number || '',
             airline: trip.airline || '',
+            add_ons: trip.add_ons || [],
           }));
         }
 
@@ -281,9 +286,12 @@ function PreviewPageContent() {
     load();
   }, [bookingId, router]);
 
-  // Total price
+  // Total price (including add-ons)
   const totalPrice = useMemo(() => {
-    return trips.reduce((sum, trip) => sum + trip.price, 0);
+    return trips.reduce((sum, trip) => {
+      const addOnsPrice = calculateAddOnsPrice(trip.add_ons || []);
+      return sum + trip.price + addOnsPrice;
+    }, 0);
   }, [trips]);
 
   // Format date for display
@@ -372,6 +380,7 @@ function PreviewPageContent() {
       children_ages: childrenAges,
       flight_number: existingTrip.flight_number || '',
       airline: existingTrip.airline || '',
+      add_ons: existingTrip.add_ons || [],
     };
 
     setTrips(newTrips);
@@ -453,6 +462,7 @@ function PreviewPageContent() {
       children_ages: Array(editChildren).fill(null),
       flight_number: '',
       airline: '',
+      add_ons: [],
     };
 
     const newTrips = [...trips, newTrip];
@@ -493,10 +503,10 @@ function PreviewPageContent() {
         airline: trip.airline || '',
         special_requests: '',
         children_ages: trip.children_ages || [],
-        add_ons: [],
+        add_ons: trip.add_ons || [],
         night_surcharge: 0,
-        add_ons_price: 0,
-        final_price: trip.price,
+        add_ons_price: calculateAddOnsPrice(trip.add_ons || []),
+        final_price: trip.price + calculateAddOnsPrice(trip.add_ons || []),
       })),
       tripType, // Save trip type (one-way or multi)
       createdAt: new Date().toISOString(),
@@ -544,6 +554,14 @@ function PreviewPageContent() {
     const newAges = [...(newTrips[tripIndex].children_ages || [])];
     newAges[childIndex] = age;
     newTrips[tripIndex] = { ...newTrips[tripIndex], children_ages: newAges };
+    setTrips(newTrips);
+    saveToLocalStorage(newTrips);
+  }
+
+  // Update add-ons for a trip
+  function updateTripAddOns(tripIndex: number, addOns: string[]) {
+    const newTrips = [...trips];
+    newTrips[tripIndex] = { ...newTrips[tripIndex], add_ons: addOns };
     setTrips(newTrips);
     saveToLocalStorage(newTrips);
   }
@@ -878,7 +896,7 @@ function PreviewPageContent() {
                     <div className="p-4 sm:p-5">
                       {/* Route Display with inline inputs */}
                       <div className="space-y-4 mb-4">
-                        {/* FROM section with pickup address */}
+                        {/* FROM section with pickup address and time */}
                         <div className="space-y-2">
                           <div className="flex items-center gap-2">
                             <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
@@ -889,13 +907,34 @@ function PreviewPageContent() {
                               <p className="text-sm font-semibold text-gray-900 leading-tight">{trip.from_location}</p>
                             </div>
                           </div>
-                          <div className="ml-8">
-                            <Input
-                              placeholder="Exact pickup address (hotel name, address...)"
-                              value={trip.pickup_address}
-                              onChange={(e) => updateTripField(index, 'pickup_address', e.target.value)}
-                              className="text-sm h-10"
-                            />
+                          <div className="ml-8 flex gap-2">
+                            <div className="flex-1">
+                              <Input
+                                placeholder="Exact pickup address (hotel name, address...)"
+                                value={trip.pickup_address}
+                                onChange={(e) => updateTripField(index, 'pickup_address', e.target.value)}
+                                className="text-sm h-10"
+                              />
+                            </div>
+                            <div className="w-28">
+                              <label className="block text-[10px] text-blue-600 font-semibold uppercase mb-1">
+                                <Clock className="h-3 w-3 inline mr-0.5" />
+                                Pickup Time
+                              </label>
+                              <select
+                                value={trip.pickup_time}
+                                onChange={(e) => updateTripField(index, 'pickup_time', e.target.value)}
+                                className="w-full h-10 px-2 border border-blue-300 rounded-lg text-sm bg-blue-50 text-blue-800 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              >
+                                {Array.from({ length: 48 }, (_, i) => {
+                                  const hour = Math.floor(i / 2);
+                                  const minute = i % 2 === 0 ? '00' : '30';
+                                  const value = `${hour.toString().padStart(2, '0')}:${minute}`;
+                                  const label = `${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour}:${minute} ${hour < 12 ? 'AM' : 'PM'}`;
+                                  return <option key={value} value={value}>{label}</option>;
+                                })}
+                              </select>
+                            </div>
                           </div>
                         </div>
 
@@ -1026,6 +1065,12 @@ function PreviewPageContent() {
                             </div>
                           </div>
                         )}
+
+                        {/* Add-ons */}
+                        <TripAddOns
+                          selectedAddOns={trip.add_ons || []}
+                          onAddOnsChange={(addOns) => updateTripAddOns(index, addOns)}
+                        />
                       </div>
 
                       {/* Status Badges & Alerts */}
@@ -1247,14 +1292,25 @@ function PreviewPageContent() {
                     <h2 className="text-white font-bold text-lg">Order Summary</h2>
                   </div>
                   <div className="p-5 space-y-3">
-                    {trips.map((trip, index) => (
-                      <div key={index} className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-gray-700">
-                          {trips.length > 1 ? `Transfer ${index + 1}` : 'Transfer'}
-                        </span>
-                        <span className="font-bold text-gray-900">${trip.price}</span>
-                      </div>
-                    ))}
+                    {trips.map((trip, index) => {
+                      const addOnsPrice = calculateAddOnsPrice(trip.add_ons || []);
+                      return (
+                        <div key={index} className="space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium text-gray-700">
+                              {trips.length > 1 ? `Transfer ${index + 1}` : 'Transfer'}
+                            </span>
+                            <span className="font-bold text-gray-900">${trip.price}</span>
+                          </div>
+                          {addOnsPrice > 0 && (
+                            <div className="flex items-center justify-between text-blue-600">
+                              <span className="text-xs pl-2">+ Add-ons</span>
+                              <span className="text-sm font-medium">+${addOnsPrice}</span>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
 
                     {/* Total */}
                     <div className="pt-3 border-t-2 border-gray-200">

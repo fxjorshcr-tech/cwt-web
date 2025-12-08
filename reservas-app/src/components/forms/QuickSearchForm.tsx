@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Loader2, AlertCircle, X, CheckCircle, Plus, Trash2, Users, ChevronDown } from 'lucide-react';
+import { Search, Loader2, AlertCircle, X, CheckCircle, Plus, Trash2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { LocationAutocomplete } from './LocationAutocomplete';
 import { ModernDatePicker } from './ModernDatePicker';
@@ -46,10 +46,9 @@ export function QuickSearchForm({
     { origin: initialOrigin, destination: initialDestination, date: null, pickupTime: '09:00' }
   ]);
 
-  // Shared passengers (same for all trips)
-  const [adults, setAdults] = useState(2);
-  const [children, setChildren] = useState(0);
-  const [showPassengerDropdown, setShowPassengerDropdown] = useState(false);
+  // Default passengers (will be edited in preview)
+  const adults = 2;
+  const children = 0;
 
   // Update first trip when initial values change
   useEffect(() => {
@@ -255,8 +254,6 @@ export function QuickSearchForm({
     );
   }
 
-  const totalPassengers = adults + children;
-
   return (
     <form
       onSubmit={handleSubmit}
@@ -304,77 +301,6 @@ export function QuickSearchForm({
               <span className="text-[10px] bg-green-500 text-white px-1.5 py-0.5 rounded font-bold">New</span>
             </button>
           </div>
-
-          {/* Passengers selector - right side */}
-          <div className="ml-auto relative">
-            <button
-              type="button"
-              onClick={() => setShowPassengerDropdown(!showPassengerDropdown)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-300 text-gray-700 text-sm hover:bg-gray-50 transition-colors"
-            >
-              <Users className="h-4 w-4" />
-              {totalPassengers}
-              <ChevronDown className="h-3 w-3" />
-            </button>
-
-            {showPassengerDropdown && (
-              <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border border-gray-200 p-4 z-50">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-gray-900">Adults</p>
-                      <p className="text-xs text-gray-500">Age 12+</p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <button
-                        type="button"
-                        onClick={() => setAdults(Math.max(1, adults - 1))}
-                        className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-gray-100"
-                      >
-                        -
-                      </button>
-                      <span className="w-6 text-center font-medium">{adults}</span>
-                      <button
-                        type="button"
-                        onClick={() => setAdults(Math.min(12, adults + 1))}
-                        className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-gray-100"
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-gray-900">Children</p>
-                      <p className="text-xs text-gray-500">Age 0-12</p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <button
-                        type="button"
-                        onClick={() => setChildren(Math.max(0, children - 1))}
-                        className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-gray-100"
-                      >
-                        -
-                      </button>
-                      <span className="w-6 text-center font-medium">{children}</span>
-                      <button
-                        type="button"
-                        onClick={() => setChildren(Math.min(12, children + 1))}
-                        className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-gray-100"
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                  <div className="pt-2 border-t">
-                    <p className="text-xs text-gray-500">Each passenger is allowed:</p>
-                    <p className="text-xs text-gray-600">• One checked bag (29 x 21 x 11 inch)</p>
-                    <p className="text-xs text-gray-600">• One carry-on bag (22 x 14 x 9 inch)</p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
         </div>
 
         {/* Error message */}
@@ -420,15 +346,12 @@ export function QuickSearchForm({
                   />
                 </div>
 
-                {/* Date & Time */}
-                <div className="w-56">
+                {/* Date */}
+                <div className="flex-1 min-w-[180px]">
                   <ModernDatePicker
                     value={trip.date}
                     onChange={(date) => updateTrip(index, 'date', date)}
                     enforceMinimumAdvance={true}
-                    showTimePicker={true}
-                    selectedTime={trip.pickupTime}
-                    onTimeChange={(time) => updateTrip(index, 'pickupTime', time)}
                   />
                 </div>
 
