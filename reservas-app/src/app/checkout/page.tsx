@@ -735,14 +735,14 @@ function CheckoutPageContent() {
                     if (isTourBooking) {
                       router.push('/private-tours');
                     } else {
-                      router.push(`/summary?booking_id=${bookingId}`);
+                      router.push(`/preview?booking_id=${bookingId}`);
                     }
                   }}
                   variant="ghost"
                   className="text-gray-600 hover:text-gray-900"
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
-                  {isTourBooking ? 'Back to Tours' : 'Back to Summary'}
+                  {isTourBooking ? 'Back to Tours' : 'Back to Trip Details'}
                 </Button>
               </div>
 

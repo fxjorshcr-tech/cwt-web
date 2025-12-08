@@ -76,8 +76,8 @@ export default function RootLayout({
         />
         
         {/* ✅ Prefetch rutas críticas del flujo de booking */}
-        <link rel="prefetch" href="/booking-details" />
-        <link rel="prefetch" href="/summary" />
+        <link rel="prefetch" href="/preview" />
+        <link rel="prefetch" href="/checkout" />
         <link rel="prefetch" href="/confirmation" />
       </head>
       <body className={`${inter.className} overflow-x-hidden`}>

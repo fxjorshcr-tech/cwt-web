@@ -944,27 +944,32 @@ function PreviewPageContent() {
                             </div>
                           </div>
                           <div className="ml-8 flex items-center gap-2">
-                            <Input
-                              placeholder="Exact pickup address (hotel name, address...)"
-                              value={trip.pickup_address}
-                              onChange={(e) => updateTripField(index, 'pickup_address', e.target.value)}
-                              className="text-sm h-10 flex-1"
-                            />
-                            <div className="flex items-center gap-1 bg-blue-600 text-white px-3 h-10 rounded-lg">
-                              <Clock className="h-4 w-4" />
-                              <select
-                                value={trip.pickup_time}
-                                onChange={(e) => updateTripField(index, 'pickup_time', e.target.value)}
-                                className="bg-transparent text-white text-sm font-semibold focus:outline-none cursor-pointer"
-                              >
-                                {Array.from({ length: 48 }, (_, i) => {
-                                  const hour = Math.floor(i / 2);
-                                  const minute = i % 2 === 0 ? '00' : '30';
-                                  const value = `${hour.toString().padStart(2, '0')}:${minute}`;
-                                  const label = `${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour}:${minute} ${hour < 12 ? 'AM' : 'PM'}`;
-                                  return <option key={value} value={value} className="text-gray-900">{label}</option>;
-                                })}
-                              </select>
+                            <div className="flex-1">
+                              <Input
+                                placeholder="Exact pickup address (hotel name, address...)"
+                                value={trip.pickup_address}
+                                onChange={(e) => updateTripField(index, 'pickup_address', e.target.value)}
+                                className="text-sm h-10"
+                              />
+                            </div>
+                            <div className="flex flex-col items-center">
+                              <span className="text-[10px] text-gray-500 uppercase mb-1">Pickup Time</span>
+                              <div className="flex items-center gap-1 bg-blue-600 text-white px-3 h-10 rounded-lg">
+                                <Clock className="h-4 w-4" />
+                                <select
+                                  value={trip.pickup_time}
+                                  onChange={(e) => updateTripField(index, 'pickup_time', e.target.value)}
+                                  className="bg-transparent text-white text-sm font-semibold focus:outline-none cursor-pointer"
+                                >
+                                  {Array.from({ length: 48 }, (_, i) => {
+                                    const hour = Math.floor(i / 2);
+                                    const minute = i % 2 === 0 ? '00' : '30';
+                                    const value = `${hour.toString().padStart(2, '0')}:${minute}`;
+                                    const label = `${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour}:${minute} ${hour < 12 ? 'AM' : 'PM'}`;
+                                    return <option key={value} value={value} className="text-gray-900">{label}</option>;
+                                  })}
+                                </select>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -990,32 +995,39 @@ function PreviewPageContent() {
                           </div>
                         </div>
 
-                        {/* Flight Information - 2 columns */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <div>
-                            <label className="block text-xs font-medium text-gray-600 mb-1">
-                              <Plane className="h-3 w-3 inline mr-1" />
-                              Flight Number (optional)
-                            </label>
-                            <Input
-                              placeholder="e.g. AA1234"
-                              value={trip.flight_number}
-                              onChange={(e) => updateTripField(index, 'flight_number', e.target.value)}
-                              className="text-sm h-10"
-                            />
+                        {/* Flight Information - only for airport routes */}
+                        {(trip.from_location.toLowerCase().includes('airport') ||
+                          trip.from_location.includes('SJO') ||
+                          trip.from_location.includes('LIR') ||
+                          trip.to_location.toLowerCase().includes('airport') ||
+                          trip.to_location.includes('SJO') ||
+                          trip.to_location.includes('LIR')) && (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                              <label className="block text-xs font-medium text-gray-600 mb-1">
+                                <Plane className="h-3 w-3 inline mr-1" />
+                                Flight Number (optional)
+                              </label>
+                              <Input
+                                placeholder="e.g. AA1234"
+                                value={trip.flight_number}
+                                onChange={(e) => updateTripField(index, 'flight_number', e.target.value)}
+                                className="text-sm h-10"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-gray-600 mb-1">
+                                Airline (optional)
+                              </label>
+                              <Input
+                                placeholder="e.g. American Airlines"
+                                value={trip.airline}
+                                onChange={(e) => updateTripField(index, 'airline', e.target.value)}
+                                className="text-sm h-10"
+                              />
+                            </div>
                           </div>
-                          <div>
-                            <label className="block text-xs font-medium text-gray-600 mb-1">
-                              Airline (optional)
-                            </label>
-                            <Input
-                              placeholder="e.g. American Airlines"
-                              value={trip.airline}
-                              onChange={(e) => updateTripField(index, 'airline', e.target.value)}
-                              className="text-sm h-10"
-                            />
-                          </div>
-                        </div>
+                        )}
 
                         {/* Passengers Selector */}
                         <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
@@ -1123,7 +1135,14 @@ function PreviewPageContent() {
                         </div>
                         <div className="bg-blue-50 rounded-lg p-2 text-center">
                           <p className="text-[10px] text-blue-600 uppercase font-medium">Price</p>
-                          <p className="text-lg font-bold text-blue-600">${trip.price}</p>
+                          <p className="text-lg font-bold text-blue-600">
+                            ${trip.price + calculateAddOnsPrice(trip.add_ons || [])}
+                          </p>
+                          {calculateAddOnsPrice(trip.add_ons || []) > 0 && (
+                            <p className="text-[10px] text-blue-500">
+                              (${trip.price} + ${calculateAddOnsPrice(trip.add_ons || [])} add-ons)
+                            </p>
+                          )}
                         </div>
                       </div>
                     </div>

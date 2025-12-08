@@ -23,8 +23,8 @@ export function usePrefetch(routes: string[]) {
 // Hook específico para el flujo de booking
 export function usePrefetchBookingFlow() {
   usePrefetch([
-    '/booking-details',
-    '/summary',
+    '/preview',
+    '/checkout',
     '/confirmation',
   ]);
 }

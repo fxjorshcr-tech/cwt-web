@@ -157,8 +157,8 @@ export const SEO_DEFAULTS = {
 
 export const APP_ROUTES = {
   HOME: '/',
-  BOOKING_DETAILS: '/booking-details',
-  SUMMARY: '/summary',
+  PREVIEW: '/preview',
+  CHECKOUT: '/checkout',
   PAYMENT: '/payment',
   CONFIRMATION: '/confirmation',
   TRANSFERS: '/transfers',
@@ -266,10 +266,10 @@ export const FEATURES = {
 // ========================================
 
 export const BOOKING_STEPS = [
-  { number: 1, name: 'Route Selection', path: '/' },
-  { number: 2, name: 'Trip Details', path: '/booking-details' },
-  { number: 3, name: 'Summary', path: '/summary' },
-  { number: 4, name: 'Payment', path: '/payment' },
+  { number: 1, name: 'Search', path: '/transfers' },
+  { number: 2, name: 'Trip Details', path: '/preview' },
+  { number: 3, name: 'Checkout', path: '/checkout' },
+  { number: 4, name: 'Done', path: '/confirmation' },
 ] as const;
 
 // ========================================
