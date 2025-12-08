@@ -251,19 +251,10 @@ export function ModernDatePicker({
         }`}
       >
         <div className="flex items-center gap-2">
-          <CalendarIcon className={`h-5 w-5 ${darkMode ? 'text-gray-400' : 'text-gray-400'}`} aria-hidden="true" />
-          <span className={value
-            ? (darkMode ? 'text-white' : 'text-gray-900')
-            : (darkMode ? 'text-gray-400' : 'text-gray-400')
-          }>
-            {value
-              ? showTimePicker
-                ? `${format(value, 'EEE, MMM d', { locale: enUS })} / ${TIME_OPTIONS.find(t => t.value === selectedTime)?.label || selectedTime}`
-                : format(value, 'EEEE, MMMM d, yyyy', { locale: enUS })
-              : showTimePicker ? 'Select date & time' : 'Select a date'
-            }
+          <CalendarIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+          <span className={value ? 'text-gray-900' : 'text-gray-400'}>
+            {value ? format(value, 'MMM d, yyyy', { locale: enUS }) : 'Select date'}
           </span>
-          {showTimePicker && <Clock className={`h-4 w-4 ml-auto ${darkMode ? 'text-gray-400' : 'text-gray-400'}`} />}
         </div>
       </button>
 
