@@ -972,7 +972,7 @@ function PreviewPageContent() {
                                   <div
                                     key={i}
                                     className={`w-1.5 h-1.5 rounded-full ${
-                                      i < bookedSlots ? 'bg-gray-300' : 'bg-green-500'
+                                      i < availableVans ? 'bg-green-500' : 'bg-gray-300'
                                     }`}
                                   />
                                 ))}
