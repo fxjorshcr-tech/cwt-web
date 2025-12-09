@@ -1290,10 +1290,14 @@ function PreviewPageContent() {
                             </div>
                           </div>
                           {/* Date & Passengers */}
-                          <div className="flex items-center gap-3 text-xs text-gray-600">
+                          <div className="flex items-center justify-between text-xs text-gray-600">
                             <span className="flex items-center gap-1">
                               <Calendar className="h-3 w-3" />
-                              {formatDisplayDate(trip.date)}
+                              {(() => {
+                                const date = parseDateFromString(trip.date);
+                                if (!date || isNaN(date.getTime())) return 'N/A';
+                                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                              })()}
                             </span>
                             <span className="flex items-center gap-1">
                               <Users className="h-3 w-3" />
