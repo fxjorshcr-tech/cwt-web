@@ -1059,71 +1059,67 @@ function PreviewPageContent() {
                           </div>
                         )}
 
-                        {/* Passengers Selector - Compact */}
-                        <div className="flex flex-wrap items-center gap-3 py-2">
-                          <div className="flex items-center gap-1.5">
-                            <Users className="h-4 w-4 text-gray-500" />
-                            <span className="text-sm text-gray-600">Passengers:</span>
-                          </div>
+                        {/* Passengers Selector - Grid for mobile */}
+                        <div className="grid grid-cols-2 gap-3 py-2">
                           {/* Adults */}
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2">
                             <span className="text-sm text-gray-700">Adults</span>
                             <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white">
                               <button
                                 type="button"
                                 onClick={() => updateTripPassengers(index, Math.max(1, trip.adults - 1), trip.children)}
                                 disabled={trip.adults <= 1}
-                                className="w-7 h-7 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-sm font-medium"
+                                className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-base font-medium"
                               >-</button>
-                              <span className="w-6 h-7 flex items-center justify-center text-sm font-semibold">{trip.adults}</span>
+                              <span className="w-8 h-8 flex items-center justify-center text-sm font-semibold">{trip.adults}</span>
                               <button
                                 type="button"
                                 onClick={() => updateTripPassengers(index, Math.min(12, trip.adults + 1), trip.children)}
                                 disabled={trip.adults + trip.children >= 12}
-                                className="w-7 h-7 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-sm font-medium"
+                                className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-base font-medium"
                               >+</button>
                             </div>
                           </div>
                           {/* Children */}
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2">
                             <span className="text-sm text-gray-700">Children</span>
                             <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white">
                               <button
                                 type="button"
                                 onClick={() => updateTripPassengers(index, trip.adults, Math.max(0, trip.children - 1))}
                                 disabled={trip.children <= 0}
-                                className="w-7 h-7 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-sm font-medium"
+                                className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-base font-medium"
                               >-</button>
-                              <span className="w-6 h-7 flex items-center justify-center text-sm font-semibold">{trip.children}</span>
+                              <span className="w-8 h-8 flex items-center justify-center text-sm font-semibold">{trip.children}</span>
                               <button
                                 type="button"
                                 onClick={() => updateTripPassengers(index, trip.adults, Math.min(11, trip.children + 1))}
                                 disabled={trip.adults + trip.children >= 12}
-                                className="w-7 h-7 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-sm font-medium"
+                                className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-base font-medium"
                               >+</button>
                             </div>
                           </div>
-                          {/* Children Ages inline if there are children */}
-                          {trip.children > 0 && (
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="text-xs text-orange-700 font-medium">Ages:</span>
-                              {Array.from({ length: trip.children }, (_, childIdx) => (
-                                <select
-                                  key={childIdx}
-                                  value={trip.children_ages?.[childIdx] ?? ''}
-                                  onChange={(e) => updateChildAge(index, childIdx, e.target.value ? parseInt(e.target.value) : null)}
-                                  className="w-14 h-7 px-1 rounded border border-orange-300 bg-orange-50 text-sm"
-                                  style={{ fontSize: '14px' }}
-                                >
-                                  <option value="">?</option>
-                                  {Array.from({ length: 13 }, (_, age) => (
-                                    <option key={age} value={age}>{age}</option>
-                                  ))}
-                                </select>
-                              ))}
-                            </div>
-                          )}
                         </div>
+                        {/* Children Ages - separate row if there are children */}
+                        {trip.children > 0 && (
+                          <div className="flex items-center gap-2 flex-wrap bg-orange-50 rounded-lg px-3 py-2">
+                            <span className="text-xs text-orange-700 font-medium">Children ages:</span>
+                            {Array.from({ length: trip.children }, (_, childIdx) => (
+                              <select
+                                key={childIdx}
+                                value={trip.children_ages?.[childIdx] ?? ''}
+                                onChange={(e) => updateChildAge(index, childIdx, e.target.value ? parseInt(e.target.value) : null)}
+                                className="w-16 h-8 px-2 rounded border border-orange-300 bg-white text-sm"
+                                style={{ fontSize: '16px' }}
+                              >
+                                <option value="">Age</option>
+                                {Array.from({ length: 13 }, (_, age) => (
+                                  <option key={age} value={age}>{age}</option>
+                                ))}
+                              </select>
+                            ))}
+                          </div>
+                        )}
 
                         {/* Add-ons */}
                         <TripAddOns
