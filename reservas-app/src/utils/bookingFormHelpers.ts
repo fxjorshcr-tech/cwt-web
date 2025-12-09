@@ -190,57 +190,75 @@ export function generateBookingId(): string {
 }
 
 /**
- * Load routes from Supabase with retry logic
+ * Load routes from Supabase with pagination to get ALL routes
  */
 export async function loadRoutesFromSupabase(
   supabase: SupabaseClient,
   maxRetries: number = 3,
-  timeout: number = 10000
+  timeout: number = 15000
 ): Promise<{ routes: Route[] | null; error: string | null }> {
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Request timeout - please refresh the page')), timeout)
-      );
+      const allRoutes: Route[] = [];
+      const pageSize = 1000;
+      let page = 0;
+      let hasMore = true;
 
-      // Use range(0, 4999) to get up to 5000 routes - Supabase default limit is 1000
-      const fetchPromise = supabase
-        .from('routes')
-        .select('id, origen, destino, precio1a6, precio7a9, precio10a12, duracion')
-        .order('origen')
-        .range(0, 4999);
+      // Load routes in batches of 1000 until we get all of them
+      while (hasMore) {
+        const from = page * pageSize;
+        const to = from + pageSize - 1;
 
-      const result = (await Promise.race([fetchPromise, timeoutPromise])) as any;
-      const { data, error: fetchError } = result;
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Request timeout - please refresh the page')), timeout)
+        );
 
-      if (fetchError) {
-        throw new Error(fetchError.message);
+        const fetchPromise = supabase
+          .from('routes')
+          .select('id, origen, destino, precio1a6, precio7a9, precio10a12, duracion')
+          .order('origen')
+          .range(from, to);
+
+        const result = (await Promise.race([fetchPromise, timeoutPromise])) as any;
+        const { data, error: fetchError } = result;
+
+        if (fetchError) {
+          throw new Error(fetchError.message);
+        }
+
+        if (!data || data.length === 0) {
+          hasMore = false;
+        } else {
+          // Filter and map valid routes
+          const validBatch = (data as any[])
+            .filter((route) => route.origen !== null && route.destino !== null)
+            .map((route) => ({
+              id: route.id,
+              origen: route.origen,
+              destino: route.destino,
+              precio1a6: route.precio1a6 ?? 0,
+              precio7a9: route.precio7a9 ?? 0,
+              precio10a12: route.precio10a12 ?? 0,
+              duracion: route.duracion ?? '',
+            }));
+
+          allRoutes.push(...validBatch);
+
+          // If we got less than pageSize, we've reached the end
+          if (data.length < pageSize) {
+            hasMore = false;
+          } else {
+            page++;
+          }
+        }
       }
 
-      if (!data || data.length === 0) {
+      if (allRoutes.length === 0) {
         throw new Error('No routes available in database');
       }
 
-      const validRoutes: Route[] = (data as any[])
-        .filter((route) => {
-          // Only require origen and destino - prices can default to 0
-          return route.origen !== null && route.destino !== null;
-        })
-        .map((route) => ({
-          id: route.id,
-          origen: route.origen,
-          destino: route.destino,
-          precio1a6: route.precio1a6 ?? 0,
-          precio7a9: route.precio7a9 ?? 0,
-          precio10a12: route.precio10a12 ?? 0,
-          duracion: route.duracion ?? '',
-        }));
-
-      if (validRoutes.length === 0) {
-        throw new Error('No valid routes available');
-      }
-
-      return { routes: validRoutes, error: null };
+      console.log(`Loaded ${allRoutes.length} routes from Supabase`);
+      return { routes: allRoutes, error: null };
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unknown error';
 
