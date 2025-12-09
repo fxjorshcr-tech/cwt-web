@@ -1268,20 +1268,46 @@ function PreviewPageContent() {
                   <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-5 py-4">
                     <h2 className="text-white font-bold text-lg">Order Summary</h2>
                   </div>
-                  <div className="p-5 space-y-3">
+                  <div className="p-4 space-y-4">
                     {trips.map((trip, index) => {
                       const addOnsPrice = calculateAddOnsPrice(trip.add_ons || []);
                       return (
-                        <div key={index} className="space-y-1">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-gray-700">
-                              {trips.length > 1 ? `Transfer ${index + 1}` : 'Transfer'}
+                        <div key={index} className="bg-gray-50 rounded-lg p-3 space-y-2">
+                          {/* Route name */}
+                          <div className="flex items-start gap-2">
+                            <MapPin className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs text-gray-500 font-medium">
+                                {trips.length > 1 ? `Transfer ${index + 1}` : 'Private Transfer'}
+                              </p>
+                              <p className="text-sm font-semibold text-gray-900 truncate">
+                                {trip.from_location}
+                              </p>
+                              <p className="text-xs text-gray-500">to</p>
+                              <p className="text-sm font-semibold text-gray-900 truncate">
+                                {trip.to_location}
+                              </p>
+                            </div>
+                          </div>
+                          {/* Date & Passengers */}
+                          <div className="flex items-center gap-3 text-xs text-gray-600">
+                            <span className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              {formatDisplayDate(trip.date)}
                             </span>
+                            <span className="flex items-center gap-1">
+                              <Users className="h-3 w-3" />
+                              {trip.adults + trip.children} pax
+                            </span>
+                          </div>
+                          {/* Price */}
+                          <div className="flex items-center justify-between pt-1 border-t border-gray-200">
+                            <span className="text-sm text-gray-600">Price</span>
                             <span className="font-bold text-gray-900">${trip.price}</span>
                           </div>
                           {addOnsPrice > 0 && (
                             <div className="flex items-center justify-between text-blue-600">
-                              <span className="text-xs pl-2">+ Add-ons</span>
+                              <span className="text-xs">+ Add-ons</span>
                               <span className="text-sm font-medium">+${addOnsPrice}</span>
                             </div>
                           )}
