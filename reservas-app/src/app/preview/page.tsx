@@ -992,26 +992,26 @@ function PreviewPageContent() {
                             className="h-10 text-base"
                             style={{ fontSize: '16px' }}
                           />
-                          {/* Pickup Time - prominent CTA below pickup address */}
-                          <div className={`flex items-center gap-2 px-3 py-2.5 rounded-lg ${
-                            trip.pickup_time
-                              ? 'bg-blue-600'
-                              : 'bg-orange-500 animate-pulse'
-                          }`}>
-                            <Clock className="h-5 w-5 text-white flex-shrink-0" />
+                          {/* Pickup Time */}
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-600 font-medium">Pickup Time:</span>
                             <select
                               value={trip.pickup_time}
                               onChange={(e) => updateTripField(index, 'pickup_time', e.target.value)}
-                              className="bg-transparent text-white text-base font-bold focus:outline-none cursor-pointer flex-1 min-w-0"
+                              className={`px-3 py-2 rounded-lg font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer ${
+                                trip.pickup_time
+                                  ? 'bg-blue-600 text-white'
+                                  : 'bg-orange-500 text-white animate-pulse'
+                              }`}
                               style={{ fontSize: '16px' }}
                             >
-                              <option value="" className="text-gray-900">SELECT PICKUP TIME</option>
+                              <option value="" className="text-gray-900 bg-white">SELECT PICKUP TIME</option>
                               {Array.from({ length: 48 }, (_, i) => {
                                 const hour = Math.floor(i / 2);
                                 const minute = i % 2 === 0 ? '00' : '30';
                                 const value = `${hour.toString().padStart(2, '0')}:${minute}`;
                                 const label = `${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour}:${minute} ${hour < 12 ? 'AM' : 'PM'}`;
-                                return <option key={value} value={value} className="text-gray-900">{label}</option>;
+                                return <option key={value} value={value} className="text-gray-900 bg-white">{label}</option>;
                               })}
                             </select>
                           </div>
