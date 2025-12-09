@@ -42,6 +42,9 @@ const POPULAR_ROUTES = [
   { from: 'LIR - Liberia Int. Airport', to: 'Rio Celeste', slug: 'lir-to-rio-celeste' },
   // Manuel Antonio routes
   { from: 'Manuel Antonio / Quepos', to: 'SJO - Juan Santamaria Int. Airport', slug: 'manuel-antonio-to-sjo' },
+  { from: 'Manuel Antonio / Quepos', to: 'La Fortuna (Arenal)', slug: 'manuel-antonio-to-la-fortuna' },
+  { from: 'Manuel Antonio / Quepos', to: 'Monteverde (Cloud Forest)', slug: 'manuel-antonio-to-monteverde' },
+  { from: 'Manuel Antonio / Quepos', to: 'Tamarindo (Guanacaste)', slug: 'manuel-antonio-to-tamarindo' },
   // Monteverde routes
   { from: 'Monteverde (Cloud Forest)', to: 'SJO - Juan Santamaria Int. Airport', slug: 'monteverde-to-sjo' },
   { from: 'Monteverde (Cloud Forest)', to: 'Manuel Antonio / Quepos', slug: 'monteverde-to-manuel-antonio' },
