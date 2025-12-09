@@ -36,6 +36,29 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/icon.png', type: 'image/png', sizes: '192x192' },
+    ],
+    apple: '/apple-icon.png',
+  },
+  openGraph: {
+    title: "Can't Wait Travel - Private Shuttle Costa Rica",
+    description: "Professional private shuttle service from SJO & LIR to all major Costa Rica destinations.",
+    url: 'https://cantwaittravelcr.com',
+    siteName: "Can't Wait Travel",
+    locale: 'en_US',
+    type: 'website',
+    images: [
+      {
+        url: 'https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: "Can't Wait Travel - Costa Rica Private Shuttles",
+      },
+    ],
+  },
 };
 
 export default function RootLayout({
