@@ -930,32 +930,36 @@ function PreviewPageContent() {
                       {/* 2. Availability & Alerts Badges */}
                       <div className="flex flex-wrap gap-1.5 mb-4">
                         {(() => {
-                          // Calculate availability based on route duration
+                          // Calculate availability based on days until booking
                           const totalSlots = 8;
                           let availableVans = 3; // default
 
-                          // Parse duration (e.g. "2h 30m" or "3h")
-                          const durationStr = trip.duration || '';
-                          const hoursMatch = durationStr.match(/(\d+)h/);
-                          const hours = hoursMatch ? parseInt(hoursMatch[1]) : 2;
+                          // Calculate days until booking
+                          const bookingDate = parseDateFromString(trip.date);
+                          const today = getNowInCostaRica();
+                          const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                          let daysUntil = 30; // default
+                          if (bookingDate && !isNaN(bookingDate.getTime())) {
+                            daysUntil = Math.floor((bookingDate.getTime() - todayStart.getTime()) / (1000 * 60 * 60 * 24));
+                          }
 
-                          // Use a simple hash for consistent randomness per route
-                          const routeKey = `${trip.from_location}-${trip.to_location}`;
+                          // Use a simple hash for consistent variance per route+date
+                          const routeKey = `${trip.from_location}-${trip.to_location}-${trip.date}`;
                           let hash = 0;
                           for (let i = 0; i < routeKey.length; i++) {
                             hash = ((hash << 5) - hash) + routeKey.charCodeAt(i);
                           }
                           const variance = Math.abs(hash % 2); // 0 or 1
 
-                          // Short routes (<2h): 2-3 available
-                          // Medium routes (2-3.5h): 3-5 available
-                          // Long routes (>3.5h): 5-7 available
-                          if (hours < 2) {
+                          // <15 days: 2-3 available
+                          // 15-60 days (2 months): 3-5 available
+                          // >60 days: 5-6 available
+                          if (daysUntil < 15) {
                             availableVans = 2 + variance; // 2-3
-                          } else if (hours <= 3) {
+                          } else if (daysUntil <= 60) {
                             availableVans = 3 + (Math.abs(hash % 3)); // 3-5
                           } else {
-                            availableVans = 5 + variance; // 5-7 (capped at 7)
+                            availableVans = 5 + variance; // 5-6
                           }
 
                           const bookedSlots = totalSlots - availableVans;
