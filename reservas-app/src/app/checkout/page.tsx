@@ -191,7 +191,7 @@ function CheckoutPageContent() {
                 from_location: trip.from_location,
                 to_location: trip.to_location,
                 date: trip.date,
-                pickup_time: details?.pickup_time || '09:00',
+                pickup_time: details?.pickup_time || '',
                 adults: trip.adults,
                 children: trip.children || 0,
                 price: basePrice,

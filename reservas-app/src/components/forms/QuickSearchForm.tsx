@@ -43,7 +43,7 @@ export function QuickSearchForm({
 
   // Multi-trip state
   const [trips, setTrips] = useState<TripInput[]>([
-    { origin: initialOrigin, destination: initialDestination, date: null, pickupTime: '09:00' }
+    { origin: initialOrigin, destination: initialDestination, date: null, pickupTime: '' }
   ]);
 
   // Default passengers (will be edited in preview)
@@ -105,7 +105,7 @@ export function QuickSearchForm({
       origin: lastTrip.destination, // Next trip starts from last destination
       destination: '',
       date: null,
-      pickupTime: '09:00',
+      pickupTime: '', // Empty - user must select
     }]);
   };
 

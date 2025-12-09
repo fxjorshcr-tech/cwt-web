@@ -40,7 +40,7 @@ import { createClient } from '@/lib/supabase/client';
 import { loadRoutesFromSupabase, type Route, calculateTripPrice } from '@/utils/bookingFormHelpers';
 import { loadBookingFromLocalStorage, saveBookingToLocalStorage } from '@/utils/localStorageHelpers';
 import { checkExistingTrips, loadTripsFromSupabase } from '@/utils/supabaseHelpers';
-import { formatDateToString, parseDateFromString, getAvailabilityCount, getNowInCostaRica } from '@/utils/timeHelpers';
+import { formatDateToString, parseDateFromString, getNowInCostaRica } from '@/utils/timeHelpers';
 
 // Popular routes that get special badge
 const POPULAR_ROUTES = [
@@ -930,31 +930,53 @@ function PreviewPageContent() {
                       {/* 2. Availability & Alerts Badges */}
                       <div className="flex flex-wrap gap-1.5 mb-4">
                         {(() => {
-                          const availableVans = getAvailabilityCount(trip.from_location, trip.to_location, trip.date);
+                          // Calculate availability based on days until booking
                           const totalSlots = 8;
-                          const isLow = availableVans <= 2;
+                          let availableVans = 3; // default
+
+                          // Calculate days until booking
+                          const bookingDate = parseDateFromString(trip.date);
+                          const today = getNowInCostaRica();
+                          const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                          let daysUntil = 30; // default
+                          if (bookingDate && !isNaN(bookingDate.getTime())) {
+                            daysUntil = Math.floor((bookingDate.getTime() - todayStart.getTime()) / (1000 * 60 * 60 * 24));
+                          }
+
+                          // Use a simple hash for consistent variance per route+date
+                          const routeKey = `${trip.from_location}-${trip.to_location}-${trip.date}`;
+                          let hash = 0;
+                          for (let i = 0; i < routeKey.length; i++) {
+                            hash = ((hash << 5) - hash) + routeKey.charCodeAt(i);
+                          }
+                          const variance = Math.abs(hash % 2); // 0 or 1
+
+                          // <15 days: 2-3 available
+                          // 15-60 days (2 months): 3-5 available
+                          // >60 days: 5-6 available
+                          if (daysUntil < 15) {
+                            availableVans = 2 + variance; // 2-3
+                          } else if (daysUntil <= 60) {
+                            availableVans = 3 + (Math.abs(hash % 3)); // 3-5
+                          } else {
+                            availableVans = 5 + variance; // 5-6
+                          }
+
+                          const bookedSlots = totalSlots - availableVans;
+
                           return (
-                            <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] ${
-                              isLow
-                                ? 'bg-red-50 border border-red-200'
-                                : 'bg-green-50 border border-green-200'
-                            }`}>
-                              <Car className={`h-3 w-3 ${isLow ? 'text-red-500' : 'text-green-500'}`} />
+                            <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] bg-green-50 border border-green-200">
+                              <Car className="h-3 w-3 text-green-600" />
                               <div className="flex items-center gap-0.5">
                                 {Array.from({ length: totalSlots }, (_, i) => (
                                   <div
                                     key={i}
                                     className={`w-1.5 h-1.5 rounded-full ${
-                                      i < availableVans
-                                        ? isLow ? 'bg-red-500' : 'bg-green-500'
-                                        : 'bg-gray-300'
+                                      i < availableVans ? 'bg-green-500' : 'bg-gray-300'
                                     }`}
                                   />
                                 ))}
                               </div>
-                              {isLow && (
-                                <span className="text-red-600 font-semibold">Book soon!</span>
-                              )}
                             </div>
                           );
                         })()}
