@@ -985,36 +985,36 @@ function PreviewPageContent() {
                               <p className="text-sm font-semibold text-gray-900 leading-tight truncate">{trip.from_location}</p>
                             </div>
                           </div>
-                          {/* Pickup Time - own row */}
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <div className={`inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] ${
-                              trip.pickup_time
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-orange-500 text-white animate-pulse'
-                            }`}>
-                              <Clock className="h-3 w-3" />
-                              <select
-                                value={trip.pickup_time}
-                                onChange={(e) => updateTripField(index, 'pickup_time', e.target.value)}
-                                className="bg-transparent text-white text-[11px] font-medium focus:outline-none cursor-pointer"
-                              >
-                                <option value="" className="text-gray-900">SELECT PICKUP TIME</option>
-                                {Array.from({ length: 48 }, (_, i) => {
-                                  const hour = Math.floor(i / 2);
-                                  const minute = i % 2 === 0 ? '00' : '30';
-                                  const value = `${hour.toString().padStart(2, '0')}:${minute}`;
-                                  const label = `${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour}:${minute} ${hour < 12 ? 'AM' : 'PM'}`;
-                                  return <option key={value} value={value} className="text-gray-900">{label}</option>;
-                                })}
-                              </select>
-                            </div>
-                          </div>
                           <Input
                             placeholder="Pickup address (hotel, Airbnb...)"
                             value={trip.pickup_address}
                             onChange={(e) => updateTripField(index, 'pickup_address', e.target.value)}
-                            className="h-9 text-sm"
+                            className="h-10 text-base"
+                            style={{ fontSize: '16px' }}
                           />
+                          {/* Pickup Time - prominent CTA below pickup address */}
+                          <div className={`flex items-center gap-2 px-3 py-2.5 rounded-lg ${
+                            trip.pickup_time
+                              ? 'bg-blue-600'
+                              : 'bg-orange-500 animate-pulse'
+                          }`}>
+                            <Clock className="h-5 w-5 text-white flex-shrink-0" />
+                            <select
+                              value={trip.pickup_time}
+                              onChange={(e) => updateTripField(index, 'pickup_time', e.target.value)}
+                              className="bg-transparent text-white text-base font-bold focus:outline-none cursor-pointer flex-1 min-w-0"
+                              style={{ fontSize: '16px' }}
+                            >
+                              <option value="" className="text-gray-900">SELECT PICKUP TIME</option>
+                              {Array.from({ length: 48 }, (_, i) => {
+                                const hour = Math.floor(i / 2);
+                                const minute = i % 2 === 0 ? '00' : '30';
+                                const value = `${hour.toString().padStart(2, '0')}:${minute}`;
+                                const label = `${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour}:${minute} ${hour < 12 ? 'AM' : 'PM'}`;
+                                return <option key={value} value={value} className="text-gray-900">{label}</option>;
+                              })}
+                            </select>
+                          </div>
                         </div>
 
                         {/* TO section with dropoff address */}
@@ -1032,7 +1032,8 @@ function PreviewPageContent() {
                             placeholder="Drop-off address (hotel, Airbnb...)"
                             value={trip.dropoff_address}
                             onChange={(e) => updateTripField(index, 'dropoff_address', e.target.value)}
-                            className="h-9 text-sm"
+                            className="h-10 text-base"
+                            style={{ fontSize: '16px' }}
                           />
                         </div>
 
@@ -1053,7 +1054,8 @@ function PreviewPageContent() {
                                 placeholder="e.g. AA1234"
                                 value={trip.flight_number}
                                 onChange={(e) => updateTripField(index, 'flight_number', e.target.value)}
-                                className="h-9 text-sm"
+                                className="h-10 text-base"
+                                style={{ fontSize: '16px' }}
                               />
                             </div>
                             <div>
@@ -1064,7 +1066,8 @@ function PreviewPageContent() {
                                 placeholder="e.g. American Airlines"
                                 value={trip.airline}
                                 onChange={(e) => updateTripField(index, 'airline', e.target.value)}
-                                className="h-9 text-sm"
+                                className="h-10 text-base"
+                                style={{ fontSize: '16px' }}
                               />
                             </div>
                           </div>
