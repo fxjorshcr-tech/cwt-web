@@ -139,7 +139,7 @@ function PreviewPageContent() {
   const [editOrigin, setEditOrigin] = useState('');
   const [editDestination, setEditDestination] = useState('');
   const [editDate, setEditDate] = useState<Date | null>(null);
-  const [editPickupTime, setEditPickupTime] = useState('09:00');
+  const [editPickupTime, setEditPickupTime] = useState('');
   const [editAdults, setEditAdults] = useState(2);
   const [editChildren, setEditChildren] = useState(0);
 
@@ -326,7 +326,7 @@ function PreviewPageContent() {
     setEditOrigin(trip.from_location || '');
     setEditDestination(trip.to_location || '');
     setEditDate(trip.date ? parseDateFromString(trip.date) : null);
-    setEditPickupTime(trip.pickup_time || '09:00');
+    setEditPickupTime(trip.pickup_time || '');
     setEditAdults(trip.adults || 1);
     setEditChildren(trip.children || 0);
     setEditingIndex(index);
@@ -403,7 +403,7 @@ function PreviewPageContent() {
       setEditOrigin('');
       setEditDestination('');
       setEditDate(null);
-      setEditPickupTime('09:00');
+      setEditPickupTime('');
       setEditAdults(2);
       setEditChildren(0);
       setShowAddTrip(true);
@@ -415,7 +415,7 @@ function PreviewPageContent() {
     setEditOrigin(lastTrip?.to_location || '');
     setEditDestination('');
     setEditDate(null); // New trip should have empty date
-    setEditPickupTime('09:00');
+    setEditPickupTime('');
     setEditAdults(lastTrip?.adults || 2);
     setEditChildren(lastTrip?.children || 0);
     setShowAddTrip(true);
@@ -499,7 +499,7 @@ function PreviewPageContent() {
       tripDetails: tripsToSave.map((trip) => ({
         pickup_address: trip.pickup_address || '',
         dropoff_address: trip.dropoff_address || '',
-        pickup_time: trip.pickup_time || '09:00',
+        pickup_time: trip.pickup_time || '',
         flight_number: trip.flight_number || '',
         airline: trip.airline || '',
         special_requests: '',
@@ -988,24 +988,24 @@ function PreviewPageContent() {
                           {/* Pickup Time - own row */}
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="text-xs text-gray-600">Pickup Time:</span>
-                            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg ${
+                            <div className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs ${
                               trip.pickup_time
                                 ? 'bg-blue-600 text-white'
                                 : 'bg-orange-500 text-white animate-pulse'
                             }`}>
-                              <Clock className="h-3.5 w-3.5" />
+                              <Clock className="h-3 w-3" />
                               <select
                                 value={trip.pickup_time}
                                 onChange={(e) => updateTripField(index, 'pickup_time', e.target.value)}
-                                className="bg-transparent text-white text-sm font-semibold focus:outline-none cursor-pointer uppercase"
+                                className="bg-transparent text-white text-xs font-medium focus:outline-none cursor-pointer"
                               >
-                                <option value="" className="text-gray-900 normal-case">SELECT PICKUP TIME</option>
+                                <option value="" className="text-gray-900">Select pickup time</option>
                                 {Array.from({ length: 48 }, (_, i) => {
                                   const hour = Math.floor(i / 2);
                                   const minute = i % 2 === 0 ? '00' : '30';
                                   const value = `${hour.toString().padStart(2, '0')}:${minute}`;
                                   const label = `${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour}:${minute} ${hour < 12 ? 'AM' : 'PM'}`;
-                                  return <option key={value} value={value} className="text-gray-900 normal-case">{label}</option>;
+                                  return <option key={value} value={value} className="text-gray-900">{label}</option>;
                                 })}
                               </select>
                             </div>

@@ -221,24 +221,18 @@ export async function loadRoutesFromSupabase(
       }
 
       const validRoutes: Route[] = (data as any[])
-        .filter((route): route is Route => {
-          return (
-            route.origen !== null &&
-            route.destino !== null &&
-            route.precio1a6 !== null &&
-            route.precio7a9 !== null &&
-            route.precio10a12 !== null &&
-            route.duracion !== null
-          );
+        .filter((route) => {
+          // Only require origen and destino - prices can default to 0
+          return route.origen !== null && route.destino !== null;
         })
         .map((route) => ({
           id: route.id,
           origen: route.origen,
           destino: route.destino,
-          precio1a6: route.precio1a6,
-          precio7a9: route.precio7a9,
-          precio10a12: route.precio10a12,
-          duracion: route.duracion,
+          precio1a6: route.precio1a6 ?? 0,
+          precio7a9: route.precio7a9 ?? 0,
+          precio10a12: route.precio10a12 ?? 0,
+          duracion: route.duracion ?? '',
         }));
 
       if (validRoutes.length === 0) {
