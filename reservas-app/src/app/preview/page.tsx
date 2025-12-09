@@ -934,17 +934,17 @@ function PreviewPageContent() {
                           const totalSlots = 8;
                           const isLow = availableVans <= 2;
                           return (
-                            <div className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs ${
+                            <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] ${
                               isLow
                                 ? 'bg-red-50 border border-red-200'
                                 : 'bg-green-50 border border-green-200'
                             }`}>
-                              <Car className={`h-3.5 w-3.5 ${isLow ? 'text-red-500' : 'text-green-500'}`} />
+                              <Car className={`h-3 w-3 ${isLow ? 'text-red-500' : 'text-green-500'}`} />
                               <div className="flex items-center gap-0.5">
                                 {Array.from({ length: totalSlots }, (_, i) => (
                                   <div
                                     key={i}
-                                    className={`w-2 h-2 rounded-full ${
+                                    className={`w-1.5 h-1.5 rounded-full ${
                                       i < availableVans
                                         ? isLow ? 'bg-red-500' : 'bg-green-500'
                                         : 'bg-gray-300'
@@ -953,7 +953,7 @@ function PreviewPageContent() {
                                 ))}
                               </div>
                               {isLow && (
-                                <span className="text-red-600 font-semibold text-[10px] ml-0.5">Low!</span>
+                                <span className="text-red-600 font-semibold">Book soon!</span>
                               )}
                             </div>
                           );
@@ -987,19 +987,19 @@ function PreviewPageContent() {
                           </div>
                           {/* Pickup Time - own row */}
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-xs text-gray-600">Pickup Time:</span>
-                            <div className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs ${
+                            <span className="text-[11px] text-gray-600">Pickup:</span>
+                            <div className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] ${
                               trip.pickup_time
                                 ? 'bg-blue-600 text-white'
                                 : 'bg-orange-500 text-white animate-pulse'
                             }`}>
-                              <Clock className="h-3 w-3" />
+                              <Clock className="h-2.5 w-2.5" />
                               <select
                                 value={trip.pickup_time}
                                 onChange={(e) => updateTripField(index, 'pickup_time', e.target.value)}
-                                className="bg-transparent text-white text-xs font-medium focus:outline-none cursor-pointer"
+                                className="bg-transparent text-white text-[11px] font-medium focus:outline-none cursor-pointer pr-1"
                               >
-                                <option value="" className="text-gray-900">Select pickup time</option>
+                                <option value="" className="text-gray-900">Select time</option>
                                 {Array.from({ length: 48 }, (_, i) => {
                                   const hour = Math.floor(i / 2);
                                   const minute = i % 2 === 0 ? '00' : '30';
@@ -1014,7 +1014,7 @@ function PreviewPageContent() {
                             placeholder="Pickup address (hotel, Airbnb...)"
                             value={trip.pickup_address}
                             onChange={(e) => updateTripField(index, 'pickup_address', e.target.value)}
-                            className="h-10"
+                            className="h-9 text-sm"
                           />
                         </div>
 
@@ -1033,7 +1033,7 @@ function PreviewPageContent() {
                             placeholder="Drop-off address (hotel, Airbnb...)"
                             value={trip.dropoff_address}
                             onChange={(e) => updateTripField(index, 'dropoff_address', e.target.value)}
-                            className="h-10"
+                            className="h-9 text-sm"
                           />
                         </div>
 
@@ -1054,7 +1054,7 @@ function PreviewPageContent() {
                                 placeholder="e.g. AA1234"
                                 value={trip.flight_number}
                                 onChange={(e) => updateTripField(index, 'flight_number', e.target.value)}
-                                className="h-10"
+                                className="h-9 text-sm"
                               />
                             </div>
                             <div>
@@ -1065,7 +1065,7 @@ function PreviewPageContent() {
                                 placeholder="e.g. American Airlines"
                                 value={trip.airline}
                                 onChange={(e) => updateTripField(index, 'airline', e.target.value)}
-                                className="h-10"
+                                className="h-9 text-sm"
                               />
                             </div>
                           </div>

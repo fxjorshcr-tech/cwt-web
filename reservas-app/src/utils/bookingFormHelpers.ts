@@ -203,11 +203,12 @@ export async function loadRoutesFromSupabase(
         setTimeout(() => reject(new Error('Request timeout - please refresh the page')), timeout)
       );
 
+      // Use range(0, 4999) to get up to 5000 routes - Supabase default limit is 1000
       const fetchPromise = supabase
         .from('routes')
         .select('id, origen, destino, precio1a6, precio7a9, precio10a12, duracion')
         .order('origen')
-        .limit(5000);
+        .range(0, 4999);
 
       const result = (await Promise.race([fetchPromise, timeoutPromise])) as any;
       const { data, error: fetchError } = result;
