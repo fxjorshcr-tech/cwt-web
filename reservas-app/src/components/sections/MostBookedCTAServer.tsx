@@ -4,12 +4,12 @@ import MostBookedCTA from './MostBookedCTA';
 
 // Nombres exactos de la base de datos
 const popularRoutes = [
-  { from: 'SJO - Juan Santamaria Int. Airport (or Alajuela City & Downtown San Jose)', to: 'La Fortuna, Arenal Volcano & El Castillo', slug: 'sjo-to-la-fortuna', displayFrom: 'SJO Airport', displayTo: 'La Fortuna' },
-  { from: 'SJO - Juan Santamaria Int. Airport (or Alajuela City & Downtown San Jose)', to: 'Tamarindo / Flamingo / Conchal (Guanacaste Beaches)', slug: 'sjo-to-tamarindo', displayFrom: 'SJO Airport', displayTo: 'Tamarindo' },
-  { from: 'SJO - Juan Santamaria Int. Airport (or Alajuela City & Downtown San Jose)', to: 'Monteverde (Cloud Forest)', slug: 'sjo-to-monteverde', displayFrom: 'SJO Airport', displayTo: 'Monteverde' },
-  { from: 'LIR - Liberia International Airport', to: 'Tamarindo / Flamingo / Conchal (Guanacaste Beaches)', slug: 'lir-to-tamarindo', displayFrom: 'LIR Airport', displayTo: 'Tamarindo' },
-  { from: 'LIR - Liberia International Airport', to: 'La Fortuna, Arenal Volcano & El Castillo', slug: 'lir-to-la-fortuna', displayFrom: 'LIR Airport', displayTo: 'La Fortuna' },
-  { from: 'La Fortuna, Arenal Volcano & El Castillo', to: 'Monteverde (Cloud Forest)', slug: 'la-fortuna-to-monteverde', displayFrom: 'La Fortuna', displayTo: 'Monteverde' },
+  { from: 'SJO - Juan Santamaria Int. Airport', to: 'La Fortuna (Arenal)', slug: 'sjo-to-la-fortuna', displayFrom: 'SJO Airport', displayTo: 'La Fortuna' },
+  { from: 'SJO - Juan Santamaria Int. Airport', to: 'Tamarindo (Guanacaste)', slug: 'sjo-to-tamarindo', displayFrom: 'SJO Airport', displayTo: 'Tamarindo' },
+  { from: 'SJO - Juan Santamaria Int. Airport', to: 'Monteverde (Cloud Forest)', slug: 'sjo-to-monteverde', displayFrom: 'SJO Airport', displayTo: 'Monteverde' },
+  { from: 'LIR - Liberia Int. Airport', to: 'Tamarindo (Guanacaste)', slug: 'lir-to-tamarindo', displayFrom: 'LIR Airport', displayTo: 'Tamarindo' },
+  { from: 'LIR - Liberia Int. Airport', to: 'La Fortuna (Arenal)', slug: 'lir-to-la-fortuna', displayFrom: 'LIR Airport', displayTo: 'La Fortuna' },
+  { from: 'La Fortuna (Arenal)', to: 'Monteverde (Cloud Forest)', slug: 'la-fortuna-to-monteverde', displayFrom: 'La Fortuna', displayTo: 'Monteverde' },
 ];
 
 async function getRoutePrice(from: string, to: string) {
