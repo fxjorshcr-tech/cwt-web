@@ -14,6 +14,7 @@ const POPULAR_ROUTES = [
   // SJO Airport routes
   { from: 'SJO - Juan Santamaria Int. Airport', to: 'La Fortuna (Arenal)', slug: 'sjo-to-la-fortuna' },
   { from: 'SJO - Juan Santamaria Int. Airport', to: 'Manuel Antonio / Quepos', slug: 'sjo-to-manuel-antonio' },
+  { from: 'SJO - Juan Santamaria Int. Airport', to: 'Jaco', slug: 'sjo-to-jaco' },
   { from: 'SJO - Juan Santamaria Int. Airport', to: 'Tamarindo (Guanacaste)', slug: 'sjo-to-tamarindo' },
   { from: 'SJO - Juan Santamaria Int. Airport', to: 'Monteverde (Cloud Forest)', slug: 'sjo-to-monteverde' },
   { from: 'SJO - Juan Santamaria Int. Airport', to: 'Puerto Viejo (Caribbean Coast)', slug: 'sjo-to-puerto-viejo' },
@@ -23,6 +24,8 @@ const POPULAR_ROUTES = [
   { from: 'La Fortuna (Arenal)', to: 'Monteverde (Cloud Forest)', slug: 'la-fortuna-to-monteverde' },
   { from: 'La Fortuna (Arenal)', to: 'Papagayo Peninsula, Guanacaste', slug: 'la-fortuna-to-papagayo' },
   { from: 'La Fortuna (Arenal)', to: 'Tamarindo (Guanacaste)', slug: 'la-fortuna-to-tamarindo' },
+  { from: 'La Fortuna (Arenal)', to: 'Flamingo (Guanacaste)', slug: 'la-fortuna-to-flamingo' },
+  { from: 'La Fortuna (Arenal)', to: 'Conchal (Guanacaste)', slug: 'la-fortuna-to-conchal' },
   { from: 'La Fortuna (Arenal)', to: 'Manuel Antonio / Quepos', slug: 'la-fortuna-to-manuel-antonio' },
   { from: 'La Fortuna (Arenal)', to: 'Jaco', slug: 'la-fortuna-to-jaco' },
   { from: 'La Fortuna (Arenal)', to: 'Samara / Playa Carrillo (Guanacaste)', slug: 'la-fortuna-to-samara' },
@@ -31,11 +34,14 @@ const POPULAR_ROUTES = [
   // LIR Airport routes
   { from: 'LIR - Liberia Int. Airport', to: 'Tamarindo (Guanacaste)', slug: 'lir-to-tamarindo' },
   { from: 'LIR - Liberia Int. Airport', to: 'Papagayo Peninsula, Guanacaste', slug: 'lir-to-papagayo' },
+  { from: 'LIR - Liberia Int. Airport', to: 'Playas del Coco (Guanacaste)', slug: 'lir-to-playas-del-coco' },
   { from: 'LIR - Liberia Int. Airport', to: 'La Fortuna (Arenal)', slug: 'lir-to-la-fortuna' },
   { from: 'LIR - Liberia Int. Airport', to: 'Nosara (Playa Guiones Area)', slug: 'lir-to-nosara' },
   { from: 'LIR - Liberia Int. Airport', to: 'Santa Teresa (Nicoya Peninsula)', slug: 'lir-to-santa-teresa' },
   { from: 'LIR - Liberia Int. Airport', to: 'Monteverde (Cloud Forest)', slug: 'lir-to-monteverde' },
   { from: 'LIR - Liberia Int. Airport', to: 'Rio Celeste', slug: 'lir-to-rio-celeste' },
+  // Manuel Antonio routes
+  { from: 'Manuel Antonio / Quepos', to: 'SJO - Juan Santamaria Int. Airport', slug: 'manuel-antonio-to-sjo' },
   // Monteverde routes
   { from: 'Monteverde (Cloud Forest)', to: 'SJO - Juan Santamaria Int. Airport', slug: 'monteverde-to-sjo' },
   { from: 'Monteverde (Cloud Forest)', to: 'Manuel Antonio / Quepos', slug: 'monteverde-to-manuel-antonio' },
