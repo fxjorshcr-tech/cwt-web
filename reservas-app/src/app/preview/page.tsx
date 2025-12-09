@@ -973,48 +973,48 @@ function PreviewPageContent() {
                       </div>
 
                       {/* 3. Route Details with inputs */}
-                      <div className="space-y-3 mb-4">
+                      <div className="space-y-4 mb-6">
                         {/* FROM section */}
                         <div className="space-y-2">
                           <div className="flex items-center gap-2">
                             <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
                               <MapPin className="h-3 w-3 text-blue-600" />
                             </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-[10px] text-gray-500 uppercase">From</p>
-                              <p className="text-sm font-semibold text-gray-900 leading-tight truncate">{trip.from_location}</p>
-                            </div>
+                            <p className="text-sm font-semibold text-gray-900 truncate">{trip.from_location}</p>
                           </div>
-                          {/* Pickup Time - own row */}
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <div className={`inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] ${
-                              trip.pickup_time
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-orange-500 text-white animate-pulse'
-                            }`}>
-                              <Clock className="h-3 w-3" />
+                          {/* Pickup Address + Time in same row */}
+                          <div className="grid grid-cols-1 sm:grid-cols-5 gap-2">
+                            <div className="sm:col-span-3">
+                              <Input
+                                placeholder="Pickup address (hotel, Airbnb...)"
+                                value={trip.pickup_address}
+                                onChange={(e) => updateTripField(index, 'pickup_address', e.target.value)}
+                                className="h-11"
+                                style={{ fontSize: '16px' }}
+                              />
+                            </div>
+                            <div className="sm:col-span-2">
                               <select
                                 value={trip.pickup_time}
                                 onChange={(e) => updateTripField(index, 'pickup_time', e.target.value)}
-                                className="bg-transparent text-white text-[11px] font-medium focus:outline-none cursor-pointer"
+                                className={`w-full h-11 px-3 rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer border text-sm ${
+                                  trip.pickup_time
+                                    ? 'bg-white text-gray-900 border-gray-300'
+                                    : 'bg-orange-50 text-orange-600 border-orange-300 animate-pulse'
+                                }`}
+                                style={{ fontSize: '16px' }}
                               >
-                                <option value="" className="text-gray-900">SELECT PICKUP TIME</option>
+                                <option value="" className="text-gray-500">Pickup Time</option>
                                 {Array.from({ length: 48 }, (_, i) => {
                                   const hour = Math.floor(i / 2);
                                   const minute = i % 2 === 0 ? '00' : '30';
                                   const value = `${hour.toString().padStart(2, '0')}:${minute}`;
                                   const label = `${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour}:${minute} ${hour < 12 ? 'AM' : 'PM'}`;
-                                  return <option key={value} value={value} className="text-gray-900">{label}</option>;
+                                  return <option key={value} value={value}>{label}</option>;
                                 })}
                               </select>
                             </div>
                           </div>
-                          <Input
-                            placeholder="Pickup address (hotel, Airbnb...)"
-                            value={trip.pickup_address}
-                            onChange={(e) => updateTripField(index, 'pickup_address', e.target.value)}
-                            className="h-9 text-sm"
-                          />
                         </div>
 
                         {/* TO section with dropoff address */}
@@ -1023,16 +1023,14 @@ function PreviewPageContent() {
                             <div className="h-6 w-6 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
                               <MapPin className="h-3 w-3 text-orange-500" />
                             </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-[10px] text-gray-500 uppercase">To</p>
-                              <p className="text-sm font-semibold text-gray-900 leading-tight truncate">{trip.to_location}</p>
-                            </div>
+                            <p className="text-sm font-semibold text-gray-900 truncate">{trip.to_location}</p>
                           </div>
                           <Input
                             placeholder="Drop-off address (hotel, Airbnb...)"
                             value={trip.dropoff_address}
                             onChange={(e) => updateTripField(index, 'dropoff_address', e.target.value)}
-                            className="h-9 text-sm"
+                            className="h-11"
+                            style={{ fontSize: '16px' }}
                           />
                         </div>
 
@@ -1043,110 +1041,83 @@ function PreviewPageContent() {
                           trip.to_location.toLowerCase().includes('airport') ||
                           trip.to_location.includes('SJO') ||
                           trip.to_location.includes('LIR')) && (
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                              <label className="block text-xs font-medium text-gray-600 mb-1">
-                                <Plane className="h-3 w-3 inline mr-1" />
-                                Flight Number (optional)
-                              </label>
-                              <Input
-                                placeholder="e.g. AA1234"
-                                value={trip.flight_number}
-                                onChange={(e) => updateTripField(index, 'flight_number', e.target.value)}
-                                className="h-9 text-sm"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-xs font-medium text-gray-600 mb-1">
-                                Airline (optional)
-                              </label>
-                              <Input
-                                placeholder="e.g. American Airlines"
-                                value={trip.airline}
-                                onChange={(e) => updateTripField(index, 'airline', e.target.value)}
-                                className="h-9 text-sm"
-                              />
-                            </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <Input
+                              placeholder="Flight # (optional)"
+                              value={trip.flight_number}
+                              onChange={(e) => updateTripField(index, 'flight_number', e.target.value)}
+                              className="h-11"
+                              style={{ fontSize: '16px' }}
+                            />
+                            <Input
+                              placeholder="Airline (optional)"
+                              value={trip.airline}
+                              onChange={(e) => updateTripField(index, 'airline', e.target.value)}
+                              className="h-11"
+                              style={{ fontSize: '16px' }}
+                            />
                           </div>
                         )}
 
-                        {/* Passengers Selector */}
-                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
-                          <p className="text-xs font-medium text-gray-700 mb-3 flex items-center gap-1">
-                            <Users className="h-3.5 w-3.5" />
-                            Passengers
-                          </p>
-                          <div className="grid grid-cols-2 gap-3">
-                            {/* Adults */}
-                            <div className="flex items-center justify-between">
-                              <span className="text-sm text-gray-700 font-medium">Adults</span>
-                              <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white shadow-sm">
-                                <button
-                                  type="button"
-                                  onClick={() => updateTripPassengers(index, Math.max(1, trip.adults - 1), trip.children)}
-                                  disabled={trip.adults <= 1}
-                                  className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-base font-medium transition-colors"
-                                >
-                                  -
-                                </button>
-                                <span className="w-8 h-8 flex items-center justify-center text-sm font-semibold bg-white">{trip.adults}</span>
-                                <button
-                                  type="button"
-                                  onClick={() => updateTripPassengers(index, Math.min(12, trip.adults + 1), trip.children)}
-                                  disabled={trip.adults + trip.children >= 12}
-                                  className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-base font-medium transition-colors"
-                                >
-                                  +
-                                </button>
-                              </div>
+                        {/* Passengers Selector - Grid for mobile */}
+                        <div className="grid grid-cols-2 gap-3 py-2">
+                          {/* Adults */}
+                          <div className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2">
+                            <span className="text-sm text-gray-700">Adults</span>
+                            <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white">
+                              <button
+                                type="button"
+                                onClick={() => updateTripPassengers(index, Math.max(1, trip.adults - 1), trip.children)}
+                                disabled={trip.adults <= 1}
+                                className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-base font-medium"
+                              >-</button>
+                              <span className="w-8 h-8 flex items-center justify-center text-sm font-semibold">{trip.adults}</span>
+                              <button
+                                type="button"
+                                onClick={() => updateTripPassengers(index, Math.min(12, trip.adults + 1), trip.children)}
+                                disabled={trip.adults + trip.children >= 12}
+                                className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-base font-medium"
+                              >+</button>
                             </div>
-                            {/* Children */}
-                            <div className="flex items-center justify-between">
-                              <span className="text-sm text-gray-700 font-medium">Children</span>
-                              <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white shadow-sm">
-                                <button
-                                  type="button"
-                                  onClick={() => updateTripPassengers(index, trip.adults, Math.max(0, trip.children - 1))}
-                                  disabled={trip.children <= 0}
-                                  className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-base font-medium transition-colors"
-                                >
-                                  -
-                                </button>
-                                <span className="w-8 h-8 flex items-center justify-center text-sm font-semibold bg-white">{trip.children}</span>
-                                <button
-                                  type="button"
-                                  onClick={() => updateTripPassengers(index, trip.adults, Math.min(11, trip.children + 1))}
-                                  disabled={trip.adults + trip.children >= 12}
-                                  className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-base font-medium transition-colors"
-                                >
-                                  +
-                                </button>
-                              </div>
+                          </div>
+                          {/* Children */}
+                          <div className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2">
+                            <span className="text-sm text-gray-700">Children</span>
+                            <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white">
+                              <button
+                                type="button"
+                                onClick={() => updateTripPassengers(index, trip.adults, Math.max(0, trip.children - 1))}
+                                disabled={trip.children <= 0}
+                                className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-base font-medium"
+                              >-</button>
+                              <span className="w-8 h-8 flex items-center justify-center text-sm font-semibold">{trip.children}</span>
+                              <button
+                                type="button"
+                                onClick={() => updateTripPassengers(index, trip.adults, Math.min(11, trip.children + 1))}
+                                disabled={trip.adults + trip.children >= 12}
+                                className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-base font-medium"
+                              >+</button>
                             </div>
                           </div>
                         </div>
-
-                        {/* Children Ages - only if there are children */}
+                        {/* Children Ages - separate row if there are children */}
                         {trip.children > 0 && (
-                          <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-                            <p className="text-xs font-medium text-orange-800 mb-2">
-                              Children&apos;s Ages (required for car seats)
-                            </p>
-                            <div className="flex flex-wrap gap-2">
-                              {Array.from({ length: trip.children }, (_, childIdx) => (
-                                <select
-                                  key={childIdx}
-                                  value={trip.children_ages?.[childIdx] ?? ''}
-                                  onChange={(e) => updateChildAge(index, childIdx, e.target.value ? parseInt(e.target.value) : null)}
-                                  className="w-20 h-9 px-2 rounded-md border border-orange-300 bg-white text-sm"
-                                >
-                                  <option value="">Age</option>
-                                  {Array.from({ length: 13 }, (_, age) => (
-                                    <option key={age} value={age}>{age}</option>
-                                  ))}
-                                </select>
-                              ))}
-                            </div>
+                          <div className="flex items-center gap-2 flex-wrap bg-orange-50 rounded-lg px-3 py-2">
+                            <span className="text-xs text-orange-700 font-medium">Children ages:</span>
+                            {Array.from({ length: trip.children }, (_, childIdx) => (
+                              <select
+                                key={childIdx}
+                                value={trip.children_ages?.[childIdx] ?? ''}
+                                onChange={(e) => updateChildAge(index, childIdx, e.target.value ? parseInt(e.target.value) : null)}
+                                className="w-16 h-8 px-2 rounded border border-orange-300 bg-white text-sm"
+                                style={{ fontSize: '16px' }}
+                              >
+                                <option value="">Age</option>
+                                {Array.from({ length: 13 }, (_, age) => (
+                                  <option key={age} value={age}>{age}</option>
+                                ))}
+                              </select>
+                            ))}
                           </div>
                         )}
 
@@ -1297,20 +1268,46 @@ function PreviewPageContent() {
                   <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-5 py-4">
                     <h2 className="text-white font-bold text-lg">Order Summary</h2>
                   </div>
-                  <div className="p-5 space-y-3">
+                  <div className="p-4 space-y-4">
                     {trips.map((trip, index) => {
                       const addOnsPrice = calculateAddOnsPrice(trip.add_ons || []);
                       return (
-                        <div key={index} className="space-y-1">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-gray-700">
-                              {trips.length > 1 ? `Transfer ${index + 1}` : 'Transfer'}
+                        <div key={index} className="bg-gray-50 rounded-lg p-3 space-y-2">
+                          {/* Route name */}
+                          <div className="flex items-start gap-2">
+                            <MapPin className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs text-gray-500 font-medium">
+                                {trips.length > 1 ? `Transfer ${index + 1}` : 'Private Transfer'}
+                              </p>
+                              <p className="text-sm font-semibold text-gray-900 truncate">
+                                {trip.from_location}
+                              </p>
+                              <p className="text-xs text-gray-500">to</p>
+                              <p className="text-sm font-semibold text-gray-900 truncate">
+                                {trip.to_location}
+                              </p>
+                            </div>
+                          </div>
+                          {/* Date & Passengers */}
+                          <div className="flex items-center gap-3 text-xs text-gray-600">
+                            <span className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              {formatDisplayDate(trip.date)}
                             </span>
+                            <span className="flex items-center gap-1">
+                              <Users className="h-3 w-3" />
+                              {trip.adults + trip.children} pax
+                            </span>
+                          </div>
+                          {/* Price */}
+                          <div className="flex items-center justify-between pt-1 border-t border-gray-200">
+                            <span className="text-sm text-gray-600">Price</span>
                             <span className="font-bold text-gray-900">${trip.price}</span>
                           </div>
                           {addOnsPrice > 0 && (
                             <div className="flex items-center justify-between text-blue-600">
-                              <span className="text-xs pl-2">+ Add-ons</span>
+                              <span className="text-xs">+ Add-ons</span>
                               <span className="text-sm font-medium">+${addOnsPrice}</span>
                             </div>
                           )}
