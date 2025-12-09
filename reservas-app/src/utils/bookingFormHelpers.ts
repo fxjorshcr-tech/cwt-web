@@ -203,10 +203,12 @@ export async function loadRoutesFromSupabase(
         setTimeout(() => reject(new Error('Request timeout - please refresh the page')), timeout)
       );
 
+      // Use range(0, 4999) to get up to 5000 routes - Supabase default limit is 1000
       const fetchPromise = supabase
         .from('routes')
         .select('id, origen, destino, precio1a6, precio7a9, precio10a12, duracion')
-        .order('origen');
+        .order('origen')
+        .range(0, 4999);
 
       const result = (await Promise.race([fetchPromise, timeoutPromise])) as any;
       const { data, error: fetchError } = result;
@@ -220,24 +222,18 @@ export async function loadRoutesFromSupabase(
       }
 
       const validRoutes: Route[] = (data as any[])
-        .filter((route): route is Route => {
-          return (
-            route.origen !== null &&
-            route.destino !== null &&
-            route.precio1a6 !== null &&
-            route.precio7a9 !== null &&
-            route.precio10a12 !== null &&
-            route.duracion !== null
-          );
+        .filter((route) => {
+          // Only require origen and destino - prices can default to 0
+          return route.origen !== null && route.destino !== null;
         })
         .map((route) => ({
           id: route.id,
           origen: route.origen,
           destino: route.destino,
-          precio1a6: route.precio1a6,
-          precio7a9: route.precio7a9,
-          precio10a12: route.precio10a12,
-          duracion: route.duracion,
+          precio1a6: route.precio1a6 ?? 0,
+          precio7a9: route.precio7a9 ?? 0,
+          precio10a12: route.precio10a12 ?? 0,
+          duracion: route.duracion ?? '',
         }));
 
       if (validRoutes.length === 0) {

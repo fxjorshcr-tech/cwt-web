@@ -139,7 +139,7 @@ function PreviewPageContent() {
   const [editOrigin, setEditOrigin] = useState('');
   const [editDestination, setEditDestination] = useState('');
   const [editDate, setEditDate] = useState<Date | null>(null);
-  const [editPickupTime, setEditPickupTime] = useState('09:00');
+  const [editPickupTime, setEditPickupTime] = useState('');
   const [editAdults, setEditAdults] = useState(2);
   const [editChildren, setEditChildren] = useState(0);
 
@@ -326,7 +326,7 @@ function PreviewPageContent() {
     setEditOrigin(trip.from_location || '');
     setEditDestination(trip.to_location || '');
     setEditDate(trip.date ? parseDateFromString(trip.date) : null);
-    setEditPickupTime(trip.pickup_time || '09:00');
+    setEditPickupTime(trip.pickup_time || '');
     setEditAdults(trip.adults || 1);
     setEditChildren(trip.children || 0);
     setEditingIndex(index);
@@ -403,7 +403,7 @@ function PreviewPageContent() {
       setEditOrigin('');
       setEditDestination('');
       setEditDate(null);
-      setEditPickupTime('09:00');
+      setEditPickupTime('');
       setEditAdults(2);
       setEditChildren(0);
       setShowAddTrip(true);
@@ -415,7 +415,7 @@ function PreviewPageContent() {
     setEditOrigin(lastTrip?.to_location || '');
     setEditDestination('');
     setEditDate(null); // New trip should have empty date
-    setEditPickupTime('09:00');
+    setEditPickupTime('');
     setEditAdults(lastTrip?.adults || 2);
     setEditChildren(lastTrip?.children || 0);
     setShowAddTrip(true);
@@ -499,7 +499,7 @@ function PreviewPageContent() {
       tripDetails: tripsToSave.map((trip) => ({
         pickup_address: trip.pickup_address || '',
         dropoff_address: trip.dropoff_address || '',
-        pickup_time: trip.pickup_time || '09:00',
+        pickup_time: trip.pickup_time || '',
         flight_number: trip.flight_number || '',
         airline: trip.airline || '',
         special_requests: '',
@@ -931,16 +931,30 @@ function PreviewPageContent() {
                       <div className="flex flex-wrap gap-1.5 mb-4">
                         {(() => {
                           const availableVans = getAvailabilityCount(trip.from_location, trip.to_location, trip.date);
+                          const totalSlots = 8;
+                          const isLow = availableVans <= 2;
                           return (
-                            <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs ${
-                              availableVans <= 2
-                                ? 'bg-red-100 border border-red-300'
-                                : 'bg-green-100 border border-green-300'
+                            <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] ${
+                              isLow
+                                ? 'bg-red-50 border border-red-200'
+                                : 'bg-green-50 border border-green-200'
                             }`}>
-                              <Car className={`h-3.5 w-3.5 ${availableVans <= 2 ? 'text-red-600' : 'text-green-600'}`} />
-                              <span className={`font-bold ${availableVans <= 2 ? 'text-red-700' : 'text-green-700'}`}>
-                                {availableVans === 1 ? '1 left!' : `${availableVans} vans`}
-                              </span>
+                              <Car className={`h-3 w-3 ${isLow ? 'text-red-500' : 'text-green-500'}`} />
+                              <div className="flex items-center gap-0.5">
+                                {Array.from({ length: totalSlots }, (_, i) => (
+                                  <div
+                                    key={i}
+                                    className={`w-1.5 h-1.5 rounded-full ${
+                                      i < availableVans
+                                        ? isLow ? 'bg-red-500' : 'bg-green-500'
+                                        : 'bg-gray-300'
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                              {isLow && (
+                                <span className="text-red-600 font-semibold">Book soon!</span>
+                              )}
                             </div>
                           );
                         })()}
@@ -972,18 +986,18 @@ function PreviewPageContent() {
                             </div>
                           </div>
                           {/* Pickup Time - own row */}
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-gray-600">Pickup Time:</span>
-                            <div className={`flex items-center gap-1 px-3 py-1.5 rounded-lg ${
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-[11px] text-gray-600">Pickup:</span>
+                            <div className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] ${
                               trip.pickup_time
                                 ? 'bg-blue-600 text-white'
                                 : 'bg-orange-500 text-white animate-pulse'
                             }`}>
-                              <Clock className="h-3.5 w-3.5" />
+                              <Clock className="h-2.5 w-2.5" />
                               <select
                                 value={trip.pickup_time}
                                 onChange={(e) => updateTripField(index, 'pickup_time', e.target.value)}
-                                className="bg-transparent text-white text-sm font-semibold focus:outline-none cursor-pointer"
+                                className="bg-transparent text-white text-[11px] font-medium focus:outline-none cursor-pointer pr-1"
                               >
                                 <option value="" className="text-gray-900">Select time</option>
                                 {Array.from({ length: 48 }, (_, i) => {
@@ -1000,7 +1014,7 @@ function PreviewPageContent() {
                             placeholder="Pickup address (hotel, Airbnb...)"
                             value={trip.pickup_address}
                             onChange={(e) => updateTripField(index, 'pickup_address', e.target.value)}
-                            className="h-10"
+                            className="h-9 text-sm"
                           />
                         </div>
 
@@ -1019,7 +1033,7 @@ function PreviewPageContent() {
                             placeholder="Drop-off address (hotel, Airbnb...)"
                             value={trip.dropoff_address}
                             onChange={(e) => updateTripField(index, 'dropoff_address', e.target.value)}
-                            className="h-10"
+                            className="h-9 text-sm"
                           />
                         </div>
 
@@ -1040,7 +1054,7 @@ function PreviewPageContent() {
                                 placeholder="e.g. AA1234"
                                 value={trip.flight_number}
                                 onChange={(e) => updateTripField(index, 'flight_number', e.target.value)}
-                                className="h-10"
+                                className="h-9 text-sm"
                               />
                             </div>
                             <div>
@@ -1051,7 +1065,7 @@ function PreviewPageContent() {
                                 placeholder="e.g. American Airlines"
                                 value={trip.airline}
                                 onChange={(e) => updateTripField(index, 'airline', e.target.value)}
-                                className="h-10"
+                                className="h-9 text-sm"
                               />
                             </div>
                           </div>
@@ -1059,52 +1073,52 @@ function PreviewPageContent() {
 
                         {/* Passengers Selector */}
                         <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
-                          <p className="text-xs font-medium text-gray-700 mb-2">
-                            <Users className="h-3 w-3 inline mr-1" />
+                          <p className="text-xs font-medium text-gray-700 mb-3 flex items-center gap-1">
+                            <Users className="h-3.5 w-3.5" />
                             Passengers
                           </p>
-                          <div className="grid grid-cols-2 gap-3">
+                          <div className="flex flex-wrap gap-4 sm:gap-6">
                             {/* Adults */}
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs text-gray-600">Adults</span>
-                              <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white">
+                            <div className="flex items-center gap-3">
+                              <span className="text-sm text-gray-700 font-medium min-w-[50px]">Adults</span>
+                              <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white shadow-sm">
                                 <button
                                   type="button"
                                   onClick={() => updateTripPassengers(index, Math.max(1, trip.adults - 1), trip.children)}
                                   disabled={trip.adults <= 1}
-                                  className="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-sm"
+                                  className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-lg font-medium transition-colors"
                                 >
                                   -
                                 </button>
-                                <span className="px-2.5 py-1 text-sm font-medium">{trip.adults}</span>
+                                <span className="w-10 h-9 flex items-center justify-center text-base font-semibold bg-white">{trip.adults}</span>
                                 <button
                                   type="button"
                                   onClick={() => updateTripPassengers(index, Math.min(12, trip.adults + 1), trip.children)}
                                   disabled={trip.adults + trip.children >= 12}
-                                  className="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-sm"
+                                  className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-lg font-medium transition-colors"
                                 >
                                   +
                                 </button>
                               </div>
                             </div>
                             {/* Children */}
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs text-gray-600">Children</span>
-                              <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white">
+                            <div className="flex items-center gap-3">
+                              <span className="text-sm text-gray-700 font-medium min-w-[55px]">Children</span>
+                              <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white shadow-sm">
                                 <button
                                   type="button"
                                   onClick={() => updateTripPassengers(index, trip.adults, Math.max(0, trip.children - 1))}
                                   disabled={trip.children <= 0}
-                                  className="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-sm"
+                                  className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-lg font-medium transition-colors"
                                 >
                                   -
                                 </button>
-                                <span className="px-2.5 py-1 text-sm font-medium">{trip.children}</span>
+                                <span className="w-10 h-9 flex items-center justify-center text-base font-semibold bg-white">{trip.children}</span>
                                 <button
                                   type="button"
                                   onClick={() => updateTripPassengers(index, trip.adults, Math.min(11, trip.children + 1))}
                                   disabled={trip.adults + trip.children >= 12}
-                                  className="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-sm"
+                                  className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-lg font-medium transition-colors"
                                 >
                                   +
                                 </button>
@@ -1311,7 +1325,6 @@ function PreviewPageContent() {
                         <span className="font-bold text-gray-900 text-lg">Total</span>
                         <span className="text-2xl font-bold text-blue-600">${totalPrice}</span>
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">Taxes and fees included</p>
                     </div>
                   </div>
                 </div>
