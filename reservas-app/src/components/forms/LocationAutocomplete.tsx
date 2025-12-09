@@ -54,13 +54,6 @@ export function LocationAutocomplete({
     if (type === 'destination' && filterByOrigin) {
       // Destino: solo mostrar destinos conectados al origen seleccionado
       filteredRoutes = routes.filter((r) => r.origen === filterByOrigin);
-      // DEBUG: Log para ver qué está pasando
-      console.log('DEBUG filterByOrigin:', filterByOrigin);
-      console.log('DEBUG routes with this origin:', filteredRoutes.length);
-      if (filterByOrigin.includes('Tamarindo')) {
-        console.log('DEBUG Tamarindo routes in memory:', routes.filter(r => r.origen.includes('Tamarindo')).length);
-        console.log('DEBUG exact match:', routes.filter(r => r.origen === filterByOrigin));
-      }
     } else if (type === 'origin' && filterByDestination) {
       // Origen: solo mostrar orígenes conectados al destino seleccionado (raro pero posible)
       filteredRoutes = routes.filter((r) => r.destino === filterByDestination);
