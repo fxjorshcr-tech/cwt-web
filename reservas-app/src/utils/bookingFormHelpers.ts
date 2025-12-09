@@ -206,7 +206,8 @@ export async function loadRoutesFromSupabase(
       const fetchPromise = supabase
         .from('routes')
         .select('id, origen, destino, precio1a6, precio7a9, precio10a12, duracion')
-        .order('origen');
+        .order('origen')
+        .limit(5000);
 
       const result = (await Promise.race([fetchPromise, timeoutPromise])) as any;
       const { data, error: fetchError } = result;

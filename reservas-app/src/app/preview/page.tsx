@@ -931,16 +931,30 @@ function PreviewPageContent() {
                       <div className="flex flex-wrap gap-1.5 mb-4">
                         {(() => {
                           const availableVans = getAvailabilityCount(trip.from_location, trip.to_location, trip.date);
+                          const totalSlots = 8;
+                          const isLow = availableVans <= 2;
                           return (
-                            <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs ${
-                              availableVans <= 2
-                                ? 'bg-red-100 border border-red-300'
-                                : 'bg-green-100 border border-green-300'
+                            <div className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs ${
+                              isLow
+                                ? 'bg-red-50 border border-red-200'
+                                : 'bg-green-50 border border-green-200'
                             }`}>
-                              <Car className={`h-3.5 w-3.5 ${availableVans <= 2 ? 'text-red-600' : 'text-green-600'}`} />
-                              <span className={`font-bold ${availableVans <= 2 ? 'text-red-700' : 'text-green-700'}`}>
-                                {availableVans === 1 ? '1 left!' : `${availableVans} vans`}
-                              </span>
+                              <Car className={`h-3.5 w-3.5 ${isLow ? 'text-red-500' : 'text-green-500'}`} />
+                              <div className="flex items-center gap-0.5">
+                                {Array.from({ length: totalSlots }, (_, i) => (
+                                  <div
+                                    key={i}
+                                    className={`w-2 h-2 rounded-full ${
+                                      i < availableVans
+                                        ? isLow ? 'bg-red-500' : 'bg-green-500'
+                                        : 'bg-gray-300'
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                              {isLow && (
+                                <span className="text-red-600 font-semibold text-[10px] ml-0.5">Low!</span>
+                              )}
                             </div>
                           );
                         })()}
@@ -972,9 +986,9 @@ function PreviewPageContent() {
                             </div>
                           </div>
                           {/* Pickup Time - own row */}
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <span className="text-xs text-gray-600">Pickup Time:</span>
-                            <div className={`flex items-center gap-1 px-3 py-1.5 rounded-lg ${
+                            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg ${
                               trip.pickup_time
                                 ? 'bg-blue-600 text-white'
                                 : 'bg-orange-500 text-white animate-pulse'
@@ -983,15 +997,15 @@ function PreviewPageContent() {
                               <select
                                 value={trip.pickup_time}
                                 onChange={(e) => updateTripField(index, 'pickup_time', e.target.value)}
-                                className="bg-transparent text-white text-sm font-semibold focus:outline-none cursor-pointer"
+                                className="bg-transparent text-white text-sm font-semibold focus:outline-none cursor-pointer uppercase"
                               >
-                                <option value="" className="text-gray-900">Select time</option>
+                                <option value="" className="text-gray-900 normal-case">SELECT PICKUP TIME</option>
                                 {Array.from({ length: 48 }, (_, i) => {
                                   const hour = Math.floor(i / 2);
                                   const minute = i % 2 === 0 ? '00' : '30';
                                   const value = `${hour.toString().padStart(2, '0')}:${minute}`;
                                   const label = `${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour}:${minute} ${hour < 12 ? 'AM' : 'PM'}`;
-                                  return <option key={value} value={value} className="text-gray-900">{label}</option>;
+                                  return <option key={value} value={value} className="text-gray-900 normal-case">{label}</option>;
                                 })}
                               </select>
                             </div>
@@ -1059,52 +1073,52 @@ function PreviewPageContent() {
 
                         {/* Passengers Selector */}
                         <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
-                          <p className="text-xs font-medium text-gray-700 mb-2">
-                            <Users className="h-3 w-3 inline mr-1" />
+                          <p className="text-xs font-medium text-gray-700 mb-3 flex items-center gap-1">
+                            <Users className="h-3.5 w-3.5" />
                             Passengers
                           </p>
-                          <div className="grid grid-cols-2 gap-3">
+                          <div className="flex flex-wrap gap-4 sm:gap-6">
                             {/* Adults */}
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs text-gray-600">Adults</span>
-                              <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white">
+                            <div className="flex items-center gap-3">
+                              <span className="text-sm text-gray-700 font-medium min-w-[50px]">Adults</span>
+                              <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white shadow-sm">
                                 <button
                                   type="button"
                                   onClick={() => updateTripPassengers(index, Math.max(1, trip.adults - 1), trip.children)}
                                   disabled={trip.adults <= 1}
-                                  className="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-sm"
+                                  className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-lg font-medium transition-colors"
                                 >
                                   -
                                 </button>
-                                <span className="px-2.5 py-1 text-sm font-medium">{trip.adults}</span>
+                                <span className="w-10 h-9 flex items-center justify-center text-base font-semibold bg-white">{trip.adults}</span>
                                 <button
                                   type="button"
                                   onClick={() => updateTripPassengers(index, Math.min(12, trip.adults + 1), trip.children)}
                                   disabled={trip.adults + trip.children >= 12}
-                                  className="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-sm"
+                                  className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-lg font-medium transition-colors"
                                 >
                                   +
                                 </button>
                               </div>
                             </div>
                             {/* Children */}
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs text-gray-600">Children</span>
-                              <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white">
+                            <div className="flex items-center gap-3">
+                              <span className="text-sm text-gray-700 font-medium min-w-[55px]">Children</span>
+                              <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white shadow-sm">
                                 <button
                                   type="button"
                                   onClick={() => updateTripPassengers(index, trip.adults, Math.max(0, trip.children - 1))}
                                   disabled={trip.children <= 0}
-                                  className="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-sm"
+                                  className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-lg font-medium transition-colors"
                                 >
                                   -
                                 </button>
-                                <span className="px-2.5 py-1 text-sm font-medium">{trip.children}</span>
+                                <span className="w-10 h-9 flex items-center justify-center text-base font-semibold bg-white">{trip.children}</span>
                                 <button
                                   type="button"
                                   onClick={() => updateTripPassengers(index, trip.adults, Math.min(11, trip.children + 1))}
                                   disabled={trip.adults + trip.children >= 12}
-                                  className="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-sm"
+                                  className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-lg font-medium transition-colors"
                                 >
                                   +
                                 </button>
@@ -1311,7 +1325,6 @@ function PreviewPageContent() {
                         <span className="font-bold text-gray-900 text-lg">Total</span>
                         <span className="text-2xl font-bold text-blue-600">${totalPrice}</span>
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">Taxes and fees included</p>
                     </div>
                   </div>
                 </div>
