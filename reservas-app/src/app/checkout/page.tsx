@@ -586,15 +586,15 @@ function CheckoutPageContent() {
           sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="absolute inset-0 flex items-end sm:items-center justify-center pb-4 sm:pb-0">
           <div className="text-center text-white px-4">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <Lock className="h-5 w-5 sm:h-6 sm:w-6" />
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold drop-shadow-lg">
+            <div className="flex items-center justify-center gap-2 mb-1 sm:mb-2">
+              <Lock className="h-4 w-4 sm:h-6 sm:w-6" />
+              <h1 className="text-xl sm:text-3xl md:text-4xl font-bold drop-shadow-lg">
                 Secure Checkout
               </h1>
             </div>
-            <p className="text-sm sm:text-base md:text-lg drop-shadow-md">
+            <p className="text-xs sm:text-base md:text-lg drop-shadow-md">
               Complete your booking in a few simple steps
             </p>
           </div>

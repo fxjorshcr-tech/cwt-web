@@ -987,19 +987,18 @@ function PreviewPageContent() {
                           </div>
                           {/* Pickup Time - own row */}
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-[11px] text-gray-600">Pickup:</span>
-                            <div className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] ${
+                            <div className={`inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] ${
                               trip.pickup_time
                                 ? 'bg-blue-600 text-white'
                                 : 'bg-orange-500 text-white animate-pulse'
                             }`}>
-                              <Clock className="h-2.5 w-2.5" />
+                              <Clock className="h-3 w-3" />
                               <select
                                 value={trip.pickup_time}
                                 onChange={(e) => updateTripField(index, 'pickup_time', e.target.value)}
-                                className="bg-transparent text-white text-[11px] font-medium focus:outline-none cursor-pointer pr-1"
+                                className="bg-transparent text-white text-[11px] font-medium focus:outline-none cursor-pointer"
                               >
-                                <option value="" className="text-gray-900">Select time</option>
+                                <option value="" className="text-gray-900">SELECT PICKUP TIME</option>
                                 {Array.from({ length: 48 }, (_, i) => {
                                   const hour = Math.floor(i / 2);
                                   const minute = i % 2 === 0 ? '00' : '30';
@@ -1077,48 +1076,48 @@ function PreviewPageContent() {
                             <Users className="h-3.5 w-3.5" />
                             Passengers
                           </p>
-                          <div className="flex flex-wrap gap-4 sm:gap-6">
+                          <div className="grid grid-cols-2 gap-3">
                             {/* Adults */}
-                            <div className="flex items-center gap-3">
-                              <span className="text-sm text-gray-700 font-medium min-w-[50px]">Adults</span>
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm text-gray-700 font-medium">Adults</span>
                               <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white shadow-sm">
                                 <button
                                   type="button"
                                   onClick={() => updateTripPassengers(index, Math.max(1, trip.adults - 1), trip.children)}
                                   disabled={trip.adults <= 1}
-                                  className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-lg font-medium transition-colors"
+                                  className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-base font-medium transition-colors"
                                 >
                                   -
                                 </button>
-                                <span className="w-10 h-9 flex items-center justify-center text-base font-semibold bg-white">{trip.adults}</span>
+                                <span className="w-8 h-8 flex items-center justify-center text-sm font-semibold bg-white">{trip.adults}</span>
                                 <button
                                   type="button"
                                   onClick={() => updateTripPassengers(index, Math.min(12, trip.adults + 1), trip.children)}
                                   disabled={trip.adults + trip.children >= 12}
-                                  className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-lg font-medium transition-colors"
+                                  className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-base font-medium transition-colors"
                                 >
                                   +
                                 </button>
                               </div>
                             </div>
                             {/* Children */}
-                            <div className="flex items-center gap-3">
-                              <span className="text-sm text-gray-700 font-medium min-w-[55px]">Children</span>
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm text-gray-700 font-medium">Children</span>
                               <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white shadow-sm">
                                 <button
                                   type="button"
                                   onClick={() => updateTripPassengers(index, trip.adults, Math.max(0, trip.children - 1))}
                                   disabled={trip.children <= 0}
-                                  className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-lg font-medium transition-colors"
+                                  className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-base font-medium transition-colors"
                                 >
                                   -
                                 </button>
-                                <span className="w-10 h-9 flex items-center justify-center text-base font-semibold bg-white">{trip.children}</span>
+                                <span className="w-8 h-8 flex items-center justify-center text-sm font-semibold bg-white">{trip.children}</span>
                                 <button
                                   type="button"
                                   onClick={() => updateTripPassengers(index, trip.adults, Math.min(11, trip.children + 1))}
                                   disabled={trip.adults + trip.children >= 12}
-                                  className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-lg font-medium transition-colors"
+                                  className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-base font-medium transition-colors"
                                 >
                                   +
                                 </button>
