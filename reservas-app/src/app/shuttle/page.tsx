@@ -61,16 +61,6 @@ const popularRoutes = [
     ]
   },
   {
-    category: 'From Manuel Antonio',
-    icon: '🏖️',
-    routes: [
-      { from: 'Manuel Antonio / Quepos', to: 'SJO - Juan Santamaria Int. Airport', slug: 'manuel-antonio-to-sjo', isHot: true },
-      { from: 'Manuel Antonio / Quepos', to: 'La Fortuna (Arenal)', slug: 'manuel-antonio-to-la-fortuna', isHot: true },
-      { from: 'Manuel Antonio / Quepos', to: 'Monteverde (Cloud Forest)', slug: 'manuel-antonio-to-monteverde' },
-      { from: 'Manuel Antonio / Quepos', to: 'Tamarindo (Guanacaste)', slug: 'manuel-antonio-to-tamarindo' },
-    ]
-  },
-  {
     category: 'From Monteverde',
     icon: '🌿',
     routes: [
