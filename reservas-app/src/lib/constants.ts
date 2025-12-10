@@ -164,7 +164,6 @@ export const APP_ROUTES = {
   TRANSFERS: '/transfers',
   PRIVATE_TOURS: '/private-tours',
   TRAVEL_GUIDE: '/travel-guide',
-  ABOUT: '/about',
   CONTACT: '/contact',
   FAQ: '/faq',
   TERMS: '/terms',

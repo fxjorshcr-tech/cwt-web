@@ -14,7 +14,6 @@ const navLinks = [
   { label: "Tailored Tours", href: "/private-tours" },
   { label: "Travel Guide", href: "/travel-guide" },
   { label: "Contact", href: "/contact" },
-  { label: "About", href: "/about" },
 ];
 
 export default function BookingNavbar() {
