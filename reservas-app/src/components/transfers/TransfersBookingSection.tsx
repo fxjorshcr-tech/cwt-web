@@ -32,7 +32,7 @@ export default function TransfersBookingSection() {
     <section
       id="booking-form"
       ref={bookingFormRef}
-      className="relative -mt-16 z-20 px-3 sm:px-6 pb-16 w-full max-w-[100vw] overflow-x-hidden"
+      className="relative -mt-16 z-20 px-3 sm:px-6 pb-16 w-full max-w-[100vw]"
     >
       <div className="max-w-4xl mx-auto w-full">
         <QuickSearchForm

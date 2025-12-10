@@ -4,7 +4,6 @@ import { Suspense } from "react";
 import Image from "next/image";
 import type { Metadata } from "next";
 import BookingNavbar from '@/components/booking/BookingNavbar';
-import BookingSteps from '@/components/booking/BookingSteps';
 import PaymentMethods from '@/components/sections/PaymentMethods';
 import TransfersBookingSection from '@/components/transfers/TransfersBookingSection';
 import {
@@ -478,9 +477,6 @@ export default function TransfersPage() {
             </div>
           </div>
         </section>
-
-        {/* Booking Steps */}
-        <BookingSteps />
 
         {/* Payment Methods */}
         <PaymentMethods />
