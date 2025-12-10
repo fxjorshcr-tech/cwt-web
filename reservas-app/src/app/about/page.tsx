@@ -37,8 +37,8 @@ export default function AboutPage() {
         <section className="relative h-[60vh] min-h-[500px] max-h-[700px]">
           <div className="absolute inset-0 z-0">
             <Image
-              src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/cwt-van-arenal-volcano.webp"
-              alt="Can't Wait Travel CR - Private Shuttle Van with Arenal Volcano"
+              src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/arenal-volcano-mountains-sky-costa-rica.webp"
+              alt="Arenal Volcano Costa Rica"
               fill
               sizes="100vw"
               className="object-cover"
@@ -115,6 +115,60 @@ export default function AboutPage() {
                   <CheckCircle2 className="h-5 w-5 text-green-600" />
                 </div>
                 <span className="font-semibold text-gray-800">No Middlemen</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Our Fleet Section */}
+        <section className="py-20 bg-gray-50">
+          <div className="container mx-auto px-6 max-w-6xl">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              {/* Image */}
+              <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-2xl">
+                <Image
+                  src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/cwt-van-arenal-volcano%20(1).webp"
+                  alt="Can't Wait Travel CR - Modern Private Shuttle Van"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+
+              {/* Text */}
+              <div>
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-full mb-6 border border-blue-100">
+                  <Truck className="h-4 w-4 text-blue-600" />
+                  <span className="text-blue-700 font-bold text-xs uppercase tracking-wider">
+                    Our Fleet
+                  </span>
+                </div>
+
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight">
+                  Modern, Comfortable & Well-Maintained
+                </h2>
+
+                <p className="text-gray-600 text-lg leading-relaxed mb-6">
+                  We invested in our own fleet of late-model vehicles because we believe your comfort matters. Air conditioning, comfortable seating, and plenty of space for your luggage — every ride feels like a private experience.
+                </p>
+
+                <ul className="space-y-3">
+                  <li className="flex items-center gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0" />
+                    <span className="text-gray-700">Late-model vans & SUVs</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0" />
+                    <span className="text-gray-700">Full A/C & comfortable seating</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0" />
+                    <span className="text-gray-700">Regular maintenance & safety checks</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0" />
+                    <span className="text-gray-700">Fully insured for your peace of mind</span>
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
