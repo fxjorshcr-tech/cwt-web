@@ -159,6 +159,31 @@ export default async function Home() {
           </div>
 
           <div className="relative z-10 h-full flex flex-col items-center justify-center px-4 sm:px-6 pt-20 sm:pt-0">
+            {/* Launch Seal Badge */}
+            <div className="absolute top-20 sm:top-24 right-3 sm:right-6 lg:right-12 z-20">
+              <div className="relative w-20 h-20 sm:w-28 sm:h-28 lg:w-32 lg:h-32 animate-[pulse_3s_ease-in-out_infinite]">
+                {/* Main seal */}
+                <div className="absolute inset-0 rounded-full border-[3px] sm:border-4 border-yellow-400 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 shadow-2xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
+                  <div className="text-center text-white px-1 sm:px-2">
+                    <div className="text-yellow-400 text-base sm:text-xl lg:text-2xl">🚀</div>
+                    <div className="text-[8px] sm:text-[10px] lg:text-xs font-black tracking-wider leading-tight uppercase">
+                      Just<br/>Launched
+                    </div>
+                    <div className="w-6 sm:w-10 lg:w-12 h-px bg-yellow-400/80 mx-auto my-0.5 sm:my-1"></div>
+                    <div className="text-[7px] sm:text-[9px] lg:text-[10px] font-bold text-yellow-300">
+                      NOV 2025
+                    </div>
+                    <div className="text-yellow-400 text-[6px] sm:text-[8px] lg:text-[10px] tracking-wider">★★★</div>
+                  </div>
+                </div>
+                {/* Corner dots */}
+                <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-yellow-400 rounded-full shadow-sm"></div>
+                <div className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-yellow-400 rounded-full shadow-sm"></div>
+                <div className="absolute top-1/2 -left-0.5 -translate-y-1/2 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-yellow-400 rounded-full shadow-sm"></div>
+                <div className="absolute top-1/2 -right-0.5 -translate-y-1/2 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-yellow-400 rounded-full shadow-sm"></div>
+              </div>
+            </div>
+
             <div className="text-center max-w-5xl">
               <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-4xl font-bold text-white mb-4 sm:mb-6 drop-shadow-2xl leading-tight">
                 Private Shuttle & Airport Transfers Across Costa Rica
