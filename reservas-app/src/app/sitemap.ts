@@ -12,7 +12,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/transfers',
     '/private-tours',
     '/travel-guide',
-    '/about',
     '/contact',
     '/faq',
     '/terms',

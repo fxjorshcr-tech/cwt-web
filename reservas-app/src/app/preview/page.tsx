@@ -288,22 +288,32 @@ function PreviewPageContent() {
     load();
   }, [bookingId, router]);
 
-  // Total price (including add-ons)
-  const totalPrice = useMemo(() => {
+  // Base price only (without add-ons) - for discount calculation
+  const basePriceTotal = useMemo(() => {
+    return trips.reduce((sum, trip) => sum + trip.price, 0);
+  }, [trips]);
+
+  // Total add-ons price
+  const totalAddOnsPrice = useMemo(() => {
     return trips.reduce((sum, trip) => {
-      const addOnsPrice = calculateAddOnsPrice(trip.add_ons || []);
-      return sum + trip.price + addOnsPrice;
+      return sum + calculateAddOnsPrice(trip.add_ons || []);
     }, 0);
   }, [trips]);
 
-  // 🎉 Launch discount (20% OFF for early supporters)
-  const launchDiscount = useMemo(() => {
-    return calculateLaunchDiscount(totalPrice);
-  }, [totalPrice]);
+  // Total price (base + add-ons)
+  const totalPrice = useMemo(() => {
+    return basePriceTotal + totalAddOnsPrice;
+  }, [basePriceTotal, totalAddOnsPrice]);
 
+  // 🎉 Launch discount (20% OFF) - ONLY applies to base price, NOT add-ons
+  const launchDiscount = useMemo(() => {
+    return calculateLaunchDiscount(basePriceTotal);
+  }, [basePriceTotal]);
+
+  // Discounted total = (base - discount) + addons
   const discountedTotal = useMemo(() => {
-    return totalPrice - launchDiscount;
-  }, [totalPrice, launchDiscount]);
+    return (basePriceTotal - launchDiscount) + totalAddOnsPrice;
+  }, [basePriceTotal, launchDiscount, totalAddOnsPrice]);
 
   // Format date for display
   // ✅ FIXED: Handle null/undefined dates safely
@@ -1091,57 +1101,59 @@ function PreviewPageContent() {
                           </div>
                         )}
 
-                        {/* Passengers Selector - Grid for mobile */}
-                        <div className="grid grid-cols-2 gap-3 py-2">
+                        {/* Passengers Selector */}
+                        <div className="flex flex-wrap items-center gap-4 py-3 px-1">
                           {/* Adults */}
-                          <div className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2">
-                            <span className="text-sm text-gray-700">Adults</span>
-                            <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white">
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm font-medium text-gray-700 w-16">Adults</span>
+                            <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white shadow-sm">
                               <button
                                 type="button"
                                 onClick={() => updateTripPassengers(index, Math.max(1, trip.adults - 1), trip.children)}
                                 disabled={trip.adults <= 1}
-                                className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-base font-medium"
+                                className="w-10 h-10 flex items-center justify-center bg-gray-50 hover:bg-gray-100 disabled:opacity-40 text-lg font-medium transition-colors"
                               >-</button>
-                              <span className="w-8 h-8 flex items-center justify-center text-sm font-semibold">{trip.adults}</span>
+                              <span className="w-10 h-10 flex items-center justify-center text-base font-bold bg-white">{trip.adults}</span>
                               <button
                                 type="button"
                                 onClick={() => updateTripPassengers(index, Math.min(12, trip.adults + 1), trip.children)}
                                 disabled={trip.adults + trip.children >= 12}
-                                className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-base font-medium"
+                                className="w-10 h-10 flex items-center justify-center bg-gray-50 hover:bg-gray-100 disabled:opacity-40 text-lg font-medium transition-colors"
                               >+</button>
                             </div>
                           </div>
+
                           {/* Children */}
-                          <div className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2">
-                            <span className="text-sm text-gray-700">Children</span>
-                            <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white">
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm font-medium text-gray-700 w-16">Children</span>
+                            <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white shadow-sm">
                               <button
                                 type="button"
                                 onClick={() => updateTripPassengers(index, trip.adults, Math.max(0, trip.children - 1))}
                                 disabled={trip.children <= 0}
-                                className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-base font-medium"
+                                className="w-10 h-10 flex items-center justify-center bg-gray-50 hover:bg-gray-100 disabled:opacity-40 text-lg font-medium transition-colors"
                               >-</button>
-                              <span className="w-8 h-8 flex items-center justify-center text-sm font-semibold">{trip.children}</span>
+                              <span className="w-10 h-10 flex items-center justify-center text-base font-bold bg-white">{trip.children}</span>
                               <button
                                 type="button"
                                 onClick={() => updateTripPassengers(index, trip.adults, Math.min(11, trip.children + 1))}
                                 disabled={trip.adults + trip.children >= 12}
-                                className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-base font-medium"
+                                className="w-10 h-10 flex items-center justify-center bg-gray-50 hover:bg-gray-100 disabled:opacity-40 text-lg font-medium transition-colors"
                               >+</button>
                             </div>
                           </div>
                         </div>
-                        {/* Children Ages - separate row if there are children */}
+
+                        {/* Children Ages */}
                         {trip.children > 0 && (
-                          <div className="flex items-center gap-2 flex-wrap bg-orange-50 rounded-lg px-3 py-2">
-                            <span className="text-xs text-orange-700 font-medium">Children ages:</span>
+                          <div className="flex items-center gap-3 flex-wrap bg-orange-50 rounded-lg px-4 py-3 border border-orange-200">
+                            <span className="text-sm text-orange-700 font-medium">Children ages:</span>
                             {Array.from({ length: trip.children }, (_, childIdx) => (
                               <select
                                 key={childIdx}
                                 value={trip.children_ages?.[childIdx] ?? ''}
                                 onChange={(e) => updateChildAge(index, childIdx, e.target.value ? parseInt(e.target.value) : null)}
-                                className="w-16 h-8 px-2 rounded border border-orange-300 bg-white text-sm"
+                                className="w-16 h-9 px-2 rounded-lg border border-orange-300 bg-white text-sm font-medium"
                                 style={{ fontSize: '16px' }}
                               >
                                 <option value="">Age</option>
@@ -1300,77 +1312,81 @@ function PreviewPageContent() {
                   <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-5 py-4">
                     <h2 className="text-white font-bold text-lg">Order Summary</h2>
                   </div>
-                  <div className="p-4 space-y-4">
+                  <div className="p-4 space-y-3">
                     {trips.map((trip, index) => {
                       const addOnsPrice = calculateAddOnsPrice(trip.add_ons || []);
                       return (
-                        <div key={index} className="bg-gray-50 rounded-lg p-3 space-y-2">
-                          {/* Route name */}
-                          <div className="flex items-start gap-2">
-                            <MapPin className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                            <div className="min-w-0 flex-1">
-                              <p className="text-xs text-gray-500 font-medium">
-                                {trips.length > 1 ? `Transfer ${index + 1}` : 'Private Transfer'}
-                              </p>
-                              <p className="text-sm font-semibold text-gray-900 truncate">
+                        <div key={index} className="border border-gray-200 rounded-lg overflow-hidden">
+                          {/* Header */}
+                          <div className="bg-gray-50 px-3 py-2 border-b border-gray-200">
+                            <p className="text-xs font-bold text-gray-700 uppercase tracking-wide">
+                              {trips.length > 1 ? `Transfer ${index + 1}` : 'Private Transfer'}
+                            </p>
+                          </div>
+
+                          <div className="p-3 space-y-2">
+                            {/* Route */}
+                            <div className="space-y-1">
+                              <p className="text-sm font-semibold text-gray-900 leading-tight">
                                 {trip.from_location}
                               </p>
-                              <p className="text-xs text-gray-500">to</p>
-                              <p className="text-sm font-semibold text-gray-900 truncate">
+                              <p className="text-xs text-gray-400">↓</p>
+                              <p className="text-sm font-semibold text-gray-900 leading-tight">
                                 {trip.to_location}
                               </p>
                             </div>
-                          </div>
-                          {/* Date & Passengers */}
-                          <div className="flex items-center justify-between text-xs text-gray-600">
-                            <span className="flex items-center gap-1">
-                              <Calendar className="h-3 w-3" />
-                              {(() => {
-                                const date = parseDateFromString(trip.date);
-                                if (!date || isNaN(date.getTime())) return 'N/A';
-                                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                              })()}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Users className="h-3 w-3" />
-                              {trip.adults + trip.children} pax
-                            </span>
-                          </div>
-                          {/* Price */}
-                          <div className="flex items-center justify-between pt-1 border-t border-gray-200">
-                            <span className="text-sm text-gray-600">Price</span>
-                            <span className="font-bold text-gray-900">${trip.price}</span>
-                          </div>
-                          {addOnsPrice > 0 && (
-                            <div className="flex items-center justify-between text-blue-600">
-                              <span className="text-xs">+ Add-ons</span>
-                              <span className="text-sm font-medium">+${addOnsPrice}</span>
+
+                            {/* Date & Pax - inline */}
+                            <div className="flex items-center gap-4 text-xs text-gray-500 pt-1">
+                              <span className="flex items-center gap-1">
+                                <Calendar className="h-3 w-3" />
+                                {(() => {
+                                  const date = parseDateFromString(trip.date);
+                                  if (!date || isNaN(date.getTime())) return 'N/A';
+                                  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                                })()}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Users className="h-3 w-3" />
+                                {trip.adults + trip.children} pax
+                              </span>
                             </div>
-                          )}
+
+                            {/* Price row */}
+                            <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                              <span className="text-xs text-gray-500">Price</span>
+                              <span className="font-bold text-gray-900">${trip.price}</span>
+                            </div>
+
+                            {addOnsPrice > 0 && (
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs text-gray-500">+ Add-ons</span>
+                                <span className="text-sm font-semibold text-blue-600">+${addOnsPrice}</span>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       );
                     })}
 
                     {/* Launch Discount */}
                     {launchDiscount > 0 && (
-                      <div className="bg-green-50 -mx-4 px-4 py-3 rounded-lg border border-green-200">
-                        <div className="flex items-center justify-between">
-                          <span className="text-green-700 font-medium flex items-center gap-2 text-sm">
-                            <span>🎉</span>
-                            Early Supporter (20% OFF)
-                          </span>
-                          <span className="font-bold text-green-600">-${launchDiscount}</span>
-                        </div>
+                      <div className="flex items-center justify-between bg-green-50 rounded-lg px-3 py-2 border border-green-200">
+                        <span className="text-green-700 font-medium flex items-center gap-1.5 text-sm">
+                          <span>🎉</span>
+                          Early Supporter (20% OFF)
+                        </span>
+                        <span className="font-bold text-green-600">-${launchDiscount}</span>
                       </div>
                     )}
 
                     {/* Total */}
-                    <div className="pt-3 border-t-2 border-gray-200">
+                    <div className="pt-3 border-t-2 border-gray-300">
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-gray-900 text-lg">Total</span>
+                        <span className="font-bold text-gray-900">Total</span>
                         <div className="text-right">
                           {launchDiscount > 0 && (
-                            <span className="text-sm text-gray-400 line-through mr-2">${totalPrice}</span>
+                            <p className="text-xs text-gray-400 line-through">${totalPrice}</p>
                           )}
                           <span className="text-2xl font-bold text-blue-600">${discountedTotal}</span>
                         </div>

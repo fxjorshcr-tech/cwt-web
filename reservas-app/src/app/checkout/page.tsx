@@ -292,12 +292,27 @@ function CheckoutPageContent() {
     }
   }, [loading, isTourBooking, tourBooking, trips]);
 
+  // Base price only (without add-ons or fees) - for discount calculation
+  const basePriceTotal = useMemo(() => {
+    if (isTourBooking && tourBooking) {
+      return tourBooking.total_price;
+    }
+    // trip.price is the base price WITHOUT fees or add-ons
+    return trips.reduce((sum, trip) => sum + trip.price, 0);
+  }, [isTourBooking, tourBooking, trips]);
+
+  // Total add-ons price
+  const totalAddOnsPrice = useMemo(() => {
+    if (isTourBooking) return 0;
+    return trips.reduce((sum, trip) => sum + (trip.add_ons_price || 0), 0);
+  }, [isTourBooking, trips]);
+
   const grandTotal = useMemo(() => {
     if (isTourBooking && tourBooking) {
       return tourBooking.total_price;
     }
-    return trips.reduce((sum, trip) => sum + (trip.final_price || trip.price), 0);
-  }, [isTourBooking, tourBooking, trips]);
+    return basePriceTotal + totalAddOnsPrice;
+  }, [isTourBooking, tourBooking, basePriceTotal, totalAddOnsPrice]);
 
   const totalPassengers = useMemo(() => {
     if (isTourBooking && tourBooking) {
@@ -306,15 +321,16 @@ function CheckoutPageContent() {
     return trips.reduce((sum, trip) => sum + trip.adults + trip.children, 0);
   }, [isTourBooking, tourBooking, trips]);
 
-  // 🎉 Launch discount calculation (20% OFF)
+  // 🎉 Launch discount calculation (20% OFF) - ONLY applies to base price, NOT add-ons
   const launchDiscount = useMemo(() => {
     if (isTourBooking) return 0;
-    return calculateLaunchDiscount(grandTotal);
-  }, [isTourBooking, grandTotal]);
+    return calculateLaunchDiscount(basePriceTotal);
+  }, [isTourBooking, basePriceTotal]);
 
+  // Discounted subtotal = (base - discount) + addons
   const discountedSubtotal = useMemo(() => {
-    return grandTotal - launchDiscount;
-  }, [grandTotal, launchDiscount]);
+    return (basePriceTotal - launchDiscount) + totalAddOnsPrice;
+  }, [basePriceTotal, launchDiscount, totalAddOnsPrice]);
 
   const totalWithFees = useMemo(() => {
     // Tours don't have service fees - price is all-inclusive
@@ -748,11 +764,11 @@ function CheckoutPageContent() {
                       )}
                     </div>
 
-                    {/* Price Plate */}
+                    {/* Price Plate - Base + Add-ons (no fees per trip) */}
                     <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-3 flex items-center justify-between">
                       <span className="text-sm font-medium text-gray-700">Transfer Price</span>
                       <span className="text-2xl font-bold text-blue-600">
-                        {formatCurrency(trip.final_price || trip.price)}
+                        {formatCurrency(trip.price + (trip.add_ons_price || 0))}
                       </span>
                     </div>
                   </div>
@@ -762,11 +778,13 @@ function CheckoutPageContent() {
                 <div className="bg-gray-50 border-t border-gray-200 p-6">
                   {!isTourBooking && (
                     <div className="space-y-2 mb-4">
+                      {/* Subtotal = base prices only */}
                       <div className="flex justify-between items-center">
                         <span className="text-gray-600">Subtotal</span>
-                        <span className="font-medium">{formatCurrency(grandTotal)}</span>
+                        <span className="font-medium">{formatCurrency(basePriceTotal)}</span>
                       </div>
-                      {/* 🎉 Launch Discount */}
+
+                      {/* 🎉 Launch Discount (20% on base price only) */}
                       {launchDiscount > 0 && (
                         <div className="flex justify-between items-center bg-green-50 -mx-6 px-6 py-2">
                           <span className="text-green-700 font-medium flex items-center gap-2">
@@ -776,6 +794,16 @@ function CheckoutPageContent() {
                           <span className="font-bold text-green-600">-{formatCurrency(launchDiscount)}</span>
                         </div>
                       )}
+
+                      {/* Add-ons (if any) */}
+                      {totalAddOnsPrice > 0 && (
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-600">Add-ons</span>
+                          <span className="font-medium">+{formatCurrency(totalAddOnsPrice)}</span>
+                        </div>
+                      )}
+
+                      {/* Service Fee */}
                       <div className="flex justify-between items-center">
                         <span className="text-gray-600">Service Fee ({(PRICING_CONFIG.FEES_PERCENTAGE * 100).toFixed(0)}%)</span>
                         <span className="font-medium text-gray-600">+{formatCurrency(discountedSubtotal * PRICING_CONFIG.FEES_PERCENTAGE)}</span>
@@ -786,7 +814,7 @@ function CheckoutPageContent() {
                     <span className="text-xl font-bold text-gray-900">Total</span>
                     <div className="text-right">
                       {launchDiscount > 0 && (
-                        <span className="text-sm text-gray-400 line-through mr-2">{formatCurrency(grandTotal + (grandTotal * PRICING_CONFIG.FEES_PERCENTAGE))}</span>
+                        <span className="text-sm text-gray-400 line-through mr-2">{formatCurrency((basePriceTotal + totalAddOnsPrice) + ((basePriceTotal + totalAddOnsPrice) * PRICING_CONFIG.FEES_PERCENTAGE))}</span>
                       )}
                       <span className="text-3xl font-bold text-blue-600">{formatCurrency(totalWithFees)}</span>
                     </div>
