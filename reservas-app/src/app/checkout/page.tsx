@@ -292,12 +292,30 @@ function CheckoutPageContent() {
     }
   }, [loading, isTourBooking, tourBooking, trips]);
 
+  // Base price (without add-ons) - for discount calculation
+  const basePriceTotal = useMemo(() => {
+    if (isTourBooking && tourBooking) {
+      return tourBooking.total_price;
+    }
+    return trips.reduce((sum, trip) => {
+      const addOnsPrice = trip.add_ons_price || 0;
+      const basePrice = (trip.final_price || trip.price) - addOnsPrice;
+      return sum + basePrice;
+    }, 0);
+  }, [isTourBooking, tourBooking, trips]);
+
+  // Total add-ons price
+  const totalAddOnsPrice = useMemo(() => {
+    if (isTourBooking) return 0;
+    return trips.reduce((sum, trip) => sum + (trip.add_ons_price || 0), 0);
+  }, [isTourBooking, trips]);
+
   const grandTotal = useMemo(() => {
     if (isTourBooking && tourBooking) {
       return tourBooking.total_price;
     }
-    return trips.reduce((sum, trip) => sum + (trip.final_price || trip.price), 0);
-  }, [isTourBooking, tourBooking, trips]);
+    return basePriceTotal + totalAddOnsPrice;
+  }, [isTourBooking, tourBooking, basePriceTotal, totalAddOnsPrice]);
 
   const totalPassengers = useMemo(() => {
     if (isTourBooking && tourBooking) {
@@ -306,15 +324,16 @@ function CheckoutPageContent() {
     return trips.reduce((sum, trip) => sum + trip.adults + trip.children, 0);
   }, [isTourBooking, tourBooking, trips]);
 
-  // 🎉 Launch discount calculation (20% OFF)
+  // 🎉 Launch discount calculation (20% OFF) - ONLY applies to base price, NOT add-ons
   const launchDiscount = useMemo(() => {
     if (isTourBooking) return 0;
-    return calculateLaunchDiscount(grandTotal);
-  }, [isTourBooking, grandTotal]);
+    return calculateLaunchDiscount(basePriceTotal);
+  }, [isTourBooking, basePriceTotal]);
 
+  // Discounted subtotal = (base - discount) + addons
   const discountedSubtotal = useMemo(() => {
-    return grandTotal - launchDiscount;
-  }, [grandTotal, launchDiscount]);
+    return (basePriceTotal - launchDiscount) + totalAddOnsPrice;
+  }, [basePriceTotal, launchDiscount, totalAddOnsPrice]);
 
   const totalWithFees = useMemo(() => {
     // Tours don't have service fees - price is all-inclusive

@@ -147,13 +147,14 @@ export function calculateFees(subtotal: number): number {
 
 /**
  * 🎉 Calculate launch discount (20% OFF for early supporters)
+ * IMPORTANT: Only applies to base price, NOT to add-ons or fees
  */
-export function calculateLaunchDiscount(subtotal: number): number {
-  if (!PRICING_CONFIG.LAUNCH_DISCOUNT.ENABLED || subtotal <= 0) {
+export function calculateLaunchDiscount(basePrice: number): number {
+  if (!PRICING_CONFIG.LAUNCH_DISCOUNT.ENABLED || basePrice <= 0) {
     return 0;
   }
 
-  const discount = subtotal * PRICING_CONFIG.LAUNCH_DISCOUNT.PERCENTAGE;
+  const discount = basePrice * PRICING_CONFIG.LAUNCH_DISCOUNT.PERCENTAGE;
   return Math.round(discount * 100) / 100;
 }
 
@@ -195,14 +196,16 @@ export function calculateFinalPrice(params: {
 }): number {
   const { basePrice, nightSurcharge = 0, addOnsPrice = 0, applyLaunchDiscount = true } = params;
 
-  const subtotal = basePrice + nightSurcharge + addOnsPrice;
+  // Apply launch discount ONLY to base price (not addons)
+  const discount = applyLaunchDiscount ? calculateLaunchDiscount(basePrice + nightSurcharge) : 0;
+  const discountedBasePrice = (basePrice + nightSurcharge) - discount;
 
-  // Apply launch discount before fees
-  const discount = applyLaunchDiscount ? calculateLaunchDiscount(subtotal) : 0;
-  const discountedSubtotal = subtotal - discount;
+  // Add-ons are NOT discounted
+  const subtotalAfterDiscount = discountedBasePrice + addOnsPrice;
 
-  const fees = calculateFees(discountedSubtotal);
-  const total = discountedSubtotal + fees;
+  // Fees apply to the total after discount
+  const fees = calculateFees(subtotalAfterDiscount);
+  const total = subtotalAfterDiscount + fees;
 
   return Math.round(total * 100) / 100;
 }
@@ -219,11 +222,16 @@ export function calculatePriceBreakdown(params: {
   const basePrice = calculateBasePrice(route, totalPassengers);
   const nightSurcharge = pickupTime ? calculateNightSurcharge(pickupTime, basePrice) : 0;
   const addOnsPrice = calculateAddOnsPrice(addOnIds);
+
+  // Subtotal before discount (base + surcharge + addons)
   const subtotal = basePrice + nightSurcharge + addOnsPrice;
 
-  // Apply launch discount
-  const discount = applyLaunchDiscount ? calculateLaunchDiscount(subtotal) : 0;
-  const discountedSubtotal = subtotal - discount;
+  // Apply launch discount ONLY to base price (not addons)
+  const basePriceForDiscount = basePrice + nightSurcharge;
+  const discount = applyLaunchDiscount ? calculateLaunchDiscount(basePriceForDiscount) : 0;
+
+  // Discounted subtotal = (base - discount) + addons
+  const discountedSubtotal = (basePriceForDiscount - discount) + addOnsPrice;
 
   const fees = calculateFees(discountedSubtotal);
   const finalPrice = calculateFinalPrice({ basePrice, nightSurcharge, addOnsPrice, applyLaunchDiscount });

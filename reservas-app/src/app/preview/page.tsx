@@ -288,22 +288,32 @@ function PreviewPageContent() {
     load();
   }, [bookingId, router]);
 
-  // Total price (including add-ons)
-  const totalPrice = useMemo(() => {
+  // Base price only (without add-ons) - for discount calculation
+  const basePriceTotal = useMemo(() => {
+    return trips.reduce((sum, trip) => sum + trip.price, 0);
+  }, [trips]);
+
+  // Total add-ons price
+  const totalAddOnsPrice = useMemo(() => {
     return trips.reduce((sum, trip) => {
-      const addOnsPrice = calculateAddOnsPrice(trip.add_ons || []);
-      return sum + trip.price + addOnsPrice;
+      return sum + calculateAddOnsPrice(trip.add_ons || []);
     }, 0);
   }, [trips]);
 
-  // 🎉 Launch discount (20% OFF for early supporters)
-  const launchDiscount = useMemo(() => {
-    return calculateLaunchDiscount(totalPrice);
-  }, [totalPrice]);
+  // Total price (base + add-ons)
+  const totalPrice = useMemo(() => {
+    return basePriceTotal + totalAddOnsPrice;
+  }, [basePriceTotal, totalAddOnsPrice]);
 
+  // 🎉 Launch discount (20% OFF) - ONLY applies to base price, NOT add-ons
+  const launchDiscount = useMemo(() => {
+    return calculateLaunchDiscount(basePriceTotal);
+  }, [basePriceTotal]);
+
+  // Discounted total = (base - discount) + addons
   const discountedTotal = useMemo(() => {
-    return totalPrice - launchDiscount;
-  }, [totalPrice, launchDiscount]);
+    return (basePriceTotal - launchDiscount) + totalAddOnsPrice;
+  }, [basePriceTotal, launchDiscount, totalAddOnsPrice]);
 
   // Format date for display
   // ✅ FIXED: Handle null/undefined dates safely
