@@ -27,7 +27,7 @@ import BookingStepper from '@/components/booking/BookingStepper';
 import TermsCheckbox from '@/components/booking/TermsCheckbox';
 import { toast } from 'sonner';
 import { formatDate, formatCurrency } from '@/lib/formatters';
-import { PRICING_CONFIG } from '@/lib/pricing-config';
+import { PRICING_CONFIG, calculateLaunchDiscount, isLaunchDiscountEnabled } from '@/lib/pricing-config';
 import {
   checkExistingTrips,
   loadTripsFromSupabase,
@@ -306,14 +306,25 @@ function CheckoutPageContent() {
     return trips.reduce((sum, trip) => sum + trip.adults + trip.children, 0);
   }, [isTourBooking, tourBooking, trips]);
 
+  // 🎉 Launch discount calculation (20% OFF)
+  const launchDiscount = useMemo(() => {
+    if (isTourBooking) return 0;
+    return calculateLaunchDiscount(grandTotal);
+  }, [isTourBooking, grandTotal]);
+
+  const discountedSubtotal = useMemo(() => {
+    return grandTotal - launchDiscount;
+  }, [grandTotal, launchDiscount]);
+
   const totalWithFees = useMemo(() => {
     // Tours don't have service fees - price is all-inclusive
     if (isTourBooking) {
       return grandTotal;
     }
-    const fees = grandTotal * PRICING_CONFIG.FEES_PERCENTAGE;
-    return grandTotal + fees;
-  }, [isTourBooking, grandTotal]);
+    // Apply fees on discounted subtotal
+    const fees = discountedSubtotal * PRICING_CONFIG.FEES_PERCENTAGE;
+    return discountedSubtotal + fees;
+  }, [isTourBooking, grandTotal, discountedSubtotal]);
 
   // Validar formulario de cliente
   const validateCustomerForm = (): boolean => {
@@ -755,15 +766,30 @@ function CheckoutPageContent() {
                         <span className="text-gray-600">Subtotal</span>
                         <span className="font-medium">{formatCurrency(grandTotal)}</span>
                       </div>
+                      {/* 🎉 Launch Discount */}
+                      {launchDiscount > 0 && (
+                        <div className="flex justify-between items-center bg-green-50 -mx-6 px-6 py-2">
+                          <span className="text-green-700 font-medium flex items-center gap-2">
+                            <span>🎉</span>
+                            Early Supporter Discount (20%)
+                          </span>
+                          <span className="font-bold text-green-600">-{formatCurrency(launchDiscount)}</span>
+                        </div>
+                      )}
                       <div className="flex justify-between items-center">
                         <span className="text-gray-600">Service Fee ({(PRICING_CONFIG.FEES_PERCENTAGE * 100).toFixed(0)}%)</span>
-                        <span className="font-medium text-gray-600">+{formatCurrency(grandTotal * PRICING_CONFIG.FEES_PERCENTAGE)}</span>
+                        <span className="font-medium text-gray-600">+{formatCurrency(discountedSubtotal * PRICING_CONFIG.FEES_PERCENTAGE)}</span>
                       </div>
                     </div>
                   )}
                   <div className="flex justify-between items-center pt-4 border-t border-gray-300">
                     <span className="text-xl font-bold text-gray-900">Total</span>
-                    <span className="text-3xl font-bold text-blue-600">{formatCurrency(totalWithFees)}</span>
+                    <div className="text-right">
+                      {launchDiscount > 0 && (
+                        <span className="text-sm text-gray-400 line-through mr-2">{formatCurrency(grandTotal + (grandTotal * PRICING_CONFIG.FEES_PERCENTAGE))}</span>
+                      )}
+                      <span className="text-3xl font-bold text-blue-600">{formatCurrency(totalWithFees)}</span>
+                    </div>
                   </div>
                   <p className="text-xs text-gray-500 text-right mt-1">Taxes and fees included</p>
                 </div>

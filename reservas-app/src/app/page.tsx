@@ -189,9 +189,81 @@ export default async function Home() {
           </div>
         </section>
 
+        {/* New Company Badge */}
+        <section className="py-12 sm:py-16 bg-white">
+          <div className="container mx-auto px-4 sm:px-6 max-w-4xl">
+            <div className="bg-gradient-to-br from-blue-50 to-green-50 border-2 border-blue-200 rounded-2xl p-6 sm:p-8 text-center">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-full mb-4">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                </span>
+                LAUNCHED NOVEMBER 25, 2025
+              </div>
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">
+                Fresh Start, Local Expertise
+              </h3>
+              <p className="text-gray-600 leading-relaxed max-w-2xl mx-auto mb-4">
+                We're a team of professional drivers with practically new vehicles and a deep passion for sharing our beloved Costa Rica.
+                We've been driving these roads for years, and now we've officially launched our own company.
+                We're building our reputation one trip at a time — and we'd love for you to be part of our story.
+              </p>
+              <div className="bg-green-100 border-2 border-green-300 rounded-xl p-4 mt-6 max-w-md mx-auto">
+                <p className="text-green-800 font-bold text-lg mb-1">
+                  🎉 Be One of Our First 100 Clients!
+                </p>
+                <p className="text-green-700 text-sm">
+                  Book now and get <span className="font-bold text-xl">20% OFF</span> your transfer.
+                  <br />
+                  <span className="text-xs text-green-600">Applied automatically at checkout.</span>
+                </p>
+              </div>
+              <p className="text-sm text-gray-500 mt-4">
+                ICT Licensed #4121-2025 • Fully Insured • Based in La Fortuna
+              </p>
+
+              {/* Check who trusts us */}
+              <div className="mt-8 pt-6 border-t border-blue-200">
+                <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
+                  Check Who Already Trusts Us
+                </p>
+                <div className="flex items-center justify-center gap-8 sm:gap-12">
+                  <a
+                    href="https://www.arenalecoglide.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="grayscale hover:grayscale-0 opacity-70 hover:opacity-100 transition-all duration-300"
+                  >
+                    <Image
+                      src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/logo-ecoglide.webp"
+                      alt="Arenal EcoGlide"
+                      width={140}
+                      height={60}
+                      className="h-12 sm:h-14 w-auto object-contain hover:scale-105 transition-transform"
+                    />
+                  </a>
+                  <a
+                    href="https://www.skylinecanopytour.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="grayscale hover:grayscale-0 opacity-70 hover:opacity-100 transition-all duration-300"
+                  >
+                    <Image
+                      src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/logo-skyline.webp"
+                      alt="Skyline Canopy Tour"
+                      width={140}
+                      height={60}
+                      className="h-12 sm:h-14 w-auto object-contain hover:scale-105 transition-transform"
+                    />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Optimized Structure for Conversions */}
         <WhyChooseUs />
-        <TrustedBy />
         <MostBookedCTAServer />
         <HowWeWork />
         <PrivateTours />

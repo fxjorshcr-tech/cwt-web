@@ -39,6 +39,7 @@ import { PassengerSelector } from '@/components/forms/PassengerSelector';
 import { createClient } from '@/lib/supabase/client';
 import { loadRoutesFromSupabase, type Route, calculateTripPrice } from '@/utils/bookingFormHelpers';
 import { loadBookingFromLocalStorage, saveBookingToLocalStorage } from '@/utils/localStorageHelpers';
+import { calculateLaunchDiscount, isLaunchDiscountEnabled } from '@/lib/pricing-config';
 import { checkExistingTrips, loadTripsFromSupabase } from '@/utils/supabaseHelpers';
 import { formatDateToString, parseDateFromString, getNowInCostaRica } from '@/utils/timeHelpers';
 
@@ -294,6 +295,15 @@ function PreviewPageContent() {
       return sum + trip.price + addOnsPrice;
     }, 0);
   }, [trips]);
+
+  // 🎉 Launch discount (20% OFF for early supporters)
+  const launchDiscount = useMemo(() => {
+    return calculateLaunchDiscount(totalPrice);
+  }, [totalPrice]);
+
+  const discountedTotal = useMemo(() => {
+    return totalPrice - launchDiscount;
+  }, [totalPrice, launchDiscount]);
 
   // Format date for display
   // ✅ FIXED: Handle null/undefined dates safely
@@ -1341,12 +1351,33 @@ function PreviewPageContent() {
                       );
                     })}
 
+                    {/* Launch Discount */}
+                    {launchDiscount > 0 && (
+                      <div className="bg-green-50 -mx-4 px-4 py-3 rounded-lg border border-green-200">
+                        <div className="flex items-center justify-between">
+                          <span className="text-green-700 font-medium flex items-center gap-2 text-sm">
+                            <span>🎉</span>
+                            Early Supporter (20% OFF)
+                          </span>
+                          <span className="font-bold text-green-600">-${launchDiscount}</span>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Total */}
                     <div className="pt-3 border-t-2 border-gray-200">
                       <div className="flex items-center justify-between">
                         <span className="font-bold text-gray-900 text-lg">Total</span>
-                        <span className="text-2xl font-bold text-blue-600">${totalPrice}</span>
+                        <div className="text-right">
+                          {launchDiscount > 0 && (
+                            <span className="text-sm text-gray-400 line-through mr-2">${totalPrice}</span>
+                          )}
+                          <span className="text-2xl font-bold text-blue-600">${discountedTotal}</span>
+                        </div>
                       </div>
+                      {launchDiscount > 0 && (
+                        <p className="text-xs text-green-600 text-right mt-1">You're saving ${launchDiscount}!</p>
+                      )}
                     </div>
                   </div>
                 </div>
