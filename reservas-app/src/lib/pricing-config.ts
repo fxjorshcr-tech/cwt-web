@@ -20,9 +20,16 @@ export const PRICING_CONFIG = {
     START_HOUR: 21,
     END_HOUR: 4,
   },
-  
+
   // Fees (13% service fee)
   FEES_PERCENTAGE: 0.13,
+
+  // 🎉 Launch Discount - First 100 clients get 20% OFF
+  LAUNCH_DISCOUNT: {
+    ENABLED: true,
+    PERCENTAGE: 0.20, // 20% discount
+    LABEL: 'Early Supporter Discount',
+  },
   
   // ✅ Add-ons precios actualizados
   ADD_ONS: {
@@ -133,9 +140,25 @@ export function calculateFees(subtotal: number): number {
   if (!subtotal || subtotal <= 0) {
     return 0;
   }
-  
+
   const fees = subtotal * PRICING_CONFIG.FEES_PERCENTAGE;
   return Math.round(fees * 100) / 100;
+}
+
+/**
+ * 🎉 Calculate launch discount (20% OFF for early supporters)
+ */
+export function calculateLaunchDiscount(subtotal: number): number {
+  if (!PRICING_CONFIG.LAUNCH_DISCOUNT.ENABLED || subtotal <= 0) {
+    return 0;
+  }
+
+  const discount = subtotal * PRICING_CONFIG.LAUNCH_DISCOUNT.PERCENTAGE;
+  return Math.round(discount * 100) / 100;
+}
+
+export function isLaunchDiscountEnabled(): boolean {
+  return PRICING_CONFIG.LAUNCH_DISCOUNT.ENABLED;
 }
 
 /**
@@ -168,13 +191,19 @@ export function calculateFinalPrice(params: {
   basePrice: number;
   nightSurcharge?: number;
   addOnsPrice?: number;
+  applyLaunchDiscount?: boolean;
 }): number {
-  const { basePrice, nightSurcharge = 0, addOnsPrice = 0 } = params;
-  
+  const { basePrice, nightSurcharge = 0, addOnsPrice = 0, applyLaunchDiscount = true } = params;
+
   const subtotal = basePrice + nightSurcharge + addOnsPrice;
-  const fees = calculateFees(subtotal);
-  const total = subtotal + fees;
-  
+
+  // Apply launch discount before fees
+  const discount = applyLaunchDiscount ? calculateLaunchDiscount(subtotal) : 0;
+  const discountedSubtotal = subtotal - discount;
+
+  const fees = calculateFees(discountedSubtotal);
+  const total = discountedSubtotal + fees;
+
   return Math.round(total * 100) / 100;
 }
 
@@ -183,24 +212,33 @@ export function calculatePriceBreakdown(params: {
   totalPassengers: number;
   pickupTime?: string;
   addOnIds?: string[];
+  applyLaunchDiscount?: boolean;
 }) {
-  const { route, totalPassengers, pickupTime, addOnIds = [] } = params;
-  
+  const { route, totalPassengers, pickupTime, addOnIds = [], applyLaunchDiscount = true } = params;
+
   const basePrice = calculateBasePrice(route, totalPassengers);
   const nightSurcharge = pickupTime ? calculateNightSurcharge(pickupTime, basePrice) : 0;
   const addOnsPrice = calculateAddOnsPrice(addOnIds);
   const subtotal = basePrice + nightSurcharge + addOnsPrice;
-  const fees = calculateFees(subtotal);
-  const finalPrice = calculateFinalPrice({ basePrice, nightSurcharge, addOnsPrice });
-  
+
+  // Apply launch discount
+  const discount = applyLaunchDiscount ? calculateLaunchDiscount(subtotal) : 0;
+  const discountedSubtotal = subtotal - discount;
+
+  const fees = calculateFees(discountedSubtotal);
+  const finalPrice = calculateFinalPrice({ basePrice, nightSurcharge, addOnsPrice, applyLaunchDiscount });
+
   return {
     basePrice,
     nightSurcharge,
     addOnsPrice,
     subtotal,
+    discount,
+    discountedSubtotal,
     fees,
     finalPrice,
     isNightTime: pickupTime ? isNightTime(pickupTime) : false,
+    hasLaunchDiscount: applyLaunchDiscount && discount > 0,
   };
 }
 

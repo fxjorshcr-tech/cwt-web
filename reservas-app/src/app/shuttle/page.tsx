@@ -186,44 +186,44 @@ export default async function MostBookedPage() {
               </p>
             </div>
 
-            {/* What's Included Grid */}
-            <div className="bg-gray-50 rounded-2xl p-8">
+            {/* What's Included */}
+            <div className="bg-gray-50 rounded-2xl p-6 sm:p-8">
               <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-6 text-center">
                 Every Private Transfer Includes
               </h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-                <div className="flex items-center gap-3 bg-white rounded-xl p-4 shadow-sm">
-                  <div className="bg-green-100 p-2 rounded-lg">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                <div className="flex items-center gap-3 bg-white rounded-xl p-3 sm:p-4 shadow-sm">
+                  <div className="bg-green-100 p-2 rounded-lg flex-shrink-0">
                     <Car className="h-5 w-5 text-green-600" />
                   </div>
                   <span className="text-sm font-medium text-gray-700">Door-to-door service</span>
                 </div>
-                <div className="flex items-center gap-3 bg-white rounded-xl p-4 shadow-sm">
-                  <div className="bg-green-100 p-2 rounded-lg">
+                <div className="flex items-center gap-3 bg-white rounded-xl p-3 sm:p-4 shadow-sm">
+                  <div className="bg-green-100 p-2 rounded-lg flex-shrink-0">
                     <DollarSign className="h-5 w-5 text-green-600" />
                   </div>
                   <span className="text-sm font-medium text-gray-700">Fixed price, no surprises</span>
                 </div>
-                <div className="flex items-center gap-3 bg-white rounded-xl p-4 shadow-sm">
-                  <div className="bg-green-100 p-2 rounded-lg">
+                <div className="flex items-center gap-3 bg-white rounded-xl p-3 sm:p-4 shadow-sm">
+                  <div className="bg-green-100 p-2 rounded-lg flex-shrink-0">
                     <User className="h-5 w-5 text-green-600" />
                   </div>
                   <span className="text-sm font-medium text-gray-700">Bilingual driver</span>
                 </div>
-                <div className="flex items-center gap-3 bg-white rounded-xl p-4 shadow-sm">
-                  <div className="bg-green-100 p-2 rounded-lg">
+                <div className="flex items-center gap-3 bg-white rounded-xl p-3 sm:p-4 shadow-sm">
+                  <div className="bg-green-100 p-2 rounded-lg flex-shrink-0">
                     <Luggage className="h-5 w-5 text-green-600" />
                   </div>
                   <span className="text-sm font-medium text-gray-700">1 large bag + 1 carry-on pp</span>
                 </div>
-                <div className="flex items-center gap-3 bg-white rounded-xl p-4 shadow-sm">
-                  <div className="bg-green-100 p-2 rounded-lg">
+                <div className="flex items-center gap-3 bg-white rounded-xl p-3 sm:p-4 shadow-sm">
+                  <div className="bg-green-100 p-2 rounded-lg flex-shrink-0">
                     <MessageCircle className="h-5 w-5 text-green-600" />
                   </div>
                   <span className="text-sm font-medium text-gray-700">WhatsApp & email support</span>
                 </div>
-                <div className="flex items-center gap-3 bg-white rounded-xl p-4 shadow-sm">
-                  <div className="bg-green-100 p-2 rounded-lg">
+                <div className="flex items-center gap-3 bg-white rounded-xl p-3 sm:p-4 shadow-sm">
+                  <div className="bg-green-100 p-2 rounded-lg flex-shrink-0">
                     <XCircle className="h-5 w-5 text-green-600" />
                   </div>
                   <span className="text-sm font-medium text-gray-700">Free cancellation (48h)</span>
