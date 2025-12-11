@@ -190,7 +190,7 @@ export default async function Home() {
         </section>
 
         {/* Trusted By Section */}
-        <section className="py-12 sm:py-16 bg-gray-50">
+        <section className="py-12 sm:py-16 bg-white">
           <div className="container mx-auto px-4 sm:px-6 max-w-4xl">
             <p className="text-xs font-bold text-gray-400 uppercase tracking-widest text-center mb-8">
               Trusted By
@@ -233,9 +233,9 @@ export default async function Home() {
                 <Image
                   src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/private-travel-cr-logo.jpg"
                   alt="Private Travel CR"
-                  width={160}
-                  height={70}
-                  className="h-12 sm:h-16 w-auto object-contain hover:scale-105 transition-transform"
+                  width={180}
+                  height={80}
+                  className="h-14 sm:h-[70px] w-auto object-contain hover:scale-105 transition-transform"
                 />
               </a>
             </div>
