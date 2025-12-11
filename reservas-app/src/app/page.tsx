@@ -190,12 +190,12 @@ export default async function Home() {
         </section>
 
         {/* Trusted By Section */}
-        <section className="py-12 sm:py-16 bg-gray-50">
+        <section className="py-12 sm:py-16 bg-white">
           <div className="container mx-auto px-4 sm:px-6 max-w-4xl">
             <p className="text-xs font-bold text-gray-400 uppercase tracking-widest text-center mb-8">
               Trusted By
             </p>
-            <div className="flex items-center justify-center gap-12 sm:gap-20">
+            <div className="grid grid-cols-3 gap-4 sm:gap-8 lg:gap-12 items-center justify-items-center">
               <a
                 href="https://www.arenalecoglide.com"
                 target="_blank"
@@ -205,9 +205,9 @@ export default async function Home() {
                 <Image
                   src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/logo-ecoglide.webp"
                   alt="Arenal EcoGlide"
-                  width={160}
-                  height={70}
-                  className="h-12 sm:h-16 w-auto object-contain hover:scale-105 transition-transform"
+                  width={250}
+                  height={120}
+                  className="h-14 sm:h-24 lg:h-28 w-auto object-contain hover:scale-105 transition-transform"
                 />
               </a>
               <a
@@ -219,9 +219,23 @@ export default async function Home() {
                 <Image
                   src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/logo-skyline.webp"
                   alt="Skyline Canopy Tour"
-                  width={160}
-                  height={70}
-                  className="h-12 sm:h-16 w-auto object-contain hover:scale-105 transition-transform"
+                  width={250}
+                  height={120}
+                  className="h-14 sm:h-24 lg:h-28 w-auto object-contain hover:scale-105 transition-transform"
+                />
+              </a>
+              <a
+                href="https://www.privatetravelcr.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="grayscale hover:grayscale-0 opacity-70 hover:opacity-100 transition-all duration-300"
+              >
+                <Image
+                  src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/private-travel-cr-logo.jpg"
+                  alt="Private Travel CR"
+                  width={250}
+                  height={120}
+                  className="h-14 sm:h-24 lg:h-28 w-auto object-contain hover:scale-105 transition-transform"
                 />
               </a>
             </div>
