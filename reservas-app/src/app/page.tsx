@@ -195,7 +195,7 @@ export default async function Home() {
             <p className="text-xs font-bold text-gray-400 uppercase tracking-widest text-center mb-8">
               Trusted By
             </p>
-            <div className="flex items-center justify-center gap-8 sm:gap-16 flex-wrap">
+            <div className="grid grid-cols-3 gap-4 sm:gap-8 lg:gap-12 items-center justify-items-center">
               <a
                 href="https://www.arenalecoglide.com"
                 target="_blank"
@@ -205,9 +205,9 @@ export default async function Home() {
                 <Image
                   src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/logo-ecoglide.webp"
                   alt="Arenal EcoGlide"
-                  width={160}
-                  height={70}
-                  className="h-12 sm:h-16 w-auto object-contain hover:scale-105 transition-transform"
+                  width={250}
+                  height={120}
+                  className="h-14 sm:h-24 lg:h-28 w-auto object-contain hover:scale-105 transition-transform"
                 />
               </a>
               <a
@@ -219,9 +219,9 @@ export default async function Home() {
                 <Image
                   src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/logo-skyline.webp"
                   alt="Skyline Canopy Tour"
-                  width={160}
-                  height={70}
-                  className="h-12 sm:h-16 w-auto object-contain hover:scale-105 transition-transform"
+                  width={250}
+                  height={120}
+                  className="h-14 sm:h-24 lg:h-28 w-auto object-contain hover:scale-105 transition-transform"
                 />
               </a>
               <a
@@ -233,9 +233,9 @@ export default async function Home() {
                 <Image
                   src="https://mmlbslwljvmscbgsqkkq.supabase.co/storage/v1/object/public/Fotos/private-travel-cr-logo.jpg"
                   alt="Private Travel CR"
-                  width={180}
-                  height={80}
-                  className="h-14 sm:h-[70px] w-auto object-contain hover:scale-105 transition-transform"
+                  width={250}
+                  height={120}
+                  className="h-14 sm:h-24 lg:h-28 w-auto object-contain hover:scale-105 transition-transform"
                 />
               </a>
             </div>
