@@ -24,11 +24,11 @@ export const PRICING_CONFIG = {
   // Fees (13% service fee)
   FEES_PERCENTAGE: 0.13,
 
-  // 🎉 Launch Discount - First 100 clients get 20% OFF
+  // Launch Discount - DISABLED
   LAUNCH_DISCOUNT: {
-    ENABLED: true,
-    PERCENTAGE: 0.20, // 20% discount
-    LABEL: 'Early Supporter Discount',
+    ENABLED: false,
+    PERCENTAGE: 0, // Discount disabled
+    LABEL: '',
   },
   
   // ✅ Add-ons precios actualizados
