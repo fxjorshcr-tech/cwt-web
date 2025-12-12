@@ -2,17 +2,20 @@
 // Dynamic seasonal messaging banner based on current date
 'use client';
 
-import { Sun, Leaf, Snowflake, Calendar } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Sun, Leaf, Calendar, LucideIcon } from 'lucide-react';
 
-// Get current season and messaging based on Costa Rica travel patterns
-function getSeasonalInfo(): {
+interface SeasonalInfo {
   type: 'high' | 'green' | 'shoulder';
   title: string;
   message: string;
   bgColor: string;
   textColor: string;
-  icon: typeof Sun;
-} {
+  icon: LucideIcon;
+}
+
+// Get current season and messaging based on Costa Rica travel patterns
+function getSeasonalInfo(): SeasonalInfo {
   const now = new Date();
   const month = now.getMonth(); // 0-11
   const day = now.getDate();
@@ -69,8 +72,19 @@ function isHolidayPeriod(): boolean {
 }
 
 export default function SeasonalBanner() {
-  const seasonal = getSeasonalInfo();
-  const isHoliday = isHolidayPeriod();
+  const [seasonal, setSeasonal] = useState<SeasonalInfo | null>(null);
+  const [isHoliday, setIsHoliday] = useState(false);
+
+  useEffect(() => {
+    setSeasonal(getSeasonalInfo());
+    setIsHoliday(isHolidayPeriod());
+  }, []);
+
+  // Don't render anything during SSR to avoid hydration mismatch
+  if (!seasonal) {
+    return null;
+  }
+
   const Icon = seasonal.icon;
 
   return (

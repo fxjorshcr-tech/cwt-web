@@ -23,13 +23,13 @@ export default function WhyChooseUs() {
             Why Private Transfers Make Sense in Costa Rica
           </h2>
           <p className="text-base sm:text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed px-4 mb-4">
-            Getting around Costa Rica doesn't have to be complicated. A private transfer means one vehicle, one destination, on your schedule—no shared stops, no fixed departure times, and no navigating mountain roads yourself.
+            You didn't fly to Costa Rica to stress about directions. Private transfer = one vehicle, one driver, zero detours. We handle the roads. You handle the vacation.
           </p>
           <p className="text-base sm:text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed px-4 mb-6">
-            We're based in La Fortuna, but we keep vehicles ready in <strong>SJO, Manuel Antonio, Guanacaste, and Monteverde</strong>. So wherever you're headed, there's a van nearby.
+            Vehicles stationed across the country: <strong>SJO, Manuel Antonio, Guanacaste, Monteverde, and La Fortuna</strong>.
           </p>
           <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto px-4 mb-6">
-            Over <strong className="text-blue-600">400+ routes</strong> connecting every major destination.
+            <strong className="text-blue-600">400+ routes</strong> across Costa Rica. Name your destination.
           </p>
           <p className="text-base sm:text-lg text-gray-700 max-w-3xl mx-auto px-4 mb-8 bg-blue-50 py-4 rounded-xl border border-blue-100">
             We believe great service starts with personal accountability. That's why we only accept bookings we can handle ourselves. Your trip isn't passed off to a third party—it stays with our team.
@@ -163,9 +163,9 @@ export default function WhyChooseUs() {
             </div>
 
             <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border-2 border-blue-200">
-              <p className="font-bold text-gray-900 text-lg mb-2">30+ Years Combined Experience</p>
+              <p className="font-bold text-gray-900 text-lg mb-2">Local Drivers, Local Knowledge</p>
               <p className="text-sm sm:text-base text-gray-700">
-                Our team has been driving these roads for decades. We know every shortcut, every viewpoint, and every road condition.
+                Our drivers live here. They know the shortcuts, the viewpoints worth stopping at, and which roads to avoid after rain.
               </p>
             </div>
           </div>

@@ -1,9 +1,18 @@
 // src/components/layout/Footer.tsx
 // ✅ UPDATED: Links activos para Legal pages
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
 export default function Footer() {
+  const [year, setYear] = useState<number | null>(null);
+
+  useEffect(() => {
+    setYear(new Date().getFullYear());
+  }, []);
+
   return (
     <footer className="bg-gray-900 text-white pt-16 pb-8">
       <div className="container mx-auto px-6 max-w-7xl">
@@ -107,7 +116,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-gray-800 pt-8 text-center">
           <p className="text-gray-300 text-sm">
-            © {new Date().getFullYear()} Can't Wait Travel Costa Rica. All rights reserved.
+            © {year || '2025'} Can't Wait Travel Costa Rica. All rights reserved.
           </p>
           <p className="text-gray-400 text-xs mt-2">
             Costa Rica Private Shuttle Service | San José Airport (SJO) | Liberia Airport (LIR) | 

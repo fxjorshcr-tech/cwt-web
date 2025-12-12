@@ -19,9 +19,12 @@ export default function HeroBookingWidget() {
   const [to, setTo] = useState('');
   const [date, setDate] = useState('');
   const [passengers, setPassengers] = useState(2);
+  const [today, setToday] = useState('');
 
   useEffect(() => {
     loadRoutes();
+    // Set today's date only on client to avoid hydration mismatch
+    setToday(new Date().toISOString().split('T')[0]);
   }, []);
 
   async function loadRoutes() {
@@ -47,8 +50,6 @@ export default function HeroBookingWidget() {
   const toLocations = from
     ? Array.from(new Set(routes.filter(r => r.origen === from).map(r => r.destino).filter((loc): loc is string => loc !== null))).sort()
     : Array.from(new Set(routes.map(r => r.destino).filter((loc): loc is string => loc !== null))).sort();
-
-  const today = new Date().toISOString().split('T')[0];
 
   return (
     <div className="w-full max-w-5xl mx-auto px-4 -mt-12 relative z-20">
@@ -106,7 +107,7 @@ export default function HeroBookingWidget() {
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              min={today}
+              min={today || undefined}
               required
               className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
